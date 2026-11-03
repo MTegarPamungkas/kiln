@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T15:18:09.673549Z",
+  "generated_at": "2026-11-03T15:42:21.286762Z",
   "extensions": [
     {
       "id": "analytics",
@@ -163,7 +163,7 @@
       "name": "Bloc state management",
       "description": "State management with Bloc and Cubit.",
       "category": "state",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -194,6 +194,18 @@
           "version": "0.1.2",
           "url": "archives/bloc-0.1.2.tgz",
           "sha256": "8139ee632a431074eab2ce6c58c5548b3243ab76fc9901bdf8255e985e73bd02",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/bloc-0.1.3.tgz",
+          "sha256": "5600e808e3ddb8a819bc8c4f33b1fde0278d5f773bca899c4ee24770c80e8832",
           "provides": [
             "state_bloc"
           ],
@@ -490,7 +502,7 @@
       "name": "GoRouter",
       "description": "Declarative routing with route slots, guards, and deep link mapping.",
       "category": "navigation",
-      "latest": "0.2.0",
+      "latest": "0.2.1",
       "tier": "official",
       "versions": [
         {
@@ -521,6 +533,18 @@
           "version": "0.2.0",
           "url": "archives/go_router-0.2.0.tgz",
           "sha256": "226eed323d8634f421b348ff4e85b34e2772138268dcb94f1edfcd4f5d647a12",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/go_router-0.2.1.tgz",
+          "sha256": "45fdb31ecb498b06fc730f0a8bea31202658ec976271309dc3b782c78981ce98",
           "provides": [
             "navigation"
           ],
@@ -1145,13 +1169,25 @@
       "name": "Theme",
       "description": "Brand color, typography, design tokens, and light or dark mode for Kiln apps.",
       "category": "theme",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/theme-0.1.0.tgz",
           "sha256": "b96b966ac120cb453a5b90a2ba0a397a8024e449a0959362646d26d172d02275",
+          "provides": [
+            "theme"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/theme-0.1.1.tgz",
+          "sha256": "05b9b552d240a05bed8e6c62194af9ba585467b5b4b26832671f275f31ae085a",
           "provides": [
             "theme"
           ],

@@ -7,6 +7,7 @@ import 'package:{{app_name}}/app/app_route.dart';
 import 'package:{{app_name}}/extensions/go_router/app_router.dart';
 import 'package:{{app_name}}/extensions/go_router/app_routes.dart';
 import 'package:{{app_name}}/extensions/go_router/go_router_module.dart';
+import 'package:{{app_name}}/extensions/go_router/go_router_support.dart';
 import 'package:{{app_name}}/extensions/go_router/router_config.dart';
 
 import 'test_support.dart';
@@ -23,6 +24,7 @@ void main() {
     expect(router, isA<GoRouter>());
     expect(registry.read<AppRouter>().router, same(router));
     expect(registry.read<AppRouterConfig>(), isA<AppRouterConfig>());
+    expect(registry.read<GoRouterSupport>(), isA<GoRouterSupport>());
     expect(
       registry.read<SlotRegistry>().find<AppRoute>(SlotNames.routerRoutes),
       isNotNull,

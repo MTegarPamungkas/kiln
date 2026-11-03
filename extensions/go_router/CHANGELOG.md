@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Add `GoRouterSupport` with the initial location, route count, auth redirect,
+  and sample-shell switches.
+- Reject an initial location without a leading slash as `notConfigured`.
+
 ## 0.2.0
 
 - **Breaking:** the sample shell and `AuthRedirect` are now opt-in.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Add `BlocSupport` with observer and app-wrapper details.
+- Create the slot registry when a module is used without bootstrap.
+
 ## 0.1.2
 
 - Bootstrap test supplies a test `CoreCopy`, matching the app template now that

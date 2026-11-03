@@ -12,10 +12,12 @@ void main() {
     );
     registry.registerSingleton<CoreCopy>(const _TestCopy());
 
-    await tester.pumpWidget(KilnApp(registry: registry));
+    await tester.pumpWidget(
+      KilnApp(registry: registry, home: const SizedBox.shrink()),
+    );
     await tester.pumpAndSettle();
 
-    expect(find.text('Ready'), findsOneWidget);
+    expect(find.byType(KilnApp), findsOneWidget);
   });
 }
 

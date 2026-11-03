@@ -8,11 +8,12 @@
     "lib/extensions/theme/semantic_colors.dart": "843c03c92fc84e065f6125008381bcf89df081e0df811b7a9ac87a06a08c4d78",
     "lib/extensions/theme/system_ui_style.dart": "8b74b47ef9ca0d884c61238584d6f42db050414b4c9e9822b21a4367454ea0c7",
     "lib/extensions/theme/text_styles.dart": "fe92eafa3e95fef9fab179e3191a30b180e5b391ae602c9300492f4f5a617735",
-    "lib/extensions/theme/theme_config.dart": "46103577e1c43ac57ef5a5173d4d954380805aa63f563d298e7836c945b29ccc",
+    "lib/extensions/theme/theme_config.dart": "67ebd2457b7d8ca446de0e26f2318b76a5b4bcc7c59043525282d3735df87cae",
     "lib/extensions/theme/theme_context_x.dart": "ce5dcb59ee5d96225eabf2b6b6e8196d105907dd5ce8353a09bf973d0ca3c94b",
     "lib/extensions/theme/theme_mode_controller.dart": "9b7bce6210a8752d645ee28169a119cf6acb24ca95923868a0c40a666760a15f",
     "lib/extensions/theme/theme_mode_store.dart": "ce266e64e1da3fa8c0d778336f0a0a6588c46147c930f25e3c2be8f9bacb59a0",
-    "lib/extensions/theme/theme_module.dart": "be0ae1beec726b9a998f7844436240b89e01678f133fd9dadfa44ccee1e506be",
+    "lib/extensions/theme/theme_module.dart": "aa243665a6f7f266b6f7a4b64184261af409ae52c4499c5d69741af566e33212",
+    "lib/extensions/theme/theme_support.dart": "778198e56a27ff6b83d75d8e4ea656986624b05d4fde7db64851b9db1373a9c2",
     "lib/extensions/theme/widgets/theme_mode_switcher.dart": "61247417cbc29b7c11d4d87605ef63491559f5407bff38809ee81e12eb4c3add",
     "test/extensions/theme/brand_theme_test.dart": "4e16cc312b20c1fe66ff89f5081fc8cbd54775d2dec92a2dfdce8317e90e0dee",
     "test/extensions/theme/color_schemes_test.dart": "2b56a3acf8c5abb971fb138eee21171e92411b6cce665655e057dc7ee1c1e3da",
@@ -26,6 +27,7 @@
     "test/extensions/theme/theme_mode_controller_test.dart": "6926f3ff7da618d1c8aff9eb2e34eb246c3eb3bdc666a13e23d509d85d9e3242",
     "test/extensions/theme/theme_mode_store_test.dart": "954e60319731ba632816bf567b41634fffb9188b2f6d592b52bdbd9457372e63",
     "test/extensions/theme/theme_mode_switcher_test.dart": "5e0ac24d1d50c74f4d768da4241af9b705dacb1fa24b91f4404a35513b99534a",
-    "test/extensions/theme/theme_module_test.dart": "50d44f8cb477b8e14e57467cae1723e8289048d0168a0c55e0b2e54b5a0cfcb6"
+    "test/extensions/theme/theme_module_test.dart": "fc8b6e3f76b711b7c885f2645f50755e4c50b1ae61692ab305c502759523e4cb",
+    "test/extensions/theme/theme_support_test.dart": "a0b1ce87601e619c8e7685763df236e86386f50299d8180f82bbfe3df2f9df4f"
   }
 }

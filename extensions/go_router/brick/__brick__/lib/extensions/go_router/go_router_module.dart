@@ -3,6 +3,7 @@ import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/app/app_route.dart';
 
 import 'app_router.dart';
+import 'go_router_support.dart';
 import 'router_config.dart';
 
 /// Registers navigation and opens the `router.routes` slot.
@@ -43,8 +44,19 @@ final class GoRouterModule extends KilnModule {
       registry.registerSingleton<AppRouterConfig>(config);
     }
     registry
+      ..registerSingleton<GoRouterSupport>(
+        GoRouterSupport(
+          config: config,
+          routeCount: appRouter.router.configuration.routes.length,
+        ),
+      )
       ..registerSingleton<AppRouter>(appRouter)
       ..registerSingleton<RouterConfig<Object>>(appRouter.router);
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<GoRouterSupport>().info;
   }
 
   @override

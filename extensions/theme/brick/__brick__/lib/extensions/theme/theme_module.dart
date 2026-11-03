@@ -5,6 +5,7 @@ import 'brand_theme.dart';
 import 'theme_config.dart';
 import 'theme_mode_controller.dart';
 import 'theme_mode_store.dart';
+import 'theme_support.dart';
 
 /// Registers the brand theme, its settings, and the live theme mode.
 final class ThemeModule extends KilnModule {
@@ -28,6 +29,9 @@ final class ThemeModule extends KilnModule {
       ..registerSingleton<ThemeConfig>(config)
       ..registerSingleton<BrandTheme>(brand)
       ..registerSingleton<ThemeModeController>(controller)
+      ..registerSingleton<ThemeSupport>(
+        ThemeSupport(config: config, persisted: store != null),
+      )
       ..registerSingleton<AppThemeConfig>(
         AppThemeConfig(
           light: brand.light,
@@ -40,6 +44,11 @@ final class ThemeModule extends KilnModule {
     if (store != null) {
       registry.registerSingleton<ThemeModeStore>(store);
     }
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<ThemeSupport>().info;
   }
 
   @override
