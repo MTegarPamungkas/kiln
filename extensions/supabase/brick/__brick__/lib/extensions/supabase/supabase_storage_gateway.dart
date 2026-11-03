@@ -90,11 +90,7 @@ final class SdkSupabaseStorageGateway implements SupabaseStorageGateway {
   Future<Uri> createSignedUrl(String path, Duration expiresIn) async {
     try {
       final url = await _client.createSignedUrl(path, expiresIn.inSeconds);
-      final uri = Uri.parse(url);
-      if (uri.hasScheme) {
-        return uri;
-      }
-      return Uri.parse(_provider.config.url).resolve(url);
+      return resolveSupabaseSignedUrl(_provider.config.url, url);
     } on Object catch (error, stackTrace) {
       throw _map(error, stackTrace, FailureCode.fileDownloadFailed);
     }
@@ -119,4 +115,20 @@ final class SdkSupabaseStorageGateway implements SupabaseStorageGateway {
       fallbackKind: FailureKind.storage,
     );
   }
+}
+
+/// Resolves the relative signed URL returned by Supabase Storage.
+///
+/// The SDK returns `/object/sign/<bucket>/<path>?...`, which must be served
+/// under the project's `/storage/v1` prefix. A full URL is returned unchanged.
+Uri resolveSupabaseSignedUrl(String projectUrl, String signedUrl) {
+  final parsed = Uri.tryParse(signedUrl);
+  if (parsed != null && parsed.hasScheme) {
+    return parsed;
+  }
+  final relative = signedUrl.startsWith('/') ? signedUrl : '/$signedUrl';
+  final path = relative.startsWith('/storage/v1/')
+      ? relative
+      : '/storage/v1$relative';
+  return Uri.parse(projectUrl).resolve(path);
 }

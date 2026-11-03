@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Fix signed storage URLs: Supabase returns `/object/sign/...`, which must be
+  resolved under `/storage/v1` instead of the project root.
+
 ## 0.1.2
 
 - Add `SupabaseSupport` and prepare the client during bootstrap.

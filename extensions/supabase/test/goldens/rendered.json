@@ -15,7 +15,7 @@
     "lib/extensions/supabase/supabase_realtime_gateway.dart": "8bb01e1ab63128011261a07fb6adb9816809d3d3379998a8bb616b8105993b0f",
     "lib/extensions/supabase/supabase_remote_database.dart": "60eae0c316379d902ee8d46b0394375c283ccfdb4ebaf6ffea5ff7271216e6e1",
     "lib/extensions/supabase/supabase_session_bridge.dart": "42e5f5cc5c407447832a94f456d10282bcdbf031c0b4114c65130cd6c9246b42",
-    "lib/extensions/supabase/supabase_storage_gateway.dart": "d1c69bc68135b26bdf71d108be083872e2c35438caff31c87a247b94487afc2b",
+    "lib/extensions/supabase/supabase_storage_gateway.dart": "a4aa1a78f0fc7c48c19b5f202bc5e685b3b7c5bd66e1ea30f35210a74d00f3eb",
     "lib/extensions/supabase/supabase_support.dart": "4c633e320390ac1a98c1fece0d06e2b87e573a031be655f61f80865169a15dbb",
     "lib/extensions/supabase/supabase_token_provider.dart": "a7335b8a9d731be666bbc360c485e2d1ffa064d5e8e26c62025dfc25eeadff50",
     "test/extensions/supabase/supabase_account_management_test.dart": "e7648436aceff4a4910ba28fb74c6f0176e2d9885f30bbab9a987e8584ad278b",
@@ -29,6 +29,7 @@
     "test/extensions/supabase/supabase_query_mapper_test.dart": "cfae069c5c0e08dd63a4a5fb564b09dfa02662a135c9d3da8c5e855e3222e5ce",
     "test/extensions/supabase/supabase_remote_database_test.dart": "d7afdf9adc3fed47b3ccf8d21e922d6dafd622abb97a509706938c1625f4c9dd",
     "test/extensions/supabase/supabase_session_bridge_test.dart": "1bcdcbb011ed13d8da400846b82ff0eaebe10f9b0598de0c6f810a0b1b6caab5",
+    "test/extensions/supabase/supabase_storage_url_test.dart": "5cf0842a2231af3cef05e4708dd34c10fca46f18124ca420db05ac36e2aad02d",
     "test/extensions/supabase/supabase_support_test.dart": "560a151ebe521691c975231564cbc0606b390ec3029741207363671c5506416b",
     "test/extensions/supabase/supabase_token_provider_test.dart": "9065f59b0a046f2831b9489a4f8446598bb6ba87b69d5f704dfa1eea43269516",
     "test/extensions/supabase/test_support.dart": "2e132744a3e50f632053a3496c92f5c7de6b9a4ee7132151e30169491e6c1768"

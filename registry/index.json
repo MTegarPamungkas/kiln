@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T15:51:23.036656Z",
+  "generated_at": "2026-11-03T17:25:28.123012Z",
   "extensions": [
     {
       "id": "analytics",
@@ -25,7 +25,7 @@
         {
           "version": "0.1.1",
           "url": "archives/analytics-0.1.1.tgz",
-          "sha256": "53c33caec25b55f424ae07fc1070ab39ed478af9062159b8b6b94bcee2b0294d",
+          "sha256": "d9f6c93151652ca552f1a3d9177e73920380f48639095e01148605fa58b2a2cc",
           "provides": [
             "analytics"
           ],
@@ -75,7 +75,7 @@
         {
           "version": "0.1.2",
           "url": "archives/appwrite-0.1.2.tgz",
-          "sha256": "54ed30dc51b4c2ac0aff467f2cf137875045ef959fbed1be1480b0d2cf2c8eaf",
+          "sha256": "60aea071de29f2caaf1449234e273aa2bb5cfd4d8cfa30e94c88218de57691f2",
           "provides": [
             "auth",
             "remote_database",
@@ -147,7 +147,7 @@
         {
           "version": "0.1.4",
           "url": "archives/biometric-0.1.4.tgz",
-          "sha256": "bd32f0e19c8401631393e7f6ffa7d5d05788bbb71a39ccf683738491df7bf36f",
+          "sha256": "440b8819612e0dfecd704e310d919155c500740fceb8e1e1b1d74fadbb561b37",
           "provides": [
             "biometric"
           ],
@@ -205,7 +205,7 @@
         {
           "version": "0.1.3",
           "url": "archives/bloc-0.1.3.tgz",
-          "sha256": "5600e808e3ddb8a819bc8c4f33b1fde0278d5f773bca899c4ee24770c80e8832",
+          "sha256": "861de4da8b3b1236abdb72d61f6475b82897daed81e2417d0d4a4eec938be7ce",
           "provides": [
             "state_bloc"
           ],
@@ -239,7 +239,7 @@
         {
           "version": "0.1.1",
           "url": "archives/connectivity-0.1.1.tgz",
-          "sha256": "3b6b7b0f8cca1966eb9e24dbbec59f877483beaff058a060538f6c7579c81423",
+          "sha256": "bad170dcb52b388909ae743d7ef392396181fc85fced8c1f107fd5ced3e69e9e",
           "provides": [
             "connectivity"
           ],
@@ -285,7 +285,7 @@
         {
           "version": "0.1.2",
           "url": "archives/deep_link-0.1.2.tgz",
-          "sha256": "d07e0d1e766deed151e5fd04cb8787e2d5df17f250ce1f1508c97ade727afa7e",
+          "sha256": "c1850c89cd780eade0ef8d8cbd604ff4329db1ecf90038ead0cf795eb706210a",
           "provides": [
             "deep_links"
           ],
@@ -359,7 +359,7 @@
         {
           "version": "0.2.4",
           "url": "archives/dio-0.2.4.tgz",
-          "sha256": "d824722f25048ee6e1a8099075999a8fde40c8031898467d72df053ad7495c29",
+          "sha256": "d3a087183bcd3ebb51d36e4ace979309469b823aba5507d050d1463d188647fa",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -394,7 +394,7 @@
         {
           "version": "0.1.1",
           "url": "archives/env-0.1.1.tgz",
-          "sha256": "ce485926fca5597afe605c79abcf16d7c9ec70ccb6cf0a406816fb0108bc3fbf",
+          "sha256": "fc755f335699e6b27a5a0f8324e0a63da35655ac723f98cf643b4def1ce3f1ac",
           "provides": [
             "env"
           ],
@@ -448,7 +448,7 @@
         {
           "version": "0.2.1",
           "url": "archives/firebase-0.2.1.tgz",
-          "sha256": "c44be10420a3d2974bb940e34c25acbff87a6c1afa59491599d0de075a27efb0",
+          "sha256": "8744b77bdd181c16f817de144ae3540755cdac57e2667dcbd72bba286043c46b",
           "provides": [
             "auth",
             "social_auth",
@@ -486,7 +486,7 @@
         {
           "version": "0.1.1",
           "url": "archives/flavors-0.1.1.tgz",
-          "sha256": "6430abffa767c2adf2bb43af014e00994c15402e43777049901944883d55da6b",
+          "sha256": "6a637605919d0f8212427c6ec3851f36c984b473da50520f1cef334e6bc5b19a",
           "provides": [
             "flavor"
           ],
@@ -544,7 +544,7 @@
         {
           "version": "0.2.1",
           "url": "archives/go_router-0.2.1.tgz",
-          "sha256": "45fdb31ecb498b06fc730f0a8bea31202658ec976271309dc3b782c78981ce98",
+          "sha256": "7767015adb9e82c137948d95ae4b9983ef43721584ddb1e6938210db57be57cd",
           "provides": [
             "navigation"
           ],
@@ -582,7 +582,7 @@
         {
           "version": "0.1.1",
           "url": "archives/http_cache-0.1.1.tgz",
-          "sha256": "f775d90c6175c6caffe3ebfcbe29482d724889c169bf2bdaf0fcef7adfdf0a30",
+          "sha256": "2da03b9575bad8f7de6f8dc80d155a3370ea776a20ebcb425a7fb77c1c6e98b6",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -621,7 +621,7 @@
         {
           "version": "0.1.1",
           "url": "archives/http_retry-0.1.1.tgz",
-          "sha256": "e3cab3a0851472e176c4fb7dd139325bf3beceb871deba6c1cdb103120ee08a0",
+          "sha256": "855b18920ae5b22b25061b3b8b5a220f6b18b279297fad64efe549659218a80b",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -656,7 +656,7 @@
         {
           "version": "0.1.1",
           "url": "archives/image_picker-0.1.1.tgz",
-          "sha256": "d9eb0849d6e9322e224fd8917ed5b1eb70365eaf89d160bc8f2646b2ba7aa535",
+          "sha256": "9a5dbac8233f18bd9be2cc990d2bba1f893859350a0f4f4a592883678ca6ab77",
           "provides": [
             "media"
           ],
@@ -738,7 +738,7 @@
         {
           "version": "0.1.5",
           "url": "archives/l10n-0.1.5.tgz",
-          "sha256": "ab9d8f03e2353ad0d38088f96e90f9e8677d3fc851d277c964fd9a200e4bb327",
+          "sha256": "2daf1d2a121c9261682a8ac2872b9e961e697f3e481ca963939d010bb2106ed1",
           "provides": [
             "l10n"
           ],
@@ -772,7 +772,7 @@
         {
           "version": "0.1.1",
           "url": "archives/local_db-0.1.1.tgz",
-          "sha256": "6ec6d4806f5076962add1e1595f5dcfeb311d10903145e15f80540dc72893bb8",
+          "sha256": "75b0552858835f2f1835e56c1167edb95c10c61279e2930726b07495146a07ac",
           "provides": [
             "local_db"
           ],
@@ -806,7 +806,7 @@
         {
           "version": "0.1.1",
           "url": "archives/logger-0.1.1.tgz",
-          "sha256": "65cc69d9bfce92f8fd40451076a6672204a10e784896d39b14067c7606783a65",
+          "sha256": "ae4126200e873f3feb238711dc819d2c759457e0ed85a79fe63fae262a7fdc43",
           "provides": [
             "logger"
           ],
@@ -876,7 +876,7 @@
         {
           "version": "0.1.4",
           "url": "archives/notifications-0.1.4.tgz",
-          "sha256": "bbaae3ce18ae7fe9ae3dab469fb7682d6cb7f45e9d64ee4ad0acc6412412e7ca",
+          "sha256": "b80192e8b91e27bf4e128bdfbd677f379e33d98a7f96ebdaf42e6755141b16a7",
           "provides": [
             "notifications"
           ],
@@ -910,7 +910,7 @@
         {
           "version": "0.1.1",
           "url": "archives/permission-0.1.1.tgz",
-          "sha256": "9e73125a9ed46fbc066cfe86371ed9575c3f7a5d4dd58e2c32f21839fdeb1dc1",
+          "sha256": "91d275d374a299018f0b6ca488ae63f378629b7c3918277327aba7afae977fee",
           "provides": [
             "permission"
           ],
@@ -964,7 +964,7 @@
         {
           "version": "0.1.2",
           "url": "archives/rest_auth-0.1.2.tgz",
-          "sha256": "17fee1b1c74bf7c9e5dd1af9c7f2fe272b47f548541e812a7e86921bb3462957",
+          "sha256": "480a6ea165ef6746730e11db2792f8e3b3274635659a19cc3923ce637408dee2",
           "requires": [
             "http_client",
             "secure_storage"
@@ -1014,7 +1014,7 @@
         {
           "version": "0.1.2",
           "url": "archives/riverpod-0.1.2.tgz",
-          "sha256": "cffa3559395f262879d1b631f6f7051151b2456861f4cd0244d52117e1f1f0f7",
+          "sha256": "a0a8cab375e3e2e2b832c40df57f44493b2c75cfd5a9d9b3618cc4a35ca556de",
           "provides": [
             "state_riverpod"
           ],
@@ -1048,7 +1048,7 @@
         {
           "version": "0.1.1",
           "url": "archives/secure_storage-0.1.1.tgz",
-          "sha256": "a580b80ef4a93e98463e4d8cc7598a9f220f2c4226ffd95c8c00365e6964758f",
+          "sha256": "e6d68827067a8788bf76c0b94a4c7e660058b2412633ad5e8c68eb58a1151d6c",
           "provides": [
             "secure_storage"
           ],
@@ -1085,7 +1085,7 @@
         {
           "version": "0.1.1",
           "url": "archives/social_login-0.1.1.tgz",
-          "sha256": "e7ebea030decdaed580ee557bd839fbac65de5e3b44e132c03ee705dd72fc0d8",
+          "sha256": "71668362df843fd54c73e0fae291c78f2f3b3e0f2fd989ab3ed52ab71f2dc66f",
           "requires": [
             "social_auth"
           ],
@@ -1122,7 +1122,7 @@
         {
           "version": "0.1.1",
           "url": "archives/storage-0.1.1.tgz",
-          "sha256": "42d36ed1f57b1e2b5c86b5c8f29ec3efe6f70645aa8d3bd5282a5a8ac1c2cf5a",
+          "sha256": "411d93b4c077ec0c3075a52edc262937dd9c7851475a8c18708da9f1602cb153",
           "provides": [
             "storage"
           ],
@@ -1138,7 +1138,7 @@
       "name": "Supabase",
       "description": "Supabase auth, PostgREST database, realtime, and storage for Kiln.",
       "category": "auth",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -1185,6 +1185,21 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/supabase-0.1.3.tgz",
+          "sha256": "a7867857707b8021f53ae7ce9b1d6df968499e3c92fe3595c2378e79425d0504",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -1211,7 +1226,7 @@
         {
           "version": "0.1.1",
           "url": "archives/theme-0.1.1.tgz",
-          "sha256": "05b9b552d240a05bed8e6c62194af9ba585467b5b4b26832671f275f31ae085a",
+          "sha256": "84dda6be348f36e58d7e7c370623e99ff95b0355e19a01ca65c5fe95c5977eed",
           "provides": [
             "theme"
           ],
