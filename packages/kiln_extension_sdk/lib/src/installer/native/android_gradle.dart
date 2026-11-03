@@ -116,7 +116,7 @@ final class AndroidGradleCompileSdkPatch implements Patch {
     if (path == null) {
       return;
     }
-    var content = files.read(path);
+    final content = files.read(path);
     if (content == null || content.contains('// kiln:compile_sdk')) {
       return;
     }
