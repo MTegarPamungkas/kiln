@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
-import 'package:{{name}}/app/app.dart';
 import 'package:{{name}}/core/l10n/core_copy.dart';
 
+import 'support/app_fixture.dart';
 import 'support/test_core_copy.dart';
 
 final class _RecordingLifecycle implements Lifecycle {
@@ -57,7 +57,7 @@ void main() {
     final registry = createTestRegistry(lifecycleController: lifecycle);
     registry.registerSingleton<CoreCopy>(const TestCoreCopy());
 
-    await tester.pumpWidget(KilnApp(registry: registry));
+    await tester.pumpWidget(buildTestApp(registry));
     await tester.pumpAndSettle();
 
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);

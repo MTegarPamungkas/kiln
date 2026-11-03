@@ -69,7 +69,7 @@ kiln/
 │  ├─ migration.schema.json                  # validates migration files in extensions/<id>/migrations
 │  └─ registry-index.schema.json             # validates registry/index.json
 ├─ bricks/                                   # Mason templates for app projects and extensions
-│  ├─ app_basic/                             # basic app project brick used by kiln create
+│  ├─ app_basic/                             # app project brick used by kiln create (minimal and starter variants)
 │  │  ├─ brick.yaml                          # app_basic brick metadata and project prompt variables
 │  │  ├─ hooks/                              # Mason hooks that run before and after generation
 │  │  │  ├─ pubspec.yaml                     # dependencies for running the hooks

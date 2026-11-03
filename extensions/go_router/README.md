@@ -8,18 +8,18 @@ fills the `RouterConfig<Object>` seam read by `app_shell.dart`, so
   `AppRouterConfig`, then opens the `router.routes` slot.
 - `AppRouter` builds `GoRouter` from the initial location, slot routes, guards,
   and `SessionController`.
-- `AuthRedirect` sends visitors who are not signed in to `/sign-in` and
-  moves visitors who are signed in away from that page.
+- `AuthRedirect` is available for apps that want a login wall; enable it with
+  `AppRouterConfig(enableAuthRedirect: true)`.
 - `DeepLinkRouteMapper` and `NotificationRouteMapper` turn incoming links and
   notification payloads into route locations.
 - `NavigationObserver` logs navigation to `AppLogger` and sends screens to
   `Analytics` when the contract is available.
-- `NotFoundPage`, `ShellScaffold`, and `route_transitions.dart` provide starter
-  UI that the app can replace.
+- `NotFoundPage`, `ShellScaffold`, and `route_transitions.dart` provide optional
+  starter UI. The sample shell is off by default.
 - `SignInPageBuilder` replaces the built-in sign-in page while keeping the auth
   guard.
-- `AppRouterConfig.includeSampleShell` removes the starter `/` and `/explore`
-  routes so the application can own those paths.
+- `AppRouterConfig.includeSampleShell` adds the starter `/` and `/explore`
+  routes when an app explicitly wants the demo shell.
 
 ## Install
 
@@ -62,15 +62,19 @@ built before those routes exist.
 
 ## Replacing the sign-in page and starter shell
 
-Register `SignInPageBuilder` to keep `AuthRedirect` but render the app's login
-screen on `/sign-in`:
+Register `SignInPageBuilder` to render the app's login screen on `/sign-in` and
+turn on the guard explicitly, because auth policy is app-owned:
 
 ```dart
 registry.registerSingleton<SignInPageBuilder>(const AppSignInPage());
+registry.registerSingleton<AppRouterConfig>(
+  const AppRouterConfig(enableAuthRedirect: true),
+);
 ```
 
-Register `AppRouterConfig(includeSampleShell: false)` to drop the starter
-two-tab shell, then contribute the app's own `/` route through the slot.
+`includeSampleShell` defaults to `false`. Set it to `true` only when you want
+the starter two-tab demo; otherwise contribute the app's own `/` route through
+the slot.
 
 ## Navigating from a widget
 

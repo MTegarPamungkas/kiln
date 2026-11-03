@@ -49,7 +49,7 @@ final class AppRouter {
     final signInBuilder = registry.readOrNull<SignInPageBuilder>();
 
     final routeGuards = <RouteGuard>[
-      if (session != null) const AuthRedirect(),
+      if (config.enableAuthRedirect && session != null) const AuthRedirect(),
       ...guards,
     ];
 

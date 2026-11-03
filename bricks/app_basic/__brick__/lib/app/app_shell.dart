@@ -4,13 +4,18 @@ import '../core/l10n/app_localizations_config.dart';
 import '../core/l10n/core_copy.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_theme_config.dart';
+{{^minimal}}
 import 'app_home.dart';
+{{/minimal}}
 import 'app_wrappers.dart';
 import 'registry_scope.dart';
 
 /// Builds MaterialApp from the registry seams and applies app wrappers.
 class AppShell extends StatelessWidget {
-  const AppShell({super.key});
+  const AppShell({this.home, super.key});
+
+  /// Root page supplied by the minimal template.
+  final Widget? home;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +24,14 @@ class AppShell extends StatelessWidget {
     final localizations = registry.readOrNull<AppLocalizationsConfig>();
     final copy = registry.read<CoreCopy>();
     final router = registry.readOrNull<RouterConfig<Object>>();
-    final home = (registry.readOrNull<AppHome>() ?? const StarterHome()).build(
-      context,
-    );
+    {{#minimal}}
+    final resolvedHome = home ?? const SizedBox.shrink();
+    {{/minimal}}
+    {{^minimal}}
+    final resolvedHome =
+        home ??
+        (registry.readOrNull<AppHome>() ?? const StarterHome()).build(context);
+    {{/minimal}}
     final wrappers = appWrappers(registry);
     final supportedLocales =
         localizations?.supportedLocales ??
@@ -52,7 +62,7 @@ class AppShell extends StatelessWidget {
           locale: locale,
           localizationsDelegates: localizations?.delegates,
           supportedLocales: supportedLocales,
-          home: home,
+          home: resolvedHome,
         );
       }
 
@@ -81,6 +91,7 @@ class AppShell extends StatelessWidget {
   }
 }
 
+{{^minimal}}
 /// Default [AppHome] used when the application registers none.
 final class StarterHome implements AppHome {
   const StarterHome();
@@ -193,3 +204,5 @@ class StarterPage extends StatelessWidget {
     );
   }
 }
+
+{{/minimal}}

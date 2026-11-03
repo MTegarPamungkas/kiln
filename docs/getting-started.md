@@ -39,6 +39,15 @@ dart run packages/kiln_cli/bin/kiln.dart create my_app \
   --yes
 ```
 
+`kiln create` generates the minimal template by default: bootstrap, registry
+scope, MaterialApp seams, and one application-owned `HomePage`. It does not
+generate a starter shell, feature navigation, or auth flow. Use
+`--template app` when you want the starter page and demo shell:
+
+```bash
+kiln create my_app --template app
+```
+
 `kiln create` always installs the `l10n` extension, so all shell text comes
 from ARB files and the template keeps no hardcoded application strings. `l10n`
 also adds `flutter: generate: true` automatically and runs gen-l10n on

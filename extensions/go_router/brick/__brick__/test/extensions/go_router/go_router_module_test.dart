@@ -85,6 +85,9 @@ void main() {
       ),
     );
     final module = GoRouterModule();
+    registry.registerSingleton<AppRouterConfig>(
+      const AppRouterConfig(includeSampleShell: true),
+    );
     module.register(registry);
     module.ready(registry);
 

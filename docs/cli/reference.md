@@ -4,7 +4,7 @@
 
 | Command | Purpose |
 | --- | --- |
-| `kiln create <name>` | Create a project from `app_basic`; `l10n` is installed automatically, other extensions are optional |
+| `kiln create <name>` | Create a minimal project; `--template app` adds the starter page. `l10n` is installed automatically |
 | `kiln add <extension...>` | Install extensions transactionally |
 | `kiln remove <extension>` | Remove an extension; edited files are skipped |
 | `kiln repair [extension...]` | Restore generated files + `extensions.g.dart`; ARB files are protected |

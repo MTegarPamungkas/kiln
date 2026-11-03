@@ -18,7 +18,10 @@ void main() {
         initialStatus: SessionStatus.authenticated,
       ),
     );
-    final appRouter = AppRouter(registry: registry);
+    final appRouter = AppRouter(
+      registry: registry,
+      config: const AppRouterConfig(includeSampleShell: true),
+    );
 
     expect(appRouter.router, isA<GoRouter>());
     await pumpRouter(tester, appRouter.router);
@@ -83,7 +86,10 @@ void main() {
         initialStatus: SessionStatus.authenticated,
       ),
     );
-    const config = AppRouterConfig(initialLocation: AppRoutes.explore);
+    const config = AppRouterConfig(
+      initialLocation: AppRoutes.explore,
+      includeSampleShell: true,
+    );
     final appRouter = AppRouter(registry: registry, config: config);
 
     await pumpRouter(tester, appRouter.router);
@@ -101,7 +107,13 @@ void main() {
       initialStatus: SessionStatus.unauthenticated,
     );
     final registry = createTestRegistry(sessionController: session);
-    final appRouter = AppRouter(registry: registry);
+    final appRouter = AppRouter(
+      registry: registry,
+      config: const AppRouterConfig(
+        includeSampleShell: true,
+        enableAuthRedirect: true,
+      ),
+    );
 
     await pumpRouter(tester, appRouter.router);
     expect(find.byKey(const Key('sign-in-page')), findsOneWidget);
@@ -132,7 +144,10 @@ void main() {
         initialStatus: SessionStatus.authenticated,
       ),
     );
-    final appRouter = AppRouter(registry: registry);
+    final appRouter = AppRouter(
+      registry: registry,
+      config: const AppRouterConfig(includeSampleShell: true),
+    );
 
     appRouter.start();
     await pumpRouter(tester, appRouter.router);
@@ -174,11 +189,46 @@ void main() {
       ),
     );
     registry.registerSingleton<SignInPageBuilder>(const _CustomSignInBuilder());
-    final appRouter = AppRouter(registry: registry);
+    final appRouter = AppRouter(
+      registry: registry,
+      config: const AppRouterConfig(enableAuthRedirect: true),
+    );
 
     await pumpRouter(tester, appRouter.router);
 
     expect(find.byKey(const Key('custom-sign-in')), findsOneWidget);
+    expect(find.byKey(const Key('sign-in-page')), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await appRouter.dispose();
+  });
+
+  testWidgets('defaults to application-owned routing', (tester) async {
+    final registry = createTestRegistry(
+      sessionController: SessionController(
+        initialStatus: SessionStatus.unauthenticated,
+      ),
+    );
+    registry
+        .read<SlotRegistry>()
+        .open<AppRoute>(SlotNames.routerRoutes)
+        .add(
+          AppRoute(
+            path: AppRoutes.home,
+            name: AppRoutes.homeName,
+            builder: (BuildContext context) =>
+                const Scaffold(body: Text('Halaman aplikasi')),
+          ),
+        );
+    final appRouter = AppRouter(registry: registry);
+
+    expect(
+      appRouter.router.configuration.routes.whereType<ShellRoute>(),
+      isEmpty,
+    );
+
+    await pumpRouter(tester, appRouter.router);
+    expect(find.text('Halaman aplikasi'), findsOneWidget);
     expect(find.byKey(const Key('sign-in-page')), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());

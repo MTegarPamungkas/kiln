@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
-import 'package:{{name}}/app/app.dart';
 import 'package:{{name}}/core/l10n/core_copy.dart';
 import 'package:{{name}}/core/theme/app_theme_config.dart';
 
+import 'support/app_fixture.dart';
 import 'support/test_core_copy.dart';
 
 void main() {
@@ -22,7 +22,7 @@ void main() {
       ..registerSingleton<SlotRegistry>(SlotRegistry())
       ..registerSingleton<AppThemeConfig>(AppThemeConfig(modeListenable: mode));
 
-    await tester.pumpWidget(KilnApp(registry: registry));
+    await tester.pumpWidget(buildTestApp(registry));
     await tester.pumpAndSettle();
 
     expect(

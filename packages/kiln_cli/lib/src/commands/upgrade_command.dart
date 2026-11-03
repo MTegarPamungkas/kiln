@@ -148,7 +148,12 @@ final class UpgradeCommand extends KilnCommand {
 
       final installer = ExtensionInstaller(
         projectRoot: project.root,
-        available: <AvailableExtension>[available],
+        // Installed extensions must stay resolvable while the candidate is
+        // validated; otherwise every other installed id looks unknown.
+        available: <AvailableExtension>[
+          ...extensionCatalog.where((entry) => entry.id != available.id),
+          available,
+        ],
       );
       final dryRemove = await installer.remove(
         id: candidate.id,

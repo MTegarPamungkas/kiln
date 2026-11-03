@@ -66,7 +66,94 @@ void main() {
       await workspace.delete(recursive: true);
     });
 
-    test('renders app_basic and installs selected extensions', () async {
+    test(
+      'renders the minimal template and installs selected extensions',
+      () async {
+        final runner = buildTestRunner(
+          cwd: workspace,
+          captured: captured,
+          processRunner: FakeProcessRunner(_fakeFlutter),
+        );
+
+        final code = await runner.run(<String>[
+          'create',
+          'created_app',
+          '--org',
+          'com.kiln.demo',
+          '--core-path',
+          corePath,
+          '--with',
+          'dio',
+          '--answer',
+          'base_url=https://api.example.com',
+          '--yes',
+        ]);
+
+        final target = Directory(p.join(workspace.path, 'created_app'));
+        expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+        expect(
+          File(p.join(target.path, 'lib', 'main.dart')).existsSync(),
+          isTrue,
+        );
+        expect(
+          File(p.join(target.path, 'lib', 'app', 'app.dart')).existsSync(),
+          isTrue,
+        );
+        final main = File(p.join(target.path, 'lib', 'main.dart'))
+            .readAsStringSync();
+        expect(main, contains('HomePage'));
+        expect(
+          File(p.join(target.path, 'lib', 'features', 'home', 'home_page.dart'))
+              .existsSync(),
+          isTrue,
+        );
+        expect(
+          File(p.join(target.path, 'lib', 'app', 'app_shell.dart'))
+              .readAsStringSync(),
+          isNot(contains('StarterPage')),
+        );
+        expect(
+          File(p.join(target.path, 'test', 'widget_test.dart')).existsSync(),
+          isFalse,
+        );
+        expect(
+          File(
+            p.join(target.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
+          ).existsSync(),
+          isTrue,
+        );
+        expect(
+          File(
+            p.join(
+              target.path,
+              'lib',
+              'extensions',
+              'l10n',
+              'l10n_module.dart',
+            ),
+          ).existsSync(),
+          isTrue,
+        );
+        expect(
+          File(p.join(target.path, 'lib', 'core', 'l10n', 'app_strings.dart'))
+              .existsSync(),
+          isFalse,
+        );
+
+        final pubspec = loadYaml(
+          File(p.join(target.path, 'pubspec.yaml')).readAsStringSync(),
+        ) as YamlMap;
+        expect(pubspec['dependency_overrides'], isNotNull);
+
+        final config = loadYaml(
+          File(p.join(target.path, 'kiln.yaml')).readAsStringSync(),
+        ) as YamlMap;
+        expect((config['project'] as YamlMap)['name'], 'created_app');
+        expect(config['state'], 'none');
+      },
+    );
+
+    test('renders the starter template when requested', () async {
       final runner = buildTestRunner(
         cwd: workspace,
         captured: captured,
@@ -75,59 +162,25 @@ void main() {
 
       final code = await runner.run(<String>[
         'create',
-        'created_app',
-        '--org',
-        'com.kiln.demo',
+        'starter_app',
+        '--template',
+        'app',
         '--core-path',
         corePath,
-        '--with',
-        'dio',
-        '--answer',
-        'base_url=https://api.example.com',
         '--yes',
       ]);
 
-      final target = Directory(p.join(workspace.path, 'created_app'));
+      final target = Directory(p.join(workspace.path, 'starter_app'));
       expect(code, ExitCodes.success, reason: captured.err.join('\n'));
       expect(
-        File(p.join(target.path, 'lib', 'main.dart')).existsSync(),
-        isTrue,
+        File(p.join(target.path, 'lib', 'main.dart')).readAsStringSync(),
+        isNot(contains('HomePage')),
       );
       expect(
-        File(p.join(target.path, 'lib', 'app', 'app.dart')).existsSync(),
-        isTrue,
+        File(p.join(target.path, 'lib', 'app', 'app_shell.dart'))
+            .readAsStringSync(),
+        contains('StarterHome'),
       );
-      expect(
-        File(p.join(target.path, 'test', 'widget_test.dart')).existsSync(),
-        isFalse,
-      );
-      expect(
-        File(p.join(target.path, 'lib', 'extensions', 'dio', 'dio_module.dart'))
-            .existsSync(),
-        isTrue,
-      );
-      expect(
-        File(
-          p.join(target.path, 'lib', 'extensions', 'l10n', 'l10n_module.dart'),
-        ).existsSync(),
-        isTrue,
-      );
-      expect(
-        File(p.join(target.path, 'lib', 'core', 'l10n', 'app_strings.dart'))
-            .existsSync(),
-        isFalse,
-      );
-
-      final pubspec = loadYaml(
-        File(p.join(target.path, 'pubspec.yaml')).readAsStringSync(),
-      ) as YamlMap;
-      expect(pubspec['dependency_overrides'], isNotNull);
-
-      final config = loadYaml(
-        File(p.join(target.path, 'kiln.yaml')).readAsStringSync(),
-      ) as YamlMap;
-      expect((config['project'] as YamlMap)['name'], 'created_app');
-      expect(config['state'], 'none');
     });
 
     test('repair restores generated files and preserves edited ARBs', () async {

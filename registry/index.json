@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T13:00:47.978956Z",
+  "generated_at": "2026-11-03T13:23:43.281784Z",
   "extensions": [
     {
       "id": "analytics",
@@ -375,7 +375,7 @@
       "name": "GoRouter",
       "description": "Declarative routing with route slots, guards, and deep link mapping.",
       "category": "navigation",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -394,6 +394,18 @@
           "version": "0.1.1",
           "url": "archives/go_router-0.1.1.tgz",
           "sha256": "d8b2f5eee1c47f4a015b4a0ae301511d92230811b3126bdb924207e611f7c01f",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/go_router-0.2.0.tgz",
+          "sha256": "226eed323d8634f421b348ff4e85b34e2772138268dcb94f1edfcd4f5d647a12",
           "provides": [
             "navigation"
           ],

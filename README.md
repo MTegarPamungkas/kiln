@@ -9,7 +9,8 @@ slots, never by importing each other.
 
 The foundation phase runs end-to-end:
 
-- `kiln create` generates an application from the `app_basic` brick.
+- `kiln create` generates a minimal application root from the `app_basic`
+  brick; `--template app` adds the starter page and demo shell.
 - `kiln add dio` installs an extension transactionally, including Android
   patches, pubspec dependencies, lockfile, and `extensions.g.dart`.
 - `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`, `cache`,

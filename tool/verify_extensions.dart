@@ -37,6 +37,7 @@ Future<void> main(List<String> arguments) async {
       'org': 'dev.kiln',
       'state': 'none',
       'platforms': <String>['android', 'ios'],
+      'minimal': true,
     },
   );
 

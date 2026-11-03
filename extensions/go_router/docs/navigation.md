@@ -8,7 +8,7 @@
 | --- | --- |
 | `RouterConfig<Object>` | The `GoRouter` instance read by `AppShell` |
 | `AppRouter` | Owner of the router, observer, and link integration |
-| `AppRouterConfig` | Initial location, diagnostic logging, error builder, extra observers, sample shell switch |
+| `AppRouterConfig` | Initial location, diagnostics, error builder, observers, sample shell and auth redirect switches |
 
 The `router.routes` slot is opened by the module. Slot items are of type
 `AppRoute` from `app_basic`, so features do not need to depend on `go_router`.
@@ -21,21 +21,30 @@ The `router.routes` slot is opened by the module. Slot items are of type
 - `/explore` with the name `explore`
 - `/sign-in` with the name `signIn`
 
-`/` and `/explore` live inside a `ShellRoute` with a `NavigationBar`.
-`/sign-in` lives outside the shell so it does not show the bottom navigation.
-
-Replace the contents of `_HomeTab` and `_ExploreTab` in `shell_scaffold.dart`,
-or replace the whole `buildShellRoute()` with the app's routes. If the shell is
-not used, remove the `buildShellRoute()` call from `AppRouter` and register the
-tab routes directly.
-
-Register an application `AppRouterConfig` before the router module to turn the
-sample shell off and claim its paths:
+Only `/sign-in` is always registered. The auth redirect and the sample `/` and
+`/explore` shell are opt-in:
 
 ```dart
 registry.registerSingleton<AppRouterConfig>(
-  const AppRouterConfig(includeSampleShell: false),
+  const AppRouterConfig(
+    includeSampleShell: true,
+    enableAuthRedirect: true,
+  ),
 );
+```
+
+With the defaults (`false`/`false`) the router resolves only the routes the
+application contributes, which keeps auth policy and navigation structure in
+the app.
+
+When `includeSampleShell` is `true`, replace the contents of `_HomeTab` and
+`_ExploreTab` in `shell_scaffold.dart`, or replace the whole
+`buildShellRoute()` with the app's shell. Leave the switch off to skip the
+sample routes entirely.
+
+To claim `/` without the demo shell, contribute a route through the slot:
+
+```dart
 registry.read<SlotRegistry>().open<AppRoute>(SlotNames.routerRoutes).add(
   AppRoute(
     path: '/',
@@ -47,8 +56,8 @@ registry.read<SlotRegistry>().open<AppRoute>(SlotNames.routerRoutes).add(
 
 ## Custom sign-in page
 
-`SignInPageBuilder` replaces the built-in sign-in page while `AuthRedirect`
-keeps guarding the session. Register it before `GoRouterModule.register`:
+`SignInPageBuilder` replaces the built-in sign-in page when
+`enableAuthRedirect` is on. Register both before `GoRouterModule.register`:
 
 ```dart
 final class AppSignInPage implements SignInPageBuilder {
@@ -58,7 +67,11 @@ final class AppSignInPage implements SignInPageBuilder {
   Widget build(BuildContext context) => const LoginPage();
 }
 
-registry.registerSingleton<SignInPageBuilder>(const AppSignInPage());
+registry
+  ..registerSingleton<SignInPageBuilder>(const AppSignInPage())
+  ..registerSingleton<AppRouterConfig>(
+    const AppRouterConfig(enableAuthRedirect: true),
+  );
 ```
 
 When no builder is registered, `AppRouter` falls back to the built-in

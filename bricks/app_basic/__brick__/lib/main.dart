@@ -5,6 +5,9 @@ import 'app/app.dart';
 import 'app/error_screen.dart';
 import 'core/error/global_error_handler.dart';
 import 'extensions/extensions.g.dart';
+{{#minimal}}
+import 'features/home/home_page.dart';
+{{/minimal}}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,5 +21,10 @@ Future<void> main() async {
   }
 
   installGlobalErrorHandlers(registry);
-  runApp(KilnApp(registry: registry));
+  runApp(
+    KilnApp(
+      registry: registry,
+      {{#minimal}}home: const HomePage(),{{/minimal}}
+    ),
+  );
 }

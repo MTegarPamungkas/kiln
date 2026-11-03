@@ -18,6 +18,12 @@ final class CreateCommand extends KilnCommand {
         defaultsTo: 'none',
         allowed: ['none', 'bloc', 'riverpod'],
       )
+      ..addOption(
+        'template',
+        defaultsTo: 'minimal',
+        allowed: ['minimal', 'app'],
+        help: 'minimal keeps only the root wiring; app adds the starter page.',
+      )
       ..addOption('org', defaultsTo: 'com.example')
       ..addOption('description', defaultsTo: 'A Kiln application.')
       ..addOption('platforms', defaultsTo: 'android,ios,web')
@@ -42,7 +48,8 @@ final class CreateCommand extends KilnCommand {
   String get name => 'create';
 
   @override
-  String get description => 'Create a new Flutter application from app_basic.';
+  String get description =>
+      'Create a new Flutter application from the Kiln template.';
 
   @override
   String get invocation => 'kiln create <name> [arguments]';
@@ -59,6 +66,7 @@ final class CreateCommand extends KilnCommand {
     }
 
     final state = argResults!['state'] as String;
+    final template = argResults!['template'] as String;
     final org = argResults!['org'] as String;
     final description = argResults!['description'] as String;
     final platforms = (argResults!['platforms'] as String)
@@ -133,6 +141,7 @@ final class CreateCommand extends KilnCommand {
         'org': org,
         'state': state,
         'platforms': platforms,
+        'minimal': template == 'minimal',
       },
     );
     for (final file in rendered) {
