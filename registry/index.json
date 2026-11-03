@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T15:08:10.494062Z",
+  "generated_at": "2026-11-03T15:18:09.673549Z",
   "extensions": [
     {
       "id": "analytics",
@@ -364,13 +364,25 @@
       "name": "Environment",
       "description": "Typed build-time configuration from --dart-define values.",
       "category": "config",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/env-0.1.0.tgz",
           "sha256": "5ff6598ef15910905b20c513b0788633001689bd4eaef3da5e3599905e01a7ca",
+          "provides": [
+            "env"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/env-0.1.1.tgz",
+          "sha256": "ce485926fca5597afe605c79abcf16d7c9ec70ccb6cf0a406816fb0108bc3fbf",
           "provides": [
             "env"
           ],
@@ -444,13 +456,25 @@
       "name": "Flavors",
       "description": "Dart-level app flavors, entry points, and launch configurations.",
       "category": "flavor",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/flavors-0.1.0.tgz",
           "sha256": "b0ae02396bcd931dec8967812997d13a1f6b88db839b118584504153839733d1",
+          "provides": [
+            "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/flavors-0.1.1.tgz",
+          "sha256": "6430abffa767c2adf2bb43af014e00994c15402e43777049901944883d55da6b",
           "provides": [
             "flavor"
           ],
@@ -866,7 +890,7 @@
       "name": "REST auth",
       "description": "Email and password authentication against a REST API.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -889,6 +913,22 @@
           "version": "0.1.1",
           "url": "archives/rest_auth-0.1.1.tgz",
           "sha256": "f5e685457ff51da5eed648bf7558b9d8c553c70f3b5ec2b392903e44623dd1c7",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/rest_auth-0.1.2.tgz",
+          "sha256": "17fee1b1c74bf7c9e5dd1af9c7f2fe272b47f548541e812a7e86921bb3462957",
           "requires": [
             "http_client",
             "secure_storage"

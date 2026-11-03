@@ -4,6 +4,7 @@ import 'auth_middleware.dart';
 import 'rest_account_management.dart';
 import 'rest_auth.dart';
 import 'rest_auth_config.dart';
+import 'rest_auth_support.dart';
 import 'rest_session_bridge.dart';
 import 'rest_token_store.dart';
 import 'unauthorized_handler.dart';
@@ -39,6 +40,12 @@ final class RestAuthModule extends KilnModule {
 
     registry
       ..registerSingleton<RestAuthConfig>(config)
+      ..registerSingleton<RestAuthSupport>(
+        RestAuthSupport(
+          config: config,
+          storageProbe: () => storage.read('rest_auth.health'),
+        ),
+      )
       ..registerSingleton<AuthRepository>(auth)
       ..registerSingleton<TokenProvider>(auth.tokenProvider)
       ..registerSingleton<AccountManagement>(
@@ -61,6 +68,11 @@ final class RestAuthModule extends KilnModule {
   }
 
   @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<RestAuthSupport>().check();
+  }
+
+  @override
   Future<void> ready(Registry registry) async {
     try {
       final auth = registry.read<AuthRepository>();
@@ -68,8 +80,15 @@ final class RestAuthModule extends KilnModule {
         await auth.initialize();
       }
       await registry.read<RestSessionBridge>().start();
-    } on Object {
-      // Session restoration is best effort; the app can still sign in.
+    } on Object catch (error) {
+      registry.readOrNull<SupportRegistry>()?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'REST auth session restore failed: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
     }
   }
 }

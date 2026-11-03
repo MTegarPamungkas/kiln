@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 import 'flavor_banner.dart';
+import 'flavors_support.dart';
 import 'release_guard.dart';
 
 typedef AppWrapper = Widget Function(BuildContext context, Widget child);
@@ -19,9 +20,9 @@ final class FlavorsModule extends KilnModule {
   @override
   void register(Registry registry) {
     final flavor = registry.readOrNull<AppFlavor>();
-    registry.registerSingleton<ReleaseGuard>(
-      ReleaseGuard(flavor: flavor),
-    );
+    registry
+      ..registerSingleton<ReleaseGuard>(ReleaseGuard(flavor: flavor))
+      ..registerSingleton<FlavorsSupport>(FlavorsSupport(flavor: flavor));
 
     final slots = registry.readOrNull<SlotRegistry>();
     slots
@@ -30,6 +31,11 @@ final class FlavorsModule extends KilnModule {
           (context, child) => FlavorBanner(flavor: flavor, child: child),
           owner: 'flavors',
         );
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<FlavorsSupport>().info;
   }
 
   @override

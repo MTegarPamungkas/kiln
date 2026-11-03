@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Validate the REST auth base URL and endpoint paths through
+  `RestAuthSupport`.
+- Probe secure storage during bootstrap and record session restore failures as
+  `unavailable`.
+
 ## 0.1.1
 
 - Configuration test now renders the prompt answers instead of hardcoded

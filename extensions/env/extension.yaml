@@ -1,6 +1,6 @@
 id: env
 name: Environment
-version: 0.1.0
+version: 0.1.1
 description: Typed build-time configuration from --dart-define values.
 category: config
 tier: official
