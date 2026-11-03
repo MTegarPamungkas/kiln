@@ -8,6 +8,7 @@ import 'package:{{app_name}}/extensions/supabase/supabase_link_handler.dart';
 import 'package:{{app_name}}/extensions/supabase/supabase_module.dart';
 import 'package:{{app_name}}/extensions/supabase/supabase_remote_database.dart';
 import 'package:{{app_name}}/extensions/supabase/supabase_session_bridge.dart';
+import 'package:{{app_name}}/extensions/supabase/supabase_support.dart';
 import 'package:{{app_name}}/extensions/supabase/supabase_token_provider.dart';
 
 void main() {
@@ -40,6 +41,7 @@ void main() {
     expect(registry.read<RemoteDatabase>(), isA<SupabaseRemoteDatabase>());
     expect(registry.read<FileStorage>(), isA<SupabaseFileStorage>());
     expect(registry.read<SupabaseConfig>(), isA<SupabaseConfig>());
+    expect(registry.read<SupabaseSupport>(), isA<SupabaseSupport>());
     expect(registry.read<PostgrestGateway>(), isA<PostgrestGateway>());
     expect(
       registry.read<SupabaseSessionBridge>(),

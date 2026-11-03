@@ -11,6 +11,7 @@ import 'package:{{app_name}}/extensions/firebase/firebase_id_token_provider.dart
 import 'package:{{app_name}}/extensions/firebase/firebase_module.dart';
 import 'package:{{app_name}}/extensions/firebase/firebase_session_bridge.dart';
 import 'package:{{app_name}}/extensions/firebase/firebase_storage_gateway.dart';
+import 'package:{{app_name}}/extensions/firebase/firebase_support.dart';
 import 'package:{{app_name}}/extensions/firebase/firestore_gateway.dart';
 import 'package:{{app_name}}/extensions/firebase/firestore_remote_database.dart';
 
@@ -24,6 +25,7 @@ void main() {
     module.register(registry);
 
     expect(registry.read<FirebaseConfig>(), isA<FirebaseConfig>());
+    expect(registry.read<FirebaseSupport>(), isA<FirebaseSupport>());
     expect(registry.read<AuthRepository>(), isA<FirebaseAuthRepository>());
     expect(registry.read<SocialAuth>(), isA<FirebaseSocialAuth>());
     expect(

@@ -12,6 +12,7 @@ import 'firebase_gateway.dart';
 import 'firebase_id_token_provider.dart';
 import 'firebase_session_bridge.dart';
 import 'firebase_storage_gateway.dart';
+import 'firebase_support.dart';
 import 'firestore_gateway.dart';
 import 'firestore_remote_database.dart';
 import 'firestore_query_mapper.dart';
@@ -40,6 +41,7 @@ final class FirebaseModule extends KilnModule {
   final FirebaseAppInitializer? initializer;
 
   FirebaseSessionBridge? _bridge;
+  FirebaseAppInitializer? _initializer;
 
   @override
   String get id => 'firebase';
@@ -97,9 +99,19 @@ final class FirebaseModule extends KilnModule {
       users: () => auth.authStateChanges,
     );
     _bridge = bridge;
+    final appInitializer =
+        initializer ?? FirebaseBootstrap(config: config, options: options);
+    _initializer = appInitializer;
 
     registry
       ..registerSingleton<FirebaseConfig>(config)
+      ..registerSingleton<FirebaseSupport>(
+        FirebaseSupport(
+          initializer: appInitializer,
+          config: config,
+          flavor: flavor,
+        ),
+      )
       ..registerSingleton<FirebaseAuthGateway>(auth)
       ..registerSingleton<FirestoreGateway>(firestore)
       ..registerSingleton<FirebaseStorageGateway>(storage)
@@ -114,12 +126,29 @@ final class FirebaseModule extends KilnModule {
   }
 
   @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<FirebaseSupport>().check();
+  }
+
+  @override
   Future<void> ready(Registry registry) async {
+    final supportRegistry = registry.readOrNull<SupportRegistry>();
     final appInitializer =
-        initializer ?? FirebaseBootstrap(config: config, options: options);
-    await appInitializer.initialize();
-    await registry.read<FirebaseEmulator>().configure(flavor);
-    registry.read<FirebaseSessionBridge>().start();
+        _initializer ?? FirebaseBootstrap(config: config, options: options);
+    try {
+      await appInitializer.initialize();
+      await registry.read<FirebaseEmulator>().configure(flavor);
+      registry.read<FirebaseSessionBridge>().start();
+    } on Object catch (error) {
+      supportRegistry?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Firebase could not finish starting: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
+    }
   }
 
   @override

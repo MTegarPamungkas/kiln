@@ -4,7 +4,7 @@
     "lib/extensions/connectivity/connectivity_config.dart": "18a561f0ea818c40bf66e03d9d2d12a4090db3a0ec9f9e2c91e12d3c03827f5d",
     "lib/extensions/connectivity/connectivity_failure_mapper.dart": "760d28f0ec0eb2456d5f6ef6b512b917f7d604ad17b01f0a21303dea5bb208ea",
     "lib/extensions/connectivity/connectivity_gateway.dart": "116dc207a6502f91eb3bc15d2b3c4f331aa1f096323aa787b8209337e4da3fb5",
-    "lib/extensions/connectivity/connectivity_module.dart": "d30dcc52f53f418f8cf0011ae8e7dab89ef4dc55f348a7ae3fe349d79ec3ca99",
+    "lib/extensions/connectivity/connectivity_module.dart": "c9aac1e7cc87ddf21531bb93774b9b77a388640f5f886e99cafe8f3b1433a866",
     "lib/extensions/connectivity/connectivity_support.dart": "1792e12ced2a67e42f0ea8d27d604b9f76faa64be656ab98198eebd645732aac",
     "lib/extensions/connectivity/device_network_monitor.dart": "eafbfd806c3e41785e4d544a5fbb8fd7ce93e82aa47060123be8c9dea7a06f1e",
     "lib/extensions/connectivity/offline_guard_middleware.dart": "7c14b6636a12290e22e9483bece2f41e09dcc240053c33a129fd0f2bdd5b1dd1",

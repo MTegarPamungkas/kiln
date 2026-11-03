@@ -46,7 +46,7 @@ final class SecureStorageModule extends KilnModule {
         storage: markerStorage,
       ).run(isIOS: defaultTargetPlatform == TargetPlatform.iOS);
     } on Object catch (error) {
-      registry.read<SupportRegistry>().record(
+      registry.readOrNull<SupportRegistry>()?.record(
         id,
         SupportInfo.unsupported(
           SupportState.unavailable,

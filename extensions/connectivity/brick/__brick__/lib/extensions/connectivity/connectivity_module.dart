@@ -48,7 +48,7 @@ final class ConnectivityModule extends KilnModule {
       try {
         await monitor.start();
       } on Object catch (error) {
-        registry.read<SupportRegistry>().record(
+        registry.readOrNull<SupportRegistry>()?.record(
           id,
           SupportInfo.unsupported(
             SupportState.unavailable,

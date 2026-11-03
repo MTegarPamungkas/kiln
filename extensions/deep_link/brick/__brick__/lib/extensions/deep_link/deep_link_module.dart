@@ -48,7 +48,7 @@ final class DeepLinkModule extends KilnModule {
     try {
       await links.start();
     } on Object catch (error) {
-      registry.read<SupportRegistry>().record(
+      registry.readOrNull<SupportRegistry>()?.record(
         id,
         SupportInfo.unsupported(
           SupportState.unavailable,

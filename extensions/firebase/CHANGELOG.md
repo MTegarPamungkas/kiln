@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Add `FirebaseSupport` and initialize Firebase during bootstrap.
+- Missing options are `notConfigured`; initialization or emulator/session
+  errors are recorded as `unavailable` instead of failing startup.
+
 ## 0.2.0
 
 - Defer Firebase SDK access in `FirebaseSessionBridge` until `ready()`, so

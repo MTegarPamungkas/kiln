@@ -10,6 +10,7 @@ import 'package:{{app_name}}/extensions/appwrite/appwrite_file_storage.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_module.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_remote_database.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_session_bridge.dart';
+import 'package:{{app_name}}/extensions/appwrite/appwrite_support.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +51,7 @@ void main() {
     module.register(registry);
 
     expect(registry.read<AppwriteConfig>(), same(config));
+    expect(registry.read<AppwriteSupport>(), isA<AppwriteSupport>());
     expect(registry.read<AuthRepository>(), isA<AppwriteAuth>());
     expect(
       registry.read<AccountManagement>(),

@@ -1,6 +1,6 @@
 id: supabase
 name: Supabase
-version: 0.1.1
+version: 0.1.2
 description: Supabase auth, PostgREST database, realtime, and storage for Kiln.
 category: auth
 tier: official

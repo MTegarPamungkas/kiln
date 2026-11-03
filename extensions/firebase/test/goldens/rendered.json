@@ -10,9 +10,10 @@
     "lib/extensions/firebase/firebase_file_storage.dart": "3d1ae896ee85cffa47799354febde04d92eb066ee85beba255c267b33b21b4d9",
     "lib/extensions/firebase/firebase_gateway.dart": "3acb2bdb473ea9fe8ba0e5fa49d952b501778a2d672cd4609307d050949be1d2",
     "lib/extensions/firebase/firebase_id_token_provider.dart": "a101ee2b0330135f013c46f05bc3c80a9d2705eb84a09f0862909e965d1d33b9",
-    "lib/extensions/firebase/firebase_module.dart": "f6fe8a9941f2c26d14c7ca656960ee576c7d900d89edc4b4e2ffa1d772951bec",
+    "lib/extensions/firebase/firebase_module.dart": "46a5ee2eff1fcca12a28048b9253bf3ee92cbe7482d9f2e870104617655a3d7c",
     "lib/extensions/firebase/firebase_session_bridge.dart": "fbcecdd122613ac81da03390e163da1235074372c79ad9c20c8abcc06cc2b683",
     "lib/extensions/firebase/firebase_storage_gateway.dart": "0304333270e26ae06f277904d2eb05344f58d1c9228f02b29a9ae0f495caf239",
+    "lib/extensions/firebase/firebase_support.dart": "ab88b7643ccbdbc2ac62e7dbc44f4f311c32af4ec344dda39b5f5d14f3c409a2",
     "lib/extensions/firebase/firestore_gateway.dart": "7d5fb73e3c79a6ca1ddd8fa5145fd5d2392fd1e35f42e240c2254429e3fd3da5",
     "lib/extensions/firebase/firestore_query_mapper.dart": "91c4ebabc0245d93ccfaa603454f82e2f00ca0a7a9028e2323fe39668daf23bd",
     "lib/extensions/firebase/firestore_remote_database.dart": "1b0da4db649cf1204e31787482b62f3ce3acf461c994262e78a5525c3c211096",
@@ -24,8 +25,9 @@
     "test/extensions/firebase/firebase_failure_mapper_test.dart": "f7474e79896cf19dcd569c3541e9eef311189e7f4ff1b032b7a7b17c9cb9ca2b",
     "test/extensions/firebase/firebase_file_storage_test.dart": "473811dfb4402abcd746b5cf1fc78c81fd672ee8f63f27363c14fdbd5fd56d49",
     "test/extensions/firebase/firebase_id_token_provider_test.dart": "251b0661faa1379738fa2a2e7635e955fd226bff99d640642aedd5460c94b345",
-    "test/extensions/firebase/firebase_module_test.dart": "2ded38455b240db1df71df66dfbd0ed1230849bfdf09c0555e9ae2883c127d7e",
+    "test/extensions/firebase/firebase_module_test.dart": "77e598c1a02fd96fc8712b848b221749ba0c11e5c0e3cfec7455e5a0c6dfc68b",
     "test/extensions/firebase/firebase_session_bridge_test.dart": "31b4354cac6e1da418ba06cb89af0636b5aa7fd94ba74070254beaaec4653018",
+    "test/extensions/firebase/firebase_support_test.dart": "adff0bbecf859d4f797cc7aab4057e8cb9ca140bd1ea07c1aa25bfc46ec262f4",
     "test/extensions/firebase/firestore_query_mapper_test.dart": "ed8233db66a431656fa5eb8d6e425fa0dcb923f7cae19bd28d2903a3380961a6",
     "test/extensions/firebase/firestore_remote_database_test.dart": "901bb0c5802e699511f0ba27177a5b7243f42057fb2eec6f8bf5fc5be4e422c7"
   }

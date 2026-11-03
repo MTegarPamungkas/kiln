@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Add `SupabaseSupport` and prepare the client during bootstrap.
+- Missing or invalid configuration is reported as `notConfigured`; client,
+  session restore, and link handler failures are recorded as `unavailable`
+  instead of failing startup.
+
 ## 0.1.1
 
 - Template the generated config test with the prompted URL and schema so it

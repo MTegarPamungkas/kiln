@@ -12,6 +12,7 @@ import 'appwrite_remote_database.dart';
 import 'appwrite_realtime_gateway.dart';
 import 'appwrite_session_bridge.dart';
 import 'appwrite_storage_gateway.dart';
+import 'appwrite_support.dart';
 
 /// Registers AuthRepository, RemoteDatabase, and FileStorage for Appwrite.
 final class AppwriteModule extends KilnModule {
@@ -46,6 +47,7 @@ final class AppwriteModule extends KilnModule {
 
   @override
   void register(Registry registry) {
+    final support = AppwriteSupport(config: config);
     final client = clientFactory.create(config: config, flavor: flavor);
     final account = SdkAppwriteAccount(
       account: appwrite.Account(client),
@@ -87,6 +89,7 @@ final class AppwriteModule extends KilnModule {
 
     registry
       ..registerSingleton<AppwriteConfig>(config)
+      ..registerSingleton<AppwriteSupport>(support)
       ..registerSingleton<AuthRepository>(auth)
       ..registerSingleton<AccountManagement>(accountManagement)
       ..registerSingleton<RemoteDatabase>(database)
@@ -95,11 +98,23 @@ final class AppwriteModule extends KilnModule {
   }
 
   @override
+  SupportInfo support(Registry registry) {
+    return registry.read<AppwriteSupport>().info;
+  }
+
+  @override
   Future<void> ready(Registry registry) async {
     try {
       await _auth?.restoreSession();
-    } on Object {
-      // A missing or expired session simply starts the app signed out.
+    } on Object catch (error) {
+      registry.readOrNull<SupportRegistry>()?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Appwrite session restore failed: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
     }
   }
 

@@ -8,7 +8,7 @@
     "lib/extensions/secure_storage/secure_storage_failure_mapper.dart": "aec9826f439f5da06ceb780bf02fa2b50e30fa41fb403037189e3ca589b486e5",
     "lib/extensions/secure_storage/secure_storage_gateway.dart": "e05210422042fcffc86c6412b041529a7c0ee9e24ca5c7ce7a9a3f996aee4d9d",
     "lib/extensions/secure_storage/secure_storage_health_check.dart": "1a29326c01ffff693c803889cbe483ba45f5e626b19bd59fa369b19e4006cd01",
-    "lib/extensions/secure_storage/secure_storage_module.dart": "599c6faa91f7e6d6d93c68b6f36bf58c53938a1cc918bbf4ede8356295ddd448",
+    "lib/extensions/secure_storage/secure_storage_module.dart": "a463a7491086c66554d7c3c0233e9932e5fc236af622704e6e6b3157f93d91f2",
     "lib/extensions/secure_storage/secure_storage_support.dart": "654ac51a9f8fe16de1e5f63ee1cd4086d11b6750aea56e27aa5c8aba7900712a",
     "lib/extensions/secure_storage/secure_token_store.dart": "e3d286965c9aabbc751a7f0a88869f9390534d84dfd4aaae428d11de4095ab1c",
     "test/extensions/secure_storage/first_run_wipe_test.dart": "8c0f535212838d8f24053f837d28f552b05ed45cd59880a72d074924f27f38b9",

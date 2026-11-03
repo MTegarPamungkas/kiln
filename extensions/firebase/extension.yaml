@@ -1,6 +1,6 @@
 id: firebase
 name: Firebase
-version: 0.2.0
+version: 0.2.1
 description: Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.
 category: auth
 tier: official

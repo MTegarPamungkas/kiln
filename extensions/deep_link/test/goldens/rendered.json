@@ -6,7 +6,7 @@
     "lib/extensions/deep_link/deep_link_config.dart": "2f2cac01d5a1a077139c4d22e47ee8954d0e576b477996f3fc0dac0e8576884b",
     "lib/extensions/deep_link/deep_link_failure_mapper.dart": "2f70eb271917450bbb70c9d649e07a851c4b1af5b5eab3f2a483e61f75aaa9a6",
     "lib/extensions/deep_link/deep_link_gateway.dart": "e8de4886fae477bbbd467454ba0427f8c022647aa514fcd747c377bcf10098c7",
-    "lib/extensions/deep_link/deep_link_module.dart": "7bda243ac509cb4de8d8e2ca1b5e06175660afba6746213a0c8a052a2e68b549",
+    "lib/extensions/deep_link/deep_link_module.dart": "6a56cfc0472a77bcf0536be8287b6193051c995c3d5875bd08cbbb9aa10052af",
     "lib/extensions/deep_link/device_deep_links.dart": "76753244fe766a544c42f4ee8e796968fd9176704fc1f9917f85bc80b21e7231",
     "lib/extensions/deep_link/link_allowlist.dart": "db148d67533413cdbe7cce95c76c9dd6d3bc61f37b5b3d687df1eb8d37ae2c02",
     "lib/extensions/deep_link/link_deduplicator.dart": "61d88e2ac815e03eedb822e750702871a5263c2b17753f37702260b4b76d3b61",

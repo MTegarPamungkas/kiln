@@ -70,7 +70,7 @@ final class NotificationsModule extends KilnModule {
     try {
       await registry.read<Notifications>().initialize();
     } on Object catch (error) {
-      registry.read<SupportRegistry>().record(
+      registry.readOrNull<SupportRegistry>()?.record(
         id,
         SupportInfo.unsupported(
           SupportState.unavailable,

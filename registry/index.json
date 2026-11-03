@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T14:35:51.752036Z",
+  "generated_at": "2026-11-03T14:52:08.716547Z",
   "extensions": [
     {
       "id": "analytics",
@@ -29,7 +29,7 @@
       "name": "Appwrite",
       "description": "Appwrite auth, remote database, and file storage backends.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -50,6 +50,20 @@
           "version": "0.1.1",
           "url": "archives/appwrite-0.1.1.tgz",
           "sha256": "f9011865e193b04a53403632a723a3417cf3bee984fa29caad5f74aa25ce4255",
+          "provides": [
+            "auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/appwrite-0.1.2.tgz",
+          "sha256": "54ed30dc51b4c2ac0aff467f2cf137875045ef959fbed1be1480b0d2cf2c8eaf",
           "provides": [
             "auth",
             "remote_database",
@@ -201,7 +215,7 @@
         {
           "version": "0.1.1",
           "url": "archives/connectivity-0.1.1.tgz",
-          "sha256": "7c05591d8d41caa7514af8f7a0727bb0234ece294edba6199e0567be24b2d65d",
+          "sha256": "3b6b7b0f8cca1966eb9e24dbbec59f877483beaff058a060538f6c7579c81423",
           "provides": [
             "connectivity"
           ],
@@ -247,7 +261,7 @@
         {
           "version": "0.1.2",
           "url": "archives/deep_link-0.1.2.tgz",
-          "sha256": "8d7dbfd2b92cd4e9832eacd4439877d290448d507959aa59dc3f81d5c91e1f29",
+          "sha256": "d07e0d1e766deed151e5fd04cb8787e2d5df17f250ce1f1508c97ade727afa7e",
           "provides": [
             "deep_links"
           ],
@@ -347,7 +361,7 @@
       "name": "Firebase",
       "description": "Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.",
       "category": "auth",
-      "latest": "0.2.0",
+      "latest": "0.2.1",
       "tier": "official",
       "versions": [
         {
@@ -370,6 +384,22 @@
           "version": "0.2.0",
           "url": "archives/firebase-0.2.0.tgz",
           "sha256": "366e25f3ba4f28f86f4b956d704f841c9ef653b8b2bf4977d5d9ce5a854819b3",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/firebase-0.2.1.tgz",
+          "sha256": "c44be10420a3d2974bb940e34c25acbff87a6c1afa59491599d0de075a27efb0",
           "provides": [
             "auth",
             "social_auth",
@@ -720,7 +750,7 @@
         {
           "version": "0.1.4",
           "url": "archives/notifications-0.1.4.tgz",
-          "sha256": "842583eb71d24f5cdce1ad214b2912a9ce71e6783cb744a3251e1f48cb2c63a2",
+          "sha256": "bbaae3ce18ae7fe9ae3dab469fb7682d6cb7f45e9d64ee4ad0acc6412412e7ca",
           "provides": [
             "notifications"
           ],
@@ -864,7 +894,7 @@
         {
           "version": "0.1.1",
           "url": "archives/secure_storage-0.1.1.tgz",
-          "sha256": "fb5ebd2aafb0265e56bd3b88b1574bacecfe96147d81660924420441a1ae0a5a",
+          "sha256": "a580b80ef4a93e98463e4d8cc7598a9f220f2c4226ffd95c8c00365e6964758f",
           "provides": [
             "secure_storage"
           ],
@@ -942,7 +972,7 @@
       "name": "Supabase",
       "description": "Supabase auth, PostgREST database, realtime, and storage for Kiln.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -964,6 +994,21 @@
           "version": "0.1.1",
           "url": "archives/supabase-0.1.1.tgz",
           "sha256": "a114cfcdc8886f0e89b0f1d9220d00954009512b1827ad8e54c6e697e584aa9c",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/supabase-0.1.2.tgz",
+          "sha256": "814226eb0c2e4c2f2ee00924d74cad1df1b5744f9e8325a97fdbe0086c8fd3b1",
           "provides": [
             "auth",
             "social_auth",

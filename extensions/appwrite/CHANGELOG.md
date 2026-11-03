@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Add `AppwriteSupport` for endpoint and identifier validation.
+- Record a failed session restore as an `unavailable` support state instead of
+  swallowing it.
+
 ## 0.1.1
 
 - Sign-in now creates the email session over HTTP and forwards the session

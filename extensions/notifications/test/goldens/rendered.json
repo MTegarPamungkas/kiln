@@ -12,7 +12,7 @@
     "lib/extensions/notifications/notification_support.dart": "6b847671df70210bad29baf14d6be871de0e8b426c48e03f972fa6a61965299a",
     "lib/extensions/notifications/notification_tap_hub.dart": "368e163b031f41ad742dab3b5833ecb7e5b80a34f4f8af5c3cc8fdec0fc182e1",
     "lib/extensions/notifications/notifications_config.dart": "863876d958d006a01dbdc55958ba874fbef9d1f580000fef295e4c2c52fe7b5e",
-    "lib/extensions/notifications/notifications_module.dart": "4c9ec68f5f3644041c412ccb8dced39e61460706b05eb2e0339a44b338a19c29",
+    "lib/extensions/notifications/notifications_module.dart": "5484f506026c80d8d82f9c5c0477edb4873791290c8dea59dac681c2c03d5ee7",
     "lib/extensions/notifications/plugin_notification_gateway.dart": "7fba975651c7ecd1e4eb6843d642123ddbe7dbc889e9f09364c2d992417ec95b",
     "lib/extensions/notifications/reminder_scheduler.dart": "b62187d60d5c853f8e6cf708a41ff048dbb6b129251b9b732468ff1d08249c06",
     "lib/extensions/notifications/timezone_resolver.dart": "6341c505cd5016accfbd7ef0bafb30684a6f490ff1585d608df7858c4de45bdb",
