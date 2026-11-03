@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T19:15:46.306477Z",
+  "generated_at": "2026-11-03T19:49:38.998223Z",
   "extensions": [
     {
       "id": "analytics",
@@ -568,7 +568,7 @@
         {
           "version": "0.2.0",
           "url": "archives/flavors-0.2.0.tgz",
-          "sha256": "14a69ee9b85b2face339d87d270cb0ae06768e0ee02572fe6c23b65c043e9bbf",
+          "sha256": "b63325103ef3f8c74d6d898a71986a24df4af638ec184ce2b64047438f29abcf",
           "provides": [
             "flavor"
           ],

@@ -12,9 +12,6 @@ void main() {
 
     expect(const ManifestValidator().validate(manifest), isEmpty);
     expect(manifest.provides, ['flavor']);
-    expect(
-      manifest.contributions.map((entry) => entry.slot),
-      contains('app.wrappers'),
-    );
+    expect(manifest.contributions, isEmpty);
   });
 }

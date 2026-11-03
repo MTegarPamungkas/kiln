@@ -7,14 +7,6 @@ tier: official
 exclusive: true
 provides:
   - flavor
-slots:
-  - name: app.wrappers
-    item: AppWrapper
-    description: Visual wrapper for the active flavor.
-contributes:
-  - slot: app.wrappers
-    item: FlavorBanner
-    description: Shows a DEV or STG ribbon outside production.
 prompts:
   - name: flavors
     type: multi
