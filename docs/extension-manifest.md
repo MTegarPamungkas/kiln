@@ -1,10 +1,10 @@
-# Manifest extension
+# Extension manifest
 
-Setiap extension memiliki `extension.yaml` di root foldernya. Schema mesin:
-`schemas/extension.schema.json`. Validator tambahan:
-`ManifestValidator`.
+Every extension has an `extension.yaml` at the root of its folder. The machine
+schema lives in `schemas/extension.schema.json`. Additional validation is done
+by `ManifestValidator`.
 
-## Contoh
+## Example
 
 ```yaml
 id: http_retry
@@ -13,9 +13,9 @@ version: 0.1.0
 description: Retries temporary HTTP failures with backoff.
 category: network
 tier: official
-provides: [http_client, http_pipeline] # capability yang disediakan
-requires: [http_client, http_pipeline] # capability yang dibutuhkan
-optional_requires: [storage]           # dipakai bila tersedia
+provides: [http_client, http_pipeline] # capabilities provided
+requires: [http_client, http_pipeline] # capabilities required
+optional_requires: [storage]           # used when available
 slots:
   - name: http.interceptors
     item: HttpMiddleware
@@ -77,29 +77,31 @@ compatibility:
   flutter: ">=3.35.0"
 ```
 
-## Field penting
+## Important fields
 
-- `provides` dan `requires` memakai nama capability, bukan id extension.
-- `exclusive: true` berarti hanya satu extension di kategori yang sama boleh
-  terpasang.
-- `slots` membuka titik sambung; `contributes` menempel ke slot yang dibuka
-  extension lain. Item harus cocok dengan tipe slot.
-- `when` membuat kontribusi hanya aktif bila semua capability tersedia.
-- `prompts` bertipe `string`, `url`, `int`, `bool`, `enum`, `secret`, atau
-  `multi`. Prompt `secret` tidak disimpan di `kiln.yaml`; nilainya disimpan di
-  `env/*.json`.
-- Patch native hanya diterapkan bila folder platform ada di proyek.
-- `conditional` menerapkan blok native hanya bila semua jawaban prompt di `when`
-  cocok; list dibandingkan per elemen.
-- `manual_steps` dilacak `kiln doctor`.
+- `provides` and `requires` use capability names, not extension ids.
+- `exclusive: true` means only one extension in the same category may be
+  installed.
+- `slots` opens attachment points; `contributes` attaches to slots opened by
+  other extensions. The item must match the slot type.
+- `when` keeps a contribution active only while all listed capabilities are
+  available.
+- `prompts` are typed as `string`, `url`, `int`, `bool`, `enum`, `secret`, or
+  `multi`. A `secret` prompt is not stored in `kiln.yaml`; its value is stored
+  in `env/*.json`.
+- Native patches are applied only when the platform folder exists in the
+  project.
+- `conditional` applies a native block only when all prompt answers in `when`
+  match; lists are compared element by element.
+- `manual_steps` are tracked by `kiln doctor`.
 
-## Validasi
+## Validation
 
 ```bash
 kiln ext validate extensions/http_retry
 ```
 
-Validator menolak id non-snake_case, semver salah, capability ganda, prompt
-tanpa opsi enum/multi, requires terhadap capability sendiri, slot ganda, serta
-permission, URL scheme, App Link host/path prefix, dan receiver Android yang
-tidak valid atau duplikat.
+The validator rejects non-snake_case ids, invalid semver, duplicate
+capabilities, prompts without enum/multi options, `requires` on the extension's
+own capability, duplicate slots, and invalid or duplicated Android permissions,
+URL schemes, App Link hosts/path prefixes, and receivers.

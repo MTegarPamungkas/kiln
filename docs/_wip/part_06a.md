@@ -1,50 +1,50 @@
-## Extension: storage dan data
+## Extensions: storage and data
 
-Tiga extension penyimpanan lokal, dari yang paling sederhana (key-value) sampai
-yang terenkripsi dan yang berbentuk dokumen. Ketiganya tidak saling mengimpor:
-`http_cache` dan `rest_auth` memakai `Storage` dan `SecureStorage` lewat
-kontrak di `kiln_core`.
+Three local storage extensions, from the simplest (key-value) to the encrypted
+one and the document-based one. They do not import each other: `http_cache`
+and `rest_auth` use `Storage` and `SecureStorage` through the contracts in
+`kiln_core`.
 
 ### storage
 
 ```text
 extensions/storage/
 ├─ extension.yaml  # manifest: provides: storage · category: storage
-├─ README.md  # ikhtisar extension: fungsi, cara memasang, dan contoh pemakaian
-├─ CHANGELOG.md  # riwayat perubahan extension per versi
-├─ docs/  # dokumentasi pemakaian storage dan migrasi key
-│  ├─ key-value-storage.md  # panduan membaca dan menulis nilai lewat Prefs dan Storage
-│  └─ typed-keys-and-migration.md  # cara memberi nama key dan memigrasi nilai lama
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/  # Mason brick yang dirender menjadi kode extension di aplikasi user
-   ├─ brick.yaml  # metadata brick Mason: nama, versi, dan variabel
-   └─ __brick__/  # template file yang dirender ke folder aplikasi user
-      ├─ lib/extensions/storage/  # kode sumber extension storage yang dirender ke aplikasi user
-      │  ├─ prefs.dart  # fasad statis Prefs.read, write, delete, bernama Prefs agar tidak bentrok dengan Storage
-      │  ├─ storage_module.dart  # mendaftarkan Storage berbasis SharedPreferences ke Registry
-      │  ├─ shared_preferences_storage.dart  # mengimplementasikan Storage key-value di atas shared_preferences
-      │  ├─ storage_config.dart  # konfigurasi bertipe: prefix key per app dan flavor
-      │  ├─ storage_failure_mapper.dart  # mengubah error plugin dan cast salah menjadi Failure(storage)
-      │  ├─ storage_gateway.dart  # membungkus SharedPreferencesAsync agar bisa di-fake di test
-      │  ├─ typed_key.dart  # mendefinisikan StorageKey<T> dengan nama, tipe, default, dan serializer
-      │  ├─ json_codec.dart  # menyimpan objek lewat jsonEncode dan jsonDecode
-      │  ├─ namespaced_storage.dart  # membungkus Storage dengan prefix, dipakai http_cache tanpa menimpa key lain
-      │  ├─ ttl_storage.dart  # menyimpan nilai dengan kedaluwarsa, memakai Clock dari kiln_core
-      │  └─ storage_migrator.dart  # mengelola versi skema key dan menjalankan langkah migrasi saat start
-      └─ test/extensions/storage/  # test extension storage yang dirender ke aplikasi user
-         ├─ shared_preferences_storage_test.dart  # menguji bahwa nilai tersimpan, terbaca, dan terhapus lewat gateway palsu
-         ├─ storage_module_test.dart  # menguji bahwa module mendaftarkan Storage ke Registry
-         ├─ storage_failure_mapper_test.dart  # menguji pemetaan error plugin dan cast salah menjadi Failure(storage)
-         ├─ typed_key_test.dart  # menguji nilai default dan serializer pada StorageKey<T>
-         ├─ json_codec_test.dart  # menguji bahwa objek tersimpan dan terbaca kembali lewat JSON
-         ├─ namespaced_storage_test.dart  # menguji bahwa prefix memisahkan key dan tidak menimpa key lain
-         ├─ ttl_storage_test.dart  # menguji bahwa nilai kedaluwarsa sesuai Clock yang dikendalikan test
-         ├─ storage_migrator_test.dart  # menguji bahwa langkah migrasi dijalankan saat versi skema key lebih lama
-         └─ storage_contract_test.dart  # menjalankan suite kontrak Storage dari kiln_testing ke implementasi ini
+├─ README.md  # extension overview: what it does, how to install it, and usage examples
+├─ CHANGELOG.md  # changelog of the extension per version
+├─ docs/  # documentation on using storage and migrating keys
+│  ├─ key-value-storage.md  # guide to reading and writing values through Prefs and Storage
+│  └─ typed-keys-and-migration.md  # how to name keys and migrate old values
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/  # Mason brick rendered into extension code in the user app
+   ├─ brick.yaml  # Mason brick metadata: name, version, and variables
+   └─ __brick__/  # template files rendered into the user app folder
+      ├─ lib/extensions/storage/  # storage extension source code rendered into the user app
+      │  ├─ prefs.dart  # static Prefs.read, write, delete facade, named Prefs so it does not clash with Storage
+      │  ├─ storage_module.dart  # registers a SharedPreferences-based Storage in the Registry
+      │  ├─ shared_preferences_storage.dart  # implements key-value Storage on top of shared_preferences
+      │  ├─ storage_config.dart  # typed configuration: key prefix per app and flavor
+      │  ├─ storage_failure_mapper.dart  # turns plugin errors and bad casts into Failure(storage)
+      │  ├─ storage_gateway.dart  # wraps SharedPreferencesAsync so it can be faked in tests
+      │  ├─ typed_key.dart  # defines StorageKey<T> with name, type, default, and serializer
+      │  ├─ json_codec.dart  # stores objects through jsonEncode and jsonDecode
+      │  ├─ namespaced_storage.dart  # wraps Storage with a prefix, used by http_cache without overwriting other keys
+      │  ├─ ttl_storage.dart  # stores values with an expiry, using Clock from kiln_core
+      │  └─ storage_migrator.dart  # manages key schema versions and runs migration steps at startup
+      └─ test/extensions/storage/  # storage extension tests rendered into the user app
+         ├─ shared_preferences_storage_test.dart  # verifies that values are stored, read, and deleted through a fake gateway
+         ├─ storage_module_test.dart  # verifies that the module registers Storage in the Registry
+         ├─ storage_failure_mapper_test.dart  # verifies the mapping of plugin errors and bad casts to Failure(storage)
+         ├─ typed_key_test.dart  # verifies the default value and serializer on StorageKey<T>
+         ├─ json_codec_test.dart  # verifies that objects are stored and read back through JSON
+         ├─ namespaced_storage_test.dart  # verifies that the prefix separates keys and does not overwrite other keys
+         ├─ ttl_storage_test.dart  # verifies that values expire according to the test-controlled Clock
+         ├─ storage_migrator_test.dart  # verifies that migration steps run when the key schema version is older
+         └─ storage_contract_test.dart  # runs the Storage contract suite from kiln_testing against this implementation
 ```
 
 ### secure_storage
@@ -52,39 +52,39 @@ extensions/storage/
 ```text
 extensions/secure_storage/
 ├─ extension.yaml  # manifest: provides: secure_storage · ios: keychain_sharing · android: allowBackup=false
-├─ README.md  # ikhtisar extension: fungsi, cara memasang, dan contoh pemakaian
-├─ CHANGELOG.md  # riwayat perubahan extension per versi
-├─ docs/  # dokumentasi penyimpanan aman dan perbedaan platform
-│  ├─ secure-storage.md  # panduan menyimpan rahasia lewat Vault dan SecureStorage
-│  └─ keystore-and-keychain-notes.md  # kehilangan data saat reinstall, backup, dan perbedaan platform
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/  # Mason brick yang dirender menjadi kode extension di aplikasi user
-   ├─ brick.yaml  # metadata brick Mason: nama, versi, dan variabel
-   └─ __brick__/  # template file yang dirender ke folder aplikasi user
-      ├─ lib/extensions/secure_storage/  # kode sumber extension secure_storage yang dirender ke aplikasi user
-      │  ├─ vault.dart  # fasad statis Vault.read, write, dan delete untuk data rahasia
-      │  ├─ secure_storage_module.dart  # mendaftarkan SecureStorage ke Registry
-      │  ├─ keystore_secure_storage.dart  # mengimplementasikan SecureStorage di atas Keychain dan Keystore
-      │  ├─ secure_storage_config.dart  # konfigurasi bertipe: opsi Android (encrypted prefs), iOS (accessibility), web
-      │  ├─ secure_storage_failure_mapper.dart  # mengubah error plugin menjadi Failure(secure_storage)
-      │  ├─ secure_storage_gateway.dart  # membungkus FlutterSecureStorage agar bisa di-fake di test
-      │  ├─ secure_token_store.dart  # mengimplementasikan TokenProvider dari kiln_core, dipakai rest_auth
-      │  ├─ namespaced_secure_storage.dart  # memberi prefix per extension agar readAll dan clear tidak menyentuh milik lain
-      │  ├─ first_run_wipe.dart  # menghapus Keychain sisa instalasi lama pada start pertama iOS
-      │  └─ secure_storage_health_check.dart  # menjalankan probe tulis-baca-hapus dan melaporkannya ke doctor dan Logger
-      └─ test/extensions/secure_storage/  # test extension secure_storage yang dirender ke aplikasi user
-         ├─ secure_storage_test.dart  # menguji bahwa rahasia tersimpan, terbaca, dan terhapus lewat gateway palsu
-         ├─ secure_storage_module_test.dart  # menguji bahwa module mendaftarkan SecureStorage ke Registry
-         ├─ secure_storage_failure_mapper_test.dart  # menguji pemetaan error plugin menjadi Failure(secure_storage)
-         ├─ secure_token_store_test.dart  # menguji bahwa token tersimpan dan terbaca lewat TokenProvider
-         ├─ namespaced_secure_storage_test.dart  # menguji bahwa readAll dan clear hanya menyentuh key berprefix sendiri
-         ├─ first_run_wipe_test.dart  # menguji bahwa Keychain lama dihapus hanya pada start pertama iOS
-         ├─ secure_storage_health_check_test.dart  # menguji bahwa probe tulis-baca-hapus melaporkan hasil ke doctor dan Logger
-         └─ secure_storage_contract_test.dart  # menjalankan suite kontrak SecureStorage dari kiln_testing ke implementasi ini
+├─ README.md  # extension overview: what it does, how to install it, and usage examples
+├─ CHANGELOG.md  # changelog of the extension per version
+├─ docs/  # documentation on secure storage and platform differences
+│  ├─ secure-storage.md  # guide to storing secrets through Vault and SecureStorage
+│  └─ keystore-and-keychain-notes.md  # data loss on reinstall, backups, and platform differences
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/  # Mason brick rendered into extension code in the user app
+   ├─ brick.yaml  # Mason brick metadata: name, version, and variables
+   └─ __brick__/  # template files rendered into the user app folder
+      ├─ lib/extensions/secure_storage/  # secure_storage extension source code rendered into the user app
+      │  ├─ vault.dart  # static Vault.read, write, and delete facade for secret data
+      │  ├─ secure_storage_module.dart  # registers SecureStorage in the Registry
+      │  ├─ keystore_secure_storage.dart  # implements SecureStorage on top of Keychain and Keystore
+      │  ├─ secure_storage_config.dart  # typed configuration: Android options (encrypted prefs), iOS (accessibility), web
+      │  ├─ secure_storage_failure_mapper.dart  # turns plugin errors into Failure(secure_storage)
+      │  ├─ secure_storage_gateway.dart  # wraps FlutterSecureStorage so it can be faked in tests
+      │  ├─ secure_token_store.dart  # implements TokenProvider from kiln_core, used by rest_auth
+      │  ├─ namespaced_secure_storage.dart  # prefixes keys per extension so readAll and clear never touch other owners
+      │  ├─ first_run_wipe.dart  # clears Keychain leftovers from old installs on the first iOS start
+      │  └─ secure_storage_health_check.dart  # runs a write-read-delete probe and reports the result to doctor and the Logger
+      └─ test/extensions/secure_storage/  # secure_storage extension tests rendered into the user app
+         ├─ secure_storage_test.dart  # verifies that secrets are stored, read, and deleted through a fake gateway
+         ├─ secure_storage_module_test.dart  # verifies that the module registers SecureStorage in the Registry
+         ├─ secure_storage_failure_mapper_test.dart  # verifies the mapping of plugin errors to Failure(secure_storage)
+         ├─ secure_token_store_test.dart  # verifies that tokens are stored and read through TokenProvider
+         ├─ namespaced_secure_storage_test.dart  # verifies that readAll and clear only touch keys with their own prefix
+         ├─ first_run_wipe_test.dart  # verifies that old Keychain data is cleared only on the first iOS start
+         ├─ secure_storage_health_check_test.dart  # verifies that the write-read-delete probe reports results to doctor and the Logger
+         └─ secure_storage_contract_test.dart  # runs the SecureStorage contract suite from kiln_testing against this implementation
 ```
 
 ### local_db
@@ -92,48 +92,48 @@ extensions/secure_storage/
 ```text
 extensions/local_db/
 ├─ extension.yaml  # manifest: provides: local_db · category: database · exclusive
-├─ README.md  # ikhtisar extension: fungsi, cara memasang, dan contoh pemakaian
-├─ CHANGELOG.md  # riwayat perubahan extension per versi
-├─ docs/  # dokumentasi database lokal, skema, dan pola offline-first
-│  ├─ local-database.md  # panduan memakai LocalDatabase, koleksi, dan query
-│  ├─ schema-versioning.md  # cara memakai migrasi dokumen
-│  └─ offline-first-pattern.md  # pola offline-first, dipakai guides/add-offline-support.md
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/  # Mason brick yang dirender menjadi kode extension di aplikasi user
-   ├─ brick.yaml  # metadata brick Mason: nama, versi, dan variabel
-   └─ __brick__/  # template file yang dirender ke folder aplikasi user
-      ├─ lib/extensions/local_db/  # kode sumber extension local_db yang dirender ke aplikasi user
-      │  ├─ local_db_module.dart  # mendaftarkan LocalDatabase ke Registry
-      │  ├─ sembast_local_database.dart  # mengimplementasikan LocalDatabase di atas Sembast
-      │  ├─ local_database_opener.dart  # membuka database Sembast, memilih varian IO atau web sesuai platform
-      │  ├─ local_database_opener_io.dart  # membuka database Sembast berbasis file di Android, iOS, dan desktop
-      │  ├─ local_database_opener_web.dart  # membuka database Sembast berbasis IndexedDB di web
-      │  ├─ local_db_config.dart  # konfigurasi bertipe: nama file database, versi skema, path override
-      │  ├─ local_db_failure_mapper.dart  # mengubah error Sembast menjadi Failure(database)
-      │  ├─ collection_watcher.dart  # menyediakan Stream<List<LocalRecord>> yang diperbarui saat koleksi berubah
-      │  ├─ transaction_runner.dart  # menjalankan beberapa operasi dalam satu transaksi atomik
-      │  ├─ typed_collection.dart  # membuat LocalCollection bertipe dengan fromJson dan toJson
-      │  ├─ query_builder.dart  # menyusun where, orderBy, dan limit menjadi LocalQuery
-      │  ├─ schema_migrator.dart  # menjalankan langkah migrasi sesuai versi skema saat database dibuka
-      │  ├─ database_encryption.dart  # menyediakan enkripsi opsional lewat kodek Sembast, kunci dari SecureStorage bila ada
-      │  ├─ backup_export.dart  # mengekspor dan mengimpor seluruh database sebagai JSON
-      │  └─ sync_queue.dart  # menampung antrean perubahan lokal untuk disinkronkan ke RemoteDatabase
-      └─ test/extensions/local_db/  # test extension local_db yang dirender ke aplikasi user
-         ├─ local_database_test.dart  # menguji bahwa LocalDatabase menyimpan, membaca, dan menghapus dokumen
-         ├─ local_db_module_test.dart  # menguji bahwa module mendaftarkan LocalDatabase ke Registry
-         ├─ local_db_failure_mapper_test.dart  # menguji pemetaan error Sembast menjadi Failure(database)
-         ├─ collection_watcher_test.dart  # menguji bahwa stream koleksi memancarkan data baru saat koleksi berubah
-         ├─ transaction_runner_test.dart  # menguji bahwa transaksi bersifat atomik dan dibatalkan saat salah satu operasi gagal
-         ├─ typed_collection_test.dart  # menguji konversi fromJson dan toJson pada LocalCollection bertipe
-         ├─ query_builder_test.dart  # menguji bahwa where, orderBy, dan limit menjadi LocalQuery yang benar
-         ├─ schema_migrator_test.dart  # menguji bahwa langkah migrasi berjalan sesuai versi skema saat open
-         ├─ database_encryption_test.dart  # menguji bahwa database terenkripsi hanya terbaca dengan kunci yang sama
-         ├─ backup_export_test.dart  # menguji bahwa ekspor lalu impor JSON memulihkan seluruh isi database
-         ├─ sync_queue_test.dart  # menguji bahwa antrean menyimpan perubahan lokal untuk disinkronkan
-         └─ local_database_contract_test.dart  # menjalankan suite kontrak LocalDatabase dari kiln_testing ke implementasi ini
+├─ README.md  # extension overview: what it does, how to install it, and usage examples
+├─ CHANGELOG.md  # changelog of the extension per version
+├─ docs/  # documentation on the local database, schema, and offline-first patterns
+│  ├─ local-database.md  # guide to using LocalDatabase, collections, and queries
+│  ├─ schema-versioning.md  # how to use document migrations
+│  └─ offline-first-pattern.md  # offline-first patterns, used by guides/add-offline-support.md
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/  # Mason brick rendered into extension code in the user app
+   ├─ brick.yaml  # Mason brick metadata: name, version, and variables
+   └─ __brick__/  # template files rendered into the user app folder
+      ├─ lib/extensions/local_db/  # local_db extension source code rendered into the user app
+      │  ├─ local_db_module.dart  # registers LocalDatabase in the Registry
+      │  ├─ sembast_local_database.dart  # implements LocalDatabase on top of Sembast
+      │  ├─ local_database_opener.dart  # opens the Sembast database, picking the IO or web variant per platform
+      │  ├─ local_database_opener_io.dart  # opens the file-based Sembast database on Android, iOS, and desktop
+      │  ├─ local_database_opener_web.dart  # opens the IndexedDB-based Sembast database on the web
+      │  ├─ local_db_config.dart  # typed configuration: database file name, schema version, path override
+      │  ├─ local_db_failure_mapper.dart  # turns Sembast errors into Failure(database)
+      │  ├─ collection_watcher.dart  # provides a Stream<List<LocalRecord>> updated whenever the collection changes
+      │  ├─ transaction_runner.dart  # runs several operations in one atomic transaction
+      │  ├─ typed_collection.dart  # builds a typed LocalCollection with fromJson and toJson
+      │  ├─ query_builder.dart  # assembles where, orderBy, and limit into a LocalQuery
+      │  ├─ schema_migrator.dart  # runs migration steps for the schema version when the database is opened
+      │  ├─ database_encryption.dart  # provides optional encryption through a Sembast codec, with the key from SecureStorage when available
+      │  ├─ backup_export.dart  # exports and imports the whole database as JSON
+      │  └─ sync_queue.dart  # queues local changes to be synced to RemoteDatabase
+      └─ test/extensions/local_db/  # local_db extension tests rendered into the user app
+         ├─ local_database_test.dart  # verifies that LocalDatabase stores, reads, and deletes documents
+         ├─ local_db_module_test.dart  # verifies that the module registers LocalDatabase in the Registry
+         ├─ local_db_failure_mapper_test.dart  # verifies the mapping of Sembast errors to Failure(database)
+         ├─ collection_watcher_test.dart  # verifies that the collection stream emits new data when the collection changes
+         ├─ transaction_runner_test.dart  # verifies that transactions are atomic and roll back when one operation fails
+         ├─ typed_collection_test.dart  # verifies fromJson and toJson conversion on a typed LocalCollection
+         ├─ query_builder_test.dart  # verifies that where, orderBy, and limit become the correct LocalQuery
+         ├─ schema_migrator_test.dart  # verifies that migration steps run for the schema version on open
+         ├─ database_encryption_test.dart  # verifies that an encrypted database is readable only with the same key
+         ├─ backup_export_test.dart  # verifies that exporting then importing JSON restores the whole database
+         ├─ sync_queue_test.dart  # verifies that the queue holds local changes for syncing
+         └─ local_database_contract_test.dart  # runs the LocalDatabase contract suite from kiln_testing against this implementation
 ```
 

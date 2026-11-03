@@ -1,10 +1,10 @@
-# Pola offline-first
+# Offline-first pattern
 
-1. Baca dari `LocalDatabase` lebih dulu.
-2. Tampilkan status `NetworkMonitor`.
-3. Saat online, kirim perubahan dari `SyncQueue` ke `RemoteDatabase`.
-4. Terapkan hasil server kembali ke lokal.
-5. Gunakan `watch` untuk memperbarui UI tanpa polling.
+1. Read from `LocalDatabase` first.
+2. Show the `NetworkMonitor` status.
+3. When online, send changes from the `SyncQueue` to `RemoteDatabase`.
+4. Apply the server result back to the local store.
+5. Use `watch` to update the UI without polling.
 
-Pastikan konflik punya aturan yang jelas: last-write-wins, versi server, atau
-resolusi manual.
+Make sure conflicts have a clear rule: last-write-wins, server version, or
+manual resolution.

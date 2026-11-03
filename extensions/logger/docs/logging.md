@@ -1,61 +1,62 @@
 # Logging
 
-`AppLogger` adalah kontrak dari `kiln_core`. Extension ini menyediakan
-implementasinya lewat `PipelineLogger`, yang memberi timestamp, menyaring
-berdasarkan level, lalu meneruskan `LogRecord` ke `SinkPipeline`.
+`AppLogger` is a contract from `kiln_core`. This extension provides its
+implementation through `PipelineLogger`, which adds timestamps, filters by
+level, and then forwards `LogRecord` values to the `SinkPipeline`.
 
 ```dart
 final logger = registry.read<AppLogger>();
 
-logger.debug('memuat profil');
-logger.info('profil dimuat', data: {'user': 'u-1'});
-logger.warning('cache lama dipakai');
-logger.error('sinkronisasi gagal', error: failure, stackTrace: stack);
+logger.debug('loading profile');
+logger.info('profile loaded', data: {'user': 'u-1'});
+logger.warning('stale cache used');
+logger.error('sync failed', error: failure, stackTrace: stack);
 ```
 
-## Level
+## Levels
 
-| Flavor | Level bawaan |
+| Flavor | Default level |
 | --- | --- |
 | `development` | `trace` |
 | `staging` | `debug` |
 | `production` | `warning` |
 
-Nilai ini berasal dari `LoggerConfig`. Bila extension `flavor` tidak terpasang,
-module memakai development untuk build debug dan production untuk build release.
+These values come from `LoggerConfig`. If the `flavor` extension is not
+installed, the module uses development for debug builds and production for
+release builds.
 
-`LogLevelController` bisa diubah saat berjalan hanya di flavor non-production.
-Di production, `setLevel` melempar `Failure` dengan kode
-`validation.unsupported_value`; level yang dikonfigurasi tetap dipakai.
+`LogLevelController` can be changed at runtime only in non-production flavors.
+In production, `setLevel` throws a `Failure` with the code
+`validation.unsupported_value`; the configured level remains in use.
 
 ```dart
 final levels = registry.read<LogLevelController>();
-levels.setLevel(LogLevel.trace); // hanya non-production
+levels.setLevel(LogLevel.trace); // non-production only
 ```
 
-## Sink
+## Sinks
 
-Sink aktif diatur oleh `LoggerConfig.activeSinks`:
+The active sinks are controlled by `LoggerConfig.activeSinks`:
 
-- `console` mencetak satu baris teks.
-- `memory` menyimpan N record terakhir untuk laporan bug dan test.
-- `file` menulis ke `app.log` berputar di folder `logs` dokumen aplikasi.
-- `breadcrumb` meneruskan warning dan error ke `CrashReporter`.
+- `console` prints a single line of text.
+- `memory` keeps the last N records for bug reports and tests.
+- `file` writes to a rotating `app.log` in the app documents `logs` folder.
+- `breadcrumb` forwards warnings and errors to `CrashReporter`.
 
-File sink hanya tersedia di VM. Build web memakai stub, jadi impor
-`file_log_sink.dart` aman di semua platform.
+The file sink is only available on the VM. Web builds use a stub, so importing
+`file_log_sink.dart` is safe on all platforms.
 
 ## HTTP
 
-Bila prompt `http_logging` aktif dan `HttpPipeline` terdaftar,
-`HttpLogMiddleware` ditambahkan dengan prioritas 90. Middleware mencatat metode,
-URL tanpa query dan user info, status, serta durasi. Header disamarkan dengan
-`PiiRedactor`; body tidak pernah dicatat. Respons 4xx dicatat sebagai warning,
-5xx dan error jaringan sebagai error, dan error tetap dilempar ulang.
+If the `http_logging` prompt is active and `HttpPipeline` is registered,
+`HttpLogMiddleware` is added with priority 90. The middleware records the
+method, URL without query and user info, status, and duration. Headers are
+redacted with `PiiRedactor`; bodies are never logged. 4xx responses are logged
+as warnings, 5xx and network errors as errors, and errors are still rethrown.
 
-## Debug dan ekspor
+## Debug and export
 
-`DebugLogPage` menampilkan isi `MemoryLogSink` di flavor non-production.
+`DebugLogPage` shows the contents of `MemoryLogSink` in non-production flavors.
 
 ```dart
 final exporter = LogExporter(
@@ -67,5 +68,5 @@ final exporter = LogExporter(
 final report = await exporter.export();
 ```
 
-Laporan menggabungkan record memori dan isi berkas, lalu menyamarkan ulang
-keduanya sebelum ditampilkan atau dibagikan.
+The report combines memory records and file contents, then redacts both again
+before they are displayed or shared.

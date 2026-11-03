@@ -1,31 +1,31 @@
 # Deep links
 
-Extension ini menyediakan kontrak `DeepLinks` dari `kiln_core`. Ada dua jenis
-tautan yang ditangani:
+This extension provides the `DeepLinks` contract from `kiln_core`. There are two
+kinds of link handled:
 
-1. Scheme kustom, misalnya `kiln://profile/42`.
-2. Universal link `https://kiln.dev/profile/42` pada Android dan iOS.
+1. Custom schemes, for example `kiln://profile/42`.
+2. Universal links `https://kiln.dev/profile/42` on Android and iOS.
 
-Keduanya masuk lewat `app_links`, dinormalkan, disaring, lalu diteruskan ke
-aplikasi.
+Both arrive through `app_links`, are normalized, filtered, and then forwarded to
+the application.
 
-## Alur pemrosesan
+## Processing flow
 
 ```text
 app_links -> LinkNormalizer -> LinkAllowlist -> LinkDeduplicator -> links
 ```
 
-- `LinkNormalizer` menurunkan huruf scheme dan host, menghapus port default,
-  merapatkan garis miring ganda, membuang garis miring di akhir path, membuang
-  parameter pelacak (`utm_*`, `fbclid`, dan sejenisnya), serta menghapus
+- `LinkNormalizer` lowercases the scheme and host, removes default ports,
+  collapses double slashes, strips the trailing slash from the path, drops
+  tracking parameters (`utm_*`, `fbclid`, and similar), and removes the
   fragment.
-- `LinkAllowlist` menerima scheme kustom yang dikonfigurasi dan `https` hanya
-  untuk host yang ada di `allowedHosts`. Path prefix dicocokkan per segmen,
-  sehingga `/app` menerima `/app/42` tetapi menolak `/application`.
-- `LinkDeduplicator` memakai `Clock`, jadi jendela duplikasi dapat diuji dengan
+- `LinkAllowlist` accepts the configured custom schemes and `https` only for
+  hosts listed in `allowedHosts`. Path prefixes are matched per segment, so
+  `/app` accepts `/app/42` but rejects `/application`.
+- `LinkDeduplicator` uses a `Clock`, so the duplicate window can be tested with
   `FixedClock`.
 
-## Siklus hidup
+## Lifecycle
 
 ```dart
 final deepLinks = DeviceDeepLinks(
@@ -43,23 +43,23 @@ if (initial != null) {
 }
 ```
 
-`start()` idempoten. Tautan yang tiba sebelum listener pertama terpasang
-disimpan di `PendingLinkBuffer` dan diputar ulang satu kali saat listener
-terpasang. Tautan peluncuran hanya tersedia lewat `initialLink`; tautan yang
-sama tidak dikirim dua kali karena deduplikasi.
+`start()` is idempotent. Links that arrive before the first listener is attached
+are stored in `PendingLinkBuffer` and replayed once when the listener attaches.
+The launch link is only available through `initialLink`; the same link is not
+delivered twice because of deduplication.
 
-`dispose()` membatalkan langganan gateway, menutup stream, dan tidak
-meneruskan tautan baru.
+`dispose()` cancels the gateway subscription, closes the stream, and stops
+forwarding new links.
 
-## Error
+## Errors
 
-`mapDeepLinkError` mengubah error plugin menjadi
-`Failure(FailureCode.deepLinkUnavailable, kind: deepLink)` dan
-`FormatException` menjadi `FailureCode.deepLinkInvalid`. `DeviceDeepLinks`
-menyimpan error terakhir di `lastFailure`; tautan yang ditolak allowlist
-diabaikan tanpa error.
+`mapDeepLinkError` turns plugin errors into
+`Failure(FailureCode.deepLinkUnavailable, kind: deepLink)` and
+`FormatException` into `FailureCode.deepLinkInvalid`. `DeviceDeepLinks` stores
+the last error in `lastFailure`; links rejected by the allowlist are ignored
+without an error.
 
-## Integrasi router
+## Router integration
 
 ```dart
 final subscription = deepLinks.links.listen((link) {
@@ -69,9 +69,9 @@ final subscription = deepLinks.links.listen((link) {
 });
 ```
 
-Untuk tautan scheme kustom, segmen pertama menjadi host URI. `kiln://profile/42`
-memiliki `host == 'profile'` dan `path == '/42'`, sehingga aplikasi perlu
-memetakan host tersebut ke route, misalnya:
+For custom scheme links, the first segment becomes the URI host.
+`kiln://profile/42` has `host == 'profile'` and `path == '/42'`, so the
+application needs to map that host to a route, for example:
 
 ```dart
 String routeFor(Uri link) {
@@ -82,9 +82,9 @@ String routeFor(Uri link) {
 }
 ```
 
-## Konfigurasi
+## Configuration
 
-`DeepLinkConfig` menyimpan scheme, host, path prefix, opsi normalisasi, dan
-jendela deduplikasi. Ubah opsi normalisasi dengan membuat konfigurasi baru dan
-mendaftarkannya ke `Registry`; `DeepLinkModule` memakai
-`DeepLinkConfig.defaults` yang dirender dari prompt.
+`DeepLinkConfig` stores the scheme, hosts, path prefixes, normalization options,
+and the deduplication window. Change the normalization options by creating a new
+configuration and registering it with the `Registry`; `DeepLinkModule` uses the
+`DeepLinkConfig.defaults` rendered from the prompt.

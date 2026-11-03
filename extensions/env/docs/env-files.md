@@ -1,25 +1,26 @@
 # Env files
 
-Extension ini mengirim tiga file contoh:
+This extension ships three example files:
 
 - `env/development.example.json`
 - `env/staging.example.json`
 - `env/production.example.json`
 
-Salin file yang diperlukan menjadi nama tanpa `.example`:
+Copy the files you need to a name without `.example`:
 
 ```bash
 cp env/development.example.json env/development.json
 ```
 
-File asli di-ignore oleh `env/.gitignore`. Jangan commit nilai lingkungan nyata.
+The real files are ignored by `env/.gitignore`. Do not commit real environment
+values.
 
-Pilih file lewat `--dart-define-from-file`:
+Select a file via `--dart-define-from-file`:
 
 ```bash
 flutter run --dart-define-from-file=env/development.json
 ```
 
-Flutter CLI juga menerima daftar file yang dipisahkan koma pada versi terbaru.
-Nilai di file tetap menjadi konstanta saat build; mengubah file memerlukan
-build ulang.
+The Flutter CLI also accepts a comma-separated list of files in recent versions.
+Values in the file remain constants at build time; changing the file requires a
+rebuild.

@@ -1,9 +1,10 @@
-# Alur permission
+# Permission flow
 
-1. `PermissionKindGuard` menolak kind yang tidak diaktifkan.
-2. Status diambil dari cache atau platform.
-3. Bila sudah granted, selesai.
-4. Bila ditolak, rationale ditampilkan (opsional).
-5. Request dikirim ke platform.
-6. Bila permanen, aplikasi diarahkan ke settings.
-7. Cache dibersihkan saat app resume agar status dari settings terbaca ulang.
+1. `PermissionKindGuard` rejects kinds that are not enabled.
+2. Status is read from the cache or the platform.
+3. If already granted, done.
+4. If denied, the rationale is shown (optional).
+5. The request is sent to the platform.
+6. If permanently denied, the app is directed to settings.
+7. The cache is cleared when the app resumes so the status from settings is
+   read again.

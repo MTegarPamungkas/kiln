@@ -1,12 +1,12 @@
-# Memulai Kiln
+# Getting started with Kiln
 
-## Prasyarat
+## Prerequisites
 
-- Flutter 3.47 atau lebih baru
-- Dart 3.13 atau lebih baru
-- Git (opsional untuk proyek hasil generate)
+- Flutter 3.47 or newer
+- Dart 3.13 or newer
+- Git (optional for generated projects)
 
-## Setup repo
+## Repo setup
 
 ```bash
 git clone <repo-kiln>
@@ -15,7 +15,7 @@ flutter pub get
 dart analyze
 ```
 
-Semua test:
+All tests:
 
 ```bash
 cd packages/kiln_core && dart test
@@ -25,10 +25,10 @@ cd ../kiln_cli && dart test
 cd ../../extensions/dio && dart test
 ```
 
-## Membuat aplikasi
+## Creating an app
 
-Jalankan CLI dari source. `--core-path` membuat proyek memakai `kiln_core` dan
-`kiln_testing` dari workspace, bukan dari pub.dev:
+Run the CLI from source. `--core-path` makes the project use `kiln_core` and
+`kiln_testing` from the workspace instead of pub.dev:
 
 ```bash
 dart run packages/kiln_cli/bin/kiln.dart create my_app \
@@ -39,12 +39,13 @@ dart run packages/kiln_cli/bin/kiln.dart create my_app \
   --yes
 ```
 
-`kiln create` selalu memasang extension `l10n`, sehingga seluruh teks shell
-berasal dari ARB dan template tidak menyimpan string aplikasi hardcoded.
-`l10n` juga otomatis menambah `flutter: generate: true` dan menjalankan
-gen-l10n saat `pub get`.
+`kiln create` always installs the `l10n` extension, so all shell text comes
+from ARB files and the template keeps no hardcoded application strings. `l10n`
+also adds `flutter: generate: true` automatically and runs gen-l10n on
+`pub get`.
 
-Tanpa `--with`, proyek tetap bisa dibuat lalu extension lain ditambahkan:
+Without `--with`, the project can still be created and other extensions added
+afterwards:
 
 ```bash
 cd my_app
@@ -52,7 +53,7 @@ dart run ../packages/kiln_cli/bin/kiln.dart add dio \
   --answer base_url=https://api.example.com
 ```
 
-Perintah lain:
+Other commands:
 
 ```bash
 kiln list
@@ -61,7 +62,7 @@ kiln graph
 kiln remove dio --yes
 ```
 
-## Struktur proyek hasil generate
+## Generated project structure
 
 ```text
 my_app/
@@ -69,19 +70,18 @@ my_app/
 │  ├─ main.dart
 │  ├─ app/            # KilnApp, RegistryScope, AppShell, error screen
 │  ├─ core/           # theme, l10n, global error handler
-│  ├─ extensions/     # kode extension + extensions.g.dart
+│  ├─ extensions/     # extension code + extensions.g.dart
 │  └─ ...
 ├─ test/
 ├─ kiln.yaml
 ├─ kiln.lock.yaml
-└─ .kiln/             # jurnal dan backup, di-ignore Git
+└─ .kiln/             # journal and backups, ignored by Git
 ```
 
-`lib/extensions/extensions.g.dart` adalah satu-satunya file aplikasi yang
-dimiliki Kiln. Jangan diedit manual; `kiln doctor --fix` akan
-mensinkronkannya.
+`lib/extensions/extensions.g.dart` is the only application file owned by Kiln.
+Do not edit it by hand; `kiln doctor --fix` keeps it in sync.
 
-## Menulis extension
+## Writing an extension
 
 ```bash
 kiln ext new hello --name "Hello extension" --provides hello
@@ -90,27 +90,27 @@ kiln ext test extensions/hello
 kiln ext pack extensions/hello
 ```
 
-Baca [extensions/writing-an-extension.md](extensions/writing-an-extension.md)
-dan [extension-manifest.md](extension-manifest.md).
+Read [extensions/writing-an-extension.md](extensions/writing-an-extension.md)
+and [extension-manifest.md](extension-manifest.md).
 
-## Katalog bawaan
+## Bundled catalog
 
-Fase 2 saat ini menyediakan:
+Phase 2 currently provides:
 
-- `bloc` dan `riverpod` untuk state management (exclusive).
-- `dio` untuk HTTP client dan pipeline.
-- `http_retry` dan `http_cache` untuk ketahanan dan cache HTTP.
-- `storage`, `secure_storage`, dan `local_db` untuk key-value, rahasia, dan
-  database offline-first.
-- `connectivity`, `permission`, `notifications`, dan `image_picker` untuk
-  status jaringan, izin, notifikasi lokal, dan pemilihan gambar.
-- `rest_auth`, `appwrite`, `firebase`, dan `supabase` untuk autentikasi,
-  remote database, dan file storage; `social_login` dan `biometric` untuk
-  jalur masuk sosial, app lock, dan penyimpanan terlindungi.
-- `go_router`, `deep_link`, `theme`, dan `l10n` untuk navigasi, tautan masuk,
-  tema, serta lokalisasi berbasis file ARB.
-- `env`, `flavors`, `logger`, dan `analytics` untuk konfigurasi build-time,
-  entry point per flavor, logging, dan analitik dengan consent.
+- `bloc` and `riverpod` for state management (exclusive).
+- `dio` for the HTTP client and pipeline.
+- `http_retry` and `http_cache` for HTTP resilience and caching.
+- `storage`, `secure_storage`, and `local_db` for key-value, secrets, and
+  offline-first databases.
+- `connectivity`, `permission`, `notifications`, and `image_picker` for network
+  status, permissions, local notifications, and image picking.
+- `rest_auth`, `appwrite`, `firebase`, and `supabase` for authentication,
+  remote databases, and file storage; `social_login` and `biometric` for social
+  sign-in, app lock, and protected storage.
+- `go_router`, `deep_link`, `theme`, and `l10n` for navigation, incoming links,
+  theming, and ARB-based localization.
+- `env`, `flavors`, `logger`, and `analytics` for build-time configuration,
+  per-flavor entry points, logging, and consent-based analytics.
 
 ```bash
 kiln create state_app --state bloc
@@ -128,16 +128,17 @@ kiln store install logger --yes
 kiln upgrade --yes
 ```
 
-Publish satu extension ke registry lokal:
+Publish a single extension to a local registry:
 
 ```bash
 kiln ext publish extensions/logger --registry="$(pwd)/registry"
 ```
 
-`tool/registry.dart` membangun ulang `registry/index.json` dan seluruh arsip
-dari folder `extensions/`.
+`tool/registry.dart` rebuilds `registry/index.json` and every archive from the
+`extensions/` folder.
 
-## Batasan saat ini
+## Current limitations
 
-- Publish langsung ke registry HTTP belum aktif; publish ke folder lokal.
-- `kiln_lints` menunggu `custom_lint` mendukung analyzer 14.
+- Publishing directly to an HTTP registry is not active yet; publish to a local
+  folder instead.
+- `kiln_lints` is waiting for `custom_lint` to support analyzer 14.

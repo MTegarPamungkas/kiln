@@ -1,7 +1,7 @@
 # Image picker
 
-`MediaPicker.pickImage()` mengembalikan `PickedImage?`; null berarti user
-membatalkan. Semua kegagalan dilempar sebagai `Failure`.
+`MediaPicker.pickImage()` returns `PickedImage?`; null means the user
+cancelled. Every failure is thrown as a `Failure`.
 
 ```dart
 final picker = registry.read<MediaPicker>();
@@ -18,28 +18,29 @@ if (image != null) {
 }
 ```
 
-## Konfigurasi
+## Configuration
 
-Prompt `max_bytes` dan `allowed_types` dirender ke `MediaPickerConfig.defaults`.
+The `max_bytes` and `allowed_types` prompts are rendered into
+`MediaPickerConfig.defaults`.
 
-- `maxWidth`, `maxHeight`, dan `imageQuality` adalah nilai bawaan; argumen
-  `pickImage` menimpanya.
-- `maxBytes` diperiksa setelah file dibaca.
-- `allowedTypes` berisi MIME. Tipe gambar yang tidak ada di daftar ditolak.
+- `maxWidth`, `maxHeight`, and `imageQuality` are the default values; the
+  `pickImage` arguments override them.
+- `maxBytes` is checked after the file is read.
+- `allowedTypes` contains MIME types. Image types not in the list are rejected.
 
-## Tipe gambar
+## Image types
 
-Tipe ditentukan dari byte awal: JPEG, PNG, GIF, WebP, HEIC, dan AVIF.
-`mimeType` dari plugin hanya dipakai bila byte tidak tersedia, karena plugin
-melaporkan tipe yang tidak konsisten di sebagian perangkat.
+The type is determined from the leading bytes: JPEG, PNG, GIF, WebP, HEIC, and
+AVIF. The plugin's `mimeType` is only used when the bytes are unavailable,
+because the plugin reports inconsistent types on some devices.
 
-## Kamera
+## Camera
 
-Bila extension `permission` terpasang dan memasang kind `camera`,
-`CameraPermissionPrecheck` meminta izin sebelum kamera dibuka. Bila kontrak
-tidak ada atau tidak bisa menjawab, plugin yang menangani izin.
+If the `permission` extension is installed and mounts the `camera` kind,
+`CameraPermissionPrecheck` requests permission before the camera opens. If the
+contract is missing or cannot answer, the plugin handles the permission.
 
-## Daftar isi
+## Table of contents
 
-- [Alur unggah](upload-flow.md)
-- [Catatan platform](platform-notes.md)
+- [Upload flow](upload-flow.md)
+- [Platform notes](platform-notes.md)

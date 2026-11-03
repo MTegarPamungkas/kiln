@@ -1,8 +1,8 @@
 # {{name}}
 
-Dokumentasi pemakaian extension `{{id.snakeCase()}}`.
+Usage documentation for the `{{id.snakeCase()}}` extension.
 
-## Kapabilitas
+## Capabilities
 
-Extension ini menyediakan `{{provides}}`. Kode aplikasi membaca kontrak dari
-`Registry`, lalu memakai layanan yang didaftarkan module.
+This extension provides `{{provides}}`. Application code reads the contract
+from `Registry`, then uses the service registered by the module.

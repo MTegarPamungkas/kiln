@@ -1,59 +1,60 @@
-# Koleksi, izin, dan query
+# Collections, permissions, and queries
 
-Appwrite 1.8 mengganti istilah *collection* dan *document* menjadi *table* dan
-*row*. Extension ini memakai API TablesDB, tetapi nama argumen kontrak tetap
-`collection` agar kode aplikasi tidak bergantung pada istilah backend. Nilai
-`collection` adalah id tabel Appwrite.
+Appwrite 1.8 renamed *collection* and *document* to *table* and *row*. This
+extension uses the TablesDB API, but the contract argument name stays
+`collection` so application code does not depend on backend terminology. The
+`collection` value is the Appwrite table id.
 
-## Bentuk dokumen
+## Document shape
 
-`RemoteDatabase` mengembalikan kolom yang tersimpan ditambah `id` berisi id row
-Appwrite. Kolom sistem seperti `$createdAt` tidak disalin; tambahkan kolom biasa
-bila aplikasi membutuhkannya.
+`RemoteDatabase` returns the stored columns plus `id` containing the Appwrite row
+id. System columns such as `$createdAt` are not copied; add an ordinary column if
+the application needs them.
 
 ```dart
 final created = await database.create('tasks', {
-  'title': 'Kirim laporan',
+  'title': 'Send report',
   'done': false,
 });
 final id = created['id'];
 ```
 
-## RemoteQuery yang didukung
+## Supported RemoteQuery
 
-| RemoteQuery | Query Appwrite |
+| RemoteQuery | Appwrite query |
 | --- | --- |
-| `equals` | `equal`, atau `isNull` bila nilainya null |
-| `notEquals` | `notEqual`, atau `isNotNull` bila nilainya null |
+| `equals` | `equal`, or `isNull` when the value is null |
+| `notEquals` | `notEqual`, or `isNotNull` when the value is null |
 | `greaterThan` | `greaterThan` |
 | `greaterThanOrEqual` | `greaterThanEqual` |
 | `lessThan` | `lessThan` |
 | `lessThanOrEqual` | `lessThanEqual` |
-| `inList` | `equal` dengan daftar nilai |
-| `notInList` | `notEqual` dengan daftar nilai |
-| `arrayContains` | `containsAny` dengan satu nilai |
+| `inList` | `equal` with a list of values |
+| `notInList` | `notEqual` with a list of values |
+| `arrayContains` | `containsAny` with a single value |
 | `isNull` | `isNull` |
 | `isNotNull` | `isNotNull` |
-| `RemoteOrder` naik | `orderAsc` |
-| `RemoteOrder` turun | `orderDesc` |
+| `RemoteOrder` ascending | `orderAsc` |
+| `RemoteOrder` descending | `orderDesc` |
 | `limit` | `limit` |
-| `offset` | `offset`, hanya bila lebih besar dari nol |
+| `offset` | `offset`, only when greater than zero |
 
-Nilai yang tidak bisa diterjemahkan, misalnya `inList` tanpa daftar, dilempar
-sebagai `Failure(validation.invalid_input)` sebelum request dikirim.
+Values that cannot be translated, for example `inList` without a list, are
+thrown as `Failure(validation.invalid_input)` before the request is sent.
 
-## Izin
+## Permissions
 
-Izin di Appwrite melekat pada row dan bucket, bukan hanya pada tabel. Pola yang
-umum dipakai:
+Permissions in Appwrite attach to rows and buckets, not just to tables. Common
+patterns:
 
-- **Data milik user.** Buat row dengan izin `read("user:$userId")` dan
-  `update("user:$userId")`, lalu filter dengan `RemoteFilter('userId', ...)`
-  sebagai lapisan tambahan.
-- **Data publik.** Berikan `read("any")` dan batasi operasi tulis ke role
-  tertentu.
-- **Berkas.** Bucket privat membutuhkan sesi user. `FileStorage.url` memakai
-  endpoint `view` Appwrite sehingga cookie sesi ikut dikirim dari aplikasi.
+- **User-owned data.** Create rows with `read("user:$userId")` and
+  `update("user:$userId")` permissions, then filter with
+  `RemoteFilter('userId', ...)` as an extra layer.
+- **Public data.** Grant `read("any")` and restrict write operations to specific
+  roles.
+- **Files.** Private buckets require a user session. `FileStorage.url` uses the
+  Appwrite `view` endpoint so the session cookie is sent along from the
+  application.
 
-`id` row selalu diisi extension; jangan memakai kolom bernama `id` untuk data
-aplikasi karena nilainya akan tertimpa.
+The row `id` is always filled in by the extension; do not use a column named
+`id` for application data because its value will be overwritten.

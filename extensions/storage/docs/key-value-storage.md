@@ -6,5 +6,5 @@ await storage.write('onboarding_done', 'true');
 final done = await storage.read('onboarding_done');
 ```
 
-Gunakan `StorageKey<T>` untuk nilai bertipe dan `JsonCodec` untuk objek.
-`NamespacedStorage` memisahkan key milik extension dari key aplikasi.
+Use `StorageKey<T>` for typed values and `JsonCodec` for objects.
+`NamespacedStorage` separates extension-owned keys from app keys.

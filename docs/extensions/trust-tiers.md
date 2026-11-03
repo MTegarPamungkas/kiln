@@ -1,14 +1,15 @@
-# Trust tier
+# Trust tiers
 
-| Tier | Arti | Hook |
+| Tier | Meaning | Hooks |
 | --- | --- | --- |
-| `official` | Dipelihara tim Kiln | Diizinkan |
-| `verified` | Ditinjau dan checksum diverifikasi | Diizinkan |
-| `community` | Dari komunitas | Perlu persetujuan eksplisit |
+| `official` | Maintained by the Kiln team | Allowed |
+| `verified` | Reviewed and checksum-verified | Allowed |
+| `community` | From the community | Explicit approval required |
 
-`HookPolicy` di SDK menolak hook dari tier komunitas kecuali pengguna
-menyetujui (`--yes`). Installer fase fondasi tidak mengeksekusi hook otomatis;
-extension yang memiliki hook dilaporkan agar pengguna memutuskan.
+`HookPolicy` in the SDK rejects hooks from community-tier extensions unless the
+user approves them (`--yes`). The foundation-phase installer does not execute
+hooks automatically; extensions that have hooks are reported so the user can
+decide.
 
-Registry fase berikutnya menambahkan checksum arsip, signature/metadata rilis,
-dan pemeriksaan trust sebelum install.
+A later registry phase adds archive checksums, release signatures/metadata, and
+trust checks before install.

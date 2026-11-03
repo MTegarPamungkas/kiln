@@ -1,6 +1,6 @@
-# Kompatibilitas
+# Compatibility
 
-Manifest extension dapat membatasi:
+An extension manifest can constrain:
 
 ```yaml
 compatibility:
@@ -9,13 +9,13 @@ compatibility:
   flutter: ">=3.35.0"
 ```
 
-`kiln doctor` memeriksa rentang ini terhadap versi CLI dan Dart yang berjalan.
-Resolver juga dapat menolak platform yang tidak didukung lewat `platforms`.
+`kiln doctor` checks these ranges against the running CLI and Dart versions. The
+resolver can also reject unsupported platforms through `platforms`.
 
-Aturan versi:
+Version rules:
 
-- Extension memakai semver.
-- Lockfile mencatat versi tepat yang terpasang.
-- Upgrade multi-versi dan migration runner menunggu katalog registry.
-- Constraint dependency extension ditulis di `dependencies` dan ditambahkan ke
-  `pubspec.yaml` proyek pengguna.
+- Extensions use semver.
+- The lockfile records the exact version installed.
+- Multi-version upgrade and the migration runner wait on the registry catalog.
+- An extension's dependency constraints are written in `dependencies` and added
+  to the user project's `pubspec.yaml`.

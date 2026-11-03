@@ -1,104 +1,104 @@
-# Struktur Folder Lengkap Kiln
+# Complete Kiln Folder Structure
 
 *1 Nov 2026 · @tegar pamungkas*
 
-> Dokumen ini adalah **desain target** yang memperluas rencana Phase 6 di
-> [`roadmap.md`](roadmap.md), bukan status implementasi. Yang sudah ada di repo
-> hari ini adalah file tanpa tanda `# baru`. `crash_report`, `codegen`, dan
-> `kiln_store` masih di-parkir di roadmap sampai ada keputusan baru; di sini
-> ketiganya digambar supaya bentuk akhirnya terlihat utuh. Bagian
-> [Keputusan desain](#keputusan-desain-yang-muncul-dari-struktur-ini) di akhir
-> mencatat hal yang harus diputuskan sebelum implementasi.
+> This document is the **target design** that expands the Phase 6 plan in
+> [`roadmap.md`](roadmap.md), not an implementation status. What already exists in the repo
+> today is the files with no `# new` tag. `crash_report`, `codegen`, and
+> `kiln_store` are still parked in the roadmap until a new decision is made; here
+> all three are drawn so the end shape looks complete. The section
+> [Design decisions](#design-decisions-that-emerge-from-this-structure) at the end
+> records what has to be decided before implementation.
 
-## Konvensi dan cara membaca
+## Conventions and how to read this
 
-Dokumen ini membuka seluruh struktur Kiln sampai tingkat file: 6 package, 29
-extension, dan proyek hasil generate. File yang sudah ada di tree tidak diberi
-tanda, sedangkan yang baru diberi `# baru`.
+This document opens up the whole Kiln structure down to the file level: 6 packages, 29
+extensions, and the generated project. Files already in the tree are not tagged, while
+new ones are tagged `# new`.
 
-- **Tanda.** `# baru` berarti belum ada di tree, `# generate` berarti hasil
-  generate dan tidak boleh diedit. Dua extension (`crash_report`, `codegen`)
-  seluruh foldernya baru, jadi 27 folder lama menjadi 29. Di dalam dua folder
-  itu file tidak ditandai satu per satu.
-- **Isi baru di semua extension.** `README.md`, `CHANGELOG.md`, `docs/`,
-  `test/` tingkat extension, dan `hooks/` (bila ada) belum ada di tree. Karena
-  itu hanya file di dalam `__brick__` yang ditandai `# baru`.
-- **Satu pola nama di dalam brick.**
-  - `<id>.dart` atau nama kapabilitasnya adalah fasad statis dengan API pendek
+- **Tags.** `# new` means not yet in the tree, `# generated` means generated
+  output and must not be edited. Two extensions (`crash_report`, `codegen`) are
+  entirely new folders, so the 27 old folders become 29. Inside those two folders
+  files are not tagged one by one.
+- **New content in every extension.** `README.md`, `CHANGELOG.md`, `docs/`,
+  extension-level `test/`, and `hooks/` (when present) are not in the tree yet. Because
+  of that only files inside `__brick__` are tagged `# new`.
+- **One naming pattern inside the brick.**
+  - `<id>.dart` or the capability name is the static facade with a short API
     (`Http`, `Prefs`, `Biometric`).
-  - `<id>_module.dart` mendaftarkan ke Registry.
-  - `<id>_config.dart` berisi konfigurasi bertipe dari prompt.
-  - `<id>_failure_mapper.dart` mengubah error pihak ketiga menjadi `Failure`.
-  - `*_gateway.dart` membungkus plugin supaya bisa di-fake di test.
-- **Extension tidak saling mengimpor.** Hubungan antar extension hanya lewat
-  kontrak di `kiln_core` dan slot (`http.interceptors`, `router.routes`, dan
-  slot lain di tabel [Slot](#slot-siapa-membuka-siapa-menempel)).
-- **Hooks hanya bila perlu.** Hook menjalankan kode di mesin user, jadi hanya
-  extension yang butuh validasi atau langkah ekstra yang punya `hooks/`.
-- **Tiga lapis test.** Test di dalam brick (jalan di aplikasi user), test
-  tingkat extension (render, analyze, golden), dan contract test dari
-  `kiln_testing` yang dijalankan ke setiap implementasi kontrak yang sama.
-- **Subfolder baru di package.** Di `kiln_core` dan `kiln_extension_sdk`, file
-  lama dikelompokkan ke subfolder. Barrel (`kiln_core.dart`,
-  `kiln_extension_sdk.dart`) tetap meng-export semuanya, jadi pemakai tidak
-  terdampak.
+  - `<id>_module.dart` registers into the Registry.
+  - `<id>_config.dart` holds the typed configuration from prompts.
+  - `<id>_failure_mapper.dart` turns third-party errors into `Failure`.
+  - `*_gateway.dart` wraps the plugin so it can be faked in tests.
+- **Extensions do not import each other.** Relationships between extensions only go
+  through contracts in `kiln_core` and slots (`http.interceptors`, `router.routes`, and
+  other slots in the [Slot](#slots-who-opens-who-attaches) table).
+- **Hooks only when needed.** Hooks run code on the user's machine, so only
+  extensions that need validation or an extra step have `hooks/`.
+- **Three test layers.** Tests inside the brick (they run in the user's app), extension-level
+  tests (render, analyze, golden), and contract tests from
+  `kiln_testing` that run against every implementation of the same contract.
+- **New subfolders in packages.** In `kiln_core` and `kiln_extension_sdk`, existing
+  files are grouped into subfolders. The barrels (`kiln_core.dart`,
+  `kiln_extension_sdk.dart`) still export everything, so consumers are not
+  affected.
 
-Isi standar tiap folder extension (di pohon bawah, bagian `test/` tingkat
-extension ditulis satu baris):
+Standard contents of each extension folder (in the tree below, the extension-level `test/`
+part is written as one line):
 
 ```text
 extensions/<id>/
 ├─ extension.yaml
 ├─ README.md
 ├─ CHANGELOG.md
-├─ docs/<topik>.md
-├─ test/                            # tingkat extension
-│  ├─ manifest_test.dart            # manifest valid terhadap schema
-│  ├─ render_test.dart              # render ke folder temp, cocok dengan golden
-│  ├─ analyze_test.dart             # hasil render lolos dart analyze
-│  └─ goldens/rendered/             # generate
+├─ docs/<topic>.md
+├─ test/                            # extension-level
+│  ├─ manifest_test.dart            # manifest is valid against the schema
+│  ├─ render_test.dart              # renders to a temp folder, matches the golden
+│  ├─ analyze_test.dart             # render output passes dart analyze
+│  └─ goldens/rendered/             # generated
 └─ brick/
    ├─ brick.yaml
-   ├─ hooks/                        # hanya jika perlu
+   ├─ hooks/                        # only when needed
    └─ __brick__/
       ├─ lib/extensions/<id>/
       └─ test/extensions/<id>/
 ```
 
-## Root monorepo
+## Monorepo root
 
-Root memuat semua yang bukan kode package: CI, dokumentasi, schema YAML,
-template proyek, contoh, registry extension, dan skrip rilis. Isi `extensions/`
-dan `packages/` diuraikan di bagian berikutnya.
+The root holds everything that is not package code: CI, documentation, YAML schemas,
+project templates, examples, the extension registry, and release scripts. The contents of
+`extensions/` and `packages/` are described in the following sections.
 
 ```text
 kiln/
 ├─ .github/
 │  ├─ ISSUE_TEMPLATE/
-│  │  ├─ bug_report.yml                      # baru
-│  │  ├─ extension_request.yml               # baru
-│  │  └─ config.yml                          # baru
+│  │  ├─ bug_report.yml                      # new
+│  │  ├─ extension_request.yml               # new
+│  │  └─ config.yml                          # new
 │  ├─ workflows/
 │  │  ├─ ci.yaml
-│  │  ├─ extensions.yaml                     # baru: matrix, hanya extension yang berubah
-│  │  ├─ bundles_check.yaml                  # baru: gagal bila bundles belum di-generate ulang
-│  │  ├─ smoke.yaml                          # baru: nightly, create + add semua + build apk dan ios
-│  │  ├─ drift.yaml                          # baru: nightly, cek versi package pihak ketiga terbaru
-│  │  ├─ docs.yaml                           # baru
-│  │  └─ release.yaml                        # baru: publish pub.dev + update registry
-│  ├─ CODEOWNERS                             # baru
-│  ├─ dependabot.yml                         # baru
-│  └─ PULL_REQUEST_TEMPLATE.md               # baru
+│  │  ├─ extensions.yaml                     # new: matrix, only the extensions that changed
+│  │  ├─ bundles_check.yaml                  # new: fails when bundles have not been regenerated
+│  │  ├─ smoke.yaml                          # new: nightly, create + add everything + build apk and ios
+│  │  ├─ drift.yaml                          # new: nightly, check the latest third-party package versions
+│  │  ├─ docs.yaml                           # new
+│  │  └─ release.yaml                        # new: publish to pub.dev + update the registry
+│  ├─ CODEOWNERS                             # new
+│  ├─ dependabot.yml                         # new
+│  └─ PULL_REQUEST_TEMPLATE.md               # new
 ├─ .vscode/
-│  ├─ settings.json                          # baru: pasang schemas/ ke extension.yaml, kiln.yaml, kiln.lock.yaml
-│  └─ extensions.json                        # baru: rekomendasi ekstensi Dart dan YAML
+│  ├─ settings.json                          # new: wire schemas/ into extension.yaml, kiln.yaml, kiln.lock.yaml
+│  └─ extensions.json                        # new: recommended Dart and YAML extensions
 ├─ docs/
 │  ├─ architecture.md
 │  ├─ extension-manifest.md
 │  ├─ roadmap.md
-│  ├─ folder-structure.md                    # baru: dokumen ini
-│  ├─ getting-started.md                     # baru
-│  ├─ concepts/                              # baru
+│  ├─ folder-structure.md                    # new: this document
+│  ├─ getting-started.md                     # new
+│  ├─ concepts/                              # new
 │  │  ├─ contracts-and-capabilities.md
 │  │  ├─ slots.md
 │  │  ├─ lockfile-and-ownership.md
@@ -107,25 +107,25 @@ kiln/
 │  │  ├─ compatibility.md
 │  │  └─ security-model.md
 │  ├─ cli/
-│  │  └─ reference.md                        # baru
-│  ├─ extensions/                            # baru
-│  │  ├─ catalog.md                          # generate dari semua extension.yaml
+│  │  └─ reference.md                        # new
+│  ├─ extensions/                            # new
+│  │  ├─ catalog.md                          # generated from every extension.yaml
 │  │  ├─ writing-an-extension.md
 │  │  ├─ testing-extensions.md
 │  │  ├─ trust-tiers.md
 │  │  └─ publishing.md
-│  ├─ guides/                                # baru
+│  ├─ guides/                                # new
 │  │  ├─ swap-backend.md
 │  │  ├─ migrate-bloc-to-riverpod.md
 │  │  ├─ add-offline-support.md
 │  │  └─ setup-flavors-and-env.md
-│  └─ adr/                                   # baru: catatan keputusan arsitektur
+│  └─ adr/                                   # new: architecture decision records
 │     ├─ 0001-never-edit-user-code.md
 │     ├─ 0002-capabilities-not-ids.md
 │     ├─ 0003-hooks-and-trust.md
 │     ├─ 0004-transactions-and-journal.md
 │     └─ 0005-checksums-and-registry.md
-├─ schemas/                                  # baru: validasi dan autocomplete YAML di IDE
+├─ schemas/                                  # new: YAML validation and autocomplete in the IDE
 │  ├─ extension.schema.json
 │  ├─ kiln.schema.json
 │  ├─ kiln-lock.schema.json
@@ -134,24 +134,24 @@ kiln/
 ├─ bricks/
 │  ├─ app_basic/
 │  │  ├─ brick.yaml
-│  │  ├─ hooks/                              # baru
+│  │  ├─ hooks/                              # new
 │  │  │  ├─ pubspec.yaml
-│  │  │  ├─ pre_gen.dart                     # validasi nama app, org, dan bentrok folder
-│  │  │  └─ post_gen.dart                    # flutter create, tambah kiln_core, pub get, format, git init
+│  │  │  ├─ pre_gen.dart                     # validates the app name, org, and folder collisions
+│  │  │  └─ post_gen.dart                    # flutter create, add kiln_core, pub get, format, git init
 │  │  └─ __brick__/
 │  │     ├─ README.md
-│  │     ├─ kiln.yaml                        # baru: konfigurasi proyek
-│  │     ├─ analysis_options.yaml            # baru
-│  │     ├─ .gitignore                       # baru: termasuk .kiln/backups, .kiln/logs, env/*.json
+│  │     ├─ kiln.yaml                        # new: project configuration
+│  │     ├─ analysis_options.yaml            # new
+│  │     ├─ .gitignore                       # new: includes .kiln/backups, .kiln/logs, env/*.json
 │  │     ├─ lib/
 │  │     │  ├─ main.dart
 │  │     │  ├─ app/
 │  │     │  │  ├─ app.dart
 │  │     │  │  ├─ registry_scope.dart
-│  │     │  │  ├─ app_shell.dart                # baru: MaterialApp, memakai theme dan locale dari modul bila ada
-│  │     │  │  ├─ error_screen.dart             # baru: layar untuk kegagalan bootstrap
-│  │     │  │  ├─ app_wrappers.dart             # baru: slot bawaan app.wrappers, tipe AppWrapper = Widget Function(BuildContext, Widget)
-│  │     │  │  └─ app_route.dart                # baru: AppRoute netral (path, name, builder) untuk slot router.routes, tanpa impor go_router
+│  │     │  │  ├─ app_shell.dart                # new: MaterialApp, uses theme and locale from modules when present
+│  │     │  │  ├─ error_screen.dart             # new: screen for bootstrap failures
+│  │     │  │  ├─ app_wrappers.dart             # new: built-in app.wrappers slot, type AppWrapper = Widget Function(BuildContext, Widget)
+│  │     │  │  └─ app_route.dart                # new: neutral AppRoute (path, name, builder) for the router.routes slot, no go_router import
 │  │     │  └─ core/
 │  │     │     ├─ l10n/
 │  │     │     │  ├─ app_localizations_config.dart
@@ -159,14 +159,14 @@ kiln/
 │  │     │     ├─ theme/
 │  │     │     │  ├─ app_theme_config.dart
 │  │     │     │  └─ app_theme.dart
-│  │     │     └─ error/                        # baru
-│  │     │        ├─ global_error_handler.dart  # FlutterError.onError dan PlatformDispatcher.onError ke Logger, lalu ke CrashReporter bila terpasang (readOrNull)
-│  │     │        └─ failure_presenter.dart     # Failure menjadi pesan yang ramah user; teksnya dari FailureMessages milik l10n bila terpasang, selain itu pesan Failure apa adanya
+│  │     │     └─ error/                        # new
+│  │     │        ├─ global_error_handler.dart  # FlutterError.onError and PlatformDispatcher.onError to Logger, then to CrashReporter when installed (readOrNull)
+│  │     │        └─ failure_presenter.dart     # Failure into a user-friendly message; the text comes from FailureMessages in l10n when installed, otherwise the raw Failure message
 │  │     └─ test/
 │  │        └─ app/
-│  │           └─ app_smoke_test.dart         # baru
-│  └─ extension_template/                    # baru: dipakai `kiln ext new`
-│     ├─ brick.yaml                          # variabel: id, name, category, provides, requires, with_hooks, with_native_patch
+│  │           └─ app_smoke_test.dart         # new
+│  └─ extension_template/                    # new: used by `kiln ext new`
+│     ├─ brick.yaml                          # variables: id, name, category, provides, requires, with_hooks, with_native_patch
 │     └─ __brick__/
 │        └─ {{id.snakeCase()}}/
 │           ├─ extension.yaml
@@ -180,7 +180,7 @@ kiln/
 │           │  └─ analyze_test.dart
 │           └─ brick/
 │              ├─ brick.yaml
-│              ├─ hooks/                   # dibuat bila with_hooks
+│              ├─ hooks/                   # created when with_hooks
 │              │  ├─ pubspec.yaml
 │              │  ├─ pre_gen.dart
 │              │  └─ post_gen.dart
@@ -193,48 +193,48 @@ kiln/
 │                 └─ test/extensions/{{id.snakeCase()}}/
 │                    ├─ {{id.snakeCase()}}_module_test.dart
 │                    └─ {{id.snakeCase()}}_failure_mapper_test.dart
-├─ extensions/                               # 29 folder, diuraikan di bagian Extension
+├─ extensions/                               # 29 folders, broken down in the Extension section
 ├─ examples/
-│  ├─ minimal/                               # baru: hasil `kiln create` tanpa extension
+│  ├─ minimal/                               # new: output of `kiln create` without extensions
 │  │  ├─ kiln.yaml, kiln.lock.yaml, pubspec.yaml
 │  │  ├─ lib/
 │  │  └─ test/
-│  ├─ full_stack/                            # baru: bloc, dio, http_retry, rest_auth, secure_storage, go_router, theme, l10n, env, logger
+│  ├─ full_stack/                            # new: bloc, dio, http_retry, rest_auth, secure_storage, go_router, theme, l10n, env, logger
 │  │  ├─ kiln.yaml, kiln.lock.yaml, pubspec.yaml
 │  │  ├─ lib/
 │  │  └─ test/
-│  ├─ backend_swap/                          # baru: bukti backend bisa diganti tanpa mengubah kode app
+│  ├─ backend_swap/                          # new: proof the backend can be swapped without changing app code
 │  │  ├─ README.md
 │  │  ├─ with_appwrite/
-│  │  └─ with_supabase/                      # hanya kiln.yaml dan lib/extensions yang berbeda
-│  └─ custom_extension/                      # baru: hasil `kiln ext new`, contoh extension komunitas lengkap
-├─ registry/                                 # baru: dihasilkan tool/build_registry.dart
-│  ├─ index.json                             # id, versi terbaru, tier
+│  │  └─ with_supabase/                      # only kiln.yaml and lib/extensions differ
+│  └─ custom_extension/                      # new: output of `kiln ext new`, a complete community extension example
+├─ registry/                                 # new: produced by tool/build_registry.dart
+│  ├─ index.json                             # id, latest version, tier
 │  ├─ README.md
 │  └─ extensions/
 │     ├─ dio/
-│     │  ├─ 1.0.0.json                       # url arsip, sha256, requires, compatibility
+│     │  ├─ 1.0.0.json                       # archive url, sha256, requires, compatibility
 │     │  └─ 1.1.0.json
-│     └─ <id>/                               # satu folder per extension
+│     └─ <id>/                               # one folder per extension
 ├─ tool/
-│  ├─ bundle.dart                            # mason bundle semua brick, flag --check untuk CI
+│  ├─ bundle.dart                            # mason bundle for every brick, --check flag for CI
 │  ├─ smoke_test.dart
-│  ├─ build_registry.dart                    # baru
-│  ├─ check_drift.dart                       # baru: bandingkan constraint extension dengan versi terbaru di pub.dev
-│  ├─ lint_extensions.dart                   # baru: jalankan `kiln ext validate` ke semua extension
-│  ├─ gen_catalog_docs.dart                  # baru: tulis docs/extensions/catalog.md
-│  └─ release.dart                           # baru: naikkan versi, changelog, tag
-├─ packages/                                 # diuraikan per package di bawah
+│  ├─ build_registry.dart                    # new
+│  ├─ check_drift.dart                       # new: compare extension constraints with the latest versions on pub.dev
+│  ├─ lint_extensions.dart                   # new: run `kiln ext validate` against every extension
+│  ├─ gen_catalog_docs.dart                  # new: write docs/extensions/catalog.md
+│  └─ release.dart                           # new: bump versions, changelog, tag
+├─ packages/                                 # broken down per package below
 │  ├─ kiln_cli/
 │  ├─ kiln_core/
 │  ├─ kiln_extension_sdk/
-│  ├─ kiln_store/                            # baru
-│  ├─ kiln_testing/                          # baru
-│  └─ kiln_lints/                            # baru, opsional (Fase 6)
-├─ CONTRIBUTING.md                           # baru
-├─ SECURITY.md                               # baru
-├─ CODE_OF_CONDUCT.md                        # baru
-├─ LICENSE                                   # baru
+│  ├─ kiln_store/                            # new
+│  ├─ kiln_testing/                          # new
+│  └─ kiln_lints/                            # new, optional (Phase 6)
+├─ CONTRIBUTING.md                           # new
+├─ SECURITY.md                               # new
+├─ CODE_OF_CONDUCT.md                        # new
+├─ LICENSE                                   # new
 ├─ .gitignore
 ├─ analysis_options.yaml
 ├─ pubspec.yaml
@@ -244,56 +244,56 @@ kiln/
 
 ## kiln_core
 
-`kiln_core` adalah satu-satunya package yang boleh dikenal kode aplikasi dan
-semua extension. Ia memuat kontrak, model error, runtime modul, state sesi, dan
-utilitas privasi, tanpa dependensi ke plugin Flutter apa pun.
+`kiln_core` is the only package that application code and every extension are allowed
+to know about. It holds the contracts, error models, module runtime, session state, and
+privacy utilities, with no dependency on any Flutter plugin.
 
 ```text
 packages/kiln_core/
 ├─ lib/
-│  ├─ kiln_core.dart                         # barrel, meng-export semuanya
+│  ├─ kiln_core.dart                         # barrel, exports everything
 │  └─ src/
-│     ├─ contracts/                          # kontrak yang dipenuhi extension
-│     │  ├─ account_management.dart          # baru: PasswordRecovery, EmailVerification, ProfileUpdate, kontrak opsional di samping AuthRepository
+│     ├─ contracts/                          # contracts the extensions fulfill
+│     │  ├─ account_management.dart          # new: PasswordRecovery, EmailVerification, ProfileUpdate, optional contracts alongside AuthRepository
 │     │  ├─ analytics.dart
 │     │  ├─ app_flavor.dart
 │     │  ├─ auth.dart                        # AuthRepository
 │     │  ├─ connectivity.dart
-│     │  ├─ crash_reporter.dart              # baru
+│     │  ├─ crash_reporter.dart              # new
 │     │  ├─ deep_links.dart
 │     │  ├─ env.dart
-│     │  ├─ file_storage.dart                # baru: upload, download, url, hapus (bucket)
+│     │  ├─ file_storage.dart                # new: upload, download, url, delete (bucket)
 │     │  ├─ http_client.dart
 │     │  ├─ local_db.dart
 │     │  ├─ logger.dart
 │     │  ├─ media_picker.dart
 │     │  ├─ notifications.dart
 │     │  ├─ permissions.dart
-│     │  ├─ remote_database.dart             # baru: CRUD dokumen, RemoteQuery, watch
+│     │  ├─ remote_database.dart             # new: document CRUD, RemoteQuery, watch
 │     │  ├─ secure_storage.dart
 │     │  ├─ social_auth.dart
 │     │  └─ storage.dart                     # key-value
 │     ├─ errors/
 │     │  ├─ failure.dart
-│     │  ├─ failure_codes.dart               # baru: kode stabil, mis. network.timeout, auth.invalid_credentials
-│     │  └─ result.dart                      # baru: Result<T> = Ok | Err(Failure)
+│     │  ├─ failure_codes.dart               # new: stable codes, e.g. network.timeout, auth.invalid_credentials
+│     │  └─ result.dart                      # new: Result<T> = Ok | Err(Failure)
 │     ├─ runtime/
 │     │  ├─ registry.dart
 │     │  ├─ get_it_registry.dart
 │     │  ├─ kiln_module.dart
-│     │  ├─ module_graph.dart                # baru: urutan init dari requires, deteksi siklus
-│     │  ├─ lifecycle.dart                   # baru: onReady, onPause, onResume, dispose
-│     │  ├─ bootstrap.dart                   # baru: KilnBootstrap.run (init async, timeout, error handler)
-│     │  └─ slot.dart                        # baru: OrderedSlot<T> untuk http.interceptors dan router.routes
-│     ├─ session/                            # baru
+│     │  ├─ module_graph.dart                # new: init order from requires, cycle detection
+│     │  ├─ lifecycle.dart                   # new: onReady, onPause, onResume, dispose
+│     │  ├─ bootstrap.dart                   # new: KilnBootstrap.run (async init, timeout, error handler)
+│     │  └─ slot.dart                        # new: OrderedSlot<T> for http.interceptors and router.routes
+│     ├─ session/                            # new
 │     │  ├─ session.dart                     # AuthSession: userId, expiresAt
 │     │  ├─ session_controller.dart          # unknown, authenticated, unauthenticated + stream
-│     │  └─ token_provider.dart              # kontrak ambil dan refresh token
-│     ├─ privacy/                            # baru
-│     │  ├─ consent.dart                     # ConsentController untuk analytics dan crash report
-│     │  └─ pii_redactor.dart                # dipakai logger, analytics, crash_report
-│     └─ util/                               # baru
-│        ├─ clock.dart                       # waktu yang bisa di-fake
+│     │  └─ token_provider.dart              # contract to get and refresh tokens
+│     ├─ privacy/                            # new
+│     │  ├─ consent.dart                     # ConsentController for analytics and crash report
+│     │  └─ pii_redactor.dart                # used by logger, analytics, crash_report
+│     └─ util/                               # new
+│        ├─ clock.dart                       # time that can be faked
 │        ├─ debouncer.dart
 │        └─ disposable.dart
 ├─ test/
@@ -302,12 +302,12 @@ packages/kiln_core/
 │  ├─ http_client_test.dart
 │  ├─ registry_test.dart
 │  ├─ runtime_contracts_test.dart
-│  ├─ result_test.dart, failure_codes_test.dart                                          # baru
-│  ├─ module_graph_test.dart, slot_test.dart, lifecycle_test.dart, bootstrap_test.dart   # baru
-│  ├─ session_controller_test.dart, consent_test.dart, pii_redactor_test.dart            # baru
-│  └─ clock_test.dart, debouncer_test.dart                                               # baru
+│  ├─ result_test.dart, failure_codes_test.dart                                          # new
+│  ├─ module_graph_test.dart, slot_test.dart, lifecycle_test.dart, bootstrap_test.dart   # new
+│  ├─ session_controller_test.dart, consent_test.dart, pii_redactor_test.dart            # new
+│  └─ clock_test.dart, debouncer_test.dart                                               # new
 ├─ example/
-│  └─ main.dart                              # baru
+│  └─ main.dart                              # new
 ├─ analysis_options.yaml
 ├─ CHANGELOG.md
 ├─ pubspec.yaml
@@ -316,70 +316,70 @@ packages/kiln_core/
 
 ## kiln_extension_sdk
 
-SDK adalah mesin di balik `kiln add`: membaca manifest, menghitung rencana,
-merender brick, lalu menerapkan perubahan dalam transaksi yang bisa dibalik.
-Bagian `installer/` paling besar, dan tiga subfoldernya (`transaction/`,
-`ownership/`, `verification/`) membuat `add` dan `remove` aman.
+The SDK is the engine behind `kiln add`: it reads the manifest, computes a plan,
+renders the brick, then applies the changes in a transaction that can be undone.
+The `installer/` part is the largest, and its three subfolders (`transaction/`,
+`ownership/`, `verification/`) make `add` and `remove` safe.
 
 ```text
 packages/kiln_extension_sdk/
 ├─ lib/
 │  ├─ kiln_extension_sdk.dart
-│  ├─ testing.dart                           # baru: ExtensionTestHarness untuk penulis extension
+│  ├─ testing.dart                           # new: ExtensionTestHarness for extension authors
 │  └─ src/
 │     ├─ kiln_exception.dart
 │     ├─ manifest/
 │     │  ├─ extension_manifest.dart
 │     │  ├─ platform_setup.dart
 │     │  ├─ slot.dart
-│     │  ├─ manifest_validator.dart          # baru: id, semver, siklus requires, field platform
-│     │  ├─ prompt_spec.dart                 # baru: tipe prompt (url, int, enum, secret) + validasi
-│     │  ├─ compatibility.dart               # baru: rentang kiln_core, dart, flutter, platform
-│     │  └─ contribution.dart                # baru: contributes ke slot, dengan when: [capability] opsional
+│     │  ├─ manifest_validator.dart          # new: id, semver, requires cycles, platform fields
+│     │  ├─ prompt_spec.dart                 # new: prompt types (url, int, enum, secret) + validation
+│     │  ├─ compatibility.dart               # new: kiln_core, dart, flutter, platform ranges
+│     │  └─ contribution.dart                # new: contributes to a slot, with optional when: [capability]
 │     ├─ resolver/
 │     │  ├─ extension_resolver.dart
 │     │  ├─ resolution_plan.dart
-│     │  ├─ capability_index.dart            # baru: siapa menyediakan apa
-│     │  ├─ conflict_report.dart             # baru: pesan konflik yang bisa ditindaklanjuti
-│     │  ├─ dependency_graph.dart            # baru: graf requires untuk `kiln graph` dan `remove`
-│     │  └─ upgrade_planner.dart             # baru
+│     │  ├─ capability_index.dart            # new: who provides what
+│     │  ├─ conflict_report.dart             # new: actionable conflict messages
+│     │  ├─ dependency_graph.dart            # new: requires graph for `kiln graph` and `remove`
+│     │  └─ upgrade_planner.dart             # new
 │     ├─ renderer/
 │     │  ├─ brick_renderer.dart
-│     │  ├─ template_vars.dart               # baru: prompt + kiln.yaml menjadi variabel Mason
-│     │  ├─ collision_policy.dart            # baru: skip, overwrite, tanya; deteksi file diedit lewat hash
-│     │  └─ hook_policy.dart                 # baru: hooks hanya jalan bila brick tepercaya
+│     │  ├─ template_vars.dart               # new: prompts + kiln.yaml become Mason variables
+│     │  ├─ collision_policy.dart            # new: skip, overwrite, ask; detects edited files via hash
+│     │  └─ hook_policy.dart                 # new: hooks only run when the brick is trusted
 │     ├─ installer/
 │     │  ├─ extension_installer.dart
 │     │  ├─ extensions_codegen.dart
 │     │  ├─ lockfile.dart
 │     │  ├─ pubspec_reader.dart
-│     │  ├─ pubspec_writer.dart              # baru: tambah dan hapus dependency lewat yaml_edit
-│     │  ├─ transaction/                     # baru
-│     │  │  ├─ transaction.dart              # jalankan langkah, catat ke jurnal
+│     │  ├─ pubspec_writer.dart              # new: add and remove dependencies via yaml_edit
+│     │  ├─ transaction/                     # new
+│     │  │  ├─ transaction.dart              # runs the steps, records them in the journal
 │     │  │  ├─ journal.dart
-│     │  │  ├─ snapshot.dart                 # backup file ke .kiln/backups
+│     │  │  ├─ snapshot.dart                 # backs files up to .kiln/backups
 │     │  │  └─ rollback.dart
-│     │  ├─ ownership/                       # baru
-│     │  │  ├─ file_ownership.dart           # hash tiap file hasil render
-│     │  │  └─ patch_journal.dart            # patch dimiliki siapa (reference count)
+│     │  ├─ ownership/                       # new
+│     │  │  ├─ file_ownership.dart           # hash of every rendered file
+│     │  │  └─ patch_journal.dart            # who owns a patch (reference count)
 │     │  ├─ native/
 │     │  │  ├─ native_setup.dart
-│     │  │  ├─ patch.dart                    # baru: interface Patch (describe, apply, revert)
+│     │  │  ├─ patch.dart                    # new: Patch interface (describe, apply, revert)
 │     │  │  ├─ android_gradle.dart
 │     │  │  ├─ android_project.dart
 │     │  │  ├─ ios_app_delegate.dart
 │     │  │  ├─ ios_entitlements.dart
 │     │  │  ├─ ios_plist.dart
-│     │  │  ├─ ios_podfile.dart              # baru: flag PERMISSION_* untuk permission_handler
-│     │  │  ├─ macos_entitlements.dart       # baru
-│     │  │  └─ web_index_html.dart           # baru
-│     │  └─ verification/                    # baru
-│     │     ├─ verifier.dart                 # pub get + dart analyze setelah apply
-│     │     └─ dry_run_reporter.dart         # diff yang akan terjadi
-│     └─ migrator/                           # baru
+│     │  │  ├─ ios_podfile.dart              # new: PERMISSION_* flags for permission_handler
+│     │  │  ├─ macos_entitlements.dart       # new
+│     │  │  └─ web_index_html.dart           # new
+│     │  └─ verification/                    # new
+│     │     ├─ verifier.dart                 # pub get + dart analyze after apply
+│     │     └─ dry_run_reporter.dart         # the diff that would happen
+│     └─ migrator/                           # new
 │        ├─ migration.dart
 │        ├─ migration_actions.dart           # rename_file, delete_file, replace_dependency, update_config, message
-│        ├─ migration_loader.dart            # baca extensions/<id>/migrations
+│        ├─ migration_loader.dart            # reads extensions/<id>/migrations
 │        └─ migration_runner.dart
 ├─ test/
 │  ├─ android_deep_links_test.dart
@@ -389,23 +389,23 @@ packages/kiln_extension_sdk/
 │  ├─ ios_entitlements_test.dart
 │  ├─ manifest_test.dart
 │  ├─ resolver_test.dart
-│  ├─ transaction_test.dart, rollback_test.dart, snapshot_test.dart                      # baru
-│  ├─ file_ownership_test.dart, patch_journal_test.dart                                  # baru
-│  ├─ pubspec_writer_test.dart, ios_podfile_test.dart                                    # baru
-│  ├─ macos_entitlements_test.dart, web_index_html_test.dart                             # baru
-│  ├─ manifest_validator_test.dart, prompt_spec_test.dart                                # baru
-│  ├─ compatibility_test.dart, contribution_test.dart                                    # baru
-│  ├─ capability_index_test.dart, conflict_report_test.dart                              # baru
-│  ├─ dependency_graph_test.dart, upgrade_planner_test.dart                              # baru
-│  ├─ collision_policy_test.dart, hook_policy_test.dart, template_vars_test.dart         # baru
-│  ├─ verifier_test.dart, dry_run_reporter_test.dart                                     # baru
-│  ├─ migration_runner_test.dart, migration_actions_test.dart                            # baru
-│  └─ fixtures/                                                                          # baru
-│     ├─ manifests/                          # valid/ dan invalid/
+│  ├─ transaction_test.dart, rollback_test.dart, snapshot_test.dart                      # new
+│  ├─ file_ownership_test.dart, patch_journal_test.dart                                  # new
+│  ├─ pubspec_writer_test.dart, ios_podfile_test.dart                                    # new
+│  ├─ macos_entitlements_test.dart, web_index_html_test.dart                             # new
+│  ├─ manifest_validator_test.dart, prompt_spec_test.dart                                # new
+│  ├─ compatibility_test.dart, contribution_test.dart                                    # new
+│  ├─ capability_index_test.dart, conflict_report_test.dart                              # new
+│  ├─ dependency_graph_test.dart, upgrade_planner_test.dart                              # new
+│  ├─ collision_policy_test.dart, hook_policy_test.dart, template_vars_test.dart         # new
+│  ├─ verifier_test.dart, dry_run_reporter_test.dart                                     # new
+│  ├─ migration_runner_test.dart, migration_actions_test.dart                            # new
+│  └─ fixtures/                                                                          # new
+│     ├─ manifests/                          # valid/ and invalid/
 │     ├─ projects/                           # fresh_app/, app_with_dio/, app_with_edited_files/, app_with_two_owners/
 │     └─ bricks/                             # tiny_brick/, brick_with_hooks/
 ├─ tool/
-│  └─ generate_schemas.dart                  # baru: JSON Schema dihasilkan dari model manifest
+│  └─ generate_schemas.dart                  # new: JSON Schema generated from the manifest model
 ├─ analysis_options.yaml
 ├─ CHANGELOG.md
 ├─ pubspec.yaml
@@ -414,9 +414,9 @@ packages/kiln_extension_sdk/
 
 ## kiln_cli
 
-CLI hanya mengurus interaksi: parsing perintah, prompt, laporan, dan kode
-keluar. Semua logika pemasangan ada di `kiln_extension_sdk`, sehingga setiap
-command tipis dan mudah dites.
+The CLI only handles interaction: command parsing, prompts, reporting, and exit
+codes. All installation logic lives in `kiln_extension_sdk`, so every
+command is thin and easy to test.
 
 ```text
 packages/kiln_cli/
@@ -426,7 +426,7 @@ packages/kiln_cli/
 │  ├─ kiln_cli.dart
 │  └─ src/
 │     ├─ command_runner.dart
-│     ├─ project_context.dart                # deteksi proyek kiln, baca kiln.yaml dan lockfile
+│     ├─ project_context.dart                # detects a kiln project, reads kiln.yaml and the lockfile
 │     ├─ paths.dart
 │     ├─ version.dart
 │     ├─ commands/
@@ -437,49 +437,49 @@ packages/kiln_cli/
 │     │  ├─ doctor_command.dart
 │     │  ├─ version_command.dart
 │     │  ├─ command_helpers.dart
-│     │  ├─ info_command.dart                # baru
-│     │  ├─ upgrade_command.dart             # baru
-│     │  ├─ rollback_command.dart            # baru
-│     │  ├─ graph_command.dart               # baru
-│     │  ├─ config_command.dart              # baru
-│     │  ├─ cache_command.dart               # baru
-│     │  ├─ store_command.dart               # baru
-│     │  ├─ completion_command.dart          # baru
-│     │  └─ ext/                             # baru: alat untuk penulis extension
+│     │  ├─ info_command.dart                # new
+│     │  ├─ upgrade_command.dart             # new
+│     │  ├─ rollback_command.dart            # new
+│     │  ├─ graph_command.dart               # new
+│     │  ├─ config_command.dart              # new
+│     │  ├─ cache_command.dart               # new
+│     │  ├─ store_command.dart               # new
+│     │  ├─ completion_command.dart          # new
+│     │  └─ ext/                             # new: tooling for extension authors
 │     │     ├─ ext_new_command.dart
 │     │     ├─ ext_validate_command.dart
 │     │     ├─ ext_test_command.dart
 │     │     ├─ ext_pack_command.dart
 │     │     └─ ext_publish_command.dart
-│     ├─ infra/                              # baru
-│     │  ├─ kiln_logger.dart                 # level, progress, --verbose, --quiet
-│     │  ├─ prompter.dart                    # interaktif, --yes, deteksi non-TTY
-│     │  ├─ exit_codes.dart                  # kode keluar tetap untuk CI
+│     ├─ infra/                              # new
+│     │  ├─ kiln_logger.dart                 # levels, progress, --verbose, --quiet
+│     │  ├─ prompter.dart                    # interactive, --yes, non-TTY detection
+│     │  ├─ exit_codes.dart                  # fixed exit codes for CI
 │     │  ├─ json_reporter.dart               # --json
-│     │  ├─ error_presenter.dart             # KilnException menjadi pesan + saran perbaikan
+│     │  ├─ error_presenter.dart             # KilnException into a message + fix suggestion
 │     │  ├─ global_config.dart               # ~/.kiln/config.yaml
-│     │  ├─ update_checker.dart              # info versi CLI baru, tidak memblokir
-│     │  ├─ process_runner.dart              # dipindah dari src/
-│     │  └─ file_system.dart                 # abstraksi supaya command bisa dites tanpa disk
-│     └─ bundles/                            # generate, jangan diedit
+│     │  ├─ update_checker.dart              # new CLI version info, non-blocking
+│     │  ├─ process_runner.dart              # moved from src/
+│     │  └─ file_system.dart                 # abstraction so commands can be tested without disk
+│     └─ bundles/                            # generated, do not edit
 │        ├─ catalog.g.dart
 │        ├─ app_basic_bundle.dart
-│        └─ <id>_bundle.dart                 # satu per extension, 29 file, nama sama dengan extensions/<id>
+│        └─ <id>_bundle.dart                 # one per extension, 29 files, named after extensions/<id>
 ├─ test/
 │  ├─ command_runner_test.dart
-│  ├─ commands/                           # baru: satu test per command
+│  ├─ commands/                           # new: one test per command
 │  │  ├─ create_command_test.dart, add_command_test.dart, remove_command_test.dart
 │  │  ├─ list_command_test.dart, doctor_command_test.dart, info_command_test.dart
 │  │  ├─ upgrade_command_test.dart, rollback_command_test.dart, graph_command_test.dart
 │  │  ├─ config_command_test.dart, cache_command_test.dart, store_command_test.dart
 │  │  └─ ext_commands_test.dart
-│  ├─ infra/                              # baru
+│  ├─ infra/                              # new
 │  │  ├─ prompter_test.dart, json_reporter_test.dart
 │  │  └─ error_presenter_test.dart, exit_codes_test.dart
-│  ├─ fixtures/                           # baru: proyek kecil per skenario
+│  ├─ fixtures/                           # new: a small project per scenario
 │  │  ├─ fresh_app/, app_with_dio/, app_with_edited_files/
 │  │  └─ app_with_flavors/, app_without_lock/
-│  └─ goldens/                            # baru: output yang harus tetap
+│  └─ goldens/                            # new: output that must stay stable
 │     ├─ add_dry_run.txt, add_dry_run.json
 │     └─ doctor_report.txt, list.json, info_dio.txt
 ├─ analysis_options.yaml
@@ -488,65 +488,65 @@ packages/kiln_cli/
 └─ README.md
 ```
 
-### Daftar perintah
+### Command list
 
-| Perintah | Fungsi | Flag penting |
+| Command | Purpose | Important flags |
 | --- | --- | --- |
-| `create` | buat proyek dari `app_basic`, pilih state management | `--state`, `--org`, `--platforms`, `--with` |
-| `add` | pasang extension secara transaksional | `--dry-run`, `--yes`, `--no-verify`, `--from` |
-| `remove` | lepas extension, hanya hapus file yang belum diedit | `--dry-run`, `--force` |
-| `upgrade` | naikkan versi extension lalu jalankan migration | `--dry-run`, `--all` |
-| `rollback` | balikkan operasi terakhir dari jurnal | `--list` |
-| `list` | extension terpasang atau tersedia | `--installed`, `--available`, `--json` |
-| `info` | provides, requires, platform, dan changelog satu extension | `--json` |
-| `graph` | graf requires dan capability | `--format text` atau `mermaid` |
-| `doctor` | periksa kesehatan proyek | `--fix`, `--json` |
-| `config` | atur registry, mirror, dan mode offline | `--global` |
-| `cache` | lihat atau bersihkan cache registry | `clean` |
-| `store` | cari dan lihat extension di registry | `search`, `info` |
-| `completion` | skrip autocomplete shell | `bash`, `zsh`, `fish` |
-| `ext` | alat penulis extension: `new`, `validate`, `test`, `pack`, `publish` | `--update-goldens`, `--tier` |
-| `version` | versi CLI dan `kiln_core` | tidak ada |
+| `create` | create a project from `app_basic`, pick the state management | `--state`, `--org`, `--platforms`, `--with` |
+| `add` | install an extension transactionally | `--dry-run`, `--yes`, `--no-verify`, `--from` |
+| `remove` | remove an extension, deleting only files that have not been edited | `--dry-run`, `--force` |
+| `upgrade` | bump the extension version then run migrations | `--dry-run`, `--all` |
+| `rollback` | undo the last operation from the journal | `--list` |
+| `list` | installed or available extensions | `--installed`, `--available`, `--json` |
+| `info` | provides, requires, platform, and changelog of one extension | `--json` |
+| `graph` | requires and capability graph | `--format text` or `mermaid` |
+| `doctor` | check project health | `--fix`, `--json` |
+| `config` | set the registry, mirror, and offline mode | `--global` |
+| `cache` | view or clear the registry cache | `clean` |
+| `store` | search and inspect extensions in the registry | `search`, `info` |
+| `completion` | shell autocomplete script | `bash`, `zsh`, `fish` |
+| `ext` | extension author tooling: `new`, `validate`, `test`, `pack`, `publish` | `--update-goldens`, `--tier` |
+| `version` | CLI and `kiln_core` versions | none |
 
-### Yang diperiksa doctor
+### What doctor checks
 
-- Hash file hasil render di lockfile dibandingkan dengan kondisi sebenarnya,
-  supaya file yang diedit user ketahuan.
-- Patch native yang hilang atau ganda (permission, entitlement,
+- The hashes of rendered files in the lockfile compared with the actual state,
+  so files the user edited are caught.
+- Missing or duplicate native patches (permission, entitlement,
   intent-filter).
-- `extensions.g.dart` yang tidak sinkron dengan lockfile.
-- Langkah manual yang belum selesai, misalnya `flutterfire configure` untuk
+- `extensions.g.dart` that is out of sync with the lockfile.
+- Unfinished manual steps, for example `flutterfire configure` for
   Firebase.
-- Extension yang tidak mendukung platform proyek, misalnya `biometric` di web.
-- Versi Dart, Flutter, dan `kiln_core` terhadap rentang `compatibility` tiap
-  extension.
-- Extension yang punya versi baru atau migration yang belum dijalankan.
-- Sisa jurnal dari operasi yang terhenti di tengah jalan.
+- Extensions that do not support the project platforms, for example `biometric` on web.
+- The Dart, Flutter, and `kiln_core` versions against each
+  extension's `compatibility` range.
+- Extensions that have a new version or pending migrations.
+- Leftover journals from operations that stopped halfway.
 
 ## kiln_store, kiln_testing, kiln_lints
 
-Tiga package baru yang menutup celah kepercayaan dan kualitas: store mengunduh
-extension dengan verifikasi, testing membuktikan setiap implementasi kontrak
-bisa saling menggantikan, dan lints menjaga aplikasi tetap bergantung pada
-kontrak.
+Three new packages that close the trust and quality gaps: the store downloads
+extensions with verification, testing proves that every contract implementation
+can replace one another, and lints keep the app depending on
+contracts.
 
 ### kiln_store
 
 ```text
-packages/kiln_store/                          # baru
+packages/kiln_store/                          # new
 ├─ lib/
 │  ├─ kiln_store.dart
 │  └─ src/
-│     ├─ registry_client.dart                # ambil index.json dari Git
-│     ├─ registry_index.dart                 # model index dan versi
-│     ├─ registry_config.dart                # URL, mirror, ref (branch atau tag)
-│     ├─ version_resolver.dart               # pilih versi yang cocok dengan kiln_core proyek
-│     ├─ search_index.dart                   # pencarian lokal dari cache
-│     ├─ checksum_verifier.dart              # sha256 arsip
-│     ├─ trust_policy.dart                   # official, verified, community; konfirmasi sebelum hook jalan
-│     ├─ archive_packer.dart                 # buat .tgz
-│     ├─ archive_unpacker.dart               # tolak path traversal (zip-slip)
-│     ├─ publisher.dart                      # validasi lalu publish
+│     ├─ registry_client.dart                # fetches index.json from Git
+│     ├─ registry_index.dart                 # index and version models
+│     ├─ registry_config.dart                # URL, mirror, ref (branch or tag)
+│     ├─ version_resolver.dart               # picks the version that matches the project's kiln_core
+│     ├─ search_index.dart                   # local search over the cache
+│     ├─ checksum_verifier.dart              # sha256 of the archive
+│     ├─ trust_policy.dart                   # official, verified, community; confirmation before hooks run
+│     ├─ archive_packer.dart                 # builds .tgz
+│     ├─ archive_unpacker.dart               # rejects path traversal (zip-slip)
+│     ├─ publisher.dart                      # validate then publish
 │     ├─ local_cache.dart
 │     └─ offline_mode.dart
 ├─ test/
@@ -554,7 +554,7 @@ packages/kiln_store/                          # baru
 │  ├─ search_index_test.dart, checksum_verifier_test.dart, trust_policy_test.dart
 │  ├─ archive_packer_test.dart, archive_unpacker_test.dart
 │  ├─ publisher_test.dart, local_cache_test.dart, offline_mode_test.dart
-│  └─ fixtures/registry/                  # index.json dan arsip contoh, termasuk arsip berbahaya
+│  └─ fixtures/registry/                  # sample index.json and archives, including malicious ones
 ├─ analysis_options.yaml
 ├─ CHANGELOG.md
 ├─ pubspec.yaml
@@ -563,13 +563,13 @@ packages/kiln_store/                          # baru
 
 ### kiln_testing
 
-Dipakai sebagai `dev_dependency` di aplikasi hasil generate dan di tiap
-extension. Suite `contracts/` dijalankan ke setiap implementasi: Appwrite,
-Firebase, Supabase, dan `rest_auth` harus lolos `auth_repository_contract`
-yang sama, dan itulah bukti bahwa backend bisa diganti.
+Used as a `dev_dependency` in generated apps and in every
+extension. The `contracts/` suite runs against every implementation: Appwrite,
+Firebase, Supabase, and `rest_auth` must all pass the same `auth_repository_contract`,
+and that is the proof that the backend can be swapped.
 
 ```text
-packages/kiln_testing/                        # baru
+packages/kiln_testing/                        # new
 ├─ lib/
 │  ├─ kiln_testing.dart
 │  └─ src/
@@ -593,7 +593,7 @@ packages/kiln_testing/                        # baru
 │     │  ├─ fake_env.dart
 │     │  ├─ fake_clock.dart
 │     │  └─ recording_logger.dart
-│     ├─ contracts/                       # suite test untuk SETIAP implementasi kontrak
+│     ├─ contracts/                       # test suite for EVERY contract implementation
 │     │  ├─ http_client_contract.dart
 │     │  ├─ storage_contract.dart
 │     │  ├─ secure_storage_contract.dart
@@ -612,13 +612,13 @@ packages/kiln_testing/                        # baru
 │     │  ├─ crash_reporter_contract.dart
 │     │  └─ logger_contract.dart
 │     └─ harness/
-│        ├─ test_registry.dart               # Registry siap pakai untuk test
-│        ├─ pump_app.dart                    # helper widget test
+│        ├─ test_registry.dart               # ready-made Registry for tests
+│        ├─ pump_app.dart                    # widget test helper
 │        ├─ matchers.dart                    # isFailure, isOk, hasCode
 │        ├─ async_helpers.dart               # pumpUntil, expectEmitsInOrder
 │        └─ golden_helpers.dart
 ├─ test/
-│  └─ fakes_satisfy_contracts_test.dart      # setiap fake harus lolos suite kontraknya sendiri
+│  └─ fakes_satisfy_contracts_test.dart      # every fake must pass its own contract suite
 ├─ analysis_options.yaml
 ├─ CHANGELOG.md
 ├─ pubspec.yaml
@@ -628,15 +628,15 @@ packages/kiln_testing/                        # baru
 ### kiln_lints
 
 ```text
-packages/kiln_lints/                          # baru, opsional (Fase 6)
+packages/kiln_lints/                          # new, optional (Phase 6)
 ├─ lib/
-│  ├─ kiln_lints.dart                     # plugin custom_lint
+│  ├─ kiln_lints.dart                     # custom_lint plugin
 │  └─ src/rules/
-│     ├─ no_cross_extension_import.dart       # extension tidak boleh mengimpor extension lain
-│     ├─ prefer_contract_over_impl.dart       # kode app memakai kontrak, bukan DioClient
-│     ├─ no_plugin_in_features.dart           # features/ tidak boleh mengimpor plugin langsung
-│     ├─ no_edit_generated_files.dart         # peringatan bila extensions.g.dart diubah
-│     └─ require_failure_handling.dart        # Result harus ditangani
+│     ├─ no_cross_extension_import.dart       # extensions must not import other extensions
+│     ├─ prefer_contract_over_impl.dart       # app code uses contracts, not DioClient
+│     ├─ no_plugin_in_features.dart           # features/ must not import plugins directly
+│     ├─ no_edit_generated_files.dart         # warn when extensions.g.dart is modified
+│     └─ require_failure_handling.dart        # Result must be handled
 ├─ test/
 │  └─ rules_test.dart
 ├─ example/
@@ -646,17 +646,17 @@ packages/kiln_lints/                          # baru, opsional (Fase 6)
 └─ README.md
 ```
 
-## Extension: state dan jaringan
+## Extensions: state and networking
 
-Lima extension ini membentuk fondasi aplikasi: satu adapter state management
-(eksklusif) dan tumpukan HTTP yang dirakit dari `dio`, `http_retry`, dan
-`http_cache` lewat slot `http.interceptors`.
+These five extensions form the foundation of the app: one state management adapter
+(exclusive) and the HTTP stack assembled from `dio`, `http_retry`, and
+`http_cache` through the `http.interceptors` slot.
 
 ### bloc
 
 ```text
 extensions/bloc/
-├─ extension.yaml                           # category: state · exclusive · provides: state_bloc (riverpod ditolak lewat aturan exclusive)
+├─ extension.yaml                           # category: state · exclusive · provides: state_bloc (riverpod is rejected through the exclusive rule)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
@@ -669,14 +669,14 @@ extensions/bloc/
       ├─ lib/
       │  ├─ bootstrap.dart
       │  ├─ app/
-      │  │  └─ bloc_providers.dart            # baru: MultiBlocProvider untuk bloc global
-      │  ├─ core/bloc/                        # baru
-      │  │  ├─ app_bloc_observer.dart         # log transisi dan error ke Logger, PII disamarkan
-      │  │  ├─ base_cubit.dart                # safeEmit (cek isClosed), runGuarded menjadi Failure
+      │  │  └─ bloc_providers.dart            # new: MultiBlocProvider for global blocs
+      │  ├─ core/bloc/                        # new
+      │  │  ├─ app_bloc_observer.dart         # logs transitions and errors to Logger, PII redacted
+      │  │  ├─ base_cubit.dart                # safeEmit (checks isClosed), runGuarded turns into Failure
       │  │  ├─ async_state.dart               # sealed: initial, loading, data, failure
       │  │  ├─ async_cubit.dart               # load, refresh, retry
       │  │  ├─ bloc_transformers.dart         # debounce, throttle, droppable, restartable
-      │  │  └─ session_cubit.dart             # membungkus SessionController dari kiln_core
+      │  │  └─ session_cubit.dart             # wraps SessionController from kiln_core
       │  └─ features/
       │     └─ counter/
       │        ├─ counter_cubit.dart
@@ -685,7 +685,7 @@ extensions/bloc/
          ├─ bootstrap_test.dart
          ├─ counter_cubit_test.dart
          ├─ counter_page_test.dart
-         └─ core/bloc/                        # baru
+         └─ core/bloc/                        # new
             ├─ app_bloc_observer_test.dart, base_cubit_test.dart, async_state_test.dart
             └─ async_cubit_test.dart, bloc_transformers_test.dart, session_cubit_test.dart
 ```
@@ -694,7 +694,7 @@ extensions/bloc/
 
 ```text
 extensions/riverpod/
-├─ extension.yaml                           # category: state · exclusive · provides: state_riverpod (bloc ditolak lewat aturan exclusive)
+├─ extension.yaml                           # category: state · exclusive · provides: state_riverpod (bloc is rejected through the exclusive rule)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
@@ -707,13 +707,13 @@ extensions/riverpod/
       ├─ lib/
       │  ├─ bootstrap.dart
       │  ├─ app/
-      │  │  └─ provider_root.dart             # baru: ProviderScope dengan override Registry
-      │  ├─ core/riverpod/                    # baru
-      │  │  ├─ kiln_providers.dart            # registryProvider dan kilnProvider<T>() untuk setiap kontrak
-      │  │  ├─ app_provider_observer.dart     # log error provider, PII disamarkan
-      │  │  ├─ async_value_x.dart             # AsyncValue.guard menjadi Failure, helper when
-      │  │  ├─ provider_overrides.dart        # override siap pakai untuk test
-      │  │  └─ session_notifier.dart          # membungkus SessionController dari kiln_core
+      │  │  └─ provider_root.dart             # new: ProviderScope with a Registry override
+      │  ├─ core/riverpod/                    # new
+      │  │  ├─ kiln_providers.dart            # registryProvider and kilnProvider<T>() for every contract
+      │  │  ├─ app_provider_observer.dart     # logs provider errors, PII redacted
+      │  │  ├─ async_value_x.dart             # AsyncValue.guard into Failure, when helper
+      │  │  ├─ provider_overrides.dart        # ready-made overrides for tests
+      │  │  └─ session_notifier.dart          # wraps SessionController from kiln_core
       │  └─ features/
       │     └─ counter/
       │        ├─ counter_page.dart
@@ -722,7 +722,7 @@ extensions/riverpod/
          ├─ bootstrap_test.dart
          ├─ counter_page_test.dart
          ├─ counter_provider_test.dart
-         └─ core/riverpod/                    # baru
+         └─ core/riverpod/                    # new
             ├─ kiln_providers_test.dart, app_provider_observer_test.dart
             └─ async_value_x_test.dart, provider_overrides_test.dart, session_notifier_test.dart
 ```
@@ -731,46 +731,46 @@ extensions/riverpod/
 
 ```text
 extensions/dio/
-├─ extension.yaml                           # provides: http_client, http_pipeline · slot: http.interceptors (baru) · android: INTERNET · macos: network.client (baru)
+├─ extension.yaml                           # provides: http_client, http_pipeline · slot: http.interceptors (new) · android: INTERNET · macos: network.client (new)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ http-client.md
-│  └─ interceptors.md                       # cara extension lain menempel ke slot
+│  └─ interceptors.md                       # how other extensions attach to the slot
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    ├─ hooks/
    │  ├─ pubspec.yaml
-   │  └─ pre_gen.dart                       # validasi base_url dan connect_timeout
+   │  └─ pre_gen.dart                       # validates base_url and connect_timeout
    └─ __brick__/
       ├─ lib/extensions/dio/
-      │  ├─ http.dart                       # baru: fasad statis Http.get, post, put, patch, delete
+      │  ├─ http.dart                       # new: static facade Http.get, post, put, patch, delete
       │  ├─ dio_module.dart
       │  ├─ dio_client.dart
-      │  ├─ dio_config.dart                 # baru: base_url, timeout, header default
-      │  ├─ dio_failure_mapper.dart         # baru: DioException menjadi Failure (timeout, offline, 401, 5xx)
-      │  ├─ cancellation.dart               # baru: batalkan request saat widget dispose
-      │  ├─ multipart_helper.dart           # baru: upload file dengan progress
-      │  ├─ download_helper.dart            # baru: unduh file dengan progress
-      │  ├─ dio_test_adapter.dart           # baru: adapter palsu untuk test
-      │  └─ interceptors/                   # baru
-      │     ├─ interceptor_slot.dart        # pintu masuk contributes dari extension lain
-      │     ├─ request_id_interceptor.dart  # header X-Request-Id untuk korelasi log
-      │     └─ user_agent_interceptor.dart  # versi app dan platform
+      │  ├─ dio_config.dart                 # new: base_url, timeout, default headers
+      │  ├─ dio_failure_mapper.dart         # new: DioException into Failure (timeout, offline, 401, 5xx)
+      │  ├─ cancellation.dart               # new: cancel the request when the widget is disposed
+      │  ├─ multipart_helper.dart           # new: upload files with progress
+      │  ├─ download_helper.dart            # new: download files with progress
+      │  ├─ dio_test_adapter.dart           # new: fake adapter for tests
+      │  └─ interceptors/                   # new
+      │     ├─ interceptor_slot.dart        # entry point for contributes from other extensions
+      │     ├─ request_id_interceptor.dart  # X-Request-Id header for log correlation
+      │     └─ user_agent_interceptor.dart  # app version and platform
       └─ test/extensions/dio/
          ├─ dio_client_test.dart
-         ├─ dio_module_test.dart, dio_failure_mapper_test.dart, cancellation_test.dart           # baru
-         ├─ multipart_helper_test.dart, download_helper_test.dart                                # baru
-         ├─ interceptor_slot_test.dart, request_id_interceptor_test.dart, user_agent_interceptor_test.dart   # baru
-         └─ http_client_contract_test.dart                                                       # baru: suite dari kiln_testing
+         ├─ dio_module_test.dart, dio_failure_mapper_test.dart, cancellation_test.dart           # new
+         ├─ multipart_helper_test.dart, download_helper_test.dart                                # new
+         ├─ interceptor_slot_test.dart, request_id_interceptor_test.dart, user_agent_interceptor_test.dart   # new
+         └─ http_client_contract_test.dart                                                       # new: suite from kiln_testing
 ```
 
 ### http_retry
 
 ```text
 extensions/http_retry/
-├─ extension.yaml                           # requires: http_client, http_pipeline · contributes: http.interceptors, priority 20 (sekarang lewat HttpPipeline.use)
+├─ extension.yaml                           # requires: http_client, http_pipeline · contributes: http.interceptors, priority 20 (currently via HttpPipeline.use)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
@@ -784,21 +784,21 @@ extensions/http_retry/
       │  ├─ retry_middleware.dart
       │  ├─ retry_policy.dart
       │  ├─ retry_settings.dart
-      │  ├─ backoff.dart                    # baru: eksponensial dengan jitter
-      │  ├─ retry_budget.dart               # baru: batas total retry per jendela waktu, mencegah retry storm
-      │  ├─ retry_after_parser.dart         # baru: header Retry-After (detik atau tanggal HTTP)
-      │  ├─ idempotency.dart                # baru: hanya retry method idempoten atau yang punya Idempotency-Key
-      │  └─ retry_events.dart               # baru: callback dan log tiap percobaan ulang
+      │  ├─ backoff.dart                    # new: exponential with jitter
+      │  ├─ retry_budget.dart               # new: cap on total retries per time window, prevents retry storms
+      │  ├─ retry_after_parser.dart         # new: Retry-After header (seconds or HTTP date)
+      │  ├─ idempotency.dart                # new: retry only idempotent methods or those with an Idempotency-Key
+      │  └─ retry_events.dart               # new: callback and log for each retry attempt
       └─ test/extensions/http_retry/
          ├─ http_retry_test.dart
-         └─ backoff_test.dart, retry_budget_test.dart, retry_after_parser_test.dart, idempotency_test.dart   # baru
+         └─ backoff_test.dart, retry_budget_test.dart, retry_after_parser_test.dart, idempotency_test.dart   # new
 ```
 
 ### http_cache
 
 ```text
 extensions/http_cache/
-├─ extension.yaml                           # requires: http_client, http_pipeline · storage opsional (when: [storage]) · contributes: http.interceptors
+├─ extension.yaml                           # requires: http_client, http_pipeline · storage optional (when: [storage]) · contributes: http.interceptors
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
@@ -812,26 +812,26 @@ extensions/http_cache/
       │  ├─ cache_policy.dart
       │  ├─ cache_settings.dart
       │  ├─ memory_http_cache.dart
-      │  ├─ cache_store.dart                # baru: interface penyimpanan cache
-      │  ├─ storage_http_cache.dart         # baru: persisten lewat kontrak Storage
-      │  ├─ cache_interceptor.dart          # baru: menempel ke slot http.interceptors
-      │  ├─ cache_key.dart                  # baru: URL, query, dan header Vary
-      │  ├─ cache_control_parser.dart       # baru: max-age, no-store, no-cache, stale-while-revalidate
-      │  ├─ etag_validator.dart             # baru: If-None-Match dan respons 304
-      │  ├─ stale_while_revalidate.dart     # baru: sajikan cache lalu perbarui di belakang
-      │  └─ cache_invalidation.dart         # baru: hapus per prefix atau tag setelah request mutasi
+      │  ├─ cache_store.dart                # new: cache storage interface
+      │  ├─ storage_http_cache.dart         # new: persistent via the Storage contract
+      │  ├─ cache_interceptor.dart          # new: attaches to the http.interceptors slot
+      │  ├─ cache_key.dart                  # new: URL, query, and Vary headers
+      │  ├─ cache_control_parser.dart       # new: max-age, no-store, no-cache, stale-while-revalidate
+      │  ├─ etag_validator.dart             # new: If-None-Match and 304 responses
+      │  ├─ stale_while_revalidate.dart     # new: serve from cache then refresh behind the scenes
+      │  └─ cache_invalidation.dart         # new: clear by prefix or tag after a mutation request
       └─ test/extensions/http_cache/
          ├─ http_cache_test.dart
-         ├─ cache_key_test.dart, cache_control_parser_test.dart, etag_validator_test.dart                  # baru
-         └─ stale_while_revalidate_test.dart, cache_invalidation_test.dart, storage_http_cache_test.dart   # baru
+         ├─ cache_key_test.dart, cache_control_parser_test.dart, etag_validator_test.dart                  # new
+         └─ stale_while_revalidate_test.dart, cache_invalidation_test.dart, storage_http_cache_test.dart   # new
 ```
 
-## Extension: storage dan data
+## Extensions: storage and data
 
-Tiga extension penyimpanan lokal, dari yang paling sederhana (key-value) sampai
-yang terenkripsi dan yang berbentuk dokumen. Ketiganya tidak saling mengimpor:
-`http_cache` dan `rest_auth` memakai `Storage` dan `SecureStorage` lewat
-kontrak di `kiln_core`.
+Three local storage extensions, from the simplest (key-value) to the encrypted
+one and the document-shaped one. None of them imports the others:
+`http_cache` and `rest_auth` use `Storage` and `SecureStorage` through
+contracts in `kiln_core`.
 
 ### storage
 
@@ -842,62 +842,62 @@ extensions/storage/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ key-value-storage.md
-│  └─ typed-keys-and-migration.md             # cara memberi nama key dan memigrasi nilai lama
+│  └─ typed-keys-and-migration.md             # how to name keys and migrate old values
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    └─ __brick__/
       ├─ lib/extensions/storage/
-      │  ├─ prefs.dart                       # baru: fasad statis Prefs.read, write, delete (bukan Storage, supaya tidak bentrok dengan kontrak)
+      │  ├─ prefs.dart                       # new: static facade Prefs.read, write, delete (not Storage, so it does not clash with the contract)
       │  ├─ storage_module.dart
       │  ├─ shared_preferences_storage.dart
-      │  ├─ storage_config.dart              # baru: prefix key per app dan flavor
-      │  ├─ storage_failure_mapper.dart      # baru: error plugin dan cast salah menjadi Failure(storage)
-      │  ├─ storage_gateway.dart             # baru: membungkus SharedPreferencesAsync supaya bisa di-fake
-      │  ├─ typed_key.dart                   # baru: StorageKey<T> dengan nama, tipe, default, dan serializer
-      │  ├─ json_codec.dart                  # baru: simpan objek lewat jsonEncode dan jsonDecode
-      │  ├─ namespaced_storage.dart          # baru: Storage dengan prefix, dipakai http_cache tanpa menimpa key lain
-      │  ├─ ttl_storage.dart                 # baru: nilai dengan kedaluwarsa, memakai Clock dari kiln_core
-      │  └─ storage_migrator.dart            # baru: versi skema key, jalankan langkah migrasi saat start
+      │  ├─ storage_config.dart              # new: key prefix per app and flavor
+      │  ├─ storage_failure_mapper.dart      # new: plugin errors and bad casts into Failure(storage)
+      │  ├─ storage_gateway.dart             # new: wraps SharedPreferencesAsync so it can be faked
+      │  ├─ typed_key.dart                   # new: StorageKey<T> with name, type, default, and serializer
+      │  ├─ json_codec.dart                  # new: store objects via jsonEncode and jsonDecode
+      │  ├─ namespaced_storage.dart          # new: Storage with a prefix, used by http_cache without overwriting other keys
+      │  ├─ ttl_storage.dart                 # new: values with an expiry, using Clock from kiln_core
+      │  └─ storage_migrator.dart            # new: key schema version, runs migration steps at startup
       └─ test/extensions/storage/
          ├─ shared_preferences_storage_test.dart
-         ├─ storage_module_test.dart, storage_failure_mapper_test.dart, typed_key_test.dart          # baru
-         ├─ json_codec_test.dart, namespaced_storage_test.dart, ttl_storage_test.dart               # baru
-         ├─ storage_migrator_test.dart                                                               # baru
-         └─ storage_contract_test.dart                                                               # baru: suite dari kiln_testing
+         ├─ storage_module_test.dart, storage_failure_mapper_test.dart, typed_key_test.dart          # new
+         ├─ json_codec_test.dart, namespaced_storage_test.dart, ttl_storage_test.dart               # new
+         ├─ storage_migrator_test.dart                                                               # new
+         └─ storage_contract_test.dart                                                               # new: suite from kiln_testing
 ```
 
 ### secure_storage
 
 ```text
 extensions/secure_storage/
-├─ extension.yaml                           # provides: secure_storage · ios: keychain_sharing · android: allowBackup=false (baru)
+├─ extension.yaml                           # provides: secure_storage · ios: keychain_sharing · android: allowBackup=false (new)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ secure-storage.md
-│  └─ keystore-and-keychain-notes.md          # kehilangan data saat reinstall, backup, dan perbedaan platform
+│  └─ keystore-and-keychain-notes.md          # data loss on reinstall, backup, and platform differences
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    └─ __brick__/
       ├─ lib/extensions/secure_storage/
-      │  ├─ vault.dart                       # baru: fasad statis Vault.read, write, delete
+      │  ├─ vault.dart                       # new: static facade Vault.read, write, delete
       │  ├─ secure_storage_module.dart
       │  ├─ keystore_secure_storage.dart
-      │  ├─ secure_storage_config.dart       # baru: opsi Android (encrypted prefs), iOS (accessibility), web
-      │  ├─ secure_storage_failure_mapper.dart  # baru: error plugin menjadi Failure(secure_storage)
-      │  ├─ secure_storage_gateway.dart      # baru: membungkus FlutterSecureStorage
-      │  ├─ secure_token_store.dart          # baru: implementasi TokenProvider dari kiln_core, dipakai rest_auth
-      │  ├─ namespaced_secure_storage.dart   # baru: prefix per extension, readAll dan clear tidak menyentuh milik lain
-      │  ├─ first_run_wipe.dart              # baru: hapus Keychain sisa instalasi lama pada start pertama iOS
-      │  └─ secure_storage_health_check.dart # baru: tulis-baca-hapus probe, laporkan ke doctor dan Logger
+      │  ├─ secure_storage_config.dart       # new: Android (encrypted prefs), iOS (accessibility), web options
+      │  ├─ secure_storage_failure_mapper.dart  # new: plugin errors into Failure(secure_storage)
+      │  ├─ secure_storage_gateway.dart      # new: wraps FlutterSecureStorage
+      │  ├─ secure_token_store.dart          # new: TokenProvider implementation from kiln_core, used by rest_auth
+      │  ├─ namespaced_secure_storage.dart   # new: prefix per extension, readAll and clear leave other owners alone
+      │  ├─ first_run_wipe.dart              # new: clears Keychain leftovers from an old install on the first iOS start
+      │  └─ secure_storage_health_check.dart # new: write-read-delete probe, reported to doctor and Logger
       └─ test/extensions/secure_storage/
          ├─ secure_storage_test.dart
-         ├─ secure_storage_module_test.dart, secure_storage_failure_mapper_test.dart                 # baru
-         ├─ secure_token_store_test.dart, namespaced_secure_storage_test.dart                        # baru
-         ├─ first_run_wipe_test.dart, secure_storage_health_check_test.dart                          # baru
-         └─ secure_storage_contract_test.dart                                                        # baru: suite dari kiln_testing
+         ├─ secure_storage_module_test.dart, secure_storage_failure_mapper_test.dart                 # new
+         ├─ secure_token_store_test.dart, namespaced_secure_storage_test.dart                        # new
+         ├─ first_run_wipe_test.dart, secure_storage_health_check_test.dart                          # new
+         └─ secure_storage_contract_test.dart                                                        # new: suite from kiln_testing
 ```
 
 ### local_db
@@ -909,8 +909,8 @@ extensions/local_db/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ local-database.md
-│  ├─ schema-versioning.md                    # cara memakai migrasi dokumen
-│  └─ offline-first-pattern.md                # dipakai guides/add-offline-support.md
+│  ├─ schema-versioning.md                    # how to use document migrations
+│  └─ offline-first-pattern.md                # used by guides/add-offline-support.md
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -921,43 +921,43 @@ extensions/local_db/
       │  ├─ local_database_opener.dart
       │  ├─ local_database_opener_io.dart
       │  ├─ local_database_opener_web.dart
-      │  ├─ local_db_config.dart             # baru: nama file database, versi skema, path override
-      │  ├─ local_db_failure_mapper.dart     # baru: error Sembast menjadi Failure(database)
-      │  ├─ collection_watcher.dart          # baru: Stream<List<LocalRecord>> yang diperbarui saat koleksi berubah
-      │  ├─ transaction_runner.dart          # baru: beberapa operasi dalam satu transaksi, atomik
-      │  ├─ typed_collection.dart            # baru: LocalCollection dengan fromJson dan toJson
-      │  ├─ query_builder.dart               # baru: where, orderBy, limit menjadi LocalQuery
-      │  ├─ schema_migrator.dart             # baru: versi skema dan langkah migrasi saat open
-      │  ├─ database_encryption.dart         # baru: opsi enkripsi kodek Sembast, kunci dari SecureStorage bila ada
-      │  ├─ backup_export.dart               # baru: ekspor dan impor seluruh database sebagai JSON
-      │  └─ sync_queue.dart                  # baru: antrean perubahan lokal untuk disinkronkan ke RemoteDatabase
+      │  ├─ local_db_config.dart             # new: database file name, schema version, path override
+      │  ├─ local_db_failure_mapper.dart     # new: Sembast errors into Failure(database)
+      │  ├─ collection_watcher.dart          # new: Stream<List<LocalRecord>> updated when the collection changes
+      │  ├─ transaction_runner.dart          # new: several operations in one atomic transaction
+      │  ├─ typed_collection.dart            # new: LocalCollection with fromJson and toJson
+      │  ├─ query_builder.dart               # new: where, orderBy, limit into LocalQuery
+      │  ├─ schema_migrator.dart             # new: schema version and migration steps on open
+      │  ├─ database_encryption.dart         # new: Sembast codec encryption option, key from SecureStorage when available
+      │  ├─ backup_export.dart               # new: export and import the whole database as JSON
+      │  └─ sync_queue.dart                  # new: queue of local changes to sync to RemoteDatabase
       └─ test/extensions/local_db/
          ├─ local_database_test.dart
-         ├─ local_db_module_test.dart, local_db_failure_mapper_test.dart                             # baru
-         ├─ collection_watcher_test.dart, transaction_runner_test.dart, typed_collection_test.dart   # baru
-         ├─ query_builder_test.dart, schema_migrator_test.dart, database_encryption_test.dart        # baru
-         ├─ backup_export_test.dart, sync_queue_test.dart                                            # baru
-         └─ local_database_contract_test.dart                                                        # baru: suite dari kiln_testing
+         ├─ local_db_module_test.dart, local_db_failure_mapper_test.dart                             # new
+         ├─ collection_watcher_test.dart, transaction_runner_test.dart, typed_collection_test.dart   # new
+         ├─ query_builder_test.dart, schema_migrator_test.dart, database_encryption_test.dart        # new
+         ├─ backup_export_test.dart, sync_queue_test.dart                                            # new
+         └─ local_database_contract_test.dart                                                        # new: suite from kiln_testing
 ```
 
-## Extension: backend dan auth
+## Extensions: backend and auth
 
-Enam extension untuk identitas dan data jarak jauh. Tiga backend (`appwrite`,
-`firebase`, `supabase`) memenuhi tiga kontrak sekaligus: `AuthRepository`,
-`RemoteDatabase`, dan `FileStorage`. `rest_auth` memenuhi `AuthRepository`
-saja, di atas `http_client`. `social_login` dan `biometric` menambah jalur
-masuk tanpa mengubah kontrak auth.
+Six extensions for identity and remote data. The three backends (`appwrite`,
+`firebase`, `supabase`) fulfill three contracts at once: `AuthRepository`,
+`RemoteDatabase`, and `FileStorage`. `rest_auth` fulfills `AuthRepository`
+only, on top of `http_client`. `social_login` and `biometric` add sign-in paths
+without changing the auth contract.
 
-Backend sengaja **tidak** punya fasad statis. Kode aplikasi membaca kontrak dari
-Registry, dan aturan lint `prefer_contract_over_impl` menolak impor langsung ke
-kelas backend.
+Backends deliberately have **no** static facade. Application code reads the contract from
+the Registry, and the `prefer_contract_over_impl` lint rule rejects direct imports of
+backend classes.
 
-Tiap backend memakai pola gateway yang sama, supaya logika sesi dan pemetaan
-error bisa dites tanpa akun sungguhan:
+Every backend uses the same gateway pattern, so session logic and error mapping
+can be tested without real accounts:
 
 ```text
-kontrak kiln_core  ←  <backend>_auth_repository / _remote_database / _file_storage
-                              ↓ memakai
+kiln_core contract  ←  <backend>_auth_repository / _remote_database / _file_storage
+                              ↓ uses
                        <backend>_*_gateway (interface)  ←  Sdk*Gateway (plugin) | Fake (test)
 ```
 
@@ -969,9 +969,9 @@ extensions/appwrite/
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
-│  ├─ appwrite-setup.md                       # buat project, platform, database, dan bucket
-│  ├─ collections-and-permissions.md          # izin dokumen dan RemoteQuery yang didukung
-│  └─ backend-swap-notes.md                   # beda perilaku dibanding firebase dan supabase
+│  ├─ appwrite-setup.md                       # create the project, platform, database, and bucket
+│  ├─ collections-and-permissions.md          # document permissions and supported RemoteQuery
+│  └─ backend-swap-notes.md                   # behavioral differences from firebase and supabase
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -980,69 +980,69 @@ extensions/appwrite/
       │  ├─ appwrite_module.dart
       │  ├─ appwrite_auth.dart
       │  ├─ appwrite_account.dart
-      │  ├─ appwrite_config.dart             # baru: endpoint, projectId, databaseId, bucketId
-      │  ├─ appwrite_client_factory.dart     # baru: Client dengan setSelfSigned hanya di flavor development
-      │  ├─ appwrite_failure_mapper.dart     # baru: AppwriteException menjadi Failure (401, 404, 409, 429, jaringan)
-      │  ├─ appwrite_account_management.dart # baru: reset password, verifikasi email, ubah profil
-      │  ├─ appwrite_session_bridge.dart     # baru: mengisi SessionController dan TokenProvider dari kiln_core
-      │  ├─ appwrite_database_gateway.dart   # baru: interface + SdkAppwriteDatabaseGateway
-      │  ├─ appwrite_remote_database.dart    # baru: implementasi RemoteDatabase
-      │  ├─ appwrite_query_mapper.dart       # baru: RemoteQuery menjadi Query Appwrite
-      │  ├─ appwrite_realtime_gateway.dart   # baru: watch() lewat langganan Realtime, tutup saat dispose
-      │  ├─ appwrite_storage_gateway.dart    # baru: interface + SdkAppwriteStorageGateway
-      │  └─ appwrite_file_storage.dart       # baru: implementasi FileStorage (upload, download, url, hapus)
+      │  ├─ appwrite_config.dart             # new: endpoint, projectId, databaseId, bucketId
+      │  ├─ appwrite_client_factory.dart     # new: Client with setSelfSigned only in the development flavor
+      │  ├─ appwrite_failure_mapper.dart     # new: AppwriteException into Failure (401, 404, 409, 429, network)
+      │  ├─ appwrite_account_management.dart # new: password reset, email verification, profile update
+      │  ├─ appwrite_session_bridge.dart     # new: fills SessionController and TokenProvider from kiln_core
+      │  ├─ appwrite_database_gateway.dart   # new: interface + SdkAppwriteDatabaseGateway
+      │  ├─ appwrite_remote_database.dart    # new: RemoteDatabase implementation
+      │  ├─ appwrite_query_mapper.dart       # new: RemoteQuery into an Appwrite Query
+      │  ├─ appwrite_realtime_gateway.dart   # new: watch() via a Realtime subscription, closed on dispose
+      │  ├─ appwrite_storage_gateway.dart    # new: interface + SdkAppwriteStorageGateway
+      │  └─ appwrite_file_storage.dart       # new: FileStorage implementation (upload, download, url, delete)
       └─ test/extensions/appwrite/
          ├─ appwrite_auth_test.dart
-         ├─ appwrite_module_test.dart, appwrite_config_test.dart, appwrite_failure_mapper_test.dart  # baru
-         ├─ appwrite_account_management_test.dart, appwrite_session_bridge_test.dart                 # baru
-         ├─ appwrite_remote_database_test.dart, appwrite_query_mapper_test.dart                      # baru
-         ├─ appwrite_realtime_gateway_test.dart, appwrite_file_storage_test.dart                     # baru
-         └─ appwrite_contract_test.dart                                                              # baru: auth, remote_database, file_storage dari kiln_testing
+         ├─ appwrite_module_test.dart, appwrite_config_test.dart, appwrite_failure_mapper_test.dart  # new
+         ├─ appwrite_account_management_test.dart, appwrite_session_bridge_test.dart                 # new
+         ├─ appwrite_remote_database_test.dart, appwrite_query_mapper_test.dart                      # new
+         ├─ appwrite_realtime_gateway_test.dart, appwrite_file_storage_test.dart                     # new
+         └─ appwrite_contract_test.dart                                                              # new: auth, remote_database, file_storage from kiln_testing
 ```
 
 ### firebase
 
 ```text
 extensions/firebase/
-├─ extension.yaml                           # provides: auth, social_auth, remote_database, file_storage · category: auth · exclusive · manual_steps: flutterfire configure (baru)
+├─ extension.yaml                           # provides: auth, social_auth, remote_database, file_storage · category: auth · exclusive · manual_steps: flutterfire configure (new)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ firebase-setup.md
-│  ├─ flutterfire-configure.md                # langkah manual yang dilacak doctor
-│  ├─ emulators.md                            # flavor development memakai Firebase Emulator Suite
-│  └─ security-rules.md                       # contoh aturan Firestore dan Storage yang cocok dengan RemoteQuery
+│  ├─ flutterfire-configure.md                # manual step tracked by doctor
+│  ├─ emulators.md                            # the development flavor uses the Firebase Emulator Suite
+│  └─ security-rules.md                       # sample Firestore and Storage rules that match RemoteQuery
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
-   ├─ hooks/                               # baru
+   ├─ hooks/                               # new
    │  ├─ pubspec.yaml
-   │  └─ pre_gen.dart                      # periksa flutterfire CLI dan firebase_options.dart, hanya memberi peringatan
+   │  └─ pre_gen.dart                      # checks the flutterfire CLI and firebase_options.dart, only warns
    └─ __brick__/
       ├─ lib/extensions/firebase/
       │  ├─ firebase_module.dart
       │  ├─ firebase_app.dart
       │  ├─ firebase_auth_repository.dart
       │  ├─ firebase_gateway.dart
-      │  ├─ firebase_failures.dart           # pemeta error yang sudah ada, namanya tidak diubah (lihat Keputusan desain)
-      │  ├─ firebase_config.dart             # baru: sumber options, host emulator, flag emulator
-      │  ├─ firebase_emulator.dart           # baru: arahkan auth, firestore, dan storage ke emulator di flavor development
-      │  ├─ firebase_account_management.dart # baru: reset password, verifikasi email, ubah profil
-      │  ├─ firebase_id_token_provider.dart  # baru: TokenProvider dari getIdToken, refresh otomatis
-      │  ├─ firebase_session_bridge.dart     # baru: authStateChanges ke SessionController
-      │  ├─ firestore_gateway.dart           # baru: interface + SdkFirestoreGateway
-      │  ├─ firestore_remote_database.dart   # baru: implementasi RemoteDatabase
-      │  ├─ firestore_query_mapper.dart      # baru: RemoteQuery menjadi query Firestore, tolak kombinasi tanpa indeks
-      │  ├─ firebase_storage_gateway.dart    # baru: interface + SdkFirebaseStorageGateway
-      │  └─ firebase_file_storage.dart       # baru: implementasi FileStorage dengan progress upload
+      │  ├─ firebase_failures.dart           # existing error mapping, name unchanged (see Design decisions)
+      │  ├─ firebase_config.dart             # new: options source, emulator host, emulator flag
+      │  ├─ firebase_emulator.dart           # new: point auth, firestore, and storage at the emulator in the development flavor
+      │  ├─ firebase_account_management.dart # new: password reset, email verification, profile update
+      │  ├─ firebase_id_token_provider.dart  # new: TokenProvider from getIdToken, automatic refresh
+      │  ├─ firebase_session_bridge.dart     # new: authStateChanges into SessionController
+      │  ├─ firestore_gateway.dart           # new: interface + SdkFirestoreGateway
+      │  ├─ firestore_remote_database.dart   # new: RemoteDatabase implementation
+      │  ├─ firestore_query_mapper.dart      # new: RemoteQuery into a Firestore query, rejects combinations without an index
+      │  ├─ firebase_storage_gateway.dart    # new: interface + SdkFirebaseStorageGateway
+      │  └─ firebase_file_storage.dart       # new: FileStorage implementation with upload progress
       └─ test/extensions/firebase/
          ├─ firebase_auth_test.dart
          ├─ firebase_failures_test.dart
-         ├─ firebase_module_test.dart, firebase_config_test.dart, firebase_emulator_test.dart        # baru
-         ├─ firebase_account_management_test.dart, firebase_id_token_provider_test.dart             # baru
-         ├─ firebase_session_bridge_test.dart, firestore_remote_database_test.dart                  # baru
-         ├─ firestore_query_mapper_test.dart, firebase_file_storage_test.dart                       # baru
-         └─ firebase_contract_test.dart                                                             # baru: auth, social_auth, remote_database, file_storage
+         ├─ firebase_module_test.dart, firebase_config_test.dart, firebase_emulator_test.dart        # new
+         ├─ firebase_account_management_test.dart, firebase_id_token_provider_test.dart             # new
+         ├─ firebase_session_bridge_test.dart, firestore_remote_database_test.dart                  # new
+         ├─ firestore_query_mapper_test.dart, firebase_file_storage_test.dart                       # new
+         └─ firebase_contract_test.dart                                                             # new: auth, social_auth, remote_database, file_storage
 ```
 
 ### supabase
@@ -1054,8 +1054,8 @@ extensions/supabase/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ supabase-setup.md
-│  ├─ row-level-security.md                   # contoh policy untuk tabel yang dipakai RemoteDatabase
-│  └─ email-confirmation-and-redirects.md     # callback lewat kontrak DeepLinks bila deep_link terpasang
+│  ├─ row-level-security.md                   # sample policies for the tables used by RemoteDatabase
+│  └─ email-confirmation-and-redirects.md     # callback via the DeepLinks contract when deep_link is installed
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1065,39 +1065,39 @@ extensions/supabase/
       │  ├─ supabase_auth_repository.dart
       │  ├─ supabase_client.dart
       │  ├─ supabase_gateway.dart
-      │  ├─ supabase_failures.dart           # pemeta error yang sudah ada, namanya tidak diubah (lihat Keputusan desain)
-      │  ├─ supabase_config.dart             # baru: url, anon key, schema, alur PKCE
-      │  ├─ supabase_account_management.dart # baru: reset password, verifikasi email, ubah profil
-      │  ├─ supabase_token_provider.dart     # baru: TokenProvider dari access token sesi
-      │  ├─ supabase_session_bridge.dart     # baru: onAuthStateChange ke SessionController
-      │  ├─ supabase_link_handler.dart       # baru: terima callback konfirmasi email lewat DeepLinks (readOrNull)
-      │  ├─ postgrest_gateway.dart           # baru: interface + SdkPostgrestGateway
-      │  ├─ supabase_remote_database.dart    # baru: implementasi RemoteDatabase
-      │  ├─ supabase_query_mapper.dart       # baru: RemoteQuery menjadi filter PostgREST
-      │  ├─ supabase_realtime_gateway.dart   # baru: watch() lewat saluran realtime
-      │  ├─ supabase_storage_gateway.dart    # baru: interface + SdkSupabaseStorageGateway
-      │  └─ supabase_file_storage.dart       # baru: implementasi FileStorage dengan signed URL
+      │  ├─ supabase_failures.dart           # existing error mapping, name unchanged (see Design decisions)
+      │  ├─ supabase_config.dart             # new: url, anon key, schema, PKCE flow
+      │  ├─ supabase_account_management.dart # new: password reset, email verification, profile update
+      │  ├─ supabase_token_provider.dart     # new: TokenProvider from the session access token
+      │  ├─ supabase_session_bridge.dart     # new: onAuthStateChange into SessionController
+      │  ├─ supabase_link_handler.dart       # new: receives the email confirmation callback via DeepLinks (readOrNull)
+      │  ├─ postgrest_gateway.dart           # new: interface + SdkPostgrestGateway
+      │  ├─ supabase_remote_database.dart    # new: RemoteDatabase implementation
+      │  ├─ supabase_query_mapper.dart       # new: RemoteQuery into a PostgREST filter
+      │  ├─ supabase_realtime_gateway.dart   # new: watch() via the realtime channel
+      │  ├─ supabase_storage_gateway.dart    # new: interface + SdkSupabaseStorageGateway
+      │  └─ supabase_file_storage.dart       # new: FileStorage implementation with signed URLs
       └─ test/extensions/supabase/
          ├─ supabase_auth_test.dart
          ├─ supabase_failures_test.dart
-         ├─ supabase_module_test.dart, supabase_config_test.dart, supabase_account_management_test.dart   # baru
-         ├─ supabase_token_provider_test.dart, supabase_session_bridge_test.dart                          # baru
-         ├─ supabase_link_handler_test.dart, supabase_remote_database_test.dart                           # baru
-         ├─ supabase_query_mapper_test.dart, supabase_file_storage_test.dart                              # baru
-         └─ supabase_contract_test.dart                                                                   # baru: auth, social_auth, remote_database, file_storage
+         ├─ supabase_module_test.dart, supabase_config_test.dart, supabase_account_management_test.dart   # new
+         ├─ supabase_token_provider_test.dart, supabase_session_bridge_test.dart                          # new
+         ├─ supabase_link_handler_test.dart, supabase_remote_database_test.dart                           # new
+         ├─ supabase_query_mapper_test.dart, supabase_file_storage_test.dart                              # new
+         └─ supabase_contract_test.dart                                                                   # new: auth, social_auth, remote_database, file_storage
 ```
 
 ### rest_auth
 
 ```text
 extensions/rest_auth/
-├─ extension.yaml                           # provides: auth · requires: http_client, secure_storage · category: auth · exclusive · prompts: base_url, path login, register, refresh, logout, me
+├─ extension.yaml                           # provides: auth · requires: http_client, secure_storage · category: auth · exclusive · prompts: base_url, login, register, refresh, logout, me paths
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ rest-auth.md
-│  ├─ server-contract.md                      # bentuk JSON login, register, refresh, logout, me
-│  └─ token-refresh.md                        # alur refresh single-flight dan kapan sesi dianggap berakhir
+│  ├─ server-contract.md                      # JSON shape of login, register, refresh, logout, me
+│  └─ token-refresh.md                        # single-flight refresh flow and when a session is considered over
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1106,22 +1106,22 @@ extensions/rest_auth/
       │  ├─ rest_auth_module.dart
       │  ├─ rest_auth.dart
       │  ├─ rest_auth_config.dart
-      │  ├─ rest_auth_failure_mapper.dart    # baru: status HTTP dan badan error menjadi Failure
-      │  ├─ rest_token_store.dart            # baru: simpan access dan refresh token lewat SecureStorage
-      │  ├─ token_refresher.dart             # baru: refresh single-flight, request paralel menunggu satu hasil
-      │  ├─ jwt_expiry.dart                  # baru: baca exp tanpa verifikasi, refresh sebelum kedaluwarsa
-      │  ├─ auth_response_parser.dart        # baru: terima camelCase dan snake_case, bentuk token yang bervariasi
-      │  ├─ auth_middleware.dart             # baru: header Bearer, contributes: http.interceptors (priority 10)
-      │  ├─ unauthorized_handler.dart        # baru: 401, refresh, ulang sekali, gagal berarti signOut
-      │  ├─ rest_account_management.dart     # baru: reset password dan verifikasi email lewat endpoint opsional
-      │  └─ rest_session_bridge.dart         # baru: mengisi SessionController dan TokenProvider
+      │  ├─ rest_auth_failure_mapper.dart    # new: HTTP status and error body into Failure
+      │  ├─ rest_token_store.dart            # new: stores access and refresh tokens via SecureStorage
+      │  ├─ token_refresher.dart             # new: single-flight refresh, parallel requests wait on one result
+      │  ├─ jwt_expiry.dart                  # new: reads exp without verification, refreshes before expiry
+      │  ├─ auth_response_parser.dart        # new: accepts camelCase and snake_case, varying token shapes
+      │  ├─ auth_middleware.dart             # new: Bearer header, contributes: http.interceptors (priority 10)
+      │  ├─ unauthorized_handler.dart        # new: 401, refresh, retry once, failure means signOut
+      │  ├─ rest_account_management.dart     # new: password reset and email verification via optional endpoints
+      │  └─ rest_session_bridge.dart         # new: fills SessionController and TokenProvider
       └─ test/extensions/rest_auth/
          ├─ rest_auth_test.dart
-         ├─ rest_auth_module_test.dart, rest_auth_failure_mapper_test.dart, rest_token_store_test.dart   # baru
-         ├─ token_refresher_test.dart, jwt_expiry_test.dart, auth_response_parser_test.dart              # baru
-         ├─ auth_middleware_test.dart, unauthorized_handler_test.dart                                    # baru
-         ├─ rest_account_management_test.dart, rest_session_bridge_test.dart                            # baru
-         └─ rest_auth_contract_test.dart                                                                 # baru: auth_repository_contract dari kiln_testing
+         ├─ rest_auth_module_test.dart, rest_auth_failure_mapper_test.dart, rest_token_store_test.dart   # new
+         ├─ token_refresher_test.dart, jwt_expiry_test.dart, auth_response_parser_test.dart              # new
+         ├─ auth_middleware_test.dart, unauthorized_handler_test.dart                                    # new
+         ├─ rest_account_management_test.dart, rest_session_bridge_test.dart                            # new
+         └─ rest_auth_contract_test.dart                                                                 # new: auth_repository_contract from kiln_testing
 ```
 
 ### social_login
@@ -1133,8 +1133,8 @@ extensions/social_login/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ social-login.md
-│  ├─ google-setup.md                         # client id Android, iOS, dan server; SHA-1
-│  └─ apple-setup.md                          # capability, service id, dan Apple di Android atau web
+│  ├─ google-setup.md                         # Android, iOS, and server client ids; SHA-1
+│  └─ apple-setup.md                          # capability, service id, and Apple on Android or web
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1143,76 +1143,76 @@ extensions/social_login/
       │  ├─ social_login_module.dart
       │  ├─ social_login.dart
       │  ├─ social_credentials.dart
-      │  ├─ social_failures.dart             # pemeta error yang sudah ada, namanya tidak diubah (lihat Keputusan desain)
-      │  ├─ social_login_config.dart         # baru: client id, provider yang diaktifkan
-      │  ├─ nonce_generator.dart             # baru: nonce acak aman dan hash SHA-256 untuk Apple
-      │  ├─ social_availability.dart         # baru: provider mana yang tersedia di platform ini
-      │  ├─ google_credential_gateway.dart   # baru: interface + SdkGoogleCredentialGateway (google_sign_in)
-      │  ├─ apple_credential_gateway.dart    # baru: interface + SdkAppleCredentialGateway (sign_in_with_apple)
-      │  ├─ social_sign_out_listener.dart    # baru: keluar dari Google saat AuthRepository.signOut
-      │  └─ widgets/                         # baru
-      │     ├─ social_login_buttons.dart     # tombol Google dan Apple sesuai pedoman merek, mengikuti ketersediaan
-      │     └─ social_login_panel.dart       # panel siap pakai dengan state loading dan pesan Failure
+      │  ├─ social_failures.dart             # existing error mapping, name unchanged (see Design decisions)
+      │  ├─ social_login_config.dart         # new: client ids, enabled providers
+      │  ├─ nonce_generator.dart             # new: secure random nonce and SHA-256 hash for Apple
+      │  ├─ social_availability.dart         # new: which providers are available on this platform
+      │  ├─ google_credential_gateway.dart   # new: interface + SdkGoogleCredentialGateway (google_sign_in)
+      │  ├─ apple_credential_gateway.dart    # new: interface + SdkAppleCredentialGateway (sign_in_with_apple)
+      │  ├─ social_sign_out_listener.dart    # new: signs out of Google when AuthRepository.signOut runs
+      │  └─ widgets/                         # new
+      │     ├─ social_login_buttons.dart     # Google and Apple buttons per brand guidelines, following availability
+      │     └─ social_login_panel.dart       # ready-made panel with loading state and Failure messages
       └─ test/extensions/social_login/
          ├─ social_login_test.dart
          ├─ social_failures_test.dart
-         ├─ social_login_module_test.dart, social_login_config_test.dart, nonce_generator_test.dart   # baru
-         ├─ social_availability_test.dart, social_sign_out_listener_test.dart                         # baru
-         ├─ social_login_buttons_test.dart, social_login_panel_test.dart                              # baru
-         └─ social_auth_contract_test.dart                                                            # baru: suite dari kiln_testing
+         ├─ social_login_module_test.dart, social_login_config_test.dart, nonce_generator_test.dart   # new
+         ├─ social_availability_test.dart, social_sign_out_listener_test.dart                         # new
+         ├─ social_login_buttons_test.dart, social_login_panel_test.dart                              # new
+         └─ social_auth_contract_test.dart                                                            # new: suite from kiln_testing
 ```
 
 ### biometric
 
 ```text
 extensions/biometric/
-├─ extension.yaml                           # provides: biometric · category: security · android: USE_BIOMETRIC, FlutterFragmentActivity · ios: NSFaceIDUsageDescription · platforms: android, ios, macos (bukan web)
+├─ extension.yaml                           # provides: biometric · category: security · android: USE_BIOMETRIC, FlutterFragmentActivity · ios: NSFaceIDUsageDescription · platforms: android, ios, macos (not web)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ biometric.md
-│  ├─ app-lock.md                             # kunci setelah app di latar belakang
-│  └─ platform-requirements.md                # tema AppCompat Android 8 ke bawah, dan batas web
+│  ├─ app-lock.md                             # lock after the app goes to the background
+│  └─ platform-requirements.md                # AppCompat theme on Android 8 and below, and web limits
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    └─ __brick__/
       ├─ lib/extensions/biometric/
-      │  ├─ biometric.dart                   # fasad Biometric yang sudah ada
+      │  ├─ biometric.dart                   # the existing Biometric facade
       │  ├─ biometric_module.dart
-      │  ├─ biometric_config.dart            # baru: alasan bawaan, masa tenggang, biometricOnly
-      │  ├─ biometric_failure_mapper.dart    # baru: tabel kode dan pesan dipindah dari biometric.dart
-      │  ├─ biometric_gateway.dart           # baru: interface + SdkBiometricGateway (LocalAuthentication)
-      │  ├─ biometric_availability.dart      # baru: available, notEnrolled, noHardware, unsupportedPlatform
-      │  ├─ biometric_gate.dart              # baru: guard(action), autentikasi dulu dengan masa tenggang memakai Clock
-      │  ├─ app_lock.dart                    # baru: kunci saat onPause lebih lama dari batas, buka lewat biometrik
-      │  ├─ app_lock_scope.dart              # baru: widget penutup layar saat terkunci, contributes: app.wrappers
-      │  └─ biometric_protected_storage.dart # baru: SecureStorage yang menuntut autentikasi sebelum read (readOrNull)
+      │  ├─ biometric_config.dart            # new: default reason, grace period, biometricOnly
+      │  ├─ biometric_failure_mapper.dart    # new: code and message table moved out of biometric.dart
+      │  ├─ biometric_gateway.dart           # new: interface + SdkBiometricGateway (LocalAuthentication)
+      │  ├─ biometric_availability.dart      # new: available, notEnrolled, noHardware, unsupportedPlatform
+      │  ├─ biometric_gate.dart              # new: guard(action), authenticates first with a grace period using Clock
+      │  ├─ app_lock.dart                    # new: locks when onPause lasts longer than the limit, unlocks via biometrics
+      │  ├─ app_lock_scope.dart              # new: widget that covers the screen while locked, contributes: app.wrappers
+      │  └─ biometric_protected_storage.dart # new: SecureStorage that requires authentication before read (readOrNull)
       └─ test/extensions/biometric/
          ├─ biometric_test.dart
-         ├─ biometric_module_test.dart, biometric_config_test.dart, biometric_failure_mapper_test.dart   # baru
-         ├─ biometric_availability_test.dart, biometric_gate_test.dart, app_lock_test.dart               # baru
-         └─ app_lock_scope_test.dart, biometric_protected_storage_test.dart                              # baru
+         ├─ biometric_module_test.dart, biometric_config_test.dart, biometric_failure_mapper_test.dart   # new
+         ├─ biometric_availability_test.dart, biometric_gate_test.dart, app_lock_test.dart               # new
+         └─ app_lock_scope_test.dart, biometric_protected_storage_test.dart                              # new
 ```
 
-## Extension: navigasi dan UI
+## Extensions: navigation and UI
 
-Empat extension yang mengubah apa yang dilihat dan dilalui user. Semuanya
-menempel ke seam yang sudah ada di `app_basic` (`AppThemeConfig`,
-`AppLocalizationsConfig`, `RouterConfig`) lewat Registry, jadi `app.dart` tidak
-perlu diedit.
+Four extensions that change what the user sees and moves through. All of them
+attach to seams that already exist in `app_basic` (`AppThemeConfig`,
+`AppLocalizationsConfig`, `RouterConfig`) through the Registry, so `app.dart` does not
+need to be edited.
 
 ### go_router
 
 ```text
 extensions/go_router/
-├─ extension.yaml                           # provides: navigation · category: navigation · exclusive · slot: router.routes (baru)
+├─ extension.yaml                           # provides: navigation · category: navigation · exclusive · slot: router.routes (new)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ navigation.md
-│  ├─ route-guards.md                         # redirect berdasarkan sesi, urutan guard
-│  └─ deep-links-and-routing.md               # cara tautan dari deep_link menjadi lokasi route
+│  ├─ route-guards.md                         # redirect based on the session, guard order
+│  └─ deep-links-and-routing.md               # how a link from deep_link becomes a route location
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1220,37 +1220,37 @@ extensions/go_router/
       ├─ lib/extensions/go_router/
       │  ├─ go_router_module.dart
       │  ├─ app_router.dart
-      │  ├─ app_routes.dart                  # baru: konstanta path dan nama route
-      │  ├─ router_config.dart               # baru: initialLocation, log diagnostik, errorBuilder
-      │  ├─ route_slot.dart                  # baru: pintu masuk contributes router.routes; AppRoute dari slot diubah menjadi GoRoute
-      │  ├─ route_guard.dart                 # baru: interface RouteGuard, guard disusun berurutan
-      │  ├─ auth_redirect.dart               # baru: belum masuk menuju /sign-in, sudah masuk menjauh dari /sign-in
-      │  ├─ session_refresh_listenable.dart  # baru: SessionController.changes menjadi refreshListenable
-      │  ├─ deep_link_route_mapper.dart      # baru: Uri dari kontrak DeepLinks menjadi lokasi route (readOrNull)
-      │  ├─ notification_route_mapper.dart   # baru: payload NotificationTap menjadi lokasi route (readOrNull)
-      │  ├─ navigation_observer.dart         # baru: catat ke AppLogger dan kirim screen ke Analytics (readOrNull)
-      │  ├─ not_found_page.dart              # baru: halaman untuk route tidak dikenal
-      │  ├─ shell_scaffold.dart              # baru: ShellRoute dengan navigasi bawah, contoh tab
-      │  └─ route_transitions.dart           # baru: transisi halaman per platform
+      │  ├─ app_routes.dart                  # new: path and route name constants
+      │  ├─ router_config.dart               # new: initialLocation, diagnostic logging, errorBuilder
+      │  ├─ route_slot.dart                  # new: entry point for router.routes contributes; AppRoute from the slot becomes a GoRoute
+      │  ├─ route_guard.dart                 # new: RouteGuard interface, guards are composed in order
+      │  ├─ auth_redirect.dart               # new: signed out goes to /sign-in, signed in is steered away from /sign-in
+      │  ├─ session_refresh_listenable.dart  # new: SessionController.changes into refreshListenable
+      │  ├─ deep_link_route_mapper.dart      # new: Uri from the DeepLinks contract into a route location (readOrNull)
+      │  ├─ notification_route_mapper.dart   # new: NotificationTap payload into a route location (readOrNull)
+      │  ├─ navigation_observer.dart         # new: log to AppLogger and send screens to Analytics (readOrNull)
+      │  ├─ not_found_page.dart              # new: page for unknown routes
+      │  ├─ shell_scaffold.dart              # new: ShellRoute with bottom navigation, sample tabs
+      │  └─ route_transitions.dart           # new: page transitions per platform
       └─ test/extensions/go_router/
          ├─ app_router_test.dart
-         ├─ go_router_module_test.dart, app_routes_test.dart, route_slot_test.dart                   # baru
-         ├─ route_guard_test.dart, auth_redirect_test.dart, session_refresh_listenable_test.dart     # baru
-         ├─ deep_link_route_mapper_test.dart, notification_route_mapper_test.dart                    # baru
-         └─ navigation_observer_test.dart, not_found_page_test.dart, shell_scaffold_test.dart        # baru
+         ├─ go_router_module_test.dart, app_routes_test.dart, route_slot_test.dart                   # new
+         ├─ route_guard_test.dart, auth_redirect_test.dart, session_refresh_listenable_test.dart     # new
+         ├─ deep_link_route_mapper_test.dart, notification_route_mapper_test.dart                    # new
+         └─ navigation_observer_test.dart, not_found_page_test.dart, shell_scaffold_test.dart        # new
 ```
 
 ### deep_link
 
 ```text
 extensions/deep_link/
-├─ extension.yaml                           # provides: deep_links · prompts: scheme, hosts (opsional) · android: url_schemes, app_links (baru) · ios: url_schemes, associated_domains (baru)
+├─ extension.yaml                           # provides: deep_links · prompts: scheme, hosts (optional) · android: url_schemes, app_links (new) · ios: url_schemes, associated_domains (new)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ deep-links.md
-│  ├─ universal-links.md                      # assetlinks.json dan apple-app-site-association
-│  └─ testing-links.md                        # adb shell am start dan xcrun simctl openurl
+│  ├─ universal-links.md                      # assetlinks.json and apple-app-site-association
+│  └─ testing-links.md                        # adb shell am start and xcrun simctl openurl
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1260,19 +1260,19 @@ extensions/deep_link/
       │  ├─ device_deep_links.dart
       │  ├─ deep_link_gateway.dart
       │  ├─ app_links_gateway.dart
-      │  ├─ deep_link_config.dart            # baru: scheme, host yang diizinkan, daftar path yang boleh
-      │  ├─ deep_link_failure_mapper.dart    # baru: error plugin menjadi Failure(deep_link)
-      │  ├─ link_allowlist.dart              # baru: tolak scheme dan host yang tidak dikenal sebelum sampai ke router
-      │  ├─ link_normalizer.dart             # baru: huruf kecil, buang parameter pelacak, rapikan path
-      │  ├─ link_deduplicator.dart           # baru: tautan sama dalam jendela singkat diabaikan, memakai Clock
-      │  ├─ pending_link_buffer.dart         # baru: simpan tautan yang tiba sebelum listener siap, putar ulang sekali
-      │  └─ app_link_builder.dart            # baru: bangun tautan keluar (share, email) dengan scheme proyek
+      │  ├─ deep_link_config.dart            # new: scheme, allowed hosts, list of allowed paths
+      │  ├─ deep_link_failure_mapper.dart    # new: plugin errors into Failure(deep_link)
+      │  ├─ link_allowlist.dart              # new: rejects unknown schemes and hosts before they reach the router
+      │  ├─ link_normalizer.dart             # new: lowercase, strip tracking parameters, tidy the path
+      │  ├─ link_deduplicator.dart           # new: identical links within a short window are ignored, using Clock
+      │  ├─ pending_link_buffer.dart         # new: holds links that arrive before the listener is ready, replays them once
+      │  └─ app_link_builder.dart            # new: builds outgoing links (share, email) with the project scheme
       └─ test/extensions/deep_link/
          ├─ device_deep_links_test.dart
-         ├─ deep_link_module_test.dart, deep_link_config_test.dart, deep_link_failure_mapper_test.dart   # baru
-         ├─ link_allowlist_test.dart, link_normalizer_test.dart, link_deduplicator_test.dart             # baru
-         ├─ pending_link_buffer_test.dart, app_link_builder_test.dart                                    # baru
-         └─ deep_links_contract_test.dart                                                                # baru: suite dari kiln_testing
+         ├─ deep_link_module_test.dart, deep_link_config_test.dart, deep_link_failure_mapper_test.dart   # new
+         ├─ link_allowlist_test.dart, link_normalizer_test.dart, link_deduplicator_test.dart             # new
+         ├─ pending_link_buffer_test.dart, app_link_builder_test.dart                                    # new
+         └─ deep_links_contract_test.dart                                                                # new: suite from kiln_testing
 ```
 
 ### theme
@@ -1284,8 +1284,8 @@ extensions/theme/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ theme.md
-│  ├─ design-tokens.md                        # warna, spasi, radius, tipografi
-│  └─ rebranding.md                           # mengganti seed color tanpa menyentuh fitur
+│  ├─ design-tokens.md                        # color, spacing, radius, typography
+│  └─ rebranding.md                           # changing the seed color without touching features
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1293,25 +1293,25 @@ extensions/theme/
       ├─ lib/extensions/theme/
       │  ├─ theme_module.dart
       │  ├─ brand_theme.dart
-      │  ├─ theme_config.dart                # baru: seed color, font, radius, kepadatan
-      │  ├─ color_schemes.dart               # baru: ColorScheme light dan dark dari seed, termasuk kontras tinggi
-      │  ├─ text_styles.dart                 # baru: skala tipografi
-      │  ├─ component_themes.dart            # baru: AppBar, tombol, input, kartu, dialog, SnackBar, NavigationBar
-      │  ├─ design_tokens.dart               # baru: AppSpacing dan AppRadius sebagai ThemeExtension
-      │  ├─ semantic_colors.dart             # baru: success, warning, info sebagai ThemeExtension
-      │  ├─ system_ui_style.dart             # baru: gaya status bar dan navigation bar mengikuti brightness
-      │  ├─ theme_mode_controller.dart       # baru: ThemeMode yang dapat diubah, memberi tahu AppShell
-      │  ├─ theme_mode_store.dart            # baru: simpan pilihan lewat Storage (readOrNull)
-      │  ├─ theme_context_x.dart             # baru: context.colors, context.spacing, context.semantic
+      │  ├─ theme_config.dart                # new: seed color, font, radius, density
+      │  ├─ color_schemes.dart               # new: light and dark ColorScheme from the seed, including high contrast
+      │  ├─ text_styles.dart                 # new: typography scale
+      │  ├─ component_themes.dart            # new: AppBar, buttons, inputs, cards, dialogs, SnackBar, NavigationBar
+      │  ├─ design_tokens.dart               # new: AppSpacing and AppRadius as ThemeExtension
+      │  ├─ semantic_colors.dart             # new: success, warning, info as ThemeExtension
+      │  ├─ system_ui_style.dart             # new: status bar and navigation bar style following brightness
+      │  ├─ theme_mode_controller.dart       # new: changeable ThemeMode, notifies AppShell
+      │  ├─ theme_mode_store.dart            # new: stores the choice via Storage (readOrNull)
+      │  ├─ theme_context_x.dart             # new: context.colors, context.spacing, context.semantic
       │  └─ widgets/
-      │     └─ theme_mode_switcher.dart      # baru: pilihan Sistem, Terang, Gelap
+      │     └─ theme_mode_switcher.dart      # new: System, Light, Dark options
       └─ test/extensions/theme/
          ├─ brand_theme_test.dart
-         ├─ theme_module_test.dart, theme_config_test.dart, color_schemes_test.dart                  # baru
-         ├─ component_themes_test.dart, design_tokens_test.dart, semantic_colors_test.dart           # baru
-         ├─ theme_mode_controller_test.dart, theme_mode_store_test.dart                              # baru
-         ├─ theme_mode_switcher_test.dart, contrast_test.dart                                        # baru: contrast_test memeriksa rasio kontras teks terhadap latar
-         └─ theme_golden_test.dart                                                                   # baru: swatch warna light dan dark
+         ├─ theme_module_test.dart, theme_config_test.dart, color_schemes_test.dart                  # new
+         ├─ component_themes_test.dart, design_tokens_test.dart, semantic_colors_test.dart           # new
+         ├─ theme_mode_controller_test.dart, theme_mode_store_test.dart                              # new
+         ├─ theme_mode_switcher_test.dart, contrast_test.dart                                        # new: contrast_test checks the contrast ratio of text against the background
+         └─ theme_golden_test.dart                                                                   # new: light and dark color swatches
 ```
 
 ### l10n
@@ -1324,7 +1324,7 @@ extensions/l10n/
 ├─ docs/
 │  ├─ l10n.md
 │  ├─ adding-a-language.md
-│  └─ formatting.md                           # tanggal, angka, mata uang, dan plural
+│  └─ formatting.md                           # dates, numbers, currencies, and plurals
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1333,46 +1333,46 @@ extensions/l10n/
       │  ├─ l10n_module.dart
       │  ├─ l10n_delegate.dart
       │  ├─ l10n_strings.dart
-      │  ├─ l10n_config.dart                 # baru: locale yang didukung, locale cadangan
-      │  ├─ locale_resolution.dart           # baru: locale perangkat menjadi locale yang didukung (id_ID menjadi id)
-      │  ├─ locale_controller.dart           # baru: locale yang dapat diubah, null berarti ikut sistem
-      │  ├─ locale_store.dart                # baru: simpan pilihan lewat Storage (readOrNull)
-      │  ├─ message_formatter.dart           # baru: placeholder bernama, escape kurung kurawal
-      │  ├─ plural_rules.dart                # baru: one dan other untuk Inggris, satu bentuk untuk Indonesia
-      │  ├─ locale_formatters.dart           # baru: tanggal, angka, dan mata uang menurut locale
-      │  ├─ failure_messages.dart            # baru: pesan ramah per FailureCode, dipakai failure_presenter di app_basic
+      │  ├─ l10n_config.dart                 # new: supported locales, fallback locale
+      │  ├─ locale_resolution.dart           # new: device locale into a supported locale (id_ID becomes id)
+      │  ├─ locale_controller.dart           # new: changeable locale, null means follow the system
+      │  ├─ locale_store.dart                # new: stores the choice via Storage (readOrNull)
+      │  ├─ message_formatter.dart           # new: named placeholders, escaped braces
+      │  ├─ plural_rules.dart                # new: one and other for English, a single form for Indonesian
+      │  ├─ locale_formatters.dart           # new: dates, numbers, and currencies per locale
+      │  ├─ failure_messages.dart            # new: friendly message per FailureCode, used by failure_presenter in app_basic
       │  └─ widgets/
-      │     └─ language_switcher.dart        # baru: pilihan bahasa
+      │     └─ language_switcher.dart        # new: language picker
       └─ test/extensions/l10n/
          ├─ l10n_test.dart
-         ├─ l10n_module_test.dart, l10n_config_test.dart, locale_resolution_test.dart                # baru
-         ├─ locale_controller_test.dart, locale_store_test.dart, message_formatter_test.dart         # baru
-         ├─ plural_rules_test.dart, locale_formatters_test.dart, failure_messages_test.dart          # baru
-         ├─ language_switcher_test.dart                                                              # baru
-         └─ l10n_coverage_test.dart                                                                  # baru: setiap key bahasa utama ada di semua bahasa lain
+         ├─ l10n_module_test.dart, l10n_config_test.dart, locale_resolution_test.dart                # new
+         ├─ locale_controller_test.dart, locale_store_test.dart, message_formatter_test.dart         # new
+         ├─ plural_rules_test.dart, locale_formatters_test.dart, failure_messages_test.dart          # new
+         ├─ language_switcher_test.dart                                                              # new
+         └─ l10n_coverage_test.dart                                                                  # new: every key in the main language exists in all other languages
 ```
 
-## Extension: platform
+## Extensions: platform
 
-Empat extension yang membungkus kemampuan perangkat. Hampir semuanya punya
-`*_gateway.dart`: plugin platform sulit dites, jadi logika (pemetaan status,
-stream, penjadwalan) dipisah dari panggilan plugin dan dites dengan fake.
+Four extensions that wrap device capabilities. Almost all of them have
+`*_gateway.dart`: platform plugins are hard to test, so the logic (status mapping,
+streams, scheduling) is separated from plugin calls and tested with fakes.
 
-`permission` adalah yang paling banyak menyentuh file native (manifest
-Android, plist iOS, flag Podfile), jadi ia mendapat prompt `kinds` supaya hanya
-izin yang dipilih yang ditambahkan ke proyek.
+`permission` touches the most native files (the Android manifest, the iOS
+plist, Podfile flags), so it gets a `kinds` prompt so that only the selected
+permissions are added to the project.
 
 ### permission
 
 ```text
 extensions/permission/
-├─ extension.yaml                           # provides: permission · category: platform · exclusive · prompts: kinds (multi-pilih) · patch per kind: android, plist, podfile PERMISSION_*
+├─ extension.yaml                           # provides: permission · category: platform · exclusive · prompts: kinds (multi-select) · per-kind patch: android, plist, podfile PERMISSION_*
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ permissions.md
-│  ├─ permission-flow.md                      # status, rationale, request, buka settings
-│  └─ store-review-notes.md                   # kenapa hanya izin terpilih yang ditambahkan (App Store dan Play)
+│  ├─ permission-flow.md                      # status, rationale, request, open settings
+│  └─ store-review-notes.md                   # why only the selected permissions are added (App Store and Play)
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1380,37 +1380,37 @@ extensions/permission/
       ├─ lib/extensions/permission/
       │  ├─ permission_module.dart
       │  ├─ device_permissions.dart
-      │  ├─ permission_config.dart           # baru: kind yang aktif, teks rationale bawaan
-      │  ├─ permission_gateway.dart          # baru: interface + SdkPermissionGateway (permission_handler)
-      │  ├─ permission_failure_mapper.dart   # baru: error plugin menjadi Failure(permission atau unavailable)
-      │  ├─ permission_kind_guard.dart       # baru: kind yang tidak diaktifkan menghasilkan Failure(configuration), bukan crash native
-      │  ├─ permission_flow.dart             # baru: ensure(kind): status, rationale, request, arahkan ke settings bila permanen
-      │  ├─ permission_group.dart            # baru: minta beberapa kind sekaligus, mis. kamera dan mikrofon untuk video
-      │  ├─ permission_status_cache.dart     # baru: kurangi panggilan platform berulang, dibatalkan saat onResume
-      │  ├─ permission_resume_observer.dart  # baru: cek ulang status setelah user kembali dari settings (Lifecycle)
-      │  └─ widgets/                         # baru
-      │     ├─ permission_gate.dart          # tampilkan child hanya bila granted, selain itu fallback
+      │  ├─ permission_config.dart           # new: active kinds, default rationale text
+      │  ├─ permission_gateway.dart          # new: interface + SdkPermissionGateway (permission_handler)
+      │  ├─ permission_failure_mapper.dart   # new: plugin errors into Failure(permission or unavailable)
+      │  ├─ permission_kind_guard.dart       # new: a kind that is not enabled yields Failure(configuration), not a native crash
+      │  ├─ permission_flow.dart             # new: ensure(kind): status, rationale, request, send to settings when permanently denied
+      │  ├─ permission_group.dart            # new: request several kinds at once, e.g. camera and microphone for video
+      │  ├─ permission_status_cache.dart     # new: reduces repeated platform calls, invalidated on onResume
+      │  ├─ permission_resume_observer.dart  # new: re-checks status after the user returns from settings (Lifecycle)
+      │  └─ widgets/                         # new
+      │     ├─ permission_gate.dart          # shows the child only when granted, otherwise the fallback
       │     ├─ permission_rationale_dialog.dart
       │     └─ open_settings_dialog.dart
       └─ test/extensions/permission/
          ├─ device_permissions_test.dart
-         ├─ permission_module_test.dart, permission_config_test.dart, permission_failure_mapper_test.dart   # baru
-         ├─ permission_kind_guard_test.dart, permission_flow_test.dart, permission_group_test.dart          # baru
-         ├─ permission_status_cache_test.dart, permission_resume_observer_test.dart                         # baru
-         ├─ permission_gate_test.dart, permission_dialogs_test.dart                                        # baru
-         └─ permissions_contract_test.dart                                                                 # baru: suite dari kiln_testing
+         ├─ permission_module_test.dart, permission_config_test.dart, permission_failure_mapper_test.dart   # new
+         ├─ permission_kind_guard_test.dart, permission_flow_test.dart, permission_group_test.dart          # new
+         ├─ permission_status_cache_test.dart, permission_resume_observer_test.dart                         # new
+         ├─ permission_gate_test.dart, permission_dialogs_test.dart                                        # new
+         └─ permissions_contract_test.dart                                                                 # new: suite from kiln_testing
 ```
 
 ### connectivity
 
 ```text
 extensions/connectivity/
-├─ extension.yaml                           # provides: connectivity · category: connectivity · exclusive · prompts: probe_url (opsional), probe_interval
+├─ extension.yaml                           # provides: connectivity · category: connectivity · exclusive · prompts: probe_url (optional), probe_interval
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ connectivity.md
-│  └─ offline-handling.md                     # beda online di jaringan dan server terjangkau; kapan memakai probe
+│  └─ offline-handling.md                     # online on the network vs. a reachable server; when to use the probe
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1418,22 +1418,22 @@ extensions/connectivity/
       ├─ lib/extensions/connectivity/
       │  ├─ connectivity_module.dart
       │  ├─ device_network_monitor.dart
-      │  ├─ connectivity_config.dart         # baru: URL probe, interval, timeout, jendela debounce
-      │  ├─ connectivity_gateway.dart        # baru: interface + SdkConnectivityGateway (connectivity_plus)
-      │  ├─ connectivity_failure_mapper.dart # baru: error plugin menjadi Failure(unavailable)
-      │  ├─ reachability_probe.dart          # baru: HEAD ke URL probe lewat kontrak HttpClient (readOrNull), opsional
-      │  ├─ status_stabilizer.dart           # baru: redam Wi-Fi yang naik turun, memakai Debouncer dari kiln_core
-      │  ├─ reconnect_trigger.dart           # baru: jalankan aksi tertunda saat status berubah ke online
-      │  ├─ offline_guard_middleware.dart    # baru: contributes: http.interceptors (when: [http_pipeline]), gagal cepat Failure(network) saat offline
-      │  └─ widgets/                         # baru
-      │     ├─ offline_banner.dart           # spanduk saat offline, tidak muncul selama status masih unknown
-      │     └─ network_status_builder.dart   # builder berdasarkan NetworkStatus
+      │  ├─ connectivity_config.dart         # new: probe URL, interval, timeout, debounce window
+      │  ├─ connectivity_gateway.dart        # new: interface + SdkConnectivityGateway (connectivity_plus)
+      │  ├─ connectivity_failure_mapper.dart # new: plugin errors into Failure(unavailable)
+      │  ├─ reachability_probe.dart          # new: HEAD to the probe URL via the HttpClient contract (readOrNull), optional
+      │  ├─ status_stabilizer.dart           # new: damps Wi-Fi flapping, using Debouncer from kiln_core
+      │  ├─ reconnect_trigger.dart           # new: runs pending actions when the status changes to online
+      │  ├─ offline_guard_middleware.dart    # new: contributes: http.interceptors (when: [http_pipeline]), fails fast with Failure(network) while offline
+      │  └─ widgets/                         # new
+      │     ├─ offline_banner.dart           # banner while offline, hidden while the status is still unknown
+      │     └─ network_status_builder.dart   # builder based on NetworkStatus
       └─ test/extensions/connectivity/
          ├─ device_network_monitor_test.dart
-         ├─ connectivity_module_test.dart, connectivity_config_test.dart, connectivity_failure_mapper_test.dart   # baru
-         ├─ reachability_probe_test.dart, status_stabilizer_test.dart, reconnect_trigger_test.dart                # baru
-         ├─ offline_guard_middleware_test.dart, offline_banner_test.dart, network_status_builder_test.dart        # baru
-         └─ connectivity_contract_test.dart                                                                       # baru: suite dari kiln_testing
+         ├─ connectivity_module_test.dart, connectivity_config_test.dart, connectivity_failure_mapper_test.dart   # new
+         ├─ reachability_probe_test.dart, status_stabilizer_test.dart, reconnect_trigger_test.dart                # new
+         ├─ offline_guard_middleware_test.dart, offline_banner_test.dart, network_status_builder_test.dart        # new
+         └─ connectivity_contract_test.dart                                                                       # new: suite from kiln_testing
 ```
 
 ### notifications
@@ -1446,8 +1446,8 @@ extensions/notifications/
 ├─ docs/
 │  ├─ notifications.md
 │  ├─ android-channels.md
-│  ├─ scheduling-and-timezones.md             # zona waktu perangkat, DST, dan batas penjadwalan
-│  └─ troubleshooting-delivery.md             # optimasi baterai Android, delegate iOS, batas web
+│  ├─ scheduling-and-timezones.md             # device time zone, DST, and scheduling limits
+│  └─ troubleshooting-delivery.md             # Android battery optimization, iOS delegate, web limits
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1457,36 +1457,36 @@ extensions/notifications/
       │  ├─ device_notifications.dart
       │  ├─ notification_gateway.dart
       │  ├─ plugin_notification_gateway.dart
-      │  ├─ notifications_config.dart        # baru: channel bawaan, ikon kecil, suara, kebijakan alarm eksak
-      │  ├─ notification_failure_mapper.dart # baru: error plugin menjadi Failure(notifications, permission, atau unavailable)
-      │  ├─ notification_channels.dart       # baru: definisi channel Android dibuat saat start
-      │  ├─ timezone_resolver.dart           # baru: tz.local dari zona perangkat, bukan UTC
-      │  ├─ notification_payload.dart        # baru: payload JSON bertipe (route, argumen) dengan batas ukuran
-      │  ├─ notification_id_allocator.dart   # baru: id stabil dari kunci string, mencegah tabrakan id
-      │  ├─ notification_tap_hub.dart        # baru: gabungkan tap foreground, tap latar belakang, dan launchTap
-      │  ├─ background_tap_handler.dart      # baru: fungsi top-level @pragma('vm:entry-point') yang diwajibkan plugin
-      │  ├─ notification_permission_flow.dart # baru: minta izin pada momen yang tepat lewat kontrak Permissions (readOrNull)
-      │  └─ reminder_scheduler.dart          # baru: jadwalkan ulang idempoten per kunci, aman dipanggil setiap start
+      │  ├─ notifications_config.dart        # new: default channel, small icon, sound, exact alarm policy
+      │  ├─ notification_failure_mapper.dart # new: plugin errors into Failure(notifications, permission, or unavailable)
+      │  ├─ notification_channels.dart       # new: Android channel definitions created at startup
+      │  ├─ timezone_resolver.dart           # new: tz.local from the device zone, not UTC
+      │  ├─ notification_payload.dart        # new: typed JSON payload (route, arguments) with a size limit
+      │  ├─ notification_id_allocator.dart   # new: stable id from a string key, prevents id collisions
+      │  ├─ notification_tap_hub.dart        # new: merges foreground taps, background taps, and launchTap
+      │  ├─ background_tap_handler.dart      # new: top-level @pragma('vm:entry-point') function required by the plugin
+      │  ├─ notification_permission_flow.dart # new: asks for permission at the right moment via the Permissions contract (readOrNull)
+      │  └─ reminder_scheduler.dart          # new: idempotent rescheduling per key, safe to call on every start
       └─ test/extensions/notifications/
          ├─ device_notifications_test.dart
-         ├─ notifications_module_test.dart, notifications_config_test.dart, notification_failure_mapper_test.dart   # baru
-         ├─ notification_channels_test.dart, timezone_resolver_test.dart, notification_payload_test.dart             # baru
-         ├─ notification_id_allocator_test.dart, notification_tap_hub_test.dart                                      # baru
-         ├─ notification_permission_flow_test.dart, reminder_scheduler_test.dart                                     # baru
-         └─ notifications_contract_test.dart                                                                         # baru: suite dari kiln_testing
+         ├─ notifications_module_test.dart, notifications_config_test.dart, notification_failure_mapper_test.dart   # new
+         ├─ notification_channels_test.dart, timezone_resolver_test.dart, notification_payload_test.dart             # new
+         ├─ notification_id_allocator_test.dart, notification_tap_hub_test.dart                                      # new
+         ├─ notification_permission_flow_test.dart, reminder_scheduler_test.dart                                     # new
+         └─ notifications_contract_test.dart                                                                         # new: suite from kiln_testing
 ```
 
 ### image_picker
 
 ```text
 extensions/image_picker/
-├─ extension.yaml                           # provides: media · category: media · exclusive · prompts: max_bytes, allowed_types · ios: plist · macos: device.camera (baru)
+├─ extension.yaml                           # provides: media · category: media · exclusive · prompts: max_bytes, allowed_types · ios: plist · macos: device.camera (new)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ image-picker.md
-│  ├─ upload-flow.md                          # dari PickedImage ke FileStorage tanpa mengimpor backend
-│  └─ platform-notes.md                       # activity dihancurkan di Android, HEIC di iOS, batas web
+│  ├─ upload-flow.md                          # from PickedImage to FileStorage without importing a backend
+│  └─ platform-notes.md                       # activity destroyed on Android, HEIC on iOS, web limits
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1495,38 +1495,38 @@ extensions/image_picker/
       │  ├─ image_picker_module.dart
       │  ├─ device_media_picker.dart
       │  ├─ image_picker_gateway.dart
-      │  ├─ media_picker_config.dart         # baru: dimensi dan kualitas bawaan, ukuran maksimum, tipe yang boleh
-      │  ├─ media_failure_mapper.dart        # baru: PlatformException menjadi Failure(permission, unavailable, atau cancelled)
-      │  ├─ mime_sniffer.dart                # baru: tipe dari byte awal (jpeg, png, webp, heic, gif), mimeType plugin tidak selalu benar
-      │  ├─ image_validator.dart             # baru: ukuran dan tipe, gagal menjadi Failure(validation)
-      │  ├─ camera_permission_precheck.dart  # baru: cek kontrak Permissions dulu (readOrNull) supaya penolakan jelas
-      │  ├─ lost_data_recovery.dart          # baru: pulihkan hasil pilihan saat activity Android dihancurkan
-      │  ├─ picked_image_x.dart              # baru: toImageProvider, ukuran terbaca ("1,2 MB")
-      │  ├─ picked_image_upload_adapter.dart # baru: PickedImage menjadi masukan FileStorage, keduanya tipe dari kiln_core
-      │  └─ widgets/                         # baru
-      │     ├─ image_source_sheet.dart       # bottom sheet kamera atau galeri
-      │     └─ avatar_picker.dart            # avatar bulat yang bisa diganti, menampilkan Failure dengan ramah
+      │  ├─ media_picker_config.dart         # new: default dimensions and quality, maximum size, allowed types
+      │  ├─ media_failure_mapper.dart        # new: PlatformException into Failure(permission, unavailable, or cancelled)
+      │  ├─ mime_sniffer.dart                # new: type from the leading bytes (jpeg, png, webp, heic, gif), the plugin's mimeType is not always right
+      │  ├─ image_validator.dart             # new: size and type, failures become Failure(validation)
+      │  ├─ camera_permission_precheck.dart  # new: checks the Permissions contract first (readOrNull) so a denial is clear
+      │  ├─ lost_data_recovery.dart          # new: recovers the picked result when the Android activity is destroyed
+      │  ├─ picked_image_x.dart              # new: toImageProvider, readable size ("1.2 MB")
+      │  ├─ picked_image_upload_adapter.dart # new: PickedImage into FileStorage input, both types from kiln_core
+      │  └─ widgets/                         # new
+      │     ├─ image_source_sheet.dart       # camera or gallery bottom sheet
+      │     └─ avatar_picker.dart            # round avatar that can be replaced, shows failures gracefully
       └─ test/extensions/image_picker/
          ├─ device_media_picker_test.dart
-         ├─ image_picker_module_test.dart, media_picker_config_test.dart, media_failure_mapper_test.dart   # baru
-         ├─ mime_sniffer_test.dart, image_validator_test.dart, camera_permission_precheck_test.dart        # baru
-         ├─ lost_data_recovery_test.dart, picked_image_x_test.dart, picked_image_upload_adapter_test.dart  # baru
-         ├─ image_source_sheet_test.dart, avatar_picker_test.dart                                          # baru
-         └─ media_picker_contract_test.dart                                                                # baru: suite dari kiln_testing
+         ├─ image_picker_module_test.dart, media_picker_config_test.dart, media_failure_mapper_test.dart   # new
+         ├─ mime_sniffer_test.dart, image_validator_test.dart, camera_permission_precheck_test.dart        # new
+         ├─ lost_data_recovery_test.dart, picked_image_x_test.dart, picked_image_upload_adapter_test.dart  # new
+         ├─ image_source_sheet_test.dart, avatar_picker_test.dart                                          # new
+         └─ media_picker_contract_test.dart                                                                # new: suite from kiln_testing
 ```
 
-## Extension: tooling
+## Extensions: tooling
 
-Tujuh extension untuk konfigurasi, observabilitas, dan alur kerja developer.
-`env`, `flavors`, dan `ci` terutama merender file proyek; `logger`,
-`analytics`, dan `crash_report` adalah satu keluarga yang berbagi
-`PiiRedactor` dan `ConsentController` dari `kiln_core`, sehingga data pribadi
-disamarkan dan persetujuan user dihormati dengan cara yang sama di ketiganya.
+Seven extensions for configuration, observability, and developer workflow.
+`env`, `flavors`, and `ci` mainly render project files; `logger`,
+`analytics`, and `crash_report` are one family that shares
+`PiiRedactor` and `ConsentController` from `kiln_core`, so personal data is
+redacted and user consent is respected the same way in all three.
 
 ```mermaid
 flowchart TD
-    PII[PiiRedactor di kiln_core]
-    CON[ConsentController di kiln_core]
+    PII[PiiRedactor in kiln_core]
+    CON[ConsentController in kiln_core]
     LOG[logger]
     ANA[analytics]
     CRA[crash_report]
@@ -1535,44 +1535,44 @@ flowchart TD
     PII --> CRA
     CON --> ANA
     CON --> CRA
-    LOG -. breadcrumb, lewat kontrak CrashReporter .-> CRA
+    LOG -. breadcrumb, via the CrashReporter contract .-> CRA
 ```
 
 ### env
 
 ```text
 extensions/env/
-├─ extension.yaml                           # provides: env · category: config · exclusive · prompts: keys (daftar nama, tipe, wajib atau tidak, rahasia atau tidak)
+├─ extension.yaml                           # provides: env · category: config · exclusive · prompts: keys (list of name, type, required or not, secret or not)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ env.md
-│  ├─ env-files.md                            # --dart-define-from-file, kenapa file asli tidak masuk Git
-│  └─ secrets-in-client-apps.md               # nilai di --dart-define tetap bisa diekstrak dari binary; apa yang tidak boleh ditaruh di sini
+│  ├─ env-files.md                            # --dart-define-from-file, why the real file stays out of Git
+│  └─ secrets-in-client-apps.md               # values in --dart-define can still be extracted from the binary; what must not go here
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    └─ __brick__/
-      ├─ env/                                # baru
-      │  ├─ development.example.json         # template tanpa nilai rahasia; file asli di-ignore Git
+      ├─ env/                                # new
+      │  ├─ development.example.json         # template without secret values; the real file is Git-ignored
       │  ├─ staging.example.json
       │  └─ production.example.json
       ├─ lib/extensions/env/
       │  ├─ env_module.dart
       │  ├─ build_env.dart
-      │  ├─ build_env_values.dart            # generate dari prompt keys: String.fromEnvironment butuh nama konstan, jadi tiap key ditulis eksplisit
-      │  ├─ env_keys.dart                    # baru: konstanta key bertipe (EnvKeys.apiBaseUrl), mencegah salah ketik
-      │  ├─ env_schema.dart                  # baru: nama, tipe, wajib, rahasia per key
-      │  ├─ env_validator.dart               # baru: periksa semua key wajib saat bootstrap, laporkan seluruh yang kurang dalam satu Failure(configuration)
-      │  ├─ env_x.dart                       # baru: uri(key), duration(key), enumValue(key) di atas kontrak Env
-      │  ├─ env_describe.dart                # baru: ringkasan untuk log dan debug, nilai rahasia disamarkan
+      │  ├─ build_env_values.dart            # generated from the keys prompt: String.fromEnvironment needs constant names, so every key is written explicitly
+      │  ├─ env_keys.dart                    # new: typed key constants (EnvKeys.apiBaseUrl), prevents typos
+      │  ├─ env_schema.dart                  # new: name, type, required, secret per key
+      │  ├─ env_validator.dart               # new: checks every required key at bootstrap, reports all missing ones in a single Failure(configuration)
+      │  ├─ env_x.dart                       # new: uri(key), duration(key), enumValue(key) on top of the Env contract
+      │  ├─ env_describe.dart                # new: summary for logs and debugging, secret values redacted
       │  └─ widgets/
-      │     └─ env_debug_page.dart           # baru: halaman debug hanya untuk flavor non-production
+      │     └─ env_debug_page.dart           # new: debug page only for non-production flavors
       └─ test/extensions/env/
          ├─ build_env_test.dart
-         ├─ env_module_test.dart, env_schema_test.dart, env_validator_test.dart                       # baru
-         ├─ env_x_test.dart, env_describe_test.dart, env_debug_page_test.dart                         # baru
-         └─ env_example_files_test.dart                                                               # baru: setiap key skema ada di semua file contoh
+         ├─ env_module_test.dart, env_schema_test.dart, env_validator_test.dart                       # new
+         ├─ env_x_test.dart, env_describe_test.dart, env_debug_page_test.dart                         # new
+         └─ env_example_files_test.dart                                                               # new: every schema key exists in all example files
 ```
 
 ### flavors
@@ -1584,41 +1584,41 @@ extensions/flavors/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ flavors.md
-│  ├─ run-configurations.md                   # menjalankan tiap flavor dari VS Code, IntelliJ, dan terminal
-│  └─ native-flavors-not-included.md          # kenapa flavor di sini hanya nilai Dart, dan apa yang tidak ditangani
+│  ├─ run-configurations.md                   # running each flavor from VS Code, IntelliJ, and the terminal
+│  └─ native-flavors-not-included.md          # why flavors here are Dart values only, and what is not handled
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    └─ __brick__/
       ├─ .vscode/
-      │  └─ launch.json                      # baru: satu konfigurasi per flavor (--target, --dart-define-from-file); bentrok dengan file user diselesaikan collision_policy
+      │  └─ launch.json                      # new: one configuration per flavor (--target, --dart-define-from-file); clashes with user files are resolved by collision_policy
       ├─ lib/
       │  ├─ main_development.dart
       │  ├─ main_staging.dart
       │  ├─ main_production.dart
       │  └─ extensions/flavors/
       │     ├─ app_flavors.dart
-      │     ├─ flavors_module.dart           # baru: mendaftarkan FlavorBanner ke slot app.wrappers (brick ini sebelumnya tidak punya module)
-      │     ├─ flavor_banner.dart            # baru: pita DEV atau STG di pojok layar, tidak tampil di production
-      │     ├─ release_guard.dart            # baru: build release dengan flavor non-production dilaporkan lewat Logger, dan assert di debug
-      │     └─ flavor_x.dart                 # baru: flavor.when(development: ..., production: ...)
+      │     ├─ flavors_module.dart           # new: registers FlavorBanner into the app.wrappers slot (this brick previously had no module)
+      │     ├─ flavor_banner.dart            # new: DEV or STG ribbon in the screen corner, hidden in production
+      │     ├─ release_guard.dart            # new: release builds with a non-production flavor are reported via Logger, and asserted in debug
+      │     └─ flavor_x.dart                 # new: flavor.when(development: ..., production: ...)
       └─ test/extensions/flavors/
          ├─ app_flavors_test.dart
-         ├─ flavors_module_test.dart, flavor_banner_test.dart, release_guard_test.dart, flavor_x_test.dart   # baru
-         └─ launch_config_test.dart                                                                          # baru: launch.json valid dan menunjuk file main yang ada
+         ├─ flavors_module_test.dart, flavor_banner_test.dart, release_guard_test.dart, flavor_x_test.dart   # new
+         └─ launch_config_test.dart                                                                          # new: launch.json is valid and points at existing main files
 ```
 
 ### logger
 
 ```text
 extensions/logger/
-├─ extension.yaml                           # provides: logger · category: logging · exclusive · prompts: file_sink (bool), http_logging (bool) · dependency: path_provider (bila file_sink)
+├─ extension.yaml                           # provides: logger · category: logging · exclusive · prompts: file_sink (bool), http_logging (bool) · dependency: path_provider (when file_sink)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ logging.md
-│  ├─ sinks.md                                # menulis sink sendiri, urutan decorator
-│  └─ what-not-to-log.md                      # token, kata sandi, dan data pribadi
+│  ├─ sinks.md                                # writing your own sink, decorator order
+│  └─ what-not-to-log.md                      # tokens, passwords, and personal data
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1626,26 +1626,26 @@ extensions/logger/
       ├─ lib/extensions/logger/
       │  ├─ logger_module.dart
       │  ├─ console_logger.dart
-      │  ├─ logger_config.dart               # baru: level per flavor, sink aktif, redaksi
-      │  ├─ log_sink.dart                    # baru: typedef LogSink dipindah dari console_logger.dart bersama interface sink
-      │  ├─ log_formatter.dart               # baru: format terbaca manusia dan format JSON lines
-      │  ├─ sink_pipeline.dart               # baru: satu LogRecord ke beberapa sink, kegagalan satu sink tidak menghentikan yang lain
-      │  ├─ redacting_sink.dart              # baru: decorator memakai PiiRedactor dari kiln_core
-      │  ├─ memory_log_sink.dart             # baru: buffer cincin N record terakhir, untuk laporan bug dan test
-      │  ├─ file_log_sink.dart               # baru: berkas log berputar di folder dokumen aplikasi (tidak untuk web)
-      │  ├─ breadcrumb_sink.dart             # baru: teruskan warning ke atas ke CrashReporter sebagai breadcrumb (readOrNull)
-      │  ├─ log_level_controller.dart        # baru: ubah level saat berjalan, hanya flavor non-production
-      │  ├─ log_exporter.dart                # baru: kumpulkan memory dan file log yang sudah disamarkan untuk dibagikan
-      │  ├─ http_log_middleware.dart         # baru: contributes: http.interceptors (when: [http_pipeline]), metode, URL, status, durasi; header Authorization disamarkan, badan tidak dicatat
+      │  ├─ logger_config.dart               # new: level per flavor, active sinks, redaction
+      │  ├─ log_sink.dart                    # new: LogSink typedef moved out of console_logger.dart along with the sink interface
+      │  ├─ log_formatter.dart               # new: human-readable format and JSON lines format
+      │  ├─ sink_pipeline.dart               # new: one LogRecord to several sinks, a failing sink does not stop the others
+      │  ├─ redacting_sink.dart              # new: decorator using PiiRedactor from kiln_core
+      │  ├─ memory_log_sink.dart             # new: ring buffer of the last N records, for bug reports and tests
+      │  ├─ file_log_sink.dart               # new: rotating log file in the app documents folder (not for web)
+      │  ├─ breadcrumb_sink.dart             # new: forwards warnings and above to CrashReporter as breadcrumbs (readOrNull)
+      │  ├─ log_level_controller.dart        # new: change the level at runtime, non-production flavors only
+      │  ├─ log_exporter.dart                # new: collects memory and file logs that are already redacted for sharing
+      │  ├─ http_log_middleware.dart         # new: contributes: http.interceptors (when: [http_pipeline]), method, URL, status, duration; Authorization headers redacted, bodies not logged
       │  └─ widgets/
-      │     └─ debug_log_page.dart           # baru: layar log dari MemoryLogSink, hanya flavor non-production
+      │     └─ debug_log_page.dart           # new: log screen from MemoryLogSink, non-production flavors only
       └─ test/extensions/logger/
          ├─ console_logger_test.dart
-         ├─ logger_module_test.dart, logger_config_test.dart, log_formatter_test.dart                 # baru
-         ├─ sink_pipeline_test.dart, redacting_sink_test.dart, memory_log_sink_test.dart              # baru
-         ├─ file_log_sink_test.dart, breadcrumb_sink_test.dart, log_level_controller_test.dart        # baru
-         ├─ log_exporter_test.dart, http_log_middleware_test.dart, debug_log_page_test.dart           # baru
-         └─ logger_contract_test.dart                                                                 # baru: suite dari kiln_testing
+         ├─ logger_module_test.dart, logger_config_test.dart, log_formatter_test.dart                 # new
+         ├─ sink_pipeline_test.dart, redacting_sink_test.dart, memory_log_sink_test.dart              # new
+         ├─ file_log_sink_test.dart, breadcrumb_sink_test.dart, log_level_controller_test.dart        # new
+         ├─ log_exporter_test.dart, http_log_middleware_test.dart, debug_log_page_test.dart           # new
+         └─ logger_contract_test.dart                                                                 # new: suite from kiln_testing
 ```
 
 ### analytics
@@ -1657,8 +1657,8 @@ extensions/analytics/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ analytics.md
-│  ├─ event-naming.md                         # konvensi nama event dan properti, event bertipe
-│  └─ privacy-and-consent.md                  # kapan event dikirim, apa yang disamarkan, bagaimana user menarik persetujuan
+│  ├─ event-naming.md                         # event and property naming conventions, typed events
+│  └─ privacy-and-consent.md                  # when events are sent, what is redacted, how the user withdraws consent
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
@@ -1667,39 +1667,39 @@ extensions/analytics/
       │  ├─ analytics_module.dart
       │  ├─ posthog_analytics.dart
       │  ├─ analytics_gateway.dart
-      │  ├─ analytics_failures.dart          # pemeta error yang sudah ada, namanya tidak diubah (lihat Keputusan desain)
-      │  ├─ analytics_config.dart            # baru: api key, host, interval flush, flavor yang mengirim
-      │  ├─ analytics_event.dart             # baru: AnalyticsEvent bertipe (nama + properti) dan Analytics.captureEvent(e)
-      │  ├─ property_sanitizer.dart          # baru: nilai menjadi JSON-like, null dibuang, nilai tak didukung menjadi Failure(validation)
-      │  ├─ consent_gate_analytics.dart      # baru: decorator, tidak mengirim apa pun sebelum ConsentController mengizinkan analytics
-      │  ├─ pii_scrubbing_analytics.dart     # baru: decorator memakai PiiRedactor pada properti dan identitas
-      │  ├─ noop_analytics.dart              # baru: dipakai bila api key kosong atau flavor tidak mengirim
-      │  └─ session_identity_listener.dart   # baru: identify saat masuk, reset saat keluar, dari SessionController
+      │  ├─ analytics_failures.dart          # existing error mapping, name unchanged (see Design decisions)
+      │  ├─ analytics_config.dart            # new: api key, host, flush interval, flavors that send
+      │  ├─ analytics_event.dart             # new: typed AnalyticsEvent (name + properties) and Analytics.captureEvent(e)
+      │  ├─ property_sanitizer.dart          # new: values become JSON-like, null is dropped, unsupported values become Failure(validation)
+      │  ├─ consent_gate_analytics.dart      # new: decorator, sends nothing until ConsentController allows analytics
+      │  ├─ pii_scrubbing_analytics.dart     # new: decorator using PiiRedactor on properties and identity
+      │  ├─ noop_analytics.dart              # new: used when the api key is empty or the flavor does not send
+      │  └─ session_identity_listener.dart   # new: identify on sign-in, reset on sign-out, from SessionController
       └─ test/extensions/analytics/
          ├─ analytics_test.dart
          ├─ analytics_failures_test.dart
-         ├─ analytics_module_test.dart, analytics_config_test.dart, analytics_event_test.dart         # baru
-         ├─ property_sanitizer_test.dart, consent_gate_analytics_test.dart                            # baru
-         ├─ pii_scrubbing_analytics_test.dart, noop_analytics_test.dart                               # baru
-         ├─ session_identity_listener_test.dart                                                       # baru
-         └─ analytics_contract_test.dart                                                              # baru: suite dari kiln_testing
+         ├─ analytics_module_test.dart, analytics_config_test.dart, analytics_event_test.dart         # new
+         ├─ property_sanitizer_test.dart, consent_gate_analytics_test.dart                            # new
+         ├─ pii_scrubbing_analytics_test.dart, noop_analytics_test.dart                               # new
+         ├─ session_identity_listener_test.dart                                                       # new
+         └─ analytics_contract_test.dart                                                              # new: suite from kiln_testing
 ```
 
 ### crash_report
 
-Extension baru. Roadmap masih mem-parkirnya karena vendor belum dipilih, jadi
-gambar ini memakai **Sentry sebagai contoh** di balik `crash_report_gateway.dart`.
-Mengganti vendor berarti mengganti satu gateway, bukan lapisan di atasnya.
+New extension. The roadmap still parks it because no vendor has been chosen, so
+this drawing uses **Sentry as an example** behind `crash_report_gateway.dart`.
+Swapping the vendor means swapping one gateway, not the layers above it.
 
 ```text
-extensions/crash_report/                     # baru, seluruh folder
+extensions/crash_report/                     # new, the whole folder
 ├─ extension.yaml                           # provides: crash_reporter · category: crash_reporting · exclusive · prompts: dsn (secret), sample_rate · android: INTERNET
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ crash-reporting.md
-│  ├─ choosing-a-vendor.md                    # kriteria dan cara mengganti gateway
-│  ├─ symbols-and-obfuscation.md              # unggah simbol di CI, --split-debug-info
+│  ├─ choosing-a-vendor.md                    # criteria and how to swap the gateway
+│  ├─ symbols-and-obfuscation.md              # upload symbols in CI, --split-debug-info
 │  └─ privacy-and-consent.md
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
@@ -1707,25 +1707,25 @@ extensions/crash_report/                     # baru, seluruh folder
    └─ __brick__/
       ├─ lib/extensions/crash_report/
       │  ├─ crash_report_module.dart
-      │  ├─ crash_report_config.dart         # dsn, environment dari AppFlavor, release, sample rate
-      │  ├─ crash_report_gateway.dart        # interface vendor: captureError, addBreadcrumb, setUser, setContext
-      │  ├─ sentry_crash_gateway.dart        # SdkCrashGateway contoh (sentry_flutter)
-      │  ├─ crash_report_failure_mapper.dart # error inisialisasi vendor menjadi Failure(unavailable), tidak pernah membuat app gagal start
-      │  ├─ safe_crash_reporter.dart         # decorator: tidak pernah melempar, kegagalan gateway dicatat sekali ke Logger
-      │  ├─ consent_gate_crash_reporter.dart # decorator: menunggu ConsentController, laporan sebelum izin dibuang atau ditahan sesuai konfigurasi
-      │  ├─ pii_scrubbing_crash_reporter.dart # decorator: PiiRedactor pada pesan, breadcrumb, konteks, dan identitas user
-      │  ├─ failure_classifier.dart          # Failure yang diharapkan (network, cancelled, validation) tidak dilaporkan sebagai crash
-      │  ├─ error_deduplicator.dart          # error identik berulang dibatasi lajunya, memakai Clock
-      │  ├─ release_info.dart                # versi dan build number untuk mengelompokkan laporan
-      │  ├─ breadcrumb_recorder.dart         # navigasi, perubahan konektivitas, dan sesi sebagai breadcrumb (semua lewat kontrak, readOrNull)
-      │  ├─ http_breadcrumb_middleware.dart  # contributes: http.interceptors (when: [http_pipeline]), tanpa badan dan header sensitif
-      │  └─ crash_test_trigger.dart          # tombol uji kirim crash, hanya flavor non-production
+      │  ├─ crash_report_config.dart         # dsn, environment from AppFlavor, release, sample rate
+      │  ├─ crash_report_gateway.dart        # vendor interface: captureError, addBreadcrumb, setUser, setContext
+      │  ├─ sentry_crash_gateway.dart        # example SdkCrashGateway (sentry_flutter)
+      │  ├─ crash_report_failure_mapper.dart # vendor init errors become Failure(unavailable), never prevent the app from starting
+      │  ├─ safe_crash_reporter.dart         # decorator: never throws, gateway failures are logged once to Logger
+      │  ├─ consent_gate_crash_reporter.dart # decorator: waits for ConsentController, reports before consent are dropped or held per configuration
+      │  ├─ pii_scrubbing_crash_reporter.dart # decorator: PiiRedactor on messages, breadcrumbs, context, and user identity
+      │  ├─ failure_classifier.dart          # expected Failures (network, cancelled, validation) are not reported as crashes
+      │  ├─ error_deduplicator.dart          # repeated identical errors are rate limited, using Clock
+      │  ├─ release_info.dart                # version and build number to group reports
+      │  ├─ breadcrumb_recorder.dart         # navigation, connectivity changes, and sessions as breadcrumbs (all through contracts, readOrNull)
+      │  ├─ http_breadcrumb_middleware.dart  # contributes: http.interceptors (when: [http_pipeline]), no bodies or sensitive headers
+      │  └─ crash_test_trigger.dart          # test crash button, non-production flavors only
       └─ test/extensions/crash_report/
          ├─ crash_report_module_test.dart, crash_report_config_test.dart, crash_report_failure_mapper_test.dart
          ├─ safe_crash_reporter_test.dart, consent_gate_crash_reporter_test.dart, pii_scrubbing_crash_reporter_test.dart
          ├─ failure_classifier_test.dart, error_deduplicator_test.dart, release_info_test.dart
          ├─ breadcrumb_recorder_test.dart, http_breadcrumb_middleware_test.dart, crash_test_trigger_test.dart
-         └─ crash_reporter_contract_test.dart       # suite dari kiln_testing
+         └─ crash_reporter_contract_test.dart       # suite from kiln_testing
 ```
 
 ### ci
@@ -1737,125 +1737,125 @@ extensions/ci/
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ ci.md
-│  ├─ required-secrets.md                     # nama secret yang dibutuhkan workflow dan cara membuatnya
-│  └─ symbols-and-release-notes.md            # langkah unggah simbol crash_report bila dipasang, dan batas extension ini
+│  ├─ required-secrets.md                     # secret names the workflows need and how to create them
+│  └─ symbols-and-release-notes.md            # crash_report symbol upload steps when installed, and the limits of this extension
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    └─ __brick__/
       ├─ .github/
       │  ├─ workflows/
-      │  │  ├─ ci.yaml                    # format, analyze, test dengan batas coverage
-      │  │  ├─ build.yaml                 # baru: apk dan web sebagai artifact, ios --no-codesign di runner macOS
-      │  │  └─ kiln_doctor.yaml           # baru: kiln doctor --json, gagal bila hash, lockfile, atau registrasi tidak sinkron
-      │  ├─ dependabot.yml                # baru: pub dan github-actions, mingguan
-      │  └─ PULL_REQUEST_TEMPLATE.md      # baru
+      │  │  ├─ ci.yaml                    # format, analyze, test with a coverage threshold
+      │  │  ├─ build.yaml                 # new: apk and web as artifacts, ios --no-codesign on the macOS runner
+      │  │  └─ kiln_doctor.yaml           # new: kiln doctor --json, fails when hashes, lockfile, or registration are out of sync
+      │  ├─ dependabot.yml                # new: pub and github-actions, weekly
+      │  └─ PULL_REQUEST_TEMPLATE.md      # new
       └─ test/extensions/ci/
          ├─ ci_workflow_test.dart
-         ├─ build_workflow_test.dart, kiln_doctor_workflow_test.dart                                 # baru
-         └─ dependabot_config_test.dart                                                              # baru
+         ├─ build_workflow_test.dart, kiln_doctor_workflow_test.dart                                 # new
+         └─ dependabot_config_test.dart                                                              # new
 ```
 
 ### codegen
 
-Extension baru dan satu-satunya yang butuh hook sebagai bagian inti alurnya
-(menjalankan `build_runner`). Roadmap mem-parkirnya sampai kontrak kode
-generate-nya jelas; gambar ini mengusulkan `json_serializable` dan `freezed`
-sebagai pilihan awal.
+A new extension and the only one that needs a hook as a core part of its flow
+(running `build_runner`). The roadmap parks it until the code generation
+contract is clear; this drawing proposes `json_serializable` and `freezed`
+as the initial choices.
 
 ```text
-extensions/codegen/                          # baru, seluruh folder
-├─ extension.yaml                           # provides: codegen · category: codegen · exclusive · prompts: generators (multi-pilih) · dependencies: json_annotation, freezed_annotation · dev_dependencies: build_runner, json_serializable, freezed (field baru)
+extensions/codegen/                          # new, the whole folder
+├─ extension.yaml                           # provides: codegen · category: codegen · exclusive · prompts: generators (multi-select) · dependencies: json_annotation, freezed_annotation · dev_dependencies: build_runner, json_serializable, freezed (new fields)
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
 │  ├─ codegen.md
-│  ├─ build-runner-workflow.md                # build sekali, watch, dan apa yang di-commit
+│  ├─ build-runner-workflow.md                # build once, watch, and what gets committed
 │  ├─ json-models.md
-│  └─ troubleshooting.md                      # konflik output, versi analyzer
+│  └─ troubleshooting.md                      # output conflicts, analyzer versions
 ├─ test/                                    # manifest_test, render_test, analyze_test, goldens/rendered/
 └─ brick/
    ├─ brick.yaml
    ├─ hooks/
    │  ├─ pubspec.yaml
-   │  ├─ pre_gen.dart                      # periksa build.yaml yang sudah ada milik user
-   │  └─ post_gen.dart                     # dart run build_runner build --delete-conflicting-outputs; gagal hanya memberi peringatan
+   │  ├─ pre_gen.dart                      # checks for an existing build.yaml owned by the user
+   │  └─ post_gen.dart                     # dart run build_runner build --delete-conflicting-outputs; failure only warns
    └─ __brick__/
-      ├─ build.yaml                          # opsi json_serializable (explicit_to_json, field_rename snake)
+      ├─ build.yaml                          # json_serializable options (explicit_to_json, field_rename snake)
       ├─ lib/extensions/codegen/
-      │  ├─ json_converters.dart             # converter DateTime epoch, Uri, dan Duration untuk @JsonKey
+      │  ├─ json_converters.dart             # DateTime epoch, Uri, and Duration converters for @JsonKey
       │  └─ example/
-      │     ├─ example_model.dart            # model contoh dengan @freezed dan @JsonSerializable
-      │     ├─ example_model.g.dart          # generate
-      │     └─ example_model.freezed.dart    # generate
+      │     ├─ example_model.dart            # sample model with @freezed and @JsonSerializable
+      │     ├─ example_model.g.dart          # generated
+      │     └─ example_model.freezed.dart    # generated
       └─ test/extensions/codegen/
          ├─ json_converters_test.dart
-         └─ example_model_test.dart            # round trip JSON
+         └─ example_model_test.dart            # JSON round trip
 ```
 
-## Slot: siapa membuka, siapa menempel
+## Slots: who opens, who attaches
 
-Slot adalah satu-satunya jalan extension memengaruhi extension lain tanpa saling
-mengimpor. Pembuka slot menentukan **tipe item** dan urutannya; penempel hanya
-menyumbang item lewat `contributes`. Angka priority lebih kecil berjalan lebih
-dulu, dan di `HttpPipeline` middleware pertama menerima request pertama dan
-response terakhir.
+Slots are the only way an extension influences another extension without importing it.
+The slot opener defines the **item type** and the order; attachers only
+contribute items through `contributes`. A smaller priority number runs first,
+and in `HttpPipeline` the first middleware receives the first request and the
+last response.
 
-| Slot | Dibuka oleh | Tipe item | Penempel (priority) |
+| Slot | Opened by | Item type | Attachers (priority) |
 | --- | --- | --- | --- |
-| `registry` | bawaan SDK | `KilnModule` | semua extension yang punya `*_module.dart` |
-| `http.interceptors` | `dio` | `HttpMiddleware` dari `kiln_core` | `connectivity` offline_guard (5), `rest_auth` auth_middleware (10), `http_retry` (20), `http_cache` (30), `logger` http_log (90), `crash_report` http_breadcrumb (95) |
-| `router.routes` | `go_router` | `AppRoute` netral dari `app_basic` | belum ada penempel bawaan; terbuka untuk extension komunitas |
-| `app.wrappers` | bawaan `app_basic` | `AppWrapper` dari `app_basic` | `flavors` FlavorBanner, `biometric` AppLockScope |
+| `registry` | built into the SDK | `KilnModule` | every extension that has a `*_module.dart` |
+| `http.interceptors` | `dio` | `HttpMiddleware` from `kiln_core` | `connectivity` offline_guard (5), `rest_auth` auth_middleware (10), `http_retry` (20), `http_cache` (30), `logger` http_log (90), `crash_report` http_breadcrumb (95) |
+| `router.routes` | `go_router` | neutral `AppRoute` from `app_basic` | no built-in attachers yet; open to community extensions |
+| `app.wrappers` | built into `app_basic` | `AppWrapper` from `app_basic` | `flavors` FlavorBanner, `biometric` AppLockScope |
 
-Urutan di `http.interceptors` dipilih dengan alasan berikut:
+The order in `http.interceptors` is chosen for these reasons:
 
 ```mermaid
 flowchart TD
-    A[request masuk] --> B[offline_guard 5: gagal cepat bila offline]
-    B --> C[auth_middleware 10: pasang Bearer, tangani 401]
-    C --> D[http_retry 20: ulangi kegagalan sementara]
-    D --> E[http_cache 30: jawab dari cache bila segar]
-    E --> F[http_log 90 dan http_breadcrumb 95: catat setiap percobaan jaringan nyata]
-    F --> G[transport Dio]
+    A[incoming request] --> B[offline_guard 5: fail fast when offline]
+    B --> C[auth_middleware 10: attach Bearer, handle 401]
+    C --> D[http_retry 20: retry transient failures]
+    D --> E[http_cache 30: answer from cache when fresh]
+    E --> F[http_log 90 and http_breadcrumb 95: record every real network attempt]
+    F --> G[Dio transport]
 ```
 
-- `offline_guard` paling luar supaya tidak ada retry, cache, atau log yang
-  terbuang saat jelas offline.
-- `auth_middleware` di luar `http_retry`, sehingga retry memakai token yang
-  sudah diperbarui dan tidak menggandakan logika refresh.
-- `http_cache` di dalam `http_retry`: hit cache tidak pernah di-retry, dan retry
-  hanya terjadi untuk miss yang benar-benar mencapai jaringan.
-- Logging paling dalam, jadi tiap percobaan ulang tercatat sebagai satu
-  baris dengan durasinya sendiri. Konsekuensinya, hit cache tidak muncul sebagai
-  request jaringan.
+- `offline_guard` is outermost so that no retry, cache, or log is wasted
+  when it is clearly offline.
+- `auth_middleware` sits outside `http_retry`, so retries use an
+  already refreshed token and do not duplicate the refresh logic.
+- `http_cache` sits inside `http_retry`: cache hits are never retried, and retries
+  only happen for misses that actually reach the network.
+- Logging is innermost, so each retry is recorded as one
+  line with its own duration. As a consequence, cache hits do not show up as
+  network requests.
 
-## Proyek hasil generate
+## Generated project
 
-Struktur `my_app` setelah `kiln create my_app --state bloc` dan `kiln add` untuk
-set yang sama dengan `examples/full_stack`: `dio`, `http_retry`, `rest_auth`,
-`secure_storage`, `go_router`, `theme`, `l10n`, `env`, `logger`. Folder
-`lib/extensions/<id>/` berisi persis isi `brick/__brick__/lib/extensions/<id>/`
-di extension terkait, jadi tidak diulang di sini.
+The structure of `my_app` after `kiln create my_app --state bloc` and `kiln add` for
+the same set as `examples/full_stack`: `dio`, `http_retry`, `rest_auth`,
+`secure_storage`, `go_router`, `theme`, `l10n`, `env`, `logger`. The folder
+`lib/extensions/<id>/` holds exactly the contents of `brick/__brick__/lib/extensions/<id>/`
+in the related extension, so it is not repeated here.
 
 ```text
 my_app/
-├─ .github/                                  # hanya bila extension ci dipasang
-├─ .kiln/                                    # di-ignore Git
-│  ├─ backups/                               # salinan file sebelum setiap operasi, dipakai rollback
-│  ├─ journal/                               # operasi yang sedang berjalan; ada isi berarti operasi terhenti
+├─ .github/                                  # only when the ci extension is installed
+├─ .kiln/                                    # Git-ignored
+│  ├─ backups/                               # copies of files before every operation, used by rollback
+│  ├─ journal/                               # operations in progress; anything here means an operation stopped
 │  └─ logs/
-├─ android/                                  # diubah kiln lewat patch native (INTERNET, dan seterusnya)
+├─ android/                                  # modified by kiln through native patches (INTERNET, and so on)
 ├─ ios/
 ├─ web/
-├─ env/                                      # dari extension env
-│  ├─ development.example.json               # masuk Git
+├─ env/                                      # from the env extension
+│  ├─ development.example.json               # committed to Git
 │  ├─ staging.example.json
 │  ├─ production.example.json
-│  └─ development.json                       # dibuat user, di-ignore Git
+│  └─ development.json                       # created by the user, Git-ignored
 ├─ lib/
 │  ├─ main.dart
-│  ├─ bootstrap.dart                         # dari bloc: runKilnApp, KilnBootstrap, error handler
+│  ├─ bootstrap.dart                         # from bloc: runKilnApp, KilnBootstrap, error handler
 │  ├─ app/
 │  │  ├─ app.dart
 │  │  ├─ registry_scope.dart
@@ -1863,16 +1863,16 @@ my_app/
 │  │  ├─ error_screen.dart
 │  │  ├─ app_wrappers.dart
 │  │  ├─ app_route.dart
-│  │  └─ bloc_providers.dart                 # dari bloc
+│  │  └─ bloc_providers.dart                 # from bloc
 │  ├─ core/
-│  │  ├─ l10n/                               # seam bawaan app_basic, diisi l10n
-│  │  ├─ theme/                              # seam bawaan app_basic, diisi theme
+│  │  ├─ l10n/                               # built-in app_basic seam, filled by l10n
+│  │  ├─ theme/                              # built-in app_basic seam, filled by theme
 │  │  ├─ error/                              # global_error_handler, failure_presenter
-│  │  └─ bloc/                               # dari bloc: observer, base_cubit, async_state, async_cubit, transformers, session_cubit
+│  │  └─ bloc/                               # from bloc: observer, base_cubit, async_state, async_cubit, transformers, session_cubit
 │  ├─ features/
-│  │  └─ counter/                            # contoh dari bloc; ganti dengan fitur milikmu
+│  │  └─ counter/                            # example from bloc; replace with your own feature
 │  └─ extensions/
-│     ├─ extensions.g.dart                   # generate, satu-satunya file aplikasi yang dimiliki kiln
+│     ├─ extensions.g.dart                   # generated, the only app file owned by kiln
 │     ├─ dio/
 │     ├─ http_retry/
 │     ├─ rest_auth/
@@ -1885,36 +1885,36 @@ my_app/
 ├─ test/
 │  ├─ app/
 │  │  └─ app_smoke_test.dart
-│  ├─ core/bloc/                             # test dari bloc
+│  ├─ core/bloc/                             # tests from bloc
 │  ├─ features/counter/
-│  └─ extensions/                            # satu folder per extension terpasang, termasuk *_contract_test.dart
-├─ .gitignore                                # .kiln/backups, .kiln/journal, .kiln/logs, env/*.json (kecuali *.example.json)
+│  └─ extensions/                            # one folder per installed extension, including *_contract_test.dart
+├─ .gitignore                                # .kiln/backups, .kiln/journal, .kiln/logs, env/*.json (except *.example.json)
 ├─ analysis_options.yaml
-├─ kiln.yaml                                 # konfigurasi proyek dan jawaban prompt; boleh diedit
-├─ kiln.lock.yaml                            # catatan kiln; jangan diedit
-├─ pubspec.yaml                              # dependency extension ditambah dan dihapus kiln lewat yaml_edit
+├─ kiln.yaml                                 # project configuration and prompt answers; may be edited
+├─ kiln.lock.yaml                            # kiln's record; do not edit
+├─ pubspec.yaml                              # extension dependencies added and removed by kiln via yaml_edit
 └─ README.md
 ```
 
-### Contoh `kiln.yaml`
+### Sample `kiln.yaml`
 
-Skema ini masih draf dan akan ditetapkan oleh `schemas/kiln.schema.json`.
-Jawaban prompt bertipe `secret` **tidak** ditulis di sini karena file ini masuk
-Git; yang tercatat hanya nama key di `env/`.
+This schema is still a draft and will be pinned down by `schemas/kiln.schema.json`.
+Prompt answers of type `secret` are **not** written here because this file goes into
+Git; only the key names in `env/` are recorded.
 
 ```yaml
-# Konfigurasi proyek kiln. Boleh diedit; kiln tidak menimpanya.
-kiln: ">=0.2.0 <0.3.0"          # rentang CLI yang cocok dengan proyek ini
+# Kiln project configuration. Safe to edit; kiln does not overwrite it.
+kiln: ">=0.2.0 <0.3.0"          # CLI range that matches this project
 core: ^0.1.0
 project:
   name: my_app
   org: com.example
   platforms: [android, ios, web]
 state: bloc
-extensions:                        # jawaban prompt per extension
+extensions:                        # prompt answers per extension
   dio:
     base_url: https://api.example.com/v1
-    connect_timeout: 15            # detik
+    connect_timeout: 15            # seconds
   rest_auth:
     base_url: https://api.example.com/v1
     login_path: /auth/login
@@ -1922,18 +1922,18 @@ extensions:                        # jawaban prompt per extension
     keys:
       - {name: API_BASE_URL, type: url, required: true}
       - {name: ENABLE_LOGGING, type: bool, required: false}
-  analytics:                       # contoh prompt secret bila analytics dipasang
-    api_key: env:POSTHOG_API_KEY   # hanya referensi, nilainya ada di env/*.json
+  analytics:                       # sample secret prompt when analytics is installed
+    api_key: env:POSTHOG_API_KEY   # reference only, the value lives in env/*.json
 verify:
-  after_add: [pub_get, analyze]    # mengatur apa yang dijalankan Verifier setelah add
+  after_add: [pub_get, analyze]    # controls what the Verifier runs after add
 registry:
   offline: false
 ```
 
-### Contoh `kiln.lock.yaml`
+### Sample `kiln.lock.yaml`
 
-Bentuk ini mengubah lockfile yang sekarang (daftar path) menjadi peta path ke
-hash, ditambah patch dan langkah manual. Lihat keputusan 5 di bawah.
+This shape changes the current lockfile (a list of paths) into a map of path to
+hash, plus patches and manual steps. See decision 5 below.
 
 ```yaml
 # Generated by kiln. Do not edit by hand.
@@ -1942,7 +1942,7 @@ core: 0.1.0
 extensions:
   dio:
     version: 0.2.0
-    source: bundled                 # bundled atau store
+    source: bundled                 # bundled or store
     dependencies: [dio]
     files:
       lib/extensions/dio/dio_module.dart: sha256:3f2a9c0e…
@@ -1960,164 +1960,164 @@ extensions:
     manual_steps: []
 ```
 
-## Keputusan desain yang muncul dari struktur ini
+## Design decisions that emerge from this structure
 
-Dokumen ini menggabungkan rencana Phase 6 dengan daftar handler per extension.
-Beberapa hal di dalamnya belum diputuskan, dan beberapa lagi saya ubah dari
-rancangan awal. Bagian ini mencatat keduanya supaya tidak terbawa diam-diam ke
-implementasi.
+This document combines the Phase 6 plan with the per-extension handler list.
+Some things in it are not decided yet, and some others I changed from the
+original draft. This section records both so they are not carried into the
+implementation unnoticed.
 
-### A. Perlu diputuskan sebelum implementasi
+### A. To be decided before implementation
 
-1. **`http.interceptors` versus `HttpPipeline.use` yang sekarang.** Hari ini
-   `HttpRetryModule` dan `HttpCacheModule` memanggil
-   `registry.read<HttpPipeline>().use(...)` dari `register()`. Slot akan
-   menggantikan atau melengkapi itu? Saran: slot membawa `HttpMiddleware` dari
-   `kiln_core`, bukan `Interceptor` milik Dio, karena kalau tidak `http_retry`
-   dan `http_cache` terkunci ke Dio dan klaim "transport bisa diganti" gugur.
-   Karena itu nama `interceptors` agak menyesatkan; `http.middleware` lebih jujur.
-   Folder `dio/interceptors/` juga sebaiknya berisi `HttpMiddleware`.
-2. **Satu category `auth` yang eksklusif untuk backend yang kini menyediakan
-   tiga kapabilitas.** `appwrite`, `firebase`, dan `supabase` sekarang
-   menyediakan `auth`, `remote_database`, dan `file_storage` sekaligus. Akibatnya
-   Firebase untuk auth dengan Supabase untuk database tidak mungkin, dan
-   `rest_auth` (auth saja) tidak bisa dipasangkan dengan database backend mana pun.
-   Saran tahap pertama: biarkan sebagai paket utuh, sederhana, dan sesuai contoh
-   `backend_swap`; catat batasannya. Pemisahan (`kiln add supabase --only
-   remote_database`) butuh aturan exclusive per kapabilitas dan sebaiknya
-   menunggu ada kebutuhan nyata.
-3. **Fasad statis melawan prinsip yang sudah tertulis.** Komentar di
-   `app/app.dart` menyatakan registry dioper eksplisit "so features never reach
-   for a global dependency container". `Http.get(...)`, `Prefs.read(...)`, dan
-   `Vault.read(...)` hanya bisa statis bila menyimpan registry global. Pilihan:
-   (a) fasad menerima `Registry` atau `BuildContext`; (b) satu `Kiln.registry`
-   global yang diisi bootstrap, terdokumentasi sebagai kenyamanan untuk kode
-   non-widget; (c) hapus fasad dan pakai kontrak. Saran: (a) atau (c). Sampai
-   diputuskan, fasad di gambar ini adalah usulan, bukan kewajiban pola.
-4. **Kontrak dan seam baru di luar daftar awal.** Saya menambahkan
-   `account_management.dart` ke `kiln_core` karena semua backend punya handler
-   reset password dan verifikasi email; tanpa kontrak, fitur itu hanya bisa
-   dipakai lewat tipe konkret dan merusak penggantian backend. Dua seam di
-   `app_basic` (`app_wrappers.dart`, `app_route.dart`) ditambahkan supaya
-   `flavors`, `biometric`, dan penyumbang route tidak perlu mengedit `app.dart`
-   dan tidak perlu mengimpor `go_router`. Seam `FailureMessages` milik `l10n`
-   dipakai `failure_presenter.dart`.
-5. **Format lockfile berubah.** Lockfile sekarang menyimpan `files` sebagai
-   daftar path; desain ini butuh peta path ke hash. Perlu `lock_version`, pembaca
-   yang menerima kedua bentuk, dan migrasi. Hati-hati dengan
-   `kiln doctor --fix`: menghitung hash dari file yang ada sekarang menjadikan
-   kondisi saat ini sebagai baseline, sehingga edit user sebelum migrasi tidak
-   lagi terdeteksi. Migrasi sebaiknya menandai file tanpa hash asli sebagai
-   "asal tidak diketahui" dan `remove` memperlakukannya sebagai sudah diedit.
-6. **Field manifest yang dipakai gambar ini tetapi belum ada di
-   `docs/extension-manifest.md`.** Semua harus masuk `extension.schema.json`,
-   `manifest_validator.dart`, dan dokumen sebelum dipakai:
+1. **`http.interceptors` versus the current `HttpPipeline.use`.** Today
+   `HttpRetryModule` and `HttpCacheModule` call
+   `registry.read<HttpPipeline>().use(...)` from `register()`. Will the slot
+   replace that or complement it? Suggestion: the slot carries `HttpMiddleware` from
+   `kiln_core`, not Dio's `Interceptor`, because otherwise `http_retry`
+   and `http_cache` are locked to Dio and the claim that "the transport can be swapped" falls apart.
+   That is why the name `interceptors` is a bit misleading; `http.middleware` is more honest.
+   The `dio/interceptors/` folder should also hold `HttpMiddleware`.
+2. **One exclusive `auth` category for backends that now provide
+   three capabilities.** `appwrite`, `firebase`, and `supabase` now
+   provide `auth`, `remote_database`, and `file_storage` at once. As a result
+   Firebase for auth together with Supabase for the database is impossible, and
+   `rest_auth` (auth only) cannot be paired with any backend database.
+   First-stage suggestion: leave it as one whole package, simple and matching the
+   `backend_swap` example; record the limitation. Splitting
+   (`kiln add supabase --only remote_database`) needs exclusive rules per capability and
+   should wait until there is a real need.
+3. **Static facades against a principle that is already written down.** The comment in
+   `app/app.dart` states that the registry is passed explicitly "so features never reach
+   for a global dependency container". `Http.get(...)`, `Prefs.read(...)`, and
+   `Vault.read(...)` can only be static if they keep a global registry. Options:
+   (a) the facade takes a `Registry` or a `BuildContext`; (b) one global
+   `Kiln.registry` filled in by bootstrap, documented as a convenience for
+   non-widget code; (c) drop the facades and use contracts. Suggestion: (a) or (c). Until
+   that is decided, the facades in this drawing are a proposal, not a required pattern.
+4. **New contracts and seams outside the initial list.** I added
+   `account_management.dart` to `kiln_core` because every backend has handlers for
+   password reset and email verification; without a contract, that feature could only be
+   used through concrete types and would break backend swapping. Two seams in
+   `app_basic` (`app_wrappers.dart`, `app_route.dart`) were added so that
+   `flavors`, `biometric`, and route contributors do not need to edit `app.dart`
+   and do not need to import `go_router`. The `FailureMessages` seam owned by `l10n`
+   is used by `failure_presenter.dart`.
+5. **Lockfile format changes.** The lockfile currently stores `files` as a list of
+   paths; this design needs a map from path to hash. That requires `lock_version`, a reader
+   that accepts both shapes, and a migration. Be careful with
+   `kiln doctor --fix`: computing hashes from the files that exist now makes the
+   current state the baseline, so user edits made before the migration are no
+   longer detected. The migration should mark files without an original hash as
+   "origin unknown" and `remove` should treat them as already edited.
+6. **Manifest fields this drawing uses that are not yet in
+   `docs/extension-manifest.md`.** All of them must land in `extension.schema.json`,
+   `manifest_validator.dart`, and the docs before they are used:
 
-   | Field | Dipakai oleh | Catatan |
+   | Field | Used by | Notes |
    | --- | --- | --- |
-   | `prompts` dengan tipe `url`, `int`, `enum`, `secret`, `bool`, **multi-pilih** | hampir semua | tipe multi-pilih belum ada di `prompt_spec.dart` (dipakai `permission`, `codegen`, `env`) |
-   | `dev_dependencies` | `codegen` | sekarang hanya `dependencies` |
-   | `manual_steps` | `firebase` | dilacak `doctor`, diselesaikan user |
-   | `platforms` | `biometric`, `permission` | batasan platform; `doctor` menandai web |
-   | `android.app_links`, `ios.associated_domains` | `deep_link` | universal link; butuh patch entitlement baru |
-   | `ios.podfile_permissions` | `permission` | flag `PERMISSION_*`, lewat `ios_podfile.dart` |
-   | `macos.*` | `dio`, `image_picker` | lewat `macos_entitlements.dart` |
-   | `android.allow_backup` | `secure_storage` | opsional, hanya bila diputuskan |
-   | `contributes[].when` | `connectivity`, `logger`, `crash_report` | middleware hanya aktif bila `http_pipeline` ada |
-   | `slots` tipe baru (`app.wrappers`, `router.routes`) | `flavors`, `biometric`, `go_router` | tipe item perlu aturan pemeriksaan |
+   | `prompts` with type `url`, `int`, `enum`, `secret`, `bool`, **multi-select** | almost all | the multi-select type is not in `prompt_spec.dart` yet (used by `permission`, `codegen`, `env`) |
+   | `dev_dependencies` | `codegen` | currently only `dependencies` |
+   | `manual_steps` | `firebase` | tracked by `doctor`, completed by the user |
+   | `platforms` | `biometric`, `permission` | platform restrictions; `doctor` flags web |
+   | `android.app_links`, `ios.associated_domains` | `deep_link` | universal links; needs a new entitlement patch |
+   | `ios.podfile_permissions` | `permission` | `PERMISSION_*` flags, via `ios_podfile.dart` |
+   | `macos.*` | `dio`, `image_picker` | via `macos_entitlements.dart` |
+   | `android.allow_backup` | `secure_storage` | optional, only if decided |
+   | `contributes[].when` | `connectivity`, `logger`, `crash_report` | the middleware is only active when `http_pipeline` is present |
+   | `slots` of new types (`app.wrappers`, `router.routes`) | `flavors`, `biometric`, `go_router` | item types need checking rules |
 
-7. **Hook versus validasi deklaratif.** `dio/hooks/pre_gen.dart` memvalidasi
-   `base_url` dan `connect_timeout`, tetapi `prompt_spec.dart` sudah memvalidasi
-   tipe `url` dan `int` tanpa menjalankan kode apa pun. Dari tiga hook
-   extension di gambar ini (`dio`, `firebase`, `codegen`), hanya `codegen` yang
-   tidak bisa digantikan secara deklaratif: ia harus menjalankan `build_runner`.
-   Hook `firebase` hanya memeriksa keberadaan `flutterfire`, yang bisa menjadi
-   `manual_steps` plus pemeriksaan `doctor`. Saran: pertahankan hook hanya di
-   `codegen`, dan hapus dua lainnya untuk memperkecil permukaan kepercayaan.
-8. **Nama dobel untuk pemeta error.** Pola `<id>_failure_mapper.dart` bentrok
-   dengan file yang sudah ada: `firebase_failures.dart`, `supabase_failures.dart`,
-   `social_failures.dart`, dan `analytics_failures.dart`. Saya tidak mengganti
-   nama file lama, karena lockfile proyek yang sudah ada mencatat path-nya.
-   Pilihannya: ubah pola dokumen menjadi `*_failures.dart`, atau ganti nama
-   keempat file lewat migration `rename_file` pada rilis berikutnya. Opsi kedua
-   sekaligus menjadi kasus pakai pertama untuk `migration_actions.dart`.
-9. **`Result<T>` dan `Failure` yang dilempar.** Seluruh kontrak yang ada
-   mendokumentasikan `throws Failure`. Menambah `Result<T>` bersama lint
-   `require_failure_handling` menimbulkan dua gaya penanganan error. Saran:
-   kontrak tetap melempar `Failure`; `Result<T>` hanya pembantu untuk kode
-   fitur (`Result.guard(...)`) dan dipakai `runGuarded` di `base_cubit` serta
-   `AsyncValue.guard`. Lint sebaiknya memeriksa `Result` yang tidak dikonsumsi,
-   bukan `Failure` yang tidak ditangkap.
-10. **Privasi bawaan.** `ConsentController` perlu status awal yang jelas:
-    opt-in (tidak ada yang dikirim sampai user setuju) atau opt-out. Saran:
-    opt-in. Untuk `crash_report`, crash yang terjadi sebelum persetujuan harus
-    dibuang atau ditahan di memori; tentukan salah satunya sebagai bawaan.
-11. **Prompt `secret`.** Kunci seperti `api_key` atau `dsn` tidak boleh masuk
-    `kiln.yaml` (masuk Git) maupun source. Usulan: nilai dibaca lewat
-    `String.fromEnvironment` di `<id>_config.dart`, dan nama key ditambahkan ke
-    `env/*.example.json`. Perlu dicatat bahwa nilai `--dart-define` tetap bisa
-    diekstrak dari binary aplikasi, jadi ini bukan penyimpanan rahasia yang aman
-    untuk kunci server.
+7. **Hooks versus declarative validation.** `dio/hooks/pre_gen.dart` validates
+   `base_url` and `connect_timeout`, but `prompt_spec.dart` already validates the
+   `url` and `int` types without running any code. Of the three extension hooks
+   in this drawing (`dio`, `firebase`, `codegen`), only `codegen` cannot be
+   replaced declaratively: it has to run `build_runner`.
+   The `firebase` hook only checks that `flutterfire` exists, which could be a
+   `manual_steps` entry plus a `doctor` check. Suggestion: keep a hook only in
+   `codegen`, and drop the other two to shrink the trust surface.
+8. **Double naming for error mapping.** The `<id>_failure_mapper.dart` pattern clashes
+   with existing files: `firebase_failures.dart`, `supabase_failures.dart`,
+   `social_failures.dart`, and `analytics_failures.dart`. I did not rename the
+   old files, because lockfiles of existing projects record their paths.
+   The options: change the document pattern to `*_failures.dart`, or rename
+   those four files via a `rename_file` migration in the next release. The second option
+   also becomes the first use case for `migration_actions.dart`.
+9. **`Result<T>` and thrown `Failure`.** Every existing contract
+   documents `throws Failure`. Adding `Result<T>` together with the
+   `require_failure_handling` lint creates two error handling styles. Suggestion:
+   contracts keep throwing `Failure`; `Result<T>` is only a helper for feature code
+   (`Result.guard(...)`) and is used by `runGuarded` in `base_cubit` and
+   `AsyncValue.guard`. The lint should check for unconsumed `Result`
+   values, not for uncaught `Failure`s.
+10. **Privacy defaults.** `ConsentController` needs a clear initial state:
+    opt-in (nothing is sent until the user agrees) or opt-out. Suggestion:
+    opt-in. For `crash_report`, crashes that happen before consent must be
+    dropped or held in memory; pick one of them as the default.
+11. **`secret` prompts.** Keys such as `api_key` or `dsn` must not land in
+    `kiln.yaml` (which goes into Git) or in the source. Proposal: the value is read via
+    `String.fromEnvironment` in `<id>_config.dart`, and the key name is added to
+    `env/*.example.json`. Note that `--dart-define` values can still be
+    extracted from the app binary, so this is not secure secret storage
+    for server keys.
 
-### B. Perubahan saya dari teks awal
+### B. My changes from the initial text
 
-Supaya mudah ditinjau, ini semua yang saya ubah dari tree dan komentar yang kamu
-tulis, selain menambah isi per extension:
+To make review easy, this is everything I changed from the tree and comments you
+wrote, besides adding per-extension content:
 
-- Fasad penyimpanan `Storage` menjadi `Prefs`, dan `secure_storage` memakai
-  `Vault`, karena `Storage` dan `SecureStorage` sudah menjadi nama kontrak di
-  `kiln_core` (lihat A3).
-- Komentar `bloc` dan `riverpod`: `category: state_management` dan
-  `conflicts: riverpod/bloc` diganti sesuai manifest asli (`category: state`,
-  `exclusive: true`, `provides: state_bloc` atau `state_riverpod`).
-- `dio` provides `http_client, http_pipeline`; `http_retry` dan `http_cache`
-  requires `http_client, http_pipeline`, sesuai manifest yang ada.
-- `http_cache`: `requires: storage` menjadi opsional (`when: [storage]`).
-  Memaksa `storage` berarti setiap proyek dengan cache ikut menarik
-  `shared_preferences`, padahal `memory_http_cache.dart` tidak membutuhkannya.
-  Kembalikan menjadi `requires` bila kamu memang ingin cache selalu persisten.
-- Backend (`appwrite`, `firebase`, `supabase`) kini menyediakan
-  `remote_database` dan `file_storage` agar dua kontrak baru di `kiln_core`
-  punya implementasi nyata.
-- Ditambahkan: bagian [Slot](#slot-siapa-membuka-siapa-menempel), kontrak
-  `account_management`, seam `app_wrappers` dan `app_route`, dan catatan di
-  bagian atas bahwa dokumen ini adalah desain target.
-- `flavors` kini punya `flavors_module.dart` supaya bisa menempel ke
-  `app.wrappers`; sebelumnya brick itu hanya merender file.
-- `app_basic/app_shell.dart` (baru) tumpang tindih dengan `app.dart` yang sudah
-  membangun `MaterialApp`. Pisahkan tanggung jawabnya: `app.dart` untuk `KilnApp`
-  dan `RegistryScope`, `app_shell.dart` untuk `MaterialApp`.
-- `.gitignore` di `app_basic` hanya menyebut `.kiln/backups` dan `.kiln/logs`;
-  roadmap juga menyebut `journal/`, dan saya menambahkannya di contoh proyek.
+- The storage facade `Storage` becomes `Prefs`, and `secure_storage` uses
+  `Vault`, because `Storage` and `SecureStorage` are already contract names in
+  `kiln_core` (see A3).
+- The `bloc` and `riverpod` comments: `category: state_management` and
+  `conflicts: riverpod/bloc` are replaced to match the real manifest (`category: state`,
+  `exclusive: true`, `provides: state_bloc` or `state_riverpod`).
+- `dio` provides `http_client, http_pipeline`; `http_retry` and `http_cache`
+  require `http_client, http_pipeline`, matching the existing manifests.
+- `http_cache`: `requires: storage` becomes optional (`when: [storage]`).
+  Forcing `storage` would mean every project with a cache also pulls in
+  `shared_preferences`, even though `memory_http_cache.dart` does not need it.
+  Put it back to `requires` if you really want the cache to always be persistent.
+- The backends (`appwrite`, `firebase`, `supabase`) now provide
+  `remote_database` and `file_storage` so the two new contracts in `kiln_core`
+  have real implementations.
+- Added: the [Slot](#slots-who-opens-who-attaches) section, the
+  `account_management` contract, the `app_wrappers` and `app_route` seams, and the note at
+  the top that this document is the target design.
+- `flavors` now has `flavors_module.dart` so it can attach to
+  `app.wrappers`; previously that brick only rendered files.
+- `app_basic/app_shell.dart` (new) overlaps with the existing `app.dart`, which already
+  builds the `MaterialApp`. Separate the responsibilities: `app.dart` for `KilnApp`
+  and `RegistryScope`, `app_shell.dart` for `MaterialApp`.
+- The `.gitignore` in `app_basic` only mentions `.kiln/backups` and `.kiln/logs`;
+  the roadmap also mentions `journal/`, and I added it in the project example.
 
-### C. Masih diparkir di roadmap
+### C. Still parked in the roadmap
 
-Gambar ini menunjukkan bentuk akhir, bukan keputusan. Tiga hal berikut masih
-ditandai "jangan mulai tanpa keputusan baru" di `roadmap.md`:
+This drawing shows the end shape, not a decision. The following three things are still
+marked "do not start without a new decision" in `roadmap.md`:
 
-- **`crash_report`**: vendor belum dipilih. Sentry dipakai hanya sebagai contoh
-  di balik gateway.
-- **`codegen`**: kontrak kode generate-nya belum konkret. `json_serializable` dan
-  `freezed` adalah usulan awal.
-- **`kiln_store`** dan `registry/`: butuh paket yang sudah dipublikasikan, dan
-  model distribusi (URL Git, registry, atau keduanya) belum diputuskan. Angka
-  "29 extension" bergantung pada dua extension pertama ikut dibuka.
+- **`crash_report`**: no vendor chosen yet. Sentry is used only as an example
+  behind the gateway.
+- **`codegen`**: its code generation contract is not concrete yet. `json_serializable` and
+  `freezed` are the initial proposal.
+- **`kiln_store`** and `registry/`: they need published packages, and the
+  distribution model (Git URL, registry, or both) is not decided. The number
+  "29 extensions" depends on those first two extensions being opened up.
 
-### D. Urutan pengerjaan yang disarankan
+### D. Suggested order of work
 
-Tidak semua handler di dokumen ini perlu hadir sekaligus. Mengikuti urutan
-Phase 6 di roadmap:
+Not every handler in this document has to exist at once. Following the Phase 6
+order in the roadmap:
 
-1. `kiln_core`: `Clock`, `Result`, `slot`, `session`, `privacy`, kontrak baru.
-2. `kiln_extension_sdk`: transaksi, `FileOwnership`, `PatchJournal`, `Verifier`.
-3. `kiln_testing` dengan suite kontrak untuk `http_client`, `storage`,
-   `auth_repository`; jalankan ke `dio`, `appwrite`, `firebase`, `supabase`.
-4. Scaffold per extension (README, CHANGELOG, `test/`) lewat
-   `extension_template`, dimulai dari `dio`.
-5. Handler per extension, mulai dari yang dipakai paling banyak: `dio`,
-   `rest_auth`, `bloc`/`riverpod`, lalu sisanya.
-6. Item yang diparkir, setelah keputusan baru.
+1. `kiln_core`: `Clock`, `Result`, `slot`, `session`, `privacy`, new contracts.
+2. `kiln_extension_sdk`: transactions, `FileOwnership`, `PatchJournal`, `Verifier`.
+3. `kiln_testing` with contract suites for `http_client`, `storage`,
+   `auth_repository`; run them against `dio`, `appwrite`, `firebase`, `supabase`.
+4. Per-extension scaffolding (README, CHANGELOG, `test/`) via
+   `extension_template`, starting with `dio`.
+5. Per-extension handlers, starting with the most used ones: `dio`,
+   `rest_auth`, `bloc`/`riverpod`, then the rest.
+6. The parked items, after new decisions.
 
-Biaya CI perlu dipertimbangkan sejak awal: `analyze_test` per extension butuh
-proyek Flutter dan `pub get`. Pakai satu proyek fixture bersama dengan cache
-pub, dan biarkan `smoke.yaml` nightly menutup kombinasi antar extension.
+CI cost needs to be considered from the start: `analyze_test` per extension needs a
+Flutter project and `pub get`. Use one shared fixture project with a pub cache,
+and let the nightly `smoke.yaml` cover combinations between extensions.

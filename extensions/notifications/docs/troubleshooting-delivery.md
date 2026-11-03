@@ -2,9 +2,10 @@
 
 ## Android receivers
 
-`flutter_local_notifications` membutuhkan dua receiver di
-`android/app/src/main/AndroidManifest.xml`. Extension menambahkannya otomatis
-lewat `android.receivers`; bagian ini hanya untuk memverifikasi hasil install:
+`flutter_local_notifications` requires two receivers in
+`android/app/src/main/AndroidManifest.xml`. The extension adds them automatically
+through `android.receivers`; this section is only for verifying the install
+result:
 
 ```xml
 <receiver
@@ -22,39 +23,39 @@ lewat `android.receivers`; bagian ini hanya untuk memverifikasi hasil install:
 </receiver>
 ```
 
-Extension juga menambahkan `POST_NOTIFICATIONS` dan
+The extension also adds `POST_NOTIFICATIONS` and
 `RECEIVE_BOOT_COMPLETED`.
 
 ## Exact alarms
 
-Dengan `exact_alarms: true`, izin berikut ditambahkan otomatis ke manifest saat
-install:
+With `exact_alarms: true`, the following permission is added to the manifest
+automatically at install:
 
 ```xml
 <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 ```
 
-Di Android 12 ke atas pengguna tetap harus memberi akses **Alarms & reminders**
-untuk aplikasi. Bila izin tidak diberikan, plugin melempar error dan
-`DeviceNotifications` mengubahnya menjadi `Failure(notifications.unavailable)`.
+On Android 12 and above the user must still grant **Alarms & reminders** access
+to the app. If the permission is not granted, the plugin throws an error and
+`DeviceNotifications` converts it into `Failure(notifications.unavailable)`.
 
-## Jadwal tidak muncul
+## Scheduled notifications not appearing
 
-1. Cek izin notifikasi lewat `requestPermission()`.
-2. Cek channel: id yang diminta harus ada di `NotificationChannels`, kalau
-   tidak notifikasi memakai channel default.
-3. Cek zona perangkat: `TimezoneResolver.configure()` harus berhasil.
-4. Cek optimized battery Android; beberapa vendor menghentikan alarm.
-5. Cek receiver di atas dan pastikan `RECEIVE_BOOT_COMPLETED` ada.
+1. Check the notification permission through `requestPermission()`.
+2. Check the channel: the requested id must exist in `NotificationChannels`,
+   otherwise the notification uses the default channel.
+3. Check the device zone: `TimezoneResolver.configure()` must succeed.
+4. Check Android's battery optimization; some vendors stop alarms.
+5. Check the receivers above and make sure `RECEIVE_BOOT_COMPLETED` is present.
 
-## Tap tidak terbaca
+## Taps not registering
 
-- Tap yang membuka aplikasi dibaca lewat `getNotificationAppLaunchDetails`,
-  jadi panggil `initialize()` sebelum mendengarkan `taps`.
-- Tap aksi latar belakang memakai `IsolateNameServer`; web tidak mendukungnya.
-- Pastikan payload berukuran di bawah `NotificationPayload.maxEncodedLength`.
+- Taps that open the app are read through `getNotificationAppLaunchDetails`, so
+  call `initialize()` before listening to `taps`.
+- Background action taps use `IsolateNameServer`; the web does not support them.
+- Make sure the payload is smaller than `NotificationPayload.maxEncodedLength`.
 
 ## Web
 
-Browser hanya mengizinkan permintaan izin sebagai respons langsung terhadap
-aksi user. Panggil `requestPermission()` dari handler tombol, bukan saat start.
+Browsers only allow permission requests as a direct response to a user action.
+Call `requestPermission()` from a button handler, not at start.

@@ -2,24 +2,25 @@
 
 ## 0.1.0
 
-- Implementasi klien registry: `RegistryConfig` (HTTP(S), `file:`, path lokal,
-  mirror, ref) dan `RegistryClient` (fetch index, fallback mirror, unduh arsip
-  dengan verifikasi SHA-256, cache opsional).
-- Model `index.json` sesuai `schemas/registry-index.schema.json`:
-  `RegistryIndex`, `RegistryExtension`, `RegistryVersion`, parse/encode, pencarian
-  lokal melalui `SearchIndex`.
-- `VersionResolver` berbasis `pub_semver` untuk memilih versi yang cocok dengan
-  `kiln_core`/Dart dan mengabaikan versi terpasang atau prerelease.
-- `ChecksumVerifier` menolak arsip dengan SHA-256 tidak cocok
+- Registry client implementation: `RegistryConfig` (HTTP(S), `file:`, local
+  path, mirror, ref) and `RegistryClient` (fetch index, mirror fallback,
+  download archives with SHA-256 verification, optional cache).
+- `index.json` models matching `schemas/registry-index.schema.json`:
+  `RegistryIndex`, `RegistryExtension`, `RegistryVersion`, parse/encode, local
+  search through `SearchIndex`.
+- `VersionResolver` based on `pub_semver` to select a version compatible with
+  `kiln_core`/Dart and to skip installed or prerelease versions.
+- `ChecksumVerifier` rejects archives whose SHA-256 does not match
   (`store.checksum_mismatch`).
-- `TrustPolicy` untuk tier official/verified/community dan konfirmasi hook.
-- `ArchivePacker` deterministik (`.tar.gz`, path POSIX, timestamp tetap) dan
-  `ArchiveUnpacker` yang menolak zip-slip, path absolut, drive letter, symlink,
-  dan hard link (`store.unsafe_archive`).
-- `LocalCache` dan `OfflineMode` untuk index/arsip offline dengan fallback cache
-  saat jaringan gagal.
-- `Publisher` untuk validasi manifest, penolakan versi duplikat, penulisan arsip,
-  pembaruan `index.json`, dan `latest` otomatis.
-- `KilnStoreException` dengan `code`, `message`, `suggestion`, dan `details`.
-- Test unit untuk seluruh modul, termasuk fixture index, arsip valid, dan arsip
-  zip-slip.
+- `TrustPolicy` for the official/verified/community tiers and hook
+  confirmation.
+- Deterministic `ArchivePacker` (`.tar.gz`, POSIX paths, fixed timestamps) and
+  `ArchiveUnpacker` that rejects zip-slip, absolute paths, drive letters,
+  symlinks, and hard links (`store.unsafe_archive`).
+- `LocalCache` and `OfflineMode` for an offline index/archives with cache
+  fallback when the network fails.
+- `Publisher` for manifest validation, duplicate version rejection, archive
+  writing, `index.json` updates, and automatic `latest`.
+- `KilnStoreException` with `code`, `message`, `suggestion`, and `details`.
+- Unit tests for every module, including index fixtures, valid archives, and
+  zip-slip archives.

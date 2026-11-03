@@ -1,8 +1,8 @@
-# Format, plural, dan pesan
+# Formatting, plurals, and messages
 
-## Placeholder
+## Placeholders
 
-Deklarasikan placeholder di ARB:
+Declare placeholders in the ARB:
 
 ```json
 {
@@ -15,13 +15,13 @@ Deklarasikan placeholder di ARB:
 }
 ```
 
-gen-l10n menghasilkan method bertipe:
+gen-l10n produces a typed method:
 
 ```dart
 Text(l10n.helloName('Ana'));
 ```
 
-## Plural
+## Plurals
 
 ```json
 {
@@ -34,7 +34,7 @@ Text(l10n.helloName('Ana'));
 }
 ```
 
-Pemakaian:
+Usage:
 
 ```dart
 Text(l10n.itemsCount(0)); // No items
@@ -42,10 +42,10 @@ Text(l10n.itemsCount(1)); // 1 item
 Text(l10n.itemsCount(3)); // 3 items
 ```
 
-Aturan plural mengikuti locale (`intl.Intl.pluralLogic`). Indonesia memakai
-satu bentuk `other`; Inggris memakai `one`/`other` dan boleh menambah `=0`.
+Plural rules follow the locale (`intl.Intl.pluralLogic`). Indonesian uses a
+single `other` form; English uses `one`/`other` and may add `=0`.
 
-## Tanggal
+## Dates
 
 ```dart
 final formatters = LocaleFormatters(locale: const Locale('id'));
@@ -55,10 +55,10 @@ formatters.formatMediumDate(DateTime(2024, 1, 15));
 formatters.formatDateTime(DateTime(2024, 1, 15, 9, 30));
 ```
 
-Data tanggal `intl` diinisialisasi oleh `L10nModule.ready`. Di unit test yang
-tidak menjalankan modul, panggil `LocaleFormatters.initialize()` lebih dulu.
+The `intl` date data is initialized by `L10nModule.ready`. In unit tests that do
+not run the module, call `LocaleFormatters.initialize()` first.
 
-## Angka dan mata uang
+## Numbers and currency
 
 ```dart
 formatters.formatNumber(1234.5); // 1.234,5
@@ -69,13 +69,13 @@ formatters.formatCurrency(1250000, decimalDigits: 0); // Rp1.250.000
 formatters.formatCurrency(1234.5, currencyCode: 'USD'); // $1,234.50
 ```
 
-Simbol mata uang mengikuti locale. Untuk data keuangan, tentukan
-`currencyCode` secara eksplisit agar tidak bergantung pada locale perangkat.
+Currency symbols follow the locale. For financial data, set `currencyCode`
+explicitly so it does not depend on the device locale.
 
-## Pesan kegagalan
+## Failure messages
 
-`L10nFailureMessages` mengelompokkan `FailureCode` menjadi getter ARB yang
-ramah. Contoh: `network.offline` menjadi `failureNetworkOffline`, sedangkan
-`storage.read_failed` dan `storage.write_failed` berbagi `failureStorage`.
-Kode yang tidak dikenal memakai `failureUnexpected`, bukan pesan teknis dari
+`L10nFailureMessages` groups `FailureCode` values into friendly ARB getters. For
+example, `network.offline` becomes `failureNetworkOffline`, while
+`storage.read_failed` and `storage.write_failed` share `failureStorage`.
+Unrecognized codes use `failureUnexpected`, not the technical message from the
 exception.

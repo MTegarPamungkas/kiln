@@ -1,7 +1,7 @@
-# Aturan keamanan Firestore dan Storage
+# Firestore and Storage security rules
 
-Aturan di bawah cocok dengan `RemoteDatabase` dan `FileStorage` dari extension
-ini: dokumen milik pengguna hanya dapat dibaca dan diubah oleh pemiliknya.
+The rules below match `RemoteDatabase` and `FileStorage` from this extension:
+user-owned documents can only be read and modified by their owner.
 
 ## Firestore
 
@@ -58,12 +58,12 @@ service firebase.storage {
 }
 ```
 
-## Catatan query
+## Query notes
 
-- `FirestoreQueryMapper` menolak filter rentang pada beberapa field dan
-  orderBy pada field berbeda karena membutuhkan indeks komposit. Bila pola itu
-  memang dibutuhkan, buat indeks di Firebase Console lalu gunakan query native
-  Firestore di luar kontrak.
-- Aturan di atas memakai `resource.data.ownerId`; pastikan setiap dokumen baru
-  menulis field tersebut, atau gunakan Cloud Functions untuk mengisinya.
-- Uji aturan dengan `firebase emulators:exec --only firestore,storage "test"`.
+- `FirestoreQueryMapper` rejects range filters on multiple fields and orderBy on
+  a different field because they require a composite index. If that pattern is
+  really needed, create the index in the Firebase Console and then use native
+  Firestore queries outside the contract.
+- The rules above use `resource.data.ownerId`; make sure every new document
+  writes that field, or use Cloud Functions to fill it in.
+- Test the rules with `firebase emulators:exec --only firestore,storage "test"`.

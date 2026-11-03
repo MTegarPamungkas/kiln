@@ -1,75 +1,75 @@
-# Arsitektur Kiln
+# Kiln architecture
 
-Kiln adalah monorepo Dart yang menghasilkan aplikasi Flutter dan memeliharanya
-lewat extension. Aplikasi hasil generate hanya mengenal kontrak di
-`kiln_core`; extension tidak saling mengimpor.
+Kiln is a Dart monorepo that generates Flutter applications and maintains them
+through extensions. A generated application only knows the contracts in
+`kiln_core`; extensions never import each other.
 
-## Package
+## Packages
 
-| Package | Tanggung jawab |
+| Package | Responsibility |
 | --- | --- |
-| `kiln_core` | Kontrak, `Failure`, `Result`, Registry, bootstrap, slot, sesi, privasi |
-| `kiln_extension_sdk` | Manifest, resolver, renderer Mason, installer transaksional, migrasi |
-| `kiln_cli` | Perintah `kiln`, prompt, laporan, bundle extension |
-| `kiln_testing` | Fake per kontrak, contract suite, harness widget |
-| `kiln_store` | Registry, checksum, trust, publish (fase registry) |
-| `kiln_lints` | Aturan lint custom untuk kontrak, plugin, dan file generated |
+| `kiln_core` | Contracts, `Failure`, `Result`, Registry, bootstrap, slots, session, privacy |
+| `kiln_extension_sdk` | Manifest, resolver, Mason renderer, transactional installer, migrations |
+| `kiln_cli` | `kiln` commands, prompts, reports, extension bundles |
+| `kiln_testing` | Fakes per contract, contract suite, widget harness |
+| `kiln_store` | Registry, checksums, trust, publish (registry phase) |
+| `kiln_lints` | Custom lint rules for contracts, plugins, and generated files |
 
-## Runtime aplikasi
+## Application runtime
 
-1. `main.dart` menjalankan `KilnBootstrap.run(modules: kilnModules())`.
-2. Bootstrap menyusun module dari capability `requires`/`provides`.
-3. Setiap module mendaftarkan layanan ke `Registry`.
-4. `KilnApp` menyediakan Registry lewat `RegistryScope`.
-5. `AppShell` membaca seam `AppThemeConfig`, `AppLocalizationsConfig`,
-   `RouterConfig`, dan slot `app.wrappers`.
-6. Fitur membaca kontrak (`RegistryScope.read<HttpClient>()`), bukan
-   implementasi.
+1. `main.dart` runs `KilnBootstrap.run(modules: kilnModules())`.
+2. Bootstrap assembles modules from the `requires`/`provides` capabilities.
+3. Each module registers its services with the `Registry`.
+4. `KilnApp` exposes the Registry through `RegistryScope`.
+5. `AppShell` reads the `AppThemeConfig`, `AppLocalizationsConfig`, and
+   `RouterConfig` seams, plus the `app.wrappers` slot.
+6. Features read contracts (`RegistryScope.read<HttpClient>()`), not
+   implementations.
 
-Tidak ada fasad statis atau global registry. Semua akses layanan melewati
-Registry yang dioper eksplisit.
+There is no static facade or global registry. Every service access goes through
+the Registry that is passed explicitly.
 
-## Model extension
+## Extension model
 
-Extension terdiri dari:
+An extension consists of:
 
-- `extension.yaml` — manifest: kapabilitas, prompt, slot, dependency, patch
-  native, compatibility.
-- `brick/` — template Mason yang dirender ke proyek pengguna.
-- `test/` — test manifest, render, dan analyze tingkat extension.
-- `README.md`, `CHANGELOG.md`, `docs/` — dokumentasi extension.
+- `extension.yaml` — the manifest: capabilities, prompts, slots, dependencies,
+  native patches, compatibility.
+- `brick/` — Mason templates rendered into the user's project.
+- `test/` — extension-level manifest, render, and analyze tests.
+- `README.md`, `CHANGELOG.md`, `docs/` — extension documentation.
 
-Extension hanya berkomunikasi lewat kapabilitas dan slot. `http_retry`
-bergantung pada `http_client`/`http_pipeline`, bukan pada id `dio`.
+Extensions communicate only through capabilities and slots. `http_retry`
+depends on `http_client`/`http_pipeline`, not on the id `dio`.
 
-## Pemasangan transaksional
+## Transactional installation
 
-`kiln add` menjalankan pipeline berikut:
+`kiln add` runs the following pipeline:
 
-1. Baca `kiln.yaml` dan `kiln.lock.yaml`.
-2. Resolver memilih provider capability, mendeteksi konflik exclusive,
-   slot yang tidak dibuka, dan siklus dependency.
-3. Render brick ke folder sementara.
-4. Terapkan collision policy terhadap hash kepemilikan di lockfile.
-5. Hitung patch native dan perubahan `pubspec.yaml`/`extensions.g.dart`.
-6. Tulis semua perubahan dalam satu `Transaction` dengan jurnal, backup, dan
+1. Read `kiln.yaml` and `kiln.lock.yaml`.
+2. The resolver selects capability providers, detects exclusive conflicts,
+   unopened slots, and dependency cycles.
+3. Render the brick into a temporary folder.
+4. Apply the collision policy against the ownership hashes in the lockfile.
+5. Compute native patches and the changes to `pubspec.yaml`/`extensions.g.dart`.
+6. Write all changes in a single `Transaction` with a journal, backups, and
    rollback.
-7. Verifikasi `pub get` dan `analyze` bila diaktifkan.
+7. Verify `pub get` and `analyze` when enabled.
 
-`kiln remove` hanya menghapus file yang hash-nya masih sama dengan lockfile.
-File yang diedit pengguna dilewati kecuali `--force`.
+`kiln remove` only deletes files whose hash still matches the lockfile. Files
+edited by the user are skipped unless `--force` is given.
 
 ## Error model
 
-Kontrak melempar `Failure` dengan `FailureCode` stabil. Feature code dapat
-mengubahnya menjadi `Result<T>` dengan `Result.guard`. `kiln_core` juga memuat
-`Result` sebagai helper, bukan kontrak kedua.
+Contracts throw `Failure` with a stable `FailureCode`. Feature code can convert
+it into `Result<T>` with `Result.guard`. `kiln_core` also ships `Result` as a
+helper, not as a second contract.
 
-## Dependency
+## Dependencies
 
-Semua dependency memakai caret ke rilis terbaru yang bisa di-resolve toolchain
-saat ini. Dua pengecualian didokumentasikan di `README.md`: `test` mengikuti pin
-`test_api` milik Flutter, dan `kiln_lints` mengikuti `custom_lint_builder`.
+All dependencies use a caret to the newest release that the current toolchain
+can resolve. Two exceptions are documented in `README.md`: `test` follows
+Flutter's `test_api` pin, and `kiln_lints` follows `custom_lint_builder`.
 
-Lihat [folder-structure.md](folder-structure.md) untuk target struktur lengkap
-dan [roadmap.md](roadmap.md) untuk urutan fase.
+See [folder-structure.md](folder-structure.md) for the complete target structure
+and [roadmap.md](roadmap.md) for the phase order.

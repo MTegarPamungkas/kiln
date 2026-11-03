@@ -1,24 +1,25 @@
-# Menerbitkan extension
+# Publishing extensions
 
-## Fase fondasi
+## Foundation phase
 
-Gunakan `kiln ext pack` untuk menghasilkan arsip:
+Use `kiln ext pack` to produce an archive:
 
 ```bash
 kiln ext pack extensions/dio --output build/dio-0.2.0.tgz
 ```
 
-Lalu publikasikan arsip secara manual atau lampirkan ke rilis. `kiln ext
-publish` belum aktif karena registry dan `kiln_store` masih diparkir.
+Then publish the archive manually or attach it to a release. `kiln ext publish`
+is not active yet because the registry and `kiln_store` are still parked.
 
-## Fase registry
+## Registry phase
 
-Langkah yang direncanakan:
+Planned steps:
 
-1. Validasi manifest dan render/analyze.
-2. Buat arsip `.tgz` dan hitung SHA-256.
-3. Tulis metadata versi (url, checksum, requires, compatibility, tier).
-4. Perbarui `registry/index.json`.
-5. Publish ke registry/mirror yang dikonfigurasi.
+1. Validate the manifest and run render/analyze.
+2. Build a `.tgz` archive and compute its SHA-256.
+3. Write the version metadata (url, checksum, requires, compatibility, tier).
+4. Update `registry/index.json`.
+5. Publish to the configured registry/mirror.
 
-Checksum diverifikasi sebelum instalasi; arsip dengan path traversal ditolak.
+Checksums are verified before installation; archives containing path traversal
+are rejected.

@@ -1,30 +1,31 @@
-# Kontrak dan kapabilitas
+# Contracts and capabilities
 
-`kiln_core` adalah satu-satunya package yang dikenal kode aplikasi dan semua
-extension. Kontrak tersedia untuk:
+`kiln_core` is the only package that application code and all extensions know
+about. Contracts are available for:
 
-HTTP (`HttpClient`, `HttpPipeline`, `HttpCache`), penyimpanan (`Storage`,
+HTTP (`HttpClient`, `HttpPipeline`, `HttpCache`), storage (`Storage`,
 `SecureStorage`, `LocalDatabase`, `RemoteDatabase`, `FileStorage`), auth
 (`AuthRepository`, `AccountManagement`, `SocialAuth`, `TokenProvider`),
 platform (`NetworkMonitor`, `Permissions`, `Notifications`, `DeepLinks`,
-`MediaPicker`), observability (`Analytics`, `CrashReporter`, `AppLogger`), dan
-konfigurasi (`Env`, `AppFlavor`).
+`MediaPicker`), observability (`Analytics`, `CrashReporter`, `AppLogger`), and
+configuration (`Env`, `AppFlavor`).
 
-## Kapabilitas
+## Capabilities
 
-Extension menyatakan `provides` dan `requires` dalam manifest. Resolver memilih
-provider untuk setiap `requires`; extension tidak pernah menulis id extension
-lain.
+Extensions declare `provides` and `requires` in the manifest. The resolver
+picks a provider for every `requires`; an extension never writes another
+extension's id.
 
-- Dua provider untuk capability yang sama = konflik.
-- Capability hilang = konflik dengan saran install.
-- `exclusive: true` menolak extension lain di kategori yang sama.
-- `when` pada kontribusi slot hanya aktif bila capability tersebut ada.
+- Two providers for the same capability = conflict.
+- Missing capability = conflict with an install suggestion.
+- `exclusive: true` rejects other extensions in the same category.
+- `when` on a slot contribution is active only while that capability exists.
 
-Kode aplikasi membaca kontrak dari Registry:
+Application code reads contracts from the Registry:
 
 ```dart
 final client = RegistryScope.read<HttpClient>(context);
 ```
 
-Implementasi konkret seperti `DioClient` tidak diimpor aplikasi.
+Concrete implementations such as `DioClient` are not imported by the
+application.

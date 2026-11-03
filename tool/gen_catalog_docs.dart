@@ -40,12 +40,12 @@ Future<void> main(List<String> arguments) async {
 
 String _render(List<ExtensionManifest> manifests) {
   final buffer = StringBuffer()
-    ..writeln('# Katalog extension')
+    ..writeln('# Extension catalog')
     ..writeln()
-    ..writeln('Katalog ini dihasilkan dari manifest extension oleh')
-    ..writeln('`tool/gen_catalog_docs.dart`. Jangan diedit manual.')
+    ..writeln('This catalog is generated from extension manifests by')
+    ..writeln('`tool/gen_catalog_docs.dart`. Do not edit it manually.')
     ..writeln()
-    ..writeln('| Id | Nama | Versi | Kategori | Tier | Provides |')
+    ..writeln('| ID | Name | Version | Category | Tier | Provides |')
     ..writeln('| --- | --- | --- | --- | --- | --- |');
 
   for (final manifest in manifests) {

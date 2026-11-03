@@ -1,20 +1,20 @@
-# Menambahkan dukungan offline
+# Adding offline support
 
-Kombinasi yang direncanakan:
+Planned combination:
 
-- `connectivity` — memantau jaringan dan menyediakan `offline_guard` middleware.
-- `http_cache` — menyajikan respons segar dari cache.
-- `local_db` — menyimpan dokumen lokal dan antrean sinkronisasi.
+- `connectivity` — monitors the network and provides the `offline_guard`
+  middleware.
+- `http_cache` — serves fresh responses from the cache.
+- `local_db` — stores local documents and the sync queue.
 
-## Pola
+## Pattern
 
-1. Baca dari `LocalDatabase` terlebih dahulu.
-2. Tampilkan status dari `NetworkMonitor`.
-3. Saat online, sinkronkan `sync_queue` ke `RemoteDatabase`.
-4. Gunakan `http.interceptors` untuk offline guard, retry, dan cache.
-5. Tulis test dengan fake `NetworkMonitor`, `HttpClient`, dan `LocalDatabase`
-   dari `kiln_testing`.
+1. Read from `LocalDatabase` first.
+2. Show status from `NetworkMonitor`.
+3. When online, sync the `sync_queue` to `RemoteDatabase`.
+4. Use `http.interceptors` for the offline guard, retries, and caching.
+5. Write tests with the `NetworkMonitor`, `HttpClient`, and `LocalDatabase`
+   fakes from `kiln_testing`.
 
-`storage`, `http_cache`, dan `local_db` sudah tersedia di katalog.
-`connectivity` menyusul pada kelompok platform; lihat
-[roadmap](../roadmap.md).
+`storage`, `http_cache`, and `local_db` are already available in the catalog.
+`connectivity` follows in the platform group; see [roadmap](../roadmap.md).

@@ -1,21 +1,21 @@
-# Patch native
+# Native patches
 
-Extension dapat mengubah file platform lewat blok manifest:
+Extensions can modify platform files through manifest blocks:
 
-- Android: permission, URL scheme, App Links, broadcast receiver,
+- Android: permissions, URL schemes, App Links, broadcast receivers,
   `allowBackup`, activity host, minSdk.
-- iOS: Info.plist, entitlement, associated domain, URL scheme, flag Podfile,
-  penanganan URL di AppDelegate.
-- macOS: entitlement di DebugProfile dan Release, URL scheme di Info.plist.
-- Web: penanda di `index.html`.
+- iOS: Info.plist, entitlements, associated domains, URL schemes, Podfile flags,
+  URL handling in AppDelegate.
+- macOS: entitlements in DebugProfile and Release, URL schemes in Info.plist.
+- Web: markers in `index.html`.
 
-Patch bersifat idempoten, punya id stabil, dan dicatat di lockfile. Patch yang
-dipakai lebih dari satu extension memakai reference count; patch hanya
-dikembalikan saat pemilik terakhir dilepas.
+Patches are idempotent, have stable ids, and are recorded in the lockfile. A
+patch used by more than one extension uses reference counting; the patch is only
+reverted when the last owner is removed.
 
-Patch hanya diterapkan bila folder platform ada di proyek. `kiln doctor`
-melaporkan patch yang hilang dari lockfile.
+Patches are applied only when the platform folder exists in the project.
+`kiln doctor` reports patches that are missing from the lockfile.
 
-Blok `conditional` menambahkan patch yang hanya aktif saat jawaban prompt
-tertentu cocok. Jawaban disimpan di `kiln.yaml`, jadi `kiln remove` dan
-`kiln upgrade` merekonstruksi patch yang sama.
+The `conditional` block adds patches that are active only when specific prompt
+answers match. Answers are stored in `kiln.yaml`, so `kiln remove` and
+`kiln upgrade` reconstruct the same patches.

@@ -7,44 +7,44 @@ final baseUrl = env.uri(EnvKeys.apiBaseUrl);
 final debugTools = env.boolValue(EnvKeys.enableDebugTools) ?? false;
 ```
 
-Nilai berasal dari `--dart-define`:
+Values come from `--dart-define`:
 
 ```bash
 flutter run --dart-define=api_base_url=https://api.kiln.dev
 ```
 
-Atau dari file JSON:
+Or from a JSON file:
 
 ```bash
 flutter run --dart-define-from-file=env/development.json
 ```
 
-## Key
+## Keys
 
-| Key | Tipe | Wajib | Rahasia |
+| Key | Type | Required | Secret |
 | --- | --- | --- | --- |
-| `api_base_url` | URI | ya | tidak |
-| `api_key` | string | tidak | ya |
-| `feature_flags` | string | tidak | tidak |
-| `enable_debug_tools` | bool | tidak | tidak |
+| `api_base_url` | URI | yes | no |
+| `api_key` | string | no | yes |
+| `feature_flags` | string | no | no |
+| `enable_debug_tools` | bool | no | no |
 
-Key yang dipilih saat install masuk ke `EnvSchema.defaults`. `BuildEnv` menolak
-membaca key yang tidak ada di skema.
+Keys selected at install time go into `EnvSchema.defaults`. `BuildEnv` refuses to
+read keys that are not in the schema.
 
-## Menambah key
+## Adding a key
 
-1. Tambahkan konstanta di `env_keys.dart`.
-2. Tambahkan `String.fromEnvironment` di `build_env_values.dart`.
-3. Tambahkan `EnvKeySpec` di `env_schema.dart`.
-4. Tambahkan key ke file `env/*.example.json`.
-5. Tambahkan key ke `EnvSchema.activeNames` bila perlu.
+1. Add the constant in `env_keys.dart`.
+2. Add the `String.fromEnvironment` in `build_env_values.dart`.
+3. Add the `EnvKeySpec` in `env_schema.dart`.
+4. Add the key to the `env/*.example.json` files.
+5. Add the key to `EnvSchema.activeNames` if needed.
 
-## Validasi
+## Validation
 
-`EnvModule.ready` memanggil validator. Semua key wajib yang kosong dilaporkan
-sekaligus, sehingga aplikasi tidak gagal satu per satu.
+`EnvModule.ready` runs the validator. All empty required keys are reported at
+once, so the application does not fail one at a time.
 
 ## Debug
 
-`EnvDebugPage` menampilkan key aktif dan menyamarkan nilai rahasia. Halaman ini
-otomatis disembunyikan di flavor production.
+`EnvDebugPage` shows the active keys and masks secret values. This page is
+automatically hidden in the production flavor.

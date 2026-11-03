@@ -1,14 +1,14 @@
 # Permission
 
-Kind yang didukung: camera, microphone, photos, notifications, location,
-locationAlways, contacts, calendar, bluetooth, dan storage.
+Supported kinds: camera, microphone, photos, notifications, location,
+locationAlways, contacts, calendar, bluetooth, and storage.
 
-Tambahkan entri native sesuai kind yang dipakai:
+Add native entries according to the kind in use:
 
-- Android: `<uses-permission>` di `AndroidManifest.xml`.
+- Android: `<uses-permission>` in `AndroidManifest.xml`.
 - iOS: `NSCameraUsageDescription`, `NSMicrophoneUsageDescription`,
-  `NSPhotoLibraryUsageDescription`, dan kunci terkait di `Info.plist`.
-- macOS: entitlement kamera/mikrofon/file.
+  `NSPhotoLibraryUsageDescription`, and related keys in `Info.plist`.
+- macOS: camera/microphone/file entitlements.
 
-Prompt `kinds` hanya mengatur kind yang boleh diminta oleh kontrak, bukan patch
-native otomatis.
+The `kinds` prompt only controls which kinds the contract is allowed to request,
+not automatic native patching.

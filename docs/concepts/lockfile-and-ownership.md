@@ -1,7 +1,7 @@
-# Lockfile dan kepemilikan
+# Lockfile and ownership
 
-`kiln.lock.yaml` mencatat versi, sumber, dependency, file beserta hash SHA-256,
-patch native, dan manual step tiap extension.
+`kiln.lock.yaml` records each extension's version, source, dependencies, files
+with their SHA-256 hashes, native patches, and manual steps.
 
 ```yaml
 lock_version: 2
@@ -17,10 +17,10 @@ extensions:
     manual_steps: []
 ```
 
-Aturan:
+Rules:
 
-- File tanpa hash (lock lama) dianggap berasal dari sumber tidak diketahui.
-- `kiln remove` hanya menghapus file yang hash sekarang sama dengan lock.
-- File yang diedit pengguna dilewati; `--force` menghapusnya.
-- `kiln doctor` membandingkan hash dan melaporkan file yang berubah.
-- `extensions.g.dart` dimiliki Kiln dan disinkronkan dari lockfile.
+- Files without a hash (old locks) are treated as coming from an unknown source.
+- `kiln remove` only deletes files whose current hash matches the lockfile.
+- Files edited by the user are skipped; `--force` deletes them.
+- `kiln doctor` compares hashes and reports changed files.
+- `extensions.g.dart` is owned by Kiln and synced from the lockfile.

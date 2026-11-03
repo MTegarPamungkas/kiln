@@ -1,16 +1,16 @@
-# Kebijakan retry
+# Retry policy
 
-Default:
+Defaults:
 
-- Maksimal 3 percobaan.
-- Jeda awal 250 ms, batas 8 detik, jitter aktif.
-- Status yang diulang: 408, 429, 500, 502, 503, 504.
-- GET, HEAD, OPTIONS, PUT, dan DELETE dianggap idempoten.
-- POST/PATCH hanya diulang bila header `Idempotency-Key` ada.
-- Budget default 10 retry per menit per path.
+- At most 3 attempts.
+- Initial delay 250 ms, cap 8 seconds, jitter enabled.
+- Retried statuses: 408, 429, 500, 502, 503, 504.
+- GET, HEAD, OPTIONS, PUT, and DELETE are considered idempotent.
+- POST/PATCH are only retried when the `Idempotency-Key` header is present.
+- Default budget of 10 retries per minute per path.
 
-`Retry-After` mengalahkan backoff. Bila budget habis, respons/kegagalan
-dikembalikan tanpa retry.
+`Retry-After` takes precedence over backoff. When the budget runs out, the
+response/failure is returned without a retry.
 
-Atur lewat prompt saat `kiln add http_retry` atau edit
+Configure it through the prompt during `kiln add http_retry` or by editing
 `lib/extensions/http_retry/retry_settings.dart`.

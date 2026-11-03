@@ -1,22 +1,22 @@
-# Mengganti backend
+# Swapping the backend
 
-Target: kode fitur tidak berubah saat backend diganti.
+Goal: feature code does not change when the backend is swapped.
 
-## Prinsip
+## Principles
 
-- Fitur memakai kontrak `AuthRepository`, `RemoteDatabase`, dan `FileStorage`
-  dari `kiln_core`.
-- Backend (`appwrite`, `firebase`, `supabase`) adalah extension exclusive yang
-  menyediakan tiga kontrak tersebut.
-- Tidak ada impor tipe konkret backend di `features/`.
+- Features use the `AuthRepository`, `RemoteDatabase`, and `FileStorage`
+  contracts from `kiln_core`.
+- The backends (`appwrite`, `firebase`, `supabase`) are exclusive extensions
+  that provide those three contracts.
+- No concrete backend types are imported in `features/`.
 
-## Langkah (fase 2)
+## Steps (phase 2)
 
-1. Pastikan fitur membaca kontrak dari Registry.
-2. `kiln remove supabase` (file yang diedit akan dilaporkan).
-3. `kiln add appwrite` dan isi prompt endpoint/project/database/bucket.
-4. Jalankan `kiln doctor`, lalu test contract backend.
-5. Bandingkan `lib/extensions/`; kode fitur tetap sama.
+1. Make sure features read contracts from the Registry.
+2. `kiln remove supabase` (edited files will be reported).
+3. `kiln add appwrite` and fill in the endpoint/project/database/bucket prompts.
+4. Run `kiln doctor`, then the backend contract tests.
+5. Compare `lib/extensions/`; the feature code stays the same.
 
-`examples/backend_swap` akan menjadi bukti kedua varian saat extension backend
-tersedia.
+`examples/backend_swap` will become the proof of both variants once the backend
+extensions are available.

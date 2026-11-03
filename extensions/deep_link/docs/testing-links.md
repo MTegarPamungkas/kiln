@@ -1,10 +1,10 @@
-# Menguji tautan
+# Testing links
 
-Selalu uji dengan aplikasi yang sudah terpasang, bukan hanya dari kode test.
+Always test with an installed application, not only from test code.
 
 ## Android
 
-Scheme kustom:
+Custom scheme:
 
 ```bash
 adb shell am start -a android.intent.action.VIEW \
@@ -18,8 +18,8 @@ adb shell am start -a android.intent.action.VIEW \
   -d "https://kiln.dev/app/42" com.example.app
 ```
 
-Tanpa nama package, Android memilih aplikasi yang cocok; ini menguji intent
-filter sekaligus. Periksa verifikasi domain dengan:
+Without a package name, Android picks a matching application; this tests the
+intent filter as well. Check domain verification with:
 
 ```bash
 adb shell pm get-app-links com.example.app
@@ -34,15 +34,15 @@ xcrun simctl openurl booted "kiln://profile/42"
 xcrun simctl openurl booted "https://kiln.dev/app/42"
 ```
 
-Perangkat: kirim tautan lewat Notes atau Safari. Universal link tidak dapat
-diuji dengan `openurl` pada semua versi simulator; gunakan perangkat bila
-perilaku terasa tidak konsisten.
+Device: send the link through Notes or Safari. Universal links cannot be tested
+with `openurl` on every simulator version; use a device if the behavior feels
+inconsistent.
 
-## Yang perlu diperiksa
+## What to check
 
-- Tautan yang sama dua kali berurutan diabaikan (jendela deduplikasi).
-- Tautan dari host lain ditolak tanpa crash.
-- Path di luar `path_prefixes` ditolak.
-- Tautan yang tiba sebelum layar pertama siap tetap sampai ke router.
-- Meluncurkan aplikasi dari tautan hanya menavigasi sekali (`initialLink`).
-- Parameter `utm_*` hilang dari URI yang diterima listener.
+- The same link twice in a row is ignored (deduplication window).
+- Links from other hosts are rejected without a crash.
+- Paths outside `path_prefixes` are rejected.
+- Links that arrive before the first screen is ready still reach the router.
+- Launching the application from a link navigates only once (`initialLink`).
+- `utm_*` parameters are gone from the URI received by the listener.

@@ -5,8 +5,9 @@ final monitor = RegistryScope.read<NetworkMonitor>(context);
 final status = monitor.status;
 ```
 
-Status awal `unknown` sampai platform memberi jawaban. `OfflineBanner` tidak
-tampil selama status masih unknown agar tidak berkedip saat start.
+The initial status is `unknown` until the platform gives an answer.
+`OfflineBanner` is not shown while the status is still unknown so it does not
+flicker at startup.
 
-`OfflineGuardMiddleware` dipasang ke `http.interceptors` dengan priority 5 bila
-`http_pipeline` tersedia.
+`OfflineGuardMiddleware` is installed into `http.interceptors` with priority 5
+when `http_pipeline` is available.

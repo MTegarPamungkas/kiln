@@ -1,74 +1,78 @@
 # Roadmap
 
-## Fase 1 — Fondasi end-to-end (selesai)
+## Phase 1 — End-to-end foundation (done)
 
-- [x] Monorepo workspace, schema YAML, `.vscode`, root tooling.
-- [x] `kiln_core`: kontrak, error, Registry, module graph, bootstrap, slot,
-      sesi, consent, PII, clock, debouncer.
-- [x] `kiln_testing`: fake per kontrak, contract suite, harness widget.
-- [x] `kiln_extension_sdk`: manifest, validator, resolver, renderer Mason,
-      installer transaksional, patch native, migrasi.
+- [x] Monorepo workspace, YAML schemas, `.vscode`, root tooling.
+- [x] `kiln_core`: contracts, errors, Registry, module graph, bootstrap, slots,
+      session, consent, PII, clock, debouncer.
+- [x] `kiln_testing`: fakes per contract, contract suite, widget harness.
+- [x] `kiln_extension_sdk`: manifest, validator, resolver, Mason renderer,
+      transactional installer, native patches, migrations.
 - [x] `kiln_cli`: create, add, remove, list, doctor, graph, info, rollback,
       config, cache, store, completion, ext new/validate/test/pack.
-- [x] Brick `app_basic`, `extension_template`, dan extension `dio`.
-- [x] Bundle generator dan `--check` untuk CI.
-- [x] Bukti end-to-end: `kiln create` + `kiln add dio` + `flutter analyze` +
-      `flutter test` pada proyek hasil generate.
-- [x] Dokumentasi arsitektur, manifest, CLI, konsep, dan keputusan desain.
+- [x] Bricks `app_basic`, `extension_template`, and the `dio` extension.
+- [x] Bundle generator and `--check` for CI.
+- [x] End-to-end proof: `kiln create` + `kiln add dio` + `flutter analyze` +
+      `flutter test` on the generated project.
+- [x] Documentation for architecture, manifest, CLI, concepts, and design
+      decisions.
 
-## Fase 2 — Extension inti
+## Phase 2 — Core extensions
 
-- [x] State management: `bloc`, `riverpod` dengan wrapper `app.wrappers`,
-      session bridge, contoh counter, dan bootstrap test.
-- [x] Jaringan: `http_retry` dan `http_cache` dengan priority pipeline
-      (retry 20 sebelum cache 30), ETag, stale-while-revalidate, dan budget.
-- [x] Storage: `storage`, `secure_storage`, dan `local_db` (Sembast,
-      transaksi, watcher, backup, sync queue, migrasi, dan enkripsi opsional).
+- [x] State management: `bloc`, `riverpod` with the `app.wrappers` wrapper,
+      session bridge, counter example, and bootstrap test.
+- [x] Networking: `http_retry` and `http_cache` with pipeline priority
+      (retry 20 before cache 30), ETag, stale-while-revalidate, and budget.
+- [x] Storage: `storage`, `secure_storage`, and `local_db` (Sembast,
+      transactions, watchers, backup, sync queue, migrations, and optional
+      encryption).
 - [x] Auth/backend: `rest_auth`, `appwrite`, `firebase`, `supabase`,
-      `social_login`, `biometric` dengan gateway yang bisa di-fake, sesi,
-      remote database, file storage, app lock, dan test kontrak.
-- [x] Navigasi/UI: `go_router`, `deep_link`, `theme`, `l10n` dengan slot
-      route, guard sesi, pemetaan tautan/tap, token desain, dan locale hidup.
+      `social_login`, `biometric` with fakeable gateways, sessions, remote
+      databases, file storage, app lock, and contract tests.
+- [x] Navigation/UI: `go_router`, `deep_link`, `theme`, `l10n` with route slots,
+      session guards, link/tap mapping, design tokens, and live locale.
 - [x] Platform: `permission`, `connectivity`, `notifications`, `image_picker`
-      dengan gateway yang bisa di-fake, widget siap pakai, dan `e2e_platform`
-      yang lolos analyze, test, dan doctor.
-- [x] Tooling: `env`, `flavors`, `logger`, `analytics` dengan nilai
-      build-time, entry point per flavor, sink/redaksi, consent gate, dan PII.
-- [x] Setiap extension: README, CHANGELOG, docs, test manifest/render/analyze,
-      contract test bila punya kontrak.
+      with fakeable gateways, ready-to-use widgets, and `e2e_platform` that
+      passes analyze, test, and doctor.
+- [x] Tooling: `env`, `flavors`, `logger`, `analytics` with build-time values,
+      per-flavor entry points, sinks/redaction, consent gate, and PII.
+- [x] Every extension: README, CHANGELOG, docs, manifest/render/analyze tests,
+      and contract tests when it owns a contract.
 
-## Fase 3 — Registry dan distribusi
+## Phase 3 — Registry and distribution
 
-- [x] Implementasi `kiln_store`: registry client, version resolver, checksum,
+- [x] `kiln_store` implementation: registry client, version resolver, checksum,
       trust policy, archive pack/unpack, offline cache, publisher.
-- [x] Registry index, arsip versi, dan generator registry.
-- [x] `kiln store search/info/install`, upgrade multi-versi dengan migration
+- [x] Registry index, version archives, and registry generator.
+- [x] `kiln store search/info/install`, multi-version upgrade with a migration
       runner.
-- [x] `kiln ext publish` dan `kiln ext pack` versi registry.
-- [x] `kiln_lints` dengan lima rule dasar, berjalan di analyzer 8 sampai
-      `custom_lint_builder` mendukung analyzer 14.
+- [x] `kiln ext publish` and the registry version of `kiln ext pack`.
+- [x] `kiln_lints` with five base rules, running on analyzer 8 until
+      `custom_lint_builder` supports analyzer 14.
 
-## Fase 4 — Kualitas dan skala
+## Phase 4 — Quality and scale
 
-- [x] Workflow extension matrix, smoke nightly, drift check, docs build,
+- [x] Extension matrix workflow, nightly smoke, drift check, docs build,
       release publish.
-- [x] Golden render per extension dan analyze fixture bersama lewat
+- [x] Per-extension golden render and shared fixture analyze through
       `tool/verify_extensions.dart`.
 - [x] `examples/minimal`, `examples/full_stack`, `examples/backend_swap`,
       `examples/custom_extension`.
-- [x] Lint custom: no cross-extension import, prefer contract, no plugin in
+- [x] Custom lints: no cross-extension import, prefer contract, no plugin in
       features, no edit generated files, require failure handling.
 
-## Diparkir sampai ada keputusan
+## Parked until a decision is made
 
-- `crash_report`: vendor belum dipilih; gateway Sentry hanya contoh.
-- `codegen`: generator pilihan (`json_serializable`/`freezed`) belum final.
-- Model distribusi registry: Git URL, registry terpisah, atau keduanya.
+- `crash_report`: no vendor chosen yet; the Sentry gateway is only a sample.
+- `codegen`: the preferred generator (`json_serializable`/`freezed`) is not
+  final.
+- Registry distribution model: Git URL, separate registry, or both.
 
-## Keputusan yang sudah diambil
+## Decisions already made
 
-- Akses layanan lewat Registry; tidak ada fasad statis/global.
-- Kontrak melempar `Failure`; `Result<T>` adalah helper feature.
-- `http.interceptors` membawa `HttpMiddleware` dari `kiln_core`, bukan tipe dio.
-- Lockfile versi 2: peta path ke hash, patch, dan manual step.
-- Semua perubahan instalasi lewat transaksi dengan jurnal dan rollback.
+- Service access goes through the Registry; there is no static/global facade.
+- Contracts throw `Failure`; `Result<T>` is a feature helper.
+- `http.interceptors` carries `HttpMiddleware` from `kiln_core`, not dio types.
+- Lockfile version 2: maps paths to hashes, patches, and manual steps.
+- Every installation change goes through a transaction with a journal and
+  rollback.

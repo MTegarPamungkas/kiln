@@ -6,11 +6,10 @@ flutter run -t lib/main_staging.dart --dart-define-from-file=env/staging.json
 flutter run -t lib/main_production.dart --dart-define-from-file=env/production.json
 ```
 
-`runKilnApp(flavor)` mendaftarkan `AppFlavor` sebelum modul lain berjalan,
-sehingga logger, analytics, dan extension lain dapat membaca flavor saat
-register.
+`runKilnApp(flavor)` registers `AppFlavor` before other modules run, so the
+logger, analytics, and other extensions can read the flavor at register time.
 
-## Pemakaian
+## Usage
 
 ```dart
 final flavor = registry.read<AppFlavor>();
@@ -25,11 +24,11 @@ final apiUrl = flavor.valueFor<String>(
 
 ## Banner
 
-`FlavorBanner` menampilkan pita DEV atau STG di pojok kiri atas. Production
-tidak menampilkan pita. Module menambahkan banner lewat slot `app.wrappers`,
-jadi `app_shell.dart` tidak perlu diedit.
+`FlavorBanner` shows a DEV or STG ribbon in the top-left corner. Production
+shows no ribbon. The module adds the banner through the `app.wrappers` slot,
+so `app_shell.dart` does not need to be edited.
 
 ## Release guard
 
-Build release dengan flavor non-production dicatat sebagai warning melalui
-`AppLogger` bila extension logger terpasang.
+Release builds with a non-production flavor are recorded as a warning through
+`AppLogger` when the logger extension is installed.

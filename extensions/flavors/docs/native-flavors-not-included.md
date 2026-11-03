@@ -1,16 +1,16 @@
 # Native flavors not included
 
-Extension ini tidak membuat product flavor Android atau scheme/build
-configuration iOS. Yang dibuat hanya:
+This extension does not create Android product flavors or iOS schemes/build
+configurations. It only creates:
 
-- nilai `AppFlavor` di Dart,
-- entry point per flavor,
-- file env per flavor,
-- konfigurasi launch editor.
+- `AppFlavor` values in Dart,
+- an entry point per flavor,
+- an env file per flavor,
+- editor launch configurations.
 
-Alasannya, product flavor native menyentuh Gradle, Xcode project, dan signing
-yang berbeda per proyek. Kiln tidak menebak konfigurasi tersebut.
+The reason is that native product flavors touch Gradle, the Xcode project, and
+signing, which differ per project. Kiln does not guess those configurations.
 
-Bila aplikasi membutuhkan applicationId atau bundle id berbeda per flavor,
-tambahkan product flavor native secara manual, lalu gunakan `--flavor` pada
-perintah Flutter. Nilai `AppFlavor` tetap dapat dipakai untuk perilaku Dart.
+If the app needs a different applicationId or bundle id per flavor, add native
+product flavors manually, then use `--flavor` on the Flutter command. `AppFlavor`
+values can still be used for Dart behavior.

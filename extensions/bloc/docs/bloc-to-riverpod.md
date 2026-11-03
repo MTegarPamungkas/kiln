@@ -1,11 +1,11 @@
-# Migrasi Bloc ke Riverpod
+# Migrating Bloc to Riverpod
 
-Kedua extension state bersifat exclusive. Langkah umum:
+The two state extensions are mutually exclusive. The general steps:
 
-1. Pindahkan state per fitur ke provider/Notifier.
-2. Ganti `BlocBuilder` dengan `Consumer`/`ConsumerWidget`.
-3. Pertahankan kontrak dan Registry; hanya lapisan state yang berubah.
-4. Jalankan `kiln remove bloc` lalu `kiln add riverpod`.
+1. Move per-feature state into providers/Notifiers.
+2. Replace `BlocBuilder` with `Consumer`/`ConsumerWidget`.
+3. Keep the contracts and Registry; only the state layer changes.
+4. Run `kiln remove bloc` then `kiln add riverpod`.
 
-Karena perubahan menyentuh wrapper aplikasi dan test, lakukan di awal proyek
-atau saat ada waktu untuk menyesuaikan fitur.
+Because the change touches the application wrapper and tests, do it at the start
+of the project or when there is time to adjust the features.

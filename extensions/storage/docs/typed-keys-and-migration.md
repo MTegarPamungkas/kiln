@@ -1,4 +1,4 @@
-# Typed key dan migrasi
+# Typed keys and migration
 
 ```dart
 final notificationsEnabled = StorageKey<bool>(
@@ -9,5 +9,5 @@ final notificationsEnabled = StorageKey<bool>(
 );
 ```
 
-`StorageMigrator` menyimpan versi skema di key `schema_version` dan menjalankan
-langkah migrasi saat start. Tambahkan langkah baru tanpa menghapus langkah lama.
+`StorageMigrator` stores the schema version in the `schema_version` key and runs
+the migration steps at start. Add new steps without removing old ones.

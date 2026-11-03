@@ -1,55 +1,55 @@
-# Deep link dan routing
+# Deep links and routing
 
-## Alur
+## Flow
 
-1. Extension `deep_link` mendaftarkan implementasi `DeepLinks`.
-2. `GoRouterModule.ready` memanggil `AppRouter.start()`.
-3. `start()` membaca `DeepLinks` dan `Notifications` lewat `readOrNull`.
-4. Setiap tautan dipetakan menjadi lokasi, lalu `router.go` dipanggil bila
-   lokasinya berbeda dari lokasi saat ini.
+1. The `deep_link` extension registers a `DeepLinks` implementation.
+2. `GoRouterModule.ready` calls `AppRouter.start()`.
+3. `start()` reads `DeepLinks` and `Notifications` through `readOrNull`.
+4. Each link is mapped to a location, then `router.go` is called if the
+   location differs from the current location.
 
-Pembacaan dilakukan saat `ready`, bukan saat `register`, agar provider yang
-didaftarkan setelah modul navigasi tetap terdeteksi. Bila kontraknya tidak ada,
-integrasi dilewati tanpa error.
+The read happens at `ready`, not at `register`, so providers registered after
+the navigation module are still detected. If the contract is missing, the
+integration is skipped without an error.
 
 ## Deep link
 
-`DeepLinkRouteMapper` menerima URI dari `DeepLinks.initialLink` dan stream
-`DeepLinks.links`.
+`DeepLinkRouteMapper` accepts URIs from `DeepLinks.initialLink` and the
+`DeepLinks.links` stream.
 
-| Tautan | Lokasi |
+| Link | Location |
 | --- | --- |
 | `https://example.com/orders/42?tab=items` | `/orders/42?tab=items` |
 | `myapp://orders/42` | `/orders/42` |
 | `myapp:///orders/42` | `/orders/42` |
 | `myapp://explore?ref=email` | `/explore?ref=email` |
-| `mailto:halo@example.com` | diabaikan |
-| `https://example.com` | diabaikan |
+| `mailto:halo@example.com` | ignored |
+| `https://example.com` | ignored |
 
-Skema `mailto`, `tel`, `sms`, `file`, `javascript`, `data`, dan `about`
-diabaikan. Query dan fragment dipertahankan karena sering dipakai untuk
-pelacakan atau detail tambahan.
+The `mailto`, `tel`, `sms`, `file`, `javascript`, `data`, and `about` schemes
+are ignored. Query and fragment are preserved because they are often used for
+tracking or extra detail.
 
-Tautan awal diproses sebelum frame pertama. Tautan yang tiba saat aplikasi
-sudah berjalan diproses lewat stream. Tautan yang menunjuk lokasi yang sama
-tidak memicu navigasi ulang.
+The initial link is processed before the first frame. Links that arrive while
+the app is already running are processed through the stream. A link that points
+to the same location does not trigger navigation again.
 
-## Notifikasi
+## Notifications
 
-`NotificationRouteMapper` menerima `NotificationTap` dari stream
-`Notifications.taps`. Payload dapat berupa route biasa atau JSON:
+`NotificationRouteMapper` accepts a `NotificationTap` from the
+`Notifications.taps` stream. The payload can be a plain route or JSON:
 
 ```text
 /orders/42
 {"route":"/orders/42","orderId":42}
 ```
 
-Payload kosong, JSON rusak, nilai `route` yang bukan string, dan teks tanpa
-awalan `/` diabaikan. Extension ini tidak mengimpor extension notifications;
-ia hanya memakai kontrak `Notifications` dan `NotificationTap` dari
-`kiln_core`.
+Empty payloads, broken JSON, a `route` value that is not a string, and text
+without a leading `/` are ignored. This extension does not import the
+notifications extension; it only uses the `Notifications` and `NotificationTap`
+contracts from `kiln_core`.
 
-## Menguji tautan
+## Testing links
 
 ```dart
 final deepLinks = FakeDeepLinks(
@@ -59,18 +59,18 @@ final registry = createTestRegistry(deepLinks: deepLinks);
 final appRouter = AppRouter(registry: registry)..start();
 ```
 
-Gunakan `FakeDeepLinks.emit` dan `FakeNotifications.emitTap` untuk menguji
-tautan berikutnya. Periksa lokasi dengan:
+Use `FakeDeepLinks.emit` and `FakeNotifications.emitTap` to test subsequent
+links. Check the location with:
 
 ```dart
 appRouter.router.routerDelegate.currentConfiguration.uri.path
 ```
 
-## Batasan
+## Limitations
 
-- Hanya tautan yang sudah dikenal router yang ditampilkan; sisanya masuk ke
+- Only links already known to the router are displayed; the rest go to
   `NotFoundPage`.
-- Parameter path harus dideklarasikan pada `AppRoute.path`, misalnya
+- Path parameters must be declared on `AppRoute.path`, for example
   `/orders/:id`.
-- Deep link tidak melewati guard; redirect tetap berlaku, termasuk ke
-  `/sign-in` untuk pengunjung yang belum masuk.
+- Deep links do not bypass guards; redirects still apply, including to
+  `/sign-in` for visitors who are not signed in.

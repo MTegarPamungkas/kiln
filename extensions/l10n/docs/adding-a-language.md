@@ -1,12 +1,12 @@
-# Menambah bahasa
+# Adding a language
 
-Ikuti langkah berikut saat menambahkan bahasa baru, misalnya Prancis (`fr`).
+Follow these steps when adding a new language, for example French (`fr`).
 
-1. Salin `lib/l10n/app_en.arb` menjadi `lib/l10n/app_fr.arb`.
-2. Ganti `@@locale` menjadi `fr` dan terjemahkan semua nilai. Jangan mengubah
-   nama key atau metadata `@key`.
-3. Tambahkan `fr` ke prompt `locales` di `extension.yaml` bila bahasa itu
-   dipilih saat instalasi:
+1. Copy `lib/l10n/app_en.arb` to `lib/l10n/app_fr.arb`.
+2. Change `@@locale` to `fr` and translate every value. Do not change key names
+   or `@key` metadata.
+3. Add `fr` to the `locales` prompt in `extension.yaml` if that language is
+   selected at install time:
 
    ```yaml
    options:
@@ -15,30 +15,29 @@ Ikuti langkah berikut saat menambahkan bahasa baru, misalnya Prancis (`fr`).
      - fr
    ```
 
-4. Jalankan generator:
+4. Run the generator:
 
    ```bash
    flutter gen-l10n
    ```
 
-   `flutter pub get` juga menjalankan generator karena `flutter.generate` aktif.
+   `flutter pub get` also runs the generator because `flutter.generate` is
+   enabled.
 
-5. Tambahkan nama asli bahasa di peta `_languageNames` pada
-   `widgets/language_switcher.dart` bila belum ada.
-6. Jalankan test:
+5. Add the native language name to the `_languageNames` map in
+   `widgets/language_switcher.dart` if it is not there yet.
+6. Run the tests:
 
    ```bash
    flutter test test/extensions/l10n
    ```
 
-`l10n_coverage_test.dart` membandingkan key ARB antarbahasa. Metadata
-placeholder dan plural wajib ikut disalin agar gen-l10n menghasilkan signature
-yang sama.
+`l10n_coverage_test.dart` compares ARB keys across languages. Placeholder and
+plural metadata must be copied along so gen-l10n produces the same signature.
 
-## Catatan
+## Notes
 
-- Kode bahasa mengikuti BCP-47 (`id`, `en`, `pt`, `pt_BR`). Resolusi mencocokkan
-  bahasa lebih dulu, jadi `id_ID` memakai ARB `id`.
-- Jangan mengubah key yang sudah dipakai aplikasi. Tambahkan key baru ke semua
-  ARB.
-- Folder `lib/l10n/generated` adalah hasil generate; jangan diedit manual.
+- Language codes follow BCP-47 (`id`, `en`, `pt`, `pt_BR`). Resolution matches
+  the language first, so `id_ID` uses the `id` ARB.
+- Do not change keys that the app already uses. Add new keys to all ARB files.
+- The `lib/l10n/generated` folder is generated output; do not edit it manually.

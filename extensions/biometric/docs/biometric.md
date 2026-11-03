@@ -11,15 +11,15 @@ if (availability == BiometricAvailability.available) {
 
 ## Status
 
-| Status | Arti |
+| Status | Meaning |
 | --- | --- |
-| `available` | Perangkat punya hardware dan minimal satu biometrik terdaftar |
-| `notEnrolled` | Hardware ada, belum ada biometrik terdaftar |
-| `noHardware` | Perangkat tidak mendukung atau hardware tidak tersedia |
-| `unsupportedPlatform` | Web atau platform di luar Android, iOS, dan macOS |
+| `available` | The device has hardware and at least one enrolled biometric |
+| `notEnrolled` | Hardware is present, but no biometric is enrolled yet |
+| `noHardware` | The device does not support it or the hardware is unavailable |
+| `unsupportedPlatform` | Web or a platform other than Android, iOS, and macOS |
 
-`authenticate()` mengembalikan false bila user gagal tantangan, dan melempar
-`Failure` untuk pembatalan, lockout, atau hardware yang tidak siap.
+`authenticate()` returns false when the user fails the challenge, and throws a
+`Failure` for cancellation, lockout, or hardware that is not ready.
 
 ## Guard
 
@@ -30,11 +30,11 @@ await gate.guard(() async {
 });
 ```
 
-Guard mengautentikasi lebih dahulu, lalu mengizinkan aksi lain dalam masa
-tenggang tanpa dialog baru. `reset()` menghapus masa tenggang.
+The guard authenticates first, then allows other actions within the grace period
+without a new dialog. `reset()` clears the grace period.
 
-## Penyimpanan terlindungi
+## Protected storage
 
-`BiometricProtectedStorage` membungkus `SecureStorage` dan meminta autentikasi
-pada setiap `read`. Penulisan tidak memerlukan autentikasi agar logout dan
-pembersihan tetap bisa berjalan.
+`BiometricProtectedStorage` wraps `SecureStorage` and requires authentication on
+every `read`. Writes do not require authentication so logout and cleanup can
+still run.

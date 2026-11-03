@@ -1,20 +1,19 @@
-# Konfirmasi email dan redirect
+# Email confirmation and redirects
 
-Supabase mengirim user kembali ke aplikasi lewat dua bentuk tautan:
+Supabase sends the user back to the app through two link shapes:
 
-- `?code=...` untuk alur PKCE, misalnya login OAuth dan reset password.
-- `?token_hash=...&type=...` untuk konfirmasi email, invite, dan magic link.
+- `?code=...` for the PKCE flow, such as OAuth login and password reset.
+- `?token_hash=...&type=...` for email confirmation, invites, and magic links.
 
-`SupabaseLinkHandler` membaca keduanya dari kontrak `DeepLinks`, lalu memanggil
-`exchangeCodeForSession` atau `verifyOtp`. Bila extension `deep_link` tidak
-terpasang, handler tidak melakukan apa pun dan aplikasi harus menangani tautan
-sendiri.
+`SupabaseLinkHandler` reads both from the `DeepLinks` contract, then calls
+`exchangeCodeForSession` or `verifyOtp`. If the `deep_link` extension is not
+installed, the handler does nothing and the app must handle the links itself.
 
-## 1. Samakan scheme
+## 1. Match the scheme
 
-`SupabaseConfig.authRedirectUrl` bawaannya `kiln-auth://auth-callback` dan
-manifest extension mendaftarkan scheme `kiln-auth` untuk Android dan iOS.
-Konfigurasikan extension `deep_link` dengan scheme yang sama:
+`SupabaseConfig.authRedirectUrl` defaults to `kiln-auth://auth-callback` and the
+extension manifest registers the `kiln-auth` scheme for Android and iOS.
+Configure the `deep_link` extension with the same scheme:
 
 ```yaml
 # extension.yaml deep_link
@@ -23,58 +22,59 @@ prompts:
     default: kiln-auth
 ```
 
-Bila scheme diganti, ubah juga `authRedirectUrl` di `supabase_config.dart` dan
-daftarkan scheme itu pada manifest extension `deep_link`.
+If the scheme is changed, also change `authRedirectUrl` in
+`supabase_config.dart` and register that scheme in the `deep_link` extension
+manifest.
 
-## 2. Daftarkan URL di dashboard
+## 2. Register the URL in the dashboard
 
-Di **Authentication > URL configuration**:
+In **Authentication > URL configuration**:
 
-- **Site URL** diisi halaman aplikasi atau `kiln-auth://auth-callback`.
-- **Redirect URLs** tambahkan setiap redirect yang dipakai, misalnya
+- **Site URL** is filled with the app page or `kiln-auth://auth-callback`.
+- **Redirect URLs** adds every redirect in use, for example
   `kiln-auth://auth-callback`.
 
-Supabase menolak `redirectTo` yang tidak ada di daftar ini.
+Supabase rejects a `redirectTo` that is not in this list.
 
-## 3. Aktifkan konfirmasi email
+## 3. Enable email confirmation
 
-Di **Authentication > Providers > Email** aktifkan **Confirm email**. Setelah
-itu `signUp` mengembalikan sesi kosong dan extension melempar
-`Failure(auth.email_not_verified)`. User harus membuka tautan konfirmasi lebih
-dulu, kemudian `signIn` bisa dipakai.
+In **Authentication > Providers > Email** enable **Confirm email**. After that
+`signUp` returns an empty session and the extension throws
+`Failure(auth.email_not_verified)`. The user must open the confirmation link
+first, after which `signIn` can be used.
 
-## 4. Alur reset password
+## 4. Password reset flow
 
 ```dart
 final account = registry.read<AccountManagement>();
 await account.sendPasswordResetEmail('user@kiln.dev');
 ```
 
-Tautan dari email berisi `token_hash` dan `type=recovery`. Setelah handler
-menukarnya menjadi sesi, tampilkan layar ganti password. Kontrak
-`AccountManagement` tidak memuat ganti password, jadi pakai gateway Supabase
-yang didaftarkan modul:
+The link from the email contains `token_hash` and `type=recovery`. Once the
+handler exchanges it for a session, show a change password screen. The
+`AccountManagement` contract does not include change password, so use the
+Supabase gateway registered by the module:
 
 ```dart
 final gateway = registry.read<SupabaseGateway>();
-await gateway.updateUser(password: 'password-baru');
+await gateway.updateUser(password: 'new-password');
 ```
 
-Untuk OAuth, panggil `SocialAuth.signIn(SocialProvider.google)`. Extension
-membuka browser, menunggu sesi dari callback, dan mengembalikan `null` bila user
-membatalkan atau waktu tunggu habis.
+For OAuth, call `SocialAuth.signIn(SocialProvider.google)`. The extension opens
+the browser, waits for the session from the callback, and returns `null` if the
+user cancels or the wait times out.
 
-## 5. Mengamati kegagalan callback
+## 5. Observing callback failures
 
-Kegagalan yang tidak bisa dilempar ke pemanggil dikirim ke
+Failures that cannot be thrown to the caller are sent to
 `SupabaseLinkHandler.failures`:
 
 ```dart
 final handler = registry.read<SupabaseLinkHandler>();
 handler.failures.listen((failure) {
-  // failure.kind == FailureKind.authentication untuk error Supabase
+  // failure.kind == FailureKind.authentication for Supabase errors
 });
 ```
 
-Tautan tanpa parameter auth (misalnya tautan biasa ke halaman aplikasi)
-diabaikan, sehingga extension `deep_link` tetap bisa memakainya untuk navigasi.
+Links without auth parameters (for example ordinary links to an app page) are
+ignored, so the `deep_link` extension can still use them for navigation.

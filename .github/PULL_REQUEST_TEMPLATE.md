@@ -1,8 +1,8 @@
-## Ringkasan
+## Summary
 
-Jelaskan alasan perubahan dan hasil yang diharapkan.
+Explain the reason for the change and the expected result.
 
-## Cakupan
+## Scope
 
 - [ ] `kiln_core`
 - [ ] `kiln_extension_sdk`
@@ -13,9 +13,9 @@ Jelaskan alasan perubahan dan hasil yang diharapkan.
 
 ## Checklist
 
-- [ ] `dart analyze` bersih
-- [ ] Semua suite test lulus
-- [ ] `dart run tool/bundle.dart --check` lulus
-- [ ] Perilaku baru memiliki test
-- [ ] Tidak ada kode pengguna yang diedit diam-diam
-- [ ] Dokumentasi diperbarui bila perlu
+- [ ] `dart analyze` is clean
+- [ ] All test suites pass
+- [ ] `dart run tool/bundle.dart --check` passes
+- [ ] New behavior has tests
+- [ ] No user code was edited silently
+- [ ] Documentation was updated when needed

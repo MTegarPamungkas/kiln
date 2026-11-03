@@ -1,35 +1,35 @@
-# Navigasi
+# Navigation
 
-## Apa yang didaftarkan
+## What is registered
 
-`GoRouterModule` mendaftarkan tiga hal ke Registry:
+`GoRouterModule` registers three things in the Registry:
 
-| Tipe | Isi |
+| Type | Contents |
 | --- | --- |
-| `RouterConfig<Object>` | Instance `GoRouter` yang dibaca `AppShell` |
-| `AppRouter` | Pemilik router, observer, dan integrasi tautan |
-| `AppRouterConfig` | Lokasi awal, log diagnostik, error builder, observer tambahan |
+| `RouterConfig<Object>` | The `GoRouter` instance read by `AppShell` |
+| `AppRouter` | Owner of the router, observer, and link integration |
+| `AppRouterConfig` | Initial location, diagnostic logging, error builder, extra observers |
 
-Slot `router.routes` dibuka oleh modul. Item slot bertipe `AppRoute` dari
-`app_basic`, sehingga fitur tidak perlu bergantung pada `go_router`.
+The `router.routes` slot is opened by the module. Slot items are of type
+`AppRoute` from `app_basic`, so features do not need to depend on `go_router`.
 
-## Route bawaan
+## Default routes
 
-`AppRoutes` menyimpan path dan nama route milik extension:
+`AppRoutes` holds the extension's route paths and names:
 
-- `/` dengan nama `home`
-- `/explore` dengan nama `explore`
-- `/sign-in` dengan nama `signIn`
+- `/` with the name `home`
+- `/explore` with the name `explore`
+- `/sign-in` with the name `signIn`
 
-`/` dan `/explore` berada di dalam `ShellRoute` dengan `NavigationBar`.
-`/sign-in` berada di luar shell agar tidak menampilkan navigasi bawah.
+`/` and `/explore` live inside a `ShellRoute` with a `NavigationBar`.
+`/sign-in` lives outside the shell so it does not show the bottom navigation.
 
-Ganti isi `_HomeTab` dan `_ExploreTab` di `shell_scaffold.dart`, atau ganti
-seluruh `buildShellRoute()` dengan route aplikasi. Jika shell tidak dipakai,
-hapus pemanggilan `buildShellRoute()` dari `AppRouter` dan daftarkan route
-tab secara langsung.
+Replace the contents of `_HomeTab` and `_ExploreTab` in `shell_scaffold.dart`,
+or replace the whole `buildShellRoute()` with the app's routes. If the shell is
+not used, remove the `buildShellRoute()` call from `AppRouter` and register the
+tab routes directly.
 
-## Menambah route lewat slot
+## Adding routes through a slot
 
 ```dart
 registry
@@ -44,11 +44,10 @@ registry
     );
 ```
 
-`RouteSlot` mengubah setiap `AppRoute` menjadi `GoRoute` dengan path, nama, dan
-builder yang sama. Urutan item mengikuti prioritas slot, lalu urutan
-penambahan.
+`RouteSlot` turns each `AppRoute` into a `GoRoute` with the same path, name, and
+builder. Item order follows slot priority, then insertion order.
 
-Parameter path dapat dibaca dari `GoRouterState` di dalam builder:
+Path parameters can be read from `GoRouterState` inside the builder:
 
 ```dart
 AppRoute(
@@ -60,10 +59,9 @@ AppRoute(
 );
 ```
 
-## Navigasi
+## Navigation
 
-Di dalam widget yang berada di bawah `MaterialApp.router`, gunakan extension
-dari `go_router`:
+Inside a widget below `MaterialApp.router`, use the extension from `go_router`:
 
 ```dart
 context.go('/orders/42');
@@ -71,17 +69,17 @@ context.pushNamed('order', pathParameters: {'id': '42'});
 context.pop();
 ```
 
-Di luar widget tree, misalnya dari sebuah controller, gunakan
+Outside the widget tree, for example from a controller, use
 `registry.read<AppRouter>().router`.
 
-## Transisi
+## Transitions
 
-`buildRoutePage` di `route_transitions.dart` memilih transisi sesuai platform:
-slide untuk iOS dan macOS, fade dengan geser kecil untuk Android, dan fade
-untuk Windows serta Linux. Route bawaan `/sign-in` memakainya. Gunakan fungsi
-yang sama di `pageBuilder` untuk route yang membutuhkan animasi khusus.
+`buildRoutePage` in `route_transitions.dart` selects a transition per platform:
+slide for iOS and macOS, fade with a small slide for Android, and fade for
+Windows and Linux. The default `/sign-in` route uses it. Use the same function
+in `pageBuilder` for routes that need a custom animation.
 
-## Konfigurasi
+## Configuration
 
 ```dart
 final config = AppRouterConfig(
@@ -91,5 +89,5 @@ final config = AppRouterConfig(
 );
 ```
 
-Bila `errorBuilder` tidak diisi, `NotFoundPage` ditampilkan. Jangan aktifkan
-`debugLogDiagnostics` di build release.
+If `errorBuilder` is not set, `NotFoundPage` is displayed. Do not enable
+`debugLogDiagnostics` in release builds.

@@ -1,8 +1,8 @@
 # Demo extension
 
-Dokumentasi pemakaian extension `demo`.
+Usage documentation for the `demo` extension.
 
-## Kapabilitas
+## Capabilities
 
-Extension ini menyediakan `demo`. Kode aplikasi membaca kontrak dari
-`Registry`, lalu memakai layanan yang didaftarkan module.
+This extension provides `demo`. Application code reads the contract from
+`Registry`, then uses the service registered by the module.

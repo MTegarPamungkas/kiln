@@ -1,33 +1,34 @@
-# Model keamanan
+# Security model
 
-## Trust tier
+## Trust tiers
 
-- `official` — dipelihara tim Kiln.
-- `verified` — ditinjau, checksum dan manifest diverifikasi.
-- `community` — hook memerlukan persetujuan eksplisit.
+- `official` — maintained by the Kiln team.
+- `verified` — reviewed, checksum and manifest verified.
+- `community` — hooks require explicit approval.
 
-## Hook
+## Hooks
 
-Hook menjalankan kode di mesin pengguna. `HookPolicy` hanya mengizinkan tier
-`official`/`verified` atau persetujuan `--yes`. Pada fase fondasi, hooks tidak
-dieksekusi otomatis oleh installer; extension yang memilikinya dilaporkan.
+Hooks run code on the user's machine. `HookPolicy` only allows the
+`official`/`verified` tiers or approval via `--yes`. In the foundation phase,
+hooks are not executed automatically by the installer; extensions that have them
+are reported.
 
-## Checksum dan arsip
+## Checksums and archives
 
-`kiln_store` (fase registry) memverifikasi SHA-256 arsip sebelum memasang dan
-menolak path traversal saat mengekstrak. Registry index membawa versi, tier,
-requires, dan compatibility.
+`kiln_store` (registry phase) verifies an archive's SHA-256 before installing
+and rejects path traversal during extraction. The registry index carries the
+version, tier, requires, and compatibility.
 
-## Rahasia
+## Secrets
 
-- Prompt `secret` tidak ditulis ke `kiln.yaml`.
-- Nilai build-time dibaca lewat `String.fromEnvironment`.
-- Nilai `--dart-define` masih bisa diekstrak dari binary; jangan menyimpan
-  kunci server di aplikasi klien.
-- Logger, analytics, dan crash reporter memakai `PiiRedactor` dan
-  `ConsentController` dari `kiln_core`.
+- `secret` prompts are not written to `kiln.yaml`.
+- Build-time values are read through `String.fromEnvironment`.
+- `--dart-define` values can still be extracted from the binary; do not store
+  server keys in a client application.
+- The logger, analytics, and crash reporter use `PiiRedactor` and
+  `ConsentController` from `kiln_core`.
 
 ## Rollback
 
-Transaksi menyimpan snapshot sebelum mengubah file dan jurnal untuk rollback,
-sehingga kegagalan di tengah proses tidak meninggalkan proyek setengah jadi.
+A transaction stores a snapshot before changing files plus a journal for
+rollback, so a mid-process failure never leaves the project half-written.

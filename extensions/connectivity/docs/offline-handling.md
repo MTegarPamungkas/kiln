@@ -1,8 +1,9 @@
-# Penanganan offline
+# Offline handling
 
-Online di jaringan tidak selalu berarti server terjangkau. Gunakan
-`ReachabilityProbe` dengan URL ringan (misalnya `/health`) bila aplikasi perlu
-mengetahui keterjangkauan server.
+Being online on the network does not always mean the server is reachable. Use
+`ReachabilityProbe` with a lightweight URL (for example `/health`) when the
+application needs to know server reachability.
 
-Probe bersifat opsional: tanpanya, status hanya mengikuti konektivitas
-platform. `offline_guard` tetap mencegah request saat perangkat offline.
+The probe is optional: without it, the status only follows platform
+connectivity. `offline_guard` still prevents requests while the device is
+offline.

@@ -1,38 +1,38 @@
-# Privasi dan persetujuan
+# Privacy and consent
 
-## Kapan event dikirim
+## When events are sent
 
-Extension ini opt-in. `ConsentGateAnalytics` adalah lapisan terluar dan
-memeriksa `ConsentController.isGranted(ConsentCategory.analytics)` pada setiap
-panggilan `capture` dan `identify`. Selama izin belum diberikan:
+This extension is opt-in. `ConsentGateAnalytics` is the outermost layer and
+checks `ConsentController.isGranted(ConsentCategory.analytics)` on every
+`capture` and `identify` call. While permission has not been granted:
 
-- tidak ada panggilan ke SDK PostHog;
-- tidak ada scrubbing properti yang sia-sia;
-- tidak ada event atau identitas yang dikirim.
+- there are no calls to the PostHog SDK;
+- there is no wasted property scrubbing;
+- no events or identities are sent.
 
-Karena pemeriksaannya per panggilan, memberikan izin setelah aplikasi berjalan
-langsung mengaktifkan pengiriman tanpa membangun ulang module. Menarik izin
-juga langsung menghentikan event berikutnya.
+Because the check happens per call, granting permission after the application is
+running immediately enables sending without rebuilding the module. Withdrawing
+permission likewise stops the next events right away.
 
-`reset` selalu diteruskan ke SDK karena hanya menghapus identitas yang
-tersimpan di perangkat dan tidak mengirim event.
+`reset` is always forwarded to the SDK because it only removes the identity
+stored on the device and does not send an event.
 
-## Apa yang disamarkan
+## What is masked
 
-`PiiScrubbingAnalytics` memakai `PiiRedactor` sebelum data mencapai gateway:
+`PiiScrubbingAnalytics` uses `PiiRedactor` before data reaches the gateway:
 
-- properti event dan trait identitas diperiksa per kunci; kunci sensitif
-  seperti `password`, `token`, `authorization`, `email`, dan `phone` diganti
-  `[redacted]`;
-- teks di dalam nilai juga dibersihkan dari email, token Bearer, dan JWT;
-- map dan list diproses rekursif;
-- `userId` tidak diubah karena berfungsi sebagai identitas pseudonim untuk
-  menggabungkan event.
+- event properties and identity traits are checked per key; sensitive keys such
+  as `password`, `token`, `authorization`, `email`, and `phone` are replaced
+  with `[redacted]`;
+- text inside values is also cleaned of emails, Bearer tokens, and JWTs;
+- maps and lists are processed recursively;
+- `userId` is left unchanged because it serves as the pseudonymous identity used
+  to tie events together.
 
-Penyamaran adalah lapisan pertahanan terakhir, bukan izin untuk mengumpulkan
-PII. Jangan mengirim data pribadi yang tidak dibutuhkan produk.
+Masking is the last line of defense, not permission to collect PII. Do not send
+personal data the product does not need.
 
-## Menarik persetujuan
+## Withdrawing consent
 
 ```dart
 final consent = registry.read<ConsentController>();
@@ -40,6 +40,6 @@ consent.deny(ConsentCategory.analytics);
 await registry.read<Analytics>().reset();
 ```
 
-Setelah izin ditarik, panggilan analytics berikutnya tidak mengirim apa pun.
-Panggil `reset` bila aplikasi juga ingin membersihkan identitas yang sudah
-tersimpan pada SDK.
+After permission is withdrawn, subsequent analytics calls send nothing. Call
+`reset` if the application also wants to clear the identity already stored in
+the SDK.

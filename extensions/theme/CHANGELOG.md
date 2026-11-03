@@ -2,7 +2,7 @@
 
 ## 0.1.0
 
-- Tema merek terang dan gelap dari seed, font, radius, dan kepadatan.
-- Skema warna kontras tinggi, token desain, dan warna semantik.
-- Kontrol mode tema yang persisten lewat `Storage` opsional.
-- Widget pemilih mode Sistem, Terang, dan Gelap.
+- Light and dark brand themes from a seed, font, radius, and density.
+- High-contrast color schemes, design tokens, and semantic colors.
+- Persistent theme mode control through optional `Storage`.
+- System, Light, and Dark mode picker widget.

@@ -1,18 +1,19 @@
-# 0002 — Extension bergantung pada kapabilitas, bukan id
+# 0002 — Extensions depend on capabilities, not ids
 
-## Keputusan
+## Decision
 
-Manifest memakai `provides` dan `requires` berisi nama capability. Extension
-tidak mengimpor extension lain dan tidak menulis id extension lain.
+The manifest uses `provides` and `requires` containing capability names.
+Extensions do not import other extensions and do not write other extensions'
+ids.
 
-## Alasan
+## Rationale
 
-Id mengikat implementasi. Capability memungkinkan backend/transport diganti
-tanpa mengubah extension dependen.
+Ids bind implementations. Capabilities let a backend or transport be swapped
+without changing dependent extensions.
 
-## Konsekuensi
+## Consequences
 
-- Resolver memilih provider dan mendeteksi konflik.
-- Dua provider capability yang sama ditolak.
-- Slot menyediakan titik sambung untuk perilaku yang tidak bisa diekspresikan
-  sebagai capability.
+- The resolver picks providers and detects conflicts.
+- Two providers for the same capability are rejected.
+- Slots provide attachment points for behavior that cannot be expressed as a
+  capability.

@@ -1,36 +1,35 @@
-# Yang tidak boleh dicatat
+# What not to log
 
-Log sering ikut terkirim ke crash reporter, dibagikan lewat laporan bug, atau
-tersimpan di perangkat. Perlakukan setiap baris log sebagai data yang bisa
-dibaca orang lain.
+Logs are often sent to crash reporters, shared through bug reports, or stored on
+the device. Treat every log line as data that other people can read.
 
-## Jangan pernah dicatat
+## Never log
 
-- Kata sandi, PIN, OTP, dan jawaban pertanyaan keamanan.
-- Token akses, refresh token, API key, dan secret server.
-- Header `Authorization`, cookie sesi, dan header autentikasi lain.
-- Nomor kartu, CVV, rekening, dan data pembayaran.
-- Isi body permintaan atau respons yang memuat data pribadi.
-- Dokumen, foto, atau isi pesan pengguna.
+- Passwords, PINs, OTPs, and security question answers.
+- Access tokens, refresh tokens, API keys, and server secrets.
+- `Authorization` headers, session cookies, and other authentication headers.
+- Card numbers, CVVs, account numbers, and payment data.
+- Request or response bodies that contain personal data.
+- Documents, photos, or the contents of user messages.
 
-## Hati-hati
+## Be careful
 
-- Email, nomor telepon, NIK, dan alamat: pakai id internal bila memungkinkan.
-- URL: query sering memuat token; middleware membuang query sebelum mencatat.
-- Error dari server: pesan mentah bisa memuat payload. Catat kode dan status,
-  bukan isi respons.
-- Stack trace: berguna untuk reproduksi, tetapi jangan menambahkan nilai input
-  ke dalamnya.
+- Email, phone numbers, national ID numbers, and addresses: use an internal id
+  when possible.
+- URLs: queries often contain tokens; the middleware strips the query before
+  logging.
+- Server errors: raw messages can contain payloads. Log the code and status, not
+  the response body.
+- Stack traces: useful for reproduction, but do not add input values to them.
 
-## Perlindungan bawaan
+## Built-in protection
 
-- `RedactingSink` menyamarkan pesan, data, dan teks error dengan `PiiRedactor`
-  sebelum record mencapai sink.
-- `HttpLogMiddleware` menyamarkan header dan tidak pernah mencatat body.
-- `LogExporter` menyamarkan ulang saat menggabungkan laporan.
-- `BreadcrumbSink` hanya meneruskan warning dan error, dan menerima record yang
-  sudah disamarkan oleh pipeline.
+- `RedactingSink` redacts messages, data, and error text with `PiiRedactor`
+  before records reach a sink.
+- `HttpLogMiddleware` redacts headers and never logs bodies.
+- `LogExporter` redacts again when combining reports.
+- `BreadcrumbSink` only forwards warnings and errors, and receives records that
+  have already been redacted by the pipeline.
 
-Redaksi adalah lapisan pertahanan terakhir, bukan izin untuk mencatat rahasia.
-Bila sebuah nilai tidak diperlukan untuk mendiagnosis masalah, jangan masukkan
-ke `LogRecord.data`.
+Redaction is the last line of defense, not permission to log secrets. If a value
+is not needed to diagnose a problem, do not put it in `LogRecord.data`.

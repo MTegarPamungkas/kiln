@@ -1,7 +1,7 @@
 # Upload flow
 
-`PickedImage` dan `FileUpload` sama-sama tipe dari `kiln_core`, jadi extension
-ini tidak mengimpor backend apa pun.
+`PickedImage` and `FileUpload` are both types from `kiln_core`, so this
+extension does not import any backend.
 
 ```dart
 final picker = registry.read<MediaPicker>();
@@ -18,12 +18,13 @@ if (image != null) {
 }
 ```
 
-Alurnya:
+The flow:
 
-1. `pickImage` membaca byte dan mendeteksi MIME.
-2. `ImageValidator` menolak gambar yang tidak lolos aturan.
-3. `PickedImageUploadAdapter` mengirim `FileUpload` ke `FileStorage`.
-4. `FileStorage` mengembalikan `StoredFile` berisi path dan URL.
+1. `pickImage` reads the bytes and detects the MIME type.
+2. `ImageValidator` rejects images that do not pass the rules.
+3. `PickedImageUploadAdapter` sends a `FileUpload` to `FileStorage`.
+4. `FileStorage` returns a `StoredFile` containing the path and URL.
 
-Adapter membutuhkan byte. Di web byte selalu ada; di perangkat asli byte dibaca
-saat memilih sehingga unggahan tidak bergantung pada path sementara.
+The adapter needs bytes. On the web the bytes are always available; on native
+devices the bytes are read at pick time so the upload does not depend on a
+temporary path.

@@ -1,13 +1,13 @@
-# Token desain
+# Design tokens
 
-Token desain tersedia sebagai `ThemeExtension`, jadi nilainya ikut tema aktif
-dan dapat di-lerp saat `AnimatedTheme` berganti mode.
+Design tokens are available as `ThemeExtension`s, so their values follow the
+active theme and can be lerped when `AnimatedTheme` switches modes.
 
-## Spasi
+## Spacing
 
-`AppSpacing` berisi `xs`, `sm`, `md`, `lg`, `xl`, dan `xxl`. Skala
-`comfortable` bernilai 4, 8, 16, 24, 32, dan 48. Skala `compact` bernilai 3, 6,
-12, 18, 24, dan 36.
+`AppSpacing` contains `xs`, `sm`, `md`, `lg`, `xl`, and `xxl`. The `comfortable`
+scale has the values 4, 8, 16, 24, 32, and 48. The `compact` scale has the values
+3, 6, 12, 18, 24, and 36.
 
 ```dart
 final spacing = context.spacing;
@@ -26,10 +26,9 @@ Padding(
 
 ## Radius
 
-`AppRadius` menurunkan `sm`, `md`, `lg`, dan `xl` dari prompt
-`corner_radius`. Nilai `md` sama dengan radius dasar; `sm` adalah 0,6 kali,
-`lg` 1,4 kali, dan `xl` 2 kali radius dasar. `pill` dipakai untuk bentuk bulat
-penuh.
+`AppRadius` derives `sm`, `md`, `lg`, and `xl` from the `corner_radius` prompt.
+The `md` value equals the base radius; `sm` is 0.6 times, `lg` 1.4 times, and
+`xl` 2 times the base radius. `pill` is used for fully rounded shapes.
 
 ```dart
 final radius = context.radii;
@@ -40,14 +39,16 @@ Card(
 );
 ```
 
-Radius yang sama dipakai tema `AppBar`, tombol, input, `Card`, `Dialog`,
-`SnackBar`, dan `NavigationBar`, sehingga satu prompt menjaga konsistensi.
+The same radius is used by the `AppBar`, button, input, `Card`, `Dialog`,
+`SnackBar`, and `NavigationBar` themes, so a single prompt keeps everything
+consistent.
 
-## Warna semantik
+## Semantic colors
 
-`SemanticColors` menyediakan `success`, `warning`, dan `info` beserta pasangan
-`onSuccess`, `onWarning`, dan `onInfo`. Palet terang dan gelap dipilih otomatis
-dari brightness dan setiap pasangan memenuhi kontras WCAG AA.
+`SemanticColors` provides `success`, `warning`, and `info` along with their
+`onSuccess`, `onWarning`, and `onInfo` counterparts. The light and dark palettes
+are chosen automatically from the brightness, and every pair meets WCAG AA
+contrast.
 
 ```dart
 Container(
@@ -60,9 +61,9 @@ Container(
 );
 ```
 
-## Tipografi
+## Typography
 
-`AppTextStyles.build` menerapkan `fontFamily` dari prompt, warna teks dari
-skema, dan bobot yang konsisten: `display*` 800, `headline*` 700, `title*` dan
-`labelLarge` 600. Ukuran mengikuti skala Material 3 sehingga tetap terbaca
-pada layar kecil.
+`AppTextStyles.build` applies the `fontFamily` from the prompt, the text colors
+from the scheme, and consistent weights: `display*` 800, `headline*` 700,
+`title*` and `labelLarge` 600. The sizes follow the Material 3 scale so they stay
+readable on small screens.

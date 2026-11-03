@@ -1,14 +1,14 @@
-# Flavor dan environment
+# Flavors and environments
 
-Target akhir:
+End goal:
 
-- `flavors` menyediakan `AppFlavor` dan banner non-production lewat slot
-  `app.wrappers`.
-- `env` menyediakan `Env` bertipe dan file `env/*.example.json`.
-- Nilai asli disimpan di `env/<flavor>.json` dan di-ignore Git.
-- Jalankan dengan `--dart-define-from-file=env/<flavor>.json`.
+- `flavors` provides `AppFlavor` and a non-production banner through the
+  `app.wrappers` slot.
+- `env` provides a typed `Env` and `env/*.example.json` files.
+- Real values live in `env/<flavor>.json` and are ignored by Git.
+- Run with `--dart-define-from-file=env/<flavor>.json`.
 
-Contoh config:
+Example config:
 
 ```yaml
 extensions:
@@ -18,8 +18,8 @@ extensions:
       - {name: ENABLE_LOGGING, type: bool, required: false}
 ```
 
-Ingat: nilai `--dart-define` dapat diekstrak dari binary, jadi jangan menyimpan
-kunci server di aplikasi klien.
+Remember: `--dart-define` values can be extracted from the binary, so do not
+store server keys in a client application.
 
-Extension `flavors` dan `env` masuk fase tooling pada
+The `flavors` and `env` extensions land in the tooling phase of the
 [roadmap](../roadmap.md).

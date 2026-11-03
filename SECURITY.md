@@ -1,32 +1,32 @@
 # Security
 
-## Melaporkan kerentanan
+## Reporting vulnerabilities
 
-Jangan membuka issue publik untuk kerentanan. Hubungi maintainer repo secara
-privat dan sertakan:
+Do not open a public issue for a vulnerability. Contact the repository
+maintainers privately and include:
 
-- versi Kiln dan extension,
-- langkah reproduksi,
-- dampak dan permukaan serangan,
-- saran perbaikan bila ada.
+- the Kiln and extension versions,
+- reproduction steps,
+- impact and attack surface,
+- a suggested fix, if you have one.
 
-## Model kepercayaan
+## Trust model
 
-- Extension `official`/`verified` boleh memakai hook; tier komunitas memerlukan
-  persetujuan eksplisit.
-- `kiln_store` memverifikasi SHA-256 arsip dan menolak path traversal.
-- `kiln add` berjalan dalam transaksi dengan snapshot dan rollback.
-- File yang diedit pengguna tidak dihapus otomatis.
+- `official`/`verified` extensions may use hooks; the community tier requires
+  explicit approval.
+- `kiln_store` verifies the archive SHA-256 and rejects path traversal.
+- `kiln add` runs inside a transaction with a snapshot and rollback.
+- Files edited by the user are never deleted automatically.
 
-## Rahasia
+## Secrets
 
-- Prompt `secret` tidak ditulis ke `kiln.yaml`.
-- Jangan menyimpan kunci server di aplikasi klien. `--dart-define` dapat
-  diekstrak dari binary.
-- Logger, analytics, dan crash reporter memakai `PiiRedactor` dan
+- `secret` prompts are never written to `kiln.yaml`.
+- Never store server keys in a client app. `--dart-define` values can be
+  extracted from the binary.
+- Loggers, analytics, and crash reporters use `PiiRedactor` and
   `ConsentController`.
 
-## Dependency
+## Dependencies
 
-Ikuti `flutter pub outdated` dan review Dependabot. Jangan menambahkan
-dependency baru tanpa kebutuhan yang jelas.
+Follow `flutter pub outdated` and review Dependabot. Do not add a new
+dependency without a clear need.

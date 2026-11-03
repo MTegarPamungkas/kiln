@@ -1,6 +1,6 @@
 # Sinks
 
-Sink adalah tujuan akhir sebuah `LogRecord`. Kontraknya kecil:
+A sink is the final destination of a `LogRecord`. The contract is small:
 
 ```dart
 abstract interface class LogSink {
@@ -9,12 +9,12 @@ abstract interface class LogSink {
 }
 ```
 
-`SinkPipeline` mengirim setiap record ke semua sink secara berurutan. Sink yang
-melempar error, sinkron maupun asinkron, dilaporkan lewat `onFailure` dan tidak
-menghentikan sink berikutnya. Jangan mencatat kegagalan sink melalui pipeline
-yang sama; pakai writer fallback agar tidak terjadi rekursi.
+`SinkPipeline` sends every record to all sinks in order. A sink that throws an
+error, whether synchronous or asynchronous, is reported through `onFailure` and
+does not stop the next sink. Do not log sink failures through the same pipeline;
+use a fallback writer so that recursion does not occur.
 
-Sink kustom:
+Custom sink:
 
 ```dart
 final class HttpCollectorSink implements LogSink {
@@ -32,15 +32,15 @@ final class HttpCollectorSink implements LogSink {
   @override
   Future<void> flush() async {
     if (buffer.isEmpty) return;
-    // Kirim buffer ke backend, lalu kosongkan.
+    // Send the buffer to the backend, then clear it.
   }
 }
 ```
 
-## Urutan decorator
+## Decorator order
 
-Bungkus sink dalam `RedactingSink` sebelum sink tersebut menyimpan atau
-mengirim data pribadi. Urutan yang disarankan:
+Wrap a sink in `RedactingSink` before that sink stores or sends personal data.
+The recommended order:
 
 ```text
 PipelineLogger -> SinkPipeline -> RedactingSink -> MemoryLogSink
@@ -48,15 +48,15 @@ PipelineLogger -> SinkPipeline -> RedactingSink -> MemoryLogSink
                                               -> BreadcrumbSink
 ```
 
-Module sudah melakukan ini untuk semua sink bila `redactionEnabled` bernilai
-true. `LogExporter` menyamarkan ulang saat membaca, sehingga laporan tetap aman
-meski record lama berasal dari sink lain.
+The module already does this for all sinks when `redactionEnabled` is true.
+`LogExporter` redacts again when reading, so reports stay safe even if old
+records came from another sink.
 
-## Catatan implementasi
+## Implementation notes
 
-- Tulis record secara serial bila sink memiliki state, seperti berkas berputar.
-- `flush()` harus menunggu semua tulisan yang sudah diterima.
-- Jangan memblokir pemanggil `write()` dengan pekerjaan jaringan yang lama;
-  antrekan dan selesaikan di `flush()`.
-- `MemoryLogSink` memakai buffer cincin: kapasitas tetap dan record tertua
-  dibuang lebih dulu.
+- Write records serially when a sink has state, such as a rotating file.
+- `flush()` must wait for all writes that have already been accepted.
+- Do not block the caller of `write()` with long network work; queue it and
+  finish it in `flush()`.
+- `MemoryLogSink` uses a ring buffer: fixed capacity and the oldest records are
+  discarded first.

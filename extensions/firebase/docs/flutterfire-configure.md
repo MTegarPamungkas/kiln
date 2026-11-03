@@ -1,18 +1,18 @@
-# Langkah manual: flutterfire configure
+# Manual step: flutterfire configure
 
-Extension ini menandai `firebase_flutterfire_configure` sebagai langkah manual
-yang dilacak `kiln doctor`. Hook Mason hanya memberi peringatan; instalasi tetap
-selesai walaupun langkah ini belum dikerjakan.
+This extension marks `firebase_flutterfire_configure` as a manual step tracked by
+`kiln doctor`. The Mason hook only gives a warning; installation still completes
+even if this step has not been done.
 
-## Yang harus ada
+## What must be present
 
-- `flutterfire` CLI tersedia di `PATH`.
-- `lib/firebase_options.dart` berisi `DefaultFirebaseOptions.currentPlatform`.
-- File native hasil generate: `google-services.json` (Android),
-  `GoogleService-Info.plist` (iOS/macOS), dan konfigurasi web pada
+- The `flutterfire` CLI is available on `PATH`.
+- `lib/firebase_options.dart` contains `DefaultFirebaseOptions.currentPlatform`.
+- The generated native files: `google-services.json` (Android),
+  `GoogleService-Info.plist` (iOS/macOS), and the web configuration in
   `firebase_options.dart`.
 
-## Perintah
+## Command
 
 ```bash
 dart pub global activate flutterfire_cli
@@ -21,13 +21,13 @@ flutterfire configure \
   --platforms=android,ios,macos,web
 ```
 
-Jalankan ulang perintah tersebut setiap kali aplikasi Firebase baru
-didaftarkan. Commit `lib/firebase_options.dart`; file ini tidak memuat secret
-dan dibutuhkan oleh build CI.
+Re-run that command every time a new Firebase application is registered. Commit
+`lib/firebase_options.dart`; this file contains no secrets and is needed by the
+CI build.
 
-## Bila memakai options eksplisit
+## When using explicit options
 
-Ubah prompt `options_source` menjadi `explicit` saat memasang extension, lalu
-bangun `FirebaseOptions` dari konfigurasi build Anda sendiri dan teruskan ke
-`FirebaseModule(options: ...)`. Hook tidak lagi memeriksa
+Change the `options_source` prompt to `explicit` when installing the extension,
+then build `FirebaseOptions` from your own build configuration and pass it to
+`FirebaseModule(options: ...)`. The hook no longer checks
 `lib/firebase_options.dart`.

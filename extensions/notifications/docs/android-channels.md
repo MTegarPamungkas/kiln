@@ -1,8 +1,8 @@
 # Android channels
 
-Android 8.0 dan lebih baru mengelompokkan notifikasi ke channel. User dapat
-mengatur suara dan pentingnya per channel, jadi channel harus dibuat sekali
-dengan id yang stabil.
+Android 8.0 and later group notifications into channels. Users can set the
+sound and importance per channel, so a channel must be created once with a
+stable id.
 
 ```dart
 NotificationChannels(
@@ -10,21 +10,22 @@ NotificationChannels(
     const NotificationChannelSpec(
       id: 'orders',
       name: 'Pesanan',
-      description: 'Perubahan status pesanan',
+      description: 'Order status update',
       importance: NotificationImportance.high,
     ),
   ],
 );
 ```
 
-Aturannya:
+The rules:
 
-- Jangan mengganti id channel yang sudah dirilis; buat channel baru.
-- Importance channel tidak bisa dinaikkan setelah dibuat; user memegang
-  kendali terakhir.
-- Nama dan deskripsi channel terlihat di pengaturan sistem, jadi tulis dengan
-  bahasa user.
+- Do not change the id of a channel that has already been released; create a
+  new channel instead.
+- A channel's importance cannot be raised after it is created; the user holds
+  the final say.
+- Channel names and descriptions are visible in system settings, so write them
+  in the user's language.
 
-`flutter_local_notifications` membuat channel saat notifikasi pertama
-ditampilkan, tetapi extension ini juga membuat semua channel saat start agar
-channel kosong tetap muncul di pengaturan aplikasi.
+`flutter_local_notifications` creates a channel when a notification is first
+displayed, but this extension also creates all channels at start so that empty
+channels still appear in the app settings.

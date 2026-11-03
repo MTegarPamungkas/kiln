@@ -2,22 +2,22 @@
 
 ## Android
 
-- Extension menambahkan izin `USE_BIOMETRIC`.
-- Activity utama diganti menjadi `FlutterFragmentActivity`; plugin
-  `local_auth` membutuhkannya untuk menampilkan prompt.
-- Prompt bawaan memakai `BiometricPrompt` pada Android 9 ke atas dan
-  kompatibilitas AppCompat pada versi lebih lama.
+- The extension adds the `USE_BIOMETRIC` permission.
+- The main activity is replaced with `FlutterFragmentActivity`; the `local_auth`
+  plugin needs it to show the prompt.
+- The built-in prompt uses `BiometricPrompt` on Android 9 and above, and the
+  AppCompat compatibility layer on older versions.
 
-## iOS dan macOS
+## iOS and macOS
 
-- Extension menambahkan `NSFaceIDUsageDescription`.
-- Pengguna harus sudah mendaftarkan Face ID atau Touch ID di perangkat.
-- Simulator dapat melaporkan hardware tanpa enrollment; uji di perangkat
-  untuk alur penuh.
+- The extension adds `NSFaceIDUsageDescription`.
+- The user must already have Face ID or Touch ID enrolled on the device.
+- Simulators can report hardware without enrollment; test the full flow on a
+  device.
 
-## Web dan desktop
+## Web and desktop
 
-Extension ini tidak mendukung web. Status `unsupportedPlatform` dikembalikan,
-dan `authenticate()` melempar `Failure(unavailable)`. Windows dan Linux juga
-tidak termasuk platform extension ini walau `local_auth` punya implementasi
-eksperimental.
+This extension does not support web. The `unsupportedPlatform` status is
+returned, and `authenticate()` throws `Failure(unavailable)`. Windows and Linux
+are also not part of the platforms supported by this extension even though
+`local_auth` has an experimental implementation.

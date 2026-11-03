@@ -1,134 +1,135 @@
-# Aturan menulis ulang potongan folder-structure.md
+# Rules for rewriting sections of folder-structure.md
 
-## Konteks
+## Context
 
-Kiln adalah monorepo (CLI + SDK + `kiln_core`) yang meng-generate aplikasi
-Flutter lewat "extension" (manifest `extension.yaml` + Mason brick). Dokumen
-`folder-structure.md` adalah **cetak biru untuk membangun proyek Kiln dari
-nol**. Karena dibangun dari nol, tidak ada lagi pembeda "sudah ada" dan
-"baru": semua file dianggap akan dibuat.
+Kiln is a monorepo (CLI + SDK + `kiln_core`) that generates Flutter
+applications through "extensions" (an `extension.yaml` manifest + a Mason
+brick). The `folder-structure.md` document is the **blueprint for building a
+Kiln project from scratch**. Because it is built from scratch, there is no
+longer any difference between "already exists" and "new": every file is
+treated as one that will be created.
 
-Tugasmu: menulis ulang SATU potongan dokumen (baris tertentu dari
-`Test AI/kiln/docs/_wip/source.md`) supaya:
+Your task: rewrite ONE section of the document (a specific line range of
+`Test AI/kiln/docs/_wip/source.md`) so that:
 
-1. semua penanda "baru" hilang, dan
-2. **setiap file dan folder di pohon punya deskripsi singkat dan jelas.**
+1. every "new" marker is gone, and
+2. **every file and folder in the tree has a short, clear description.**
 
-Kamu bukan pemilik desain. Jangan menambah, menghapus, atau memindahkan file
-(kecuali penggantian nama di aturan 8). Tugasmu hanya redaksional.
+You do not own the design. Do not add, remove, or move files
+(except for the renames in rule 8). Your job is editorial only.
 
-## Cara kerja
+## How to work
 
-1. Baca `Test AI/kiln/docs/_wip/source.md` pada rentang baris yang diberikan
-   (read_file dengan start_line dan end_line). Baca juga kontrak di bagian
-   `kiln_core` dokumen itu (baris 245-316) bila perlu memahami istilah.
-2. Tulis hasilnya ke `Test AI/kiln/docs/_wip/part_<NN>.md` dengan write_file.
-   Bila hasilnya terlalu panjang untuk satu panggilan, pecah menjadi
-   `part_<NN>a.md`, `part_<NN>b.md`, dan seterusnya, tepat di batas antar
-   bagian (jangan memotong di tengah blok kode).
-3. Hasil berisi persis rentang yang ditugaskan: tidak ada kalimat
-   pengantar/penutup tambahan dan tidak ada pembungkus. Mulai dari baris
-   pertama rentang, akhiri di baris terakhirnya.
-4. Balas dengan pesan singkat: nama file yang ditulis, jumlah baris, dan hal
-   yang meragukan. Jangan menyalin isi hasil ke balasan.
+1. Read `Test AI/kiln/docs/_wip/source.md` over the line range you are given
+   (read_file with start_line and end_line). Also read the contracts in the
+   `kiln_core` part of that document (lines 245-316) if you need to understand the
+   terminology.
+2. Write the result to `Test AI/kiln/docs/_wip/part_<NN>.md` with write_file.
+   If the result is too long for a single call, split it into
+   `part_<NN>a.md`, `part_<NN>b.md`, and so on, exactly at the boundary between
+   sections (do not cut in the middle of a code block).
+3. The result contains exactly the assigned range: no extra
+   opening or closing sentences and no wrapper. Start at the first line of
+   the range, end at its last line.
+4. Reply with a short message: the file name you wrote, the line count, and anything
+   doubtful. Do not copy the result into the reply.
 
-## Aturan penulisan
+## Writing rules
 
-1. **Hapus penanda "baru"**: `# baru`, `# baru:` (pertahankan deskripsi
-   sesudah titik dua), `(baru)`, `# baru dalam folder ini`, `# baru, seluruh
-   folder`. Kata "baru" tidak boleh tersisa sebagai penanda status. Penanda
-   `# generate` diganti menjadi bagian deskripsi, mis. `generate dari ...,
-   jangan diedit`.
-2. **Setiap baris pohon wajib punya komentar.** Setiap baris yang memakai
-   `├─` atau `└─` harus berakhir dengan `# deskripsi`. Tidak boleh ada baris
-   file atau folder tanpa komentar (termasuk `lib/`, `test/`, `docs/`,
+1. **Remove the "new" markers**: `# new`, `# new:` (keep the description
+   after the colon), `(new)`, `# new in this folder`, `# new, seluruh
+   folder`. The word "new" must not remain as a status marker. The `# generate`
+   marker becomes part of the description, e.g. `generated from ..., do not edit`.
+2. **Every tree line must have a comment.** Every line that uses
+   `├─` or `└─` must end with `# description`. There must be no
+   file or folder line without a comment (including `lib/`, `test/`, `docs/`,
    `fixtures/`, `widgets/`, `hooks/`, `__brick__/`).
-3. **Satu file atau folder per baris.** Pecah baris yang memuat beberapa
-   entri. Contoh: `├─ a_test.dart, b_test.dart  # baru` menjadi dua baris
-   dengan deskripsi masing-masing. `├─ kiln.yaml, kiln.lock.yaml, pubspec.yaml`
-   menjadi tiga baris. `├─ fresh_app/, app_with_dio/` menjadi dua baris.
-   Cabang (`├─` dan `└─`) harus tetap benar: entri terakhir di sebuah folder
-   memakai `└─`, yang lain `├─`, dan garis vertikal `│` diteruskan dengan
-   benar untuk anak-anaknya.
-4. **Bentuk deskripsi**: bahasa Indonesia, satu klausa berisi 3 sampai 12
-   kata (maksimal sekitar 90 karakter), tanpa titik di akhir, menyatakan
-   *apa yang dikerjakan file itu*, bukan mengulang namanya.
-   - Buruk: `# helper cache`. Bagus: `# membuat kunci cache dari URL, query, dan header Vary`.
-   - File test: awali dengan `menguji ...` dan sebut perilaku utamanya.
-     Contoh: `# menguji bahwa kegagalan sementara diulang sesuai kebijakan`.
-   - `*_module.dart`: `mendaftarkan <apa> ke Registry`.
-   - `*_gateway.dart`: `membungkus <plugin> agar bisa di-fake di test`.
-   - `*_failure_mapper.dart`: `mengubah error <sumber> menjadi Failure`.
-   - `*_config.dart`: `konfigurasi bertipe: <isi utama>`.
-   - `*_contract_test.dart`: `menjalankan suite kontrak <nama> dari kiln_testing ke implementasi ini`.
-   - Folder: jelaskan isinya, mis. `# widget siap pakai untuk fitur ini`.
-   - Jangan memakai kata kosong seperti "helper", "util", "dll", atau
-     "berbagai" tanpa konteks.
-5. **Baris `extension.yaml`** memakai format `# manifest: ...` berisi field
-   penting yang sudah tertulis di komentar aslinya (provides, requires,
-   category, exclusive, slot atau contributes, prompts, platform). Ringkas,
-   maksimal sekitar 140 karakter. Buang `(baru)` di dalamnya.
-6. **Blok `test/` tingkat extension.** Setiap baris
+3. **One file or folder per line.** Split lines that carry several
+   entries. Example: `├─ a_test.dart, b_test.dart  # new` becomes two lines
+   with their own descriptions. `├─ kiln.yaml, kiln.lock.yaml, pubspec.yaml`
+   becomes three lines. `├─ fresh_app/, app_with_dio/` becomes two lines.
+   The branches (`├─` and `└─`) must stay correct: the last entry in a folder
+   uses `└─`, the others `├─`, and the vertical bar `│` is carried through
+   correctly for their children.
+4. **Description form**: one clause of 3 to 12 words (about 90 characters max),
+   with no trailing period, stating *what the file does*, not repeating its name.
+   - Bad: `# cache helper`. Good: `# builds a cache key from the URL, query, and Vary header`.
+   - Test files: start with `tests ...` and name the main behavior.
+     Example: `# tests that a transient failure is retried per the policy`.
+   - `*_module.dart`: `registers <what> with the Registry`.
+   - `*_gateway.dart`: `wraps <plugin> so it can be faked in tests`.
+   - `*_failure_mapper.dart`: `maps <source> errors to Failure`.
+   - `*_config.dart`: `typed configuration: <main contents>`.
+   - `*_contract_test.dart`: `runs the <name> contract suite from kiln_testing against this implementation`.
+   - Folders: describe what they contain, e.g. `# ready-made widgets for this feature`.
+   - Do not use filler words such as "helper", "util", "etc.", or
+     "various" without context.
+5. **The `extension.yaml` line** uses the `# manifest: ...` format and contains the
+   important fields already written in its original comment (provides, requires,
+   category, exclusive, slot or contributes, prompts, platform). Keep it short,
+   about 140 characters max. Drop `(new)` inside it.
+6. **The extension-level `test/` block.** Every line
    `├─ test/    # manifest_test, render_test, analyze_test, goldens/rendered/`
-   di pohon extension diganti persis dengan blok berikut (indentasi pohon
-   extension sama di semua extension):
+   in an extension tree is replaced with exactly the following block (the
+   extension tree indentation is the same in every extension):
 
    ```text
-   ├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-   │  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-   │  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-   │  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-   │  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
+   ├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+   │  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
+   │  ├─ render_test.dart                      # renders the brick to a temp folder, the result must match the golden
+   │  ├─ analyze_test.dart                     # the rendered result must pass dart analyze without warnings
+   │  └─ goldens/rendered/                     # reference render output for render_test, generated via kiln ext test --update-goldens
    ```
 
-   Hanya berlaku untuk pohon `extensions/<id>/`. Blok standar di bagian
-   "Konvensi" ditangani orang lain; jangan disentuh bila di luar rentangmu.
-7. **Struktur dipertahankan.** Urutan, hierarki, dan jumlah file sama dengan
-   sumber (setelah pemisahan baris pada aturan 3 dan penggantian nama pada
-   aturan 8). Judul, paragraf, tabel, dan diagram mermaid dipertahankan
-   apa adanya, kecuali kalimat yang membahas status "baru", "sudah ada",
-   "sebelumnya", "sekarang", "dipindah", atau "nama tidak diubah": tulis ulang
-   kalimat itu seolah proyek dibuat dari nol, atau hapus bila hanya
-   membicarakan perbandingan dengan kondisi lama.
-8. **Penamaan pemeta error disatukan** di seluruh dokumen:
-   - `firebase_failures.dart` menjadi `firebase_failure_mapper.dart`
-   - `supabase_failures.dart` menjadi `supabase_failure_mapper.dart`
-   - `social_failures.dart` menjadi `social_login_failure_mapper.dart`
-   - `analytics_failures.dart` menjadi `analytics_failure_mapper.dart`
-   - berkas test pasangannya ikut: `<nama>_failure_mapper_test.dart`.
-   Bila setelah penggantian ada dua entri bernama sama dalam satu folder,
-   gabungkan jadi satu entri. Hapus catatan seperti "pemeta error yang sudah
-   ada, namanya tidak diubah (lihat Keputusan desain)".
-9. **Hapus rujukan ke kondisi lama.** Contoh penulisan ulang:
-   - `typedef LogSink dipindah dari console_logger.dart bersama interface sink`
-     menjadi `kontrak sink dan typedef LogSink`
-   - `fasad Biometric yang sudah ada` menjadi
-     `fasad Biometric: canAuthenticate dan authenticate`
-   - `tabel kode dan pesan dipindah dari biometric.dart` menjadi
-     `tabel kode error plugin ke FailureCode beserta pesannya`
-   - `(brick ini sebelumnya tidak punya module)` dihapus
-   - `(sekarang lewat HttpPipeline.use)` menjadi `(ditempelkan ke HttpPipeline)`
-   - `dipindah dari src/` dihapus; tulis tujuan file saja.
-10. Dalam blok kode jangan memakai backtick. Istilah teknis tetap dalam
-    ejaan aslinya (Registry, Failure, Clock, Slot, AppLogger, dst).
-11. Format komentar: dua spasi atau lebih sebelum `#`, satu spasi sesudahnya.
-    Perataan kolom akan dirapikan otomatis nanti, tidak perlu manual.
+   This applies only to `extensions/<id>/` trees. The standard block in the
+   "Conventions" section is handled by someone else; do not touch it if it is outside
+   your range.
+7. **Structure is preserved.** The order, hierarchy, and number of files match the
+   source (after the line splitting in rule 3 and the renames in
+   rule 8). Headings, paragraphs, tables, and mermaid diagrams are preserved
+   as they are, except for sentences that discuss the status "new", "already present",
+   "previous", "now", "moved", or "name unchanged": rewrite
+   those sentences as if the project were built from scratch, or delete them if they only
+   talk about a comparison with the old condition.
+8. **Error mapper naming is unified** across the whole document:
+   - `firebase_failures.dart` becomes `firebase_failure_mapper.dart`
+   - `supabase_failures.dart` becomes `supabase_failure_mapper.dart`
+   - `social_failures.dart` becomes `social_login_failure_mapper.dart`
+   - `analytics_failures.dart` becomes `analytics_failure_mapper.dart`
+   - the matching test files follow: `<name>_failure_mapper_test.dart`.
+   If the replacement leaves two entries with the same name in one folder,
+   merge them into a single entry. Delete notes such as "the existing error
+   mapper, its name is not changed (see Design decisions)".
+9. **Remove references to the old condition.** Example rewrites:
+   - `typedef LogSink moved from console_logger.dart together with the sink interface`
+     becomes `sink contract and the LogSink typedef`
+   - `the existing Biometric facade` becomes
+     `Biometric facade: canAuthenticate and authenticate`
+   - `the code and message table moved from biometric.dart` becomes
+     `plugin error code to FailureCode table with their messages`
+   - `(this brick previously had no module)` is deleted
+   - `(now through HttpPipeline.use)` becomes `(attached to HttpPipeline)`
+   - `moved from src/` is deleted; write only the file's destination.
+10. Do not use backticks inside code blocks. Technical terms keep their
+    original spelling (Registry, Failure, Clock, Slot, AppLogger, etc.).
+11. Comment format: two or more spaces before `#`, one space after it.
+    Column alignment is tidied up automatically later, no need to do it by hand.
 
-## Kosakata kontrak (untuk menulis deskripsi test dan file)
+## Contract vocabulary (for writing test and file descriptions)
 
-`kiln_core` memuat: `Storage` (key-value), `SecureStorage`, `HttpClient`,
+`kiln_core` contains: `Storage` (key-value), `SecureStorage`, `HttpClient`,
 `HttpMiddleware`, `HttpPipeline`, `HttpCache`, `AuthRepository`, `SocialAuth`,
-`SocialLogin`, `AccountManagement` (reset password, verifikasi email, ubah
-profil), `LocalDatabase`, `RemoteDatabase`, `FileStorage`, `NetworkMonitor`,
+`SocialLogin`, `AccountManagement` (password reset, email verification, profile
+update), `LocalDatabase`, `RemoteDatabase`, `FileStorage`, `NetworkMonitor`,
 `Permissions`, `Notifications`, `DeepLinks`, `MediaPicker`, `Analytics`,
 `CrashReporter`, `AppLogger`, `Env`, `AppFlavor`, `Failure`, `FailureCode`,
 `Result<T>`, `Registry`, `KilnModule`, `SessionController`, `TokenProvider`,
 `ConsentController`, `PiiRedactor`, `Clock`, `Debouncer`, `OrderedSlot<T>`,
 `Lifecycle`, `KilnBootstrap`.
 
-Slot: `registry` (bawaan), `http.interceptors` (dibuka `dio`, item
-`HttpMiddleware`), `router.routes` (dibuka `go_router`, item `AppRoute`),
-`app.wrappers` (bawaan `app_basic`, item `AppWrapper`).
+Slots: `registry` (default), `http.interceptors` (opened by `dio`, items are
+`HttpMiddleware`), `router.routes` (opened by `go_router`, items are `AppRoute`),
+`app.wrappers` (default in `app_basic`, items are `AppWrapper`).
 
-`kiln_testing` memuat fake per kontrak, suite `*_contract.dart` per kontrak,
-dan harness test (`test_registry`, `pump_app`, matchers, async helpers).
+`kiln_testing` contains a fake per contract, a `*_contract.dart` suite per contract,
+and the test harnesses (`test_registry`, `pump_app`, matchers, async helpers).

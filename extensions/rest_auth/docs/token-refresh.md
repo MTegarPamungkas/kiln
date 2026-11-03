@@ -1,38 +1,39 @@
 # Token refresh
 
-## Kapan refresh
+## When to refresh
 
-`TokenRefresher` memakai dua sumber kedaluwarsa:
+`TokenRefresher` uses two sources of expiry:
 
-1. `expiresAt` dari respons login (dihitung dari `expires_in` atau `expiresAt`).
-2. `exp` JWT bila server tidak mengirim masa berlaku.
+1. `expiresAt` from the login response (computed from `expires_in` or
+   `expiresAt`).
+2. The JWT `exp` if the server does not send a validity period.
 
-Token dianggap perlu refresh bila tersisa kurang dari 30 detik (leeway
-`RestAuthConfig.refreshLeeway`).
+A token is considered to need a refresh when less than 30 seconds remain
+(leeway `RestAuthConfig.refreshLeeway`).
 
 ## Single-flight
 
-Semua pemanggil `accessToken()` yang menemukan token kedaluwarsa berbagi satu
-`Future` refresh. Server hanya menerima satu permintaan refresh walau sepuluh
-request HTTP berjalan bersamaan.
+All callers of `accessToken()` that find an expired token share a single refresh
+`Future`. The server receives only one refresh request even when ten HTTP
+requests are running concurrently.
 
 ```dart
 final token = await auth.tokenProvider.accessToken();
 ```
 
-## Setelah 401
+## After a 401
 
-`UnauthorizedHandler` melakukan:
+`UnauthorizedHandler` does the following:
 
-1. Memanggil `refreshAccessToken()`.
-2. Bila token baru ada, mengulang request sekali dengan Bearer baru.
-3. Bila refresh gagal atau request kedua tetap 401, memanggil `signOut()`.
+1. Calls `refreshAccessToken()`.
+2. If a new token exists, retries the request once with the new Bearer.
+3. If the refresh fails or the second request is still 401, calls `signOut()`.
 
-`signOut()` menghapus token dan menandai sesi berakhir, sehingga guard
-navigasi dapat mengarahkan user ke halaman masuk.
+`signOut()` deletes the tokens and marks the session as ended, so navigation
+guards can direct the user to the sign-in page.
 
-## Kegagalan
+## Failures
 
-Refresh yang gagal melempar `Failure` dari pemetaan status server. Jaringan
-putus tidak menghapus token; user bisa mencoba lagi saat online. Hanya
-`signOut` eksplisit yang menghapus seluruh token.
+A failed refresh throws a `Failure` mapped from the server status. A dropped
+connection does not delete the tokens; the user can try again when online. Only
+an explicit `signOut` deletes all tokens.

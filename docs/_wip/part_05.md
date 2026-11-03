@@ -1,219 +1,219 @@
-## Extension: state dan jaringan
+## Extensions: state and networking
 
-Lima extension ini membentuk fondasi aplikasi: satu adapter state management
-(eksklusif) dan tumpukan HTTP yang dirakit dari `dio`, `http_retry`, dan
-`http_cache` lewat slot `http.interceptors`.
+These five extensions form the foundation of an application: one state
+management adapter (exclusive) and an HTTP stack assembled from `dio`,
+`http_retry`, and `http_cache` through the `http.interceptors` slot.
 
 ### bloc
 
 ```text
-extensions/bloc/                            # extension state management berbasis Bloc dan Cubit
-├─ extension.yaml                           # manifest: category: state · exclusive · provides: state_bloc (riverpod ditolak lewat aturan exclusive)
-├─ README.md                                # panduan singkat pemasangan dan pemakaian extension bloc
-├─ CHANGELOG.md                             # riwayat perubahan extension bloc per versi
-├─ docs/                                    # dokumentasi pemakaian extension bloc
-│  ├─ state-with-bloc.md                    # panduan mengelola state aplikasi dengan Cubit dan Bloc
-│  └─ bloc-to-riverpod.md                   # panduan migrasi state dari bloc ke riverpod
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason yang di-render ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason dan daftar variabelnya
-   └─ __brick__/                            # isi template yang disalin ke aplikasi hasil generate
-      ├─ lib/                               # kode Dart yang disalin ke lib/ aplikasi
-      │  ├─ bootstrap.dart                  # menyiapkan Registry dan AppBlocObserver sebelum runApp
-      │  ├─ app/                            # komposisi tingkat aplikasi untuk state global
-      │  │  └─ bloc_providers.dart          # MultiBlocProvider untuk bloc global
-      │  ├─ core/bloc/                      # fondasi Bloc dan Cubit yang dipakai semua fitur
-      │  │  ├─ app_bloc_observer.dart       # log transisi dan error ke Logger, PII disamarkan
-      │  │  ├─ base_cubit.dart              # safeEmit (cek isClosed), runGuarded menjadi Failure
+extensions/bloc/                            # state management extension based on Bloc and Cubit
+├─ extension.yaml                           # manifest: category: state · exclusive · provides: state_bloc (riverpod is rejected by the exclusive rule)
+├─ README.md                                # short guide to installing and using the bloc extension
+├─ CHANGELOG.md                             # changelog of the bloc extension per version
+├─ docs/                                    # documentation on using the bloc extension
+│  ├─ state-with-bloc.md                    # guide to managing app state with Cubit and Bloc
+│  └─ bloc-to-riverpod.md                   # guide to migrating state from bloc to riverpod
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/                                   # Mason brick rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata and its list of variables
+   └─ __brick__/                            # template contents copied into the generated app
+      ├─ lib/                               # Dart code copied into the app lib/
+      │  ├─ bootstrap.dart                  # sets up the Registry and AppBlocObserver before runApp
+      │  ├─ app/                            # app-level composition for global state
+      │  │  └─ bloc_providers.dart          # MultiBlocProvider for global blocs
+      │  ├─ core/bloc/                      # Bloc and Cubit foundation shared by every feature
+      │  │  ├─ app_bloc_observer.dart       # logs transitions and errors to the Logger with PII redacted
+      │  │  ├─ base_cubit.dart              # safeEmit (checks isClosed), runGuarded becomes a Failure
       │  │  ├─ async_state.dart             # sealed: initial, loading, data, failure
       │  │  ├─ async_cubit.dart             # load, refresh, retry
       │  │  ├─ bloc_transformers.dart       # debounce, throttle, droppable, restartable
-      │  │  └─ session_cubit.dart           # membungkus SessionController dari kiln_core
-      │  └─ features/                       # fitur contoh yang memakai state Bloc
-      │     └─ counter/                     # fitur counter sebagai contoh pemakaian Cubit
-      │        ├─ counter_cubit.dart        # Cubit yang menyimpan nilai counter dan mengubahnya
-      │        └─ counter_page.dart         # halaman counter yang membaca CounterCubit lewat BlocBuilder
-      └─ test/                              # test yang ikut ter-generate ke aplikasi user
-         ├─ bootstrap_test.dart             # menguji bahwa bootstrap memasang observer Bloc dan menyiapkan Registry
-         ├─ counter_cubit_test.dart         # menguji bahwa CounterCubit mengubah state sesuai aksi
-         ├─ counter_page_test.dart          # menguji bahwa CounterPage menampilkan nilai counter dan bereaksi pada tombol
-         └─ core/bloc/                      # test untuk fondasi Bloc di core/bloc
-            ├─ app_bloc_observer_test.dart  # menguji bahwa observer mencatat transisi dan error dengan PII disamarkan
-            ├─ base_cubit_test.dart         # menguji bahwa safeEmit tidak emit saat isClosed dan runGuarded menjadi Failure
-            ├─ async_state_test.dart        # menguji varian sealed AsyncState: initial, loading, data, failure
-            ├─ async_cubit_test.dart        # menguji bahwa load, refresh, dan retry menghasilkan urutan state yang benar
-            ├─ bloc_transformers_test.dart  # menguji perilaku transformer debounce, throttle, droppable, dan restartable
-            └─ session_cubit_test.dart      # menguji bahwa SessionCubit meneruskan status SessionController
+      │  │  └─ session_cubit.dart           # wraps SessionController from kiln_core
+      │  └─ features/                       # sample feature that uses Bloc state
+      │     └─ counter/                     # counter feature as an example of Cubit usage
+      │        ├─ counter_cubit.dart        # Cubit that holds the counter value and changes it
+      │        └─ counter_page.dart         # counter page that reads CounterCubit through BlocBuilder
+      └─ test/                              # tests also generated into the user app
+         ├─ bootstrap_test.dart             # verifies that bootstrap installs the Bloc observer and sets up the Registry
+         ├─ counter_cubit_test.dart         # verifies that CounterCubit changes state in response to actions
+         ├─ counter_page_test.dart          # verifies that CounterPage shows the counter value and reacts to the buttons
+         └─ core/bloc/                      # tests for the Bloc foundation in core/bloc
+            ├─ app_bloc_observer_test.dart  # verifies that the observer records transitions and errors with PII redacted
+            ├─ base_cubit_test.dart         # verifies that safeEmit does not emit when isClosed and runGuarded becomes a Failure
+            ├─ async_state_test.dart        # verifies the sealed AsyncState variants: initial, loading, data, failure
+            ├─ async_cubit_test.dart        # verifies that load, refresh, and retry produce the correct state sequence
+            ├─ bloc_transformers_test.dart  # verifies the behavior of the debounce, throttle, droppable, and restartable transformers
+            └─ session_cubit_test.dart      # verifies that SessionCubit forwards the status of SessionController
 ```
 
 ### riverpod
 
 ```text
-extensions/riverpod/                        # extension state management berbasis Riverpod
-├─ extension.yaml                           # manifest: category: state · exclusive · provides: state_riverpod (bloc ditolak lewat aturan exclusive)
-├─ README.md                                # panduan singkat pemasangan dan pemakaian extension riverpod
-├─ CHANGELOG.md                             # riwayat perubahan extension riverpod per versi
-├─ docs/                                    # dokumentasi pemakaian extension riverpod
-│  ├─ state-with-riverpod.md                # panduan mengelola state aplikasi dengan provider dan Notifier
-│  └─ riverpod-to-bloc.md                   # panduan migrasi state dari riverpod ke bloc
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason yang di-render ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason dan daftar variabelnya
-   └─ __brick__/                            # isi template yang disalin ke aplikasi hasil generate
-      ├─ lib/                               # kode Dart yang disalin ke lib/ aplikasi
-      │  ├─ bootstrap.dart                  # menyiapkan Registry dan ProviderScope sebelum runApp
-      │  ├─ app/                            # komposisi tingkat aplikasi untuk state global
-      │  │  └─ provider_root.dart           # ProviderScope dengan override Registry
-      │  ├─ core/riverpod/                  # fondasi Riverpod yang dipakai semua fitur
-      │  │  ├─ kiln_providers.dart          # registryProvider dan kilnProvider<T>() untuk setiap kontrak
-      │  │  ├─ app_provider_observer.dart   # log error provider, PII disamarkan
-      │  │  ├─ async_value_x.dart           # ekstensi AsyncValue: guard menjadi Failure dan pemetaan when yang ringkas
-      │  │  ├─ provider_overrides.dart      # override siap pakai untuk test
-      │  │  └─ session_notifier.dart        # membungkus SessionController dari kiln_core
-      │  └─ features/                       # fitur contoh yang memakai state Riverpod
-      │     └─ counter/                     # fitur counter sebagai contoh pemakaian provider
-      │        ├─ counter_page.dart         # halaman counter yang membaca state dari provider
-      │        └─ counter_provider.dart     # provider yang menyimpan nilai counter dan mengubahnya
-      └─ test/                              # test yang ikut ter-generate ke aplikasi user
-         ├─ bootstrap_test.dart             # menguji bahwa bootstrap menyiapkan ProviderScope dengan Registry
-         ├─ counter_page_test.dart          # menguji bahwa CounterPage menampilkan nilai counter dan bereaksi pada tombol
-         ├─ counter_provider_test.dart      # menguji bahwa counter provider mengubah state sesuai aksi
-         └─ core/riverpod/                  # test untuk fondasi Riverpod di core/riverpod
-            ├─ kiln_providers_test.dart     # menguji bahwa registryProvider dan kilnProvider<T>() mengambil kontrak dari Registry
-            ├─ app_provider_observer_test.dart  # menguji bahwa observer mencatat error provider dengan PII disamarkan
-            ├─ async_value_x_test.dart      # menguji bahwa guard mengubah exception menjadi Failure dan when memetakan state
-            ├─ provider_overrides_test.dart  # menguji bahwa override test mengganti kontrak dengan fake
-            └─ session_notifier_test.dart   # menguji bahwa SessionNotifier meneruskan status SessionController
+extensions/riverpod/                        # state management extension based on Riverpod
+├─ extension.yaml                           # manifest: category: state · exclusive · provides: state_riverpod (bloc is rejected by the exclusive rule)
+├─ README.md                                # short guide to installing and using the riverpod extension
+├─ CHANGELOG.md                             # changelog of the riverpod extension per version
+├─ docs/                                    # documentation on using the riverpod extension
+│  ├─ state-with-riverpod.md                # guide to managing app state with providers and Notifier
+│  └─ riverpod-to-bloc.md                   # guide to migrating state from riverpod to bloc
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/                                   # Mason brick rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata and its list of variables
+   └─ __brick__/                            # template contents copied into the generated app
+      ├─ lib/                               # Dart code copied into the app lib/
+      │  ├─ bootstrap.dart                  # sets up the Registry and ProviderScope before runApp
+      │  ├─ app/                            # app-level composition for global state
+      │  │  └─ provider_root.dart           # ProviderScope with a Registry override
+      │  ├─ core/riverpod/                  # Riverpod foundation shared by every feature
+      │  │  ├─ kiln_providers.dart          # registryProvider and kilnProvider<T>() for every contract
+      │  │  ├─ app_provider_observer.dart   # logs provider errors with PII redacted
+      │  │  ├─ async_value_x.dart           # AsyncValue extension: guard becomes a Failure and concise when mapping
+      │  │  ├─ provider_overrides.dart      # ready-made overrides for tests
+      │  │  └─ session_notifier.dart        # wraps SessionController from kiln_core
+      │  └─ features/                       # sample feature that uses Riverpod state
+      │     └─ counter/                     # counter feature as an example of provider usage
+      │        ├─ counter_page.dart         # counter page that reads state from the provider
+      │        └─ counter_provider.dart     # provider that holds the counter value and changes it
+      └─ test/                              # tests also generated into the user app
+         ├─ bootstrap_test.dart             # verifies that bootstrap sets up the ProviderScope with the Registry
+         ├─ counter_page_test.dart          # verifies that CounterPage shows the counter value and reacts to the buttons
+         ├─ counter_provider_test.dart      # verifies that the counter provider changes state in response to actions
+         └─ core/riverpod/                  # tests for the Riverpod foundation in core/riverpod
+            ├─ kiln_providers_test.dart     # verifies that registryProvider and kilnProvider<T>() take contracts from the Registry
+            ├─ app_provider_observer_test.dart  # verifies that the observer records provider errors with PII redacted
+            ├─ async_value_x_test.dart      # verifies that guard turns exceptions into a Failure and when maps state
+            ├─ provider_overrides_test.dart  # verifies that test overrides replace contracts with fakes
+            └─ session_notifier_test.dart   # verifies that SessionNotifier forwards the status of SessionController
 ```
 
 ### dio
 
 ```text
-extensions/dio/                             # extension HTTP client berbasis dio dan pembuka slot interceptor
-├─ extension.yaml                           # manifest: provides: http_client, http_pipeline · membuka slot: http.interceptors · android: INTERNET · macos: network.client
-├─ README.md                                # panduan singkat pemasangan dan pemakaian extension dio
-├─ CHANGELOG.md                             # riwayat perubahan extension dio per versi
-├─ docs/                                    # dokumentasi pemakaian extension dio
-│  ├─ http-client.md                        # panduan membuat request dan menangani error lewat HttpClient
-│  └─ interceptors.md                       # cara extension lain menempel ke slot http.interceptors
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason yang di-render ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason dan variabel seperti base_url dan connect_timeout
-   ├─ hooks/                                # hook Mason yang jalan saat generate
-   │  ├─ pubspec.yaml                       # dependensi yang dibutuhkan skrip hook
-   │  └─ pre_gen.dart                       # memvalidasi base_url dan connect_timeout sebelum render
-   └─ __brick__/                            # isi template yang disalin ke aplikasi hasil generate
-      ├─ lib/extensions/dio/                # kode extension dio di aplikasi hasil generate
-      │  ├─ http.dart                       # fasad statis Http.get, post, put, patch, delete
-      │  ├─ dio_module.dart                 # mendaftarkan HttpClient dan HttpPipeline ke Registry
-      │  ├─ dio_client.dart                 # implementasi kontrak HttpClient di atas Dio dengan HttpPipeline
-      │  ├─ dio_config.dart                 # konfigurasi bertipe: base_url, timeout, header default
-      │  ├─ dio_failure_mapper.dart         # mengubah error DioException menjadi Failure (timeout, offline, 401, 5xx)
-      │  ├─ cancellation.dart               # membatalkan request saat widget dispose
-      │  ├─ multipart_helper.dart           # mengunggah file multipart dengan laporan progress
-      │  ├─ download_helper.dart            # mengunduh file dengan laporan progress
-      │  ├─ dio_test_adapter.dart           # adapter HTTP palsu agar test tidak memakai jaringan
-      │  └─ interceptors/                   # interceptor bawaan dan pintu masuk slot
-      │     ├─ interceptor_slot.dart        # pintu masuk contributes dari extension lain
-      │     ├─ request_id_interceptor.dart  # menambah header X-Request-Id untuk korelasi log
-      │     └─ user_agent_interceptor.dart  # menambah header User-Agent berisi versi app dan platform
-      └─ test/extensions/dio/               # test yang ikut ter-generate untuk extension dio
-         ├─ dio_client_test.dart            # menguji bahwa DioClient mengirim request dan mengembalikan Result
-         ├─ dio_module_test.dart            # menguji bahwa modul mendaftarkan HttpClient dan HttpPipeline ke Registry
-         ├─ dio_failure_mapper_test.dart    # menguji bahwa DioException dipetakan ke Failure (timeout, offline, 401, 5xx)
-         ├─ cancellation_test.dart          # menguji bahwa request dibatalkan saat widget dispose
-         ├─ multipart_helper_test.dart      # menguji bahwa unggah multipart mengirim file dan melaporkan progress
-         ├─ download_helper_test.dart       # menguji bahwa unduhan menulis file dan melaporkan progress
-         ├─ interceptor_slot_test.dart      # menguji bahwa kontribusi slot dipasang sesuai urutan priority
-         ├─ request_id_interceptor_test.dart  # menguji bahwa setiap request membawa header X-Request-Id
-         ├─ user_agent_interceptor_test.dart  # menguji bahwa header User-Agent memuat versi app dan platform
-         └─ http_client_contract_test.dart  # menjalankan suite kontrak HttpClient dari kiln_testing ke implementasi ini
+extensions/dio/                             # HTTP client extension based on dio that opens the interceptor slot
+├─ extension.yaml                           # manifest: provides: http_client, http_pipeline · opens slot: http.interceptors · android: INTERNET · macos: network.client
+├─ README.md                                # short guide to installing and using the dio extension
+├─ CHANGELOG.md                             # changelog of the dio extension per version
+├─ docs/                                    # documentation on using the dio extension
+│  ├─ http-client.md                        # guide to making requests and handling errors through HttpClient
+│  └─ interceptors.md                       # how other extensions attach to the http.interceptors slot
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/                                   # Mason brick rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata and variables such as base_url and connect_timeout
+   ├─ hooks/                                # Mason hooks that run during generation
+   │  ├─ pubspec.yaml                       # dependencies required by the hook scripts
+   │  └─ pre_gen.dart                       # validates base_url and connect_timeout before rendering
+   └─ __brick__/                            # template contents copied into the generated app
+      ├─ lib/extensions/dio/                # dio extension code in the generated app
+      │  ├─ http.dart                       # static Http facade: get, post, put, patch, delete
+      │  ├─ dio_module.dart                 # registers HttpClient and HttpPipeline in the Registry
+      │  ├─ dio_client.dart                 # HttpClient contract implementation on top of Dio with HttpPipeline
+      │  ├─ dio_config.dart                 # typed configuration: base_url, timeout, default headers
+      │  ├─ dio_failure_mapper.dart         # turns DioException errors into a Failure (timeout, offline, 401, 5xx)
+      │  ├─ cancellation.dart               # cancels the request when the widget is disposed
+      │  ├─ multipart_helper.dart           # uploads multipart files with progress reporting
+      │  ├─ download_helper.dart            # downloads files with progress reporting
+      │  ├─ dio_test_adapter.dart           # fake HTTP adapter so tests do not touch the network
+      │  └─ interceptors/                   # built-in interceptors and the slot entry point
+      │     ├─ interceptor_slot.dart        # entry point for contributes from other extensions
+      │     ├─ request_id_interceptor.dart  # adds the X-Request-Id header for log correlation
+      │     └─ user_agent_interceptor.dart  # adds a User-Agent header with the app version and platform
+      └─ test/extensions/dio/               # tests also generated for the dio extension
+         ├─ dio_client_test.dart            # verifies that DioClient sends requests and returns a Result
+         ├─ dio_module_test.dart            # verifies that the module registers HttpClient and HttpPipeline in the Registry
+         ├─ dio_failure_mapper_test.dart    # verifies that DioException is mapped to a Failure (timeout, offline, 401, 5xx)
+         ├─ cancellation_test.dart          # verifies that the request is cancelled when the widget is disposed
+         ├─ multipart_helper_test.dart      # verifies that multipart upload sends files and reports progress
+         ├─ download_helper_test.dart       # verifies that downloads write files and report progress
+         ├─ interceptor_slot_test.dart      # verifies that slot contributions are installed in priority order
+         ├─ request_id_interceptor_test.dart  # verifies that every request carries the X-Request-Id header
+         ├─ user_agent_interceptor_test.dart  # verifies that the User-Agent header contains the app version and platform
+         └─ http_client_contract_test.dart  # runs the HttpClient contract suite from kiln_testing against this implementation
 ```
 
 ### http_retry
 
 ```text
-extensions/http_retry/                      # extension retry otomatis untuk request HTTP yang gagal sementara
-├─ extension.yaml                           # manifest: requires: http_client, http_pipeline · contributes: http.interceptors, priority 20 (ditempelkan ke HttpPipeline)
-├─ README.md                                # panduan singkat pemasangan dan pemakaian extension http_retry
-├─ CHANGELOG.md                             # riwayat perubahan extension http_retry per versi
-├─ docs/                                    # dokumentasi pemakaian extension http_retry
-│  └─ retry-policy.md                       # panduan mengatur kebijakan retry, backoff, dan budget
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason yang di-render ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason dan daftar variabelnya
-   └─ __brick__/                            # isi template yang disalin ke aplikasi hasil generate
-      ├─ lib/extensions/http_retry/         # kode extension http_retry di aplikasi hasil generate
-      │  ├─ http_retry_module.dart          # mendaftarkan RetryMiddleware ke Registry dan HttpPipeline
-      │  ├─ retry_middleware.dart           # HttpMiddleware yang mengulang request gagal sesuai kebijakan
-      │  ├─ retry_policy.dart               # menentukan kegagalan mana yang layak diulang dan berapa kali
-      │  ├─ retry_settings.dart             # pengaturan bertipe: jumlah percobaan, jeda awal, dan batas backoff
-      │  ├─ backoff.dart                    # menghitung jeda eksponensial dengan jitter
-      │  ├─ retry_budget.dart               # membatasi total retry per jendela waktu, mencegah retry storm
-      │  ├─ retry_after_parser.dart         # membaca header Retry-After (detik atau tanggal HTTP)
-      │  ├─ idempotency.dart                # hanya mengulang method idempoten atau yang punya Idempotency-Key
-      │  └─ retry_events.dart               # memicu callback dan log pada tiap percobaan ulang
-      └─ test/extensions/http_retry/        # test yang ikut ter-generate untuk extension http_retry
-         ├─ http_retry_test.dart            # menguji bahwa kegagalan sementara diulang sesuai kebijakan
-         ├─ backoff_test.dart               # menguji bahwa jeda tumbuh eksponensial dan jitter tetap dalam batas
-         ├─ retry_budget_test.dart          # menguji bahwa retry berhenti saat budget jendela waktu habis
-         ├─ retry_after_parser_test.dart    # menguji bahwa Retry-After dalam detik maupun tanggal HTTP terbaca benar
-         └─ idempotency_test.dart           # menguji bahwa hanya method idempoten atau ber-Idempotency-Key yang diulang
+extensions/http_retry/                      # automatic retry extension for HTTP requests that fail temporarily
+├─ extension.yaml                           # manifest: requires: http_client, http_pipeline · contributes: http.interceptors, priority 20 (attached to HttpPipeline)
+├─ README.md                                # short guide to installing and using the http_retry extension
+├─ CHANGELOG.md                             # changelog of the http_retry extension per version
+├─ docs/                                    # documentation on using the http_retry extension
+│  └─ retry-policy.md                       # guide to configuring the retry policy, backoff, and budget
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/                                   # Mason brick rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata and its list of variables
+   └─ __brick__/                            # template contents copied into the generated app
+      ├─ lib/extensions/http_retry/         # http_retry extension code in the generated app
+      │  ├─ http_retry_module.dart          # registers RetryMiddleware in the Registry and the HttpPipeline
+      │  ├─ retry_middleware.dart           # HttpMiddleware that repeats failed requests according to the policy
+      │  ├─ retry_policy.dart               # decides which failures are worth retrying and how many times
+      │  ├─ retry_settings.dart             # typed settings: attempt count, initial delay, and backoff ceiling
+      │  ├─ backoff.dart                    # computes exponential delay with jitter
+      │  ├─ retry_budget.dart               # caps total retries per time window, preventing retry storms
+      │  ├─ retry_after_parser.dart         # parses the Retry-After header (seconds or an HTTP date)
+      │  ├─ idempotency.dart                # retries only idempotent methods or those with an Idempotency-Key
+      │  └─ retry_events.dart               # fires callbacks and logs on every retry attempt
+      └─ test/extensions/http_retry/        # tests also generated for the http_retry extension
+         ├─ http_retry_test.dart            # verifies that temporary failures are retried according to the policy
+         ├─ backoff_test.dart               # verifies that the delay grows exponentially and jitter stays within bounds
+         ├─ retry_budget_test.dart          # verifies that retries stop when the time-window budget is exhausted
+         ├─ retry_after_parser_test.dart    # verifies that Retry-After is parsed correctly both as seconds and as an HTTP date
+         └─ idempotency_test.dart           # verifies that only idempotent methods or those with an Idempotency-Key are retried
 ```
 
 ### http_cache
 
 ```text
-extensions/http_cache/                      # extension cache respons HTTP dengan penyimpanan opsional
-├─ extension.yaml                           # manifest: requires: http_client, http_pipeline · storage opsional (when: [storage]) · contributes: http.interceptors, priority 30
-├─ README.md                                # panduan singkat pemasangan dan pemakaian extension http_cache
-├─ CHANGELOG.md                             # riwayat perubahan extension http_cache per versi
-├─ docs/                                    # dokumentasi pemakaian extension http_cache
-│  └─ caching-strategies.md                 # panduan memilih strategi cache dan invalidasi
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason yang di-render ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason dan daftar variabelnya
-   └─ __brick__/                            # isi template yang disalin ke aplikasi hasil generate
-      ├─ lib/extensions/http_cache/         # kode extension http_cache di aplikasi hasil generate
-      │  ├─ http_cache_module.dart          # mendaftarkan HttpCache ke Registry dan interceptor ke HttpPipeline
-      │  ├─ cache_policy.dart               # menentukan respons mana yang boleh disimpan dan berapa lama
-      │  ├─ cache_settings.dart             # pengaturan bertipe: strategi cache, TTL, dan ukuran maksimum
-      │  ├─ memory_http_cache.dart          # implementasi HttpCache di memori proses
-      │  ├─ cache_store.dart                # interface penyimpanan entri cache yang dipakai implementasi HttpCache
-      │  ├─ storage_http_cache.dart         # HttpCache persisten lewat kontrak Storage
-      │  ├─ cache_interceptor.dart          # HttpMiddleware cache yang menempel ke slot http.interceptors
-      │  ├─ cache_key.dart                  # membuat kunci cache dari URL, query, dan header Vary
-      │  ├─ cache_control_parser.dart       # membaca Cache-Control: max-age, no-store, no-cache, stale-while-revalidate
-      │  ├─ etag_validator.dart             # memvalidasi ETag lewat If-None-Match dan respons 304
-      │  ├─ stale_while_revalidate.dart     # menyajikan cache lama lalu menyegarkan di latar belakang
-      │  └─ cache_invalidation.dart         # menghapus entri per prefix atau tag setelah request mutasi
-      └─ test/extensions/http_cache/        # test yang ikut ter-generate untuk extension http_cache
-         ├─ http_cache_test.dart            # menguji bahwa respons disajikan dari cache sesuai kebijakan
-         ├─ cache_key_test.dart             # menguji bahwa kunci cache memuat URL, query, dan header Vary
-         ├─ cache_control_parser_test.dart  # menguji bahwa direktif Cache-Control terbaca benar
-         ├─ etag_validator_test.dart        # menguji bahwa ETag memicu If-None-Match dan respons 304 memakai cache
-         ├─ stale_while_revalidate_test.dart  # menguji bahwa cache lama disajikan lalu disegarkan di latar belakang
-         ├─ cache_invalidation_test.dart    # menguji bahwa request mutasi menghapus entri per prefix atau tag
-         └─ storage_http_cache_test.dart    # menguji bahwa cache persisten menyimpan dan membaca entri lewat Storage
+extensions/http_cache/                      # HTTP response cache extension with optional storage
+├─ extension.yaml                           # manifest: requires: http_client, http_pipeline · optional storage (when: [storage]) · contributes: http.interceptors, priority 30
+├─ README.md                                # short guide to installing and using the http_cache extension
+├─ CHANGELOG.md                             # changelog of the http_cache extension per version
+├─ docs/                                    # documentation on using the http_cache extension
+│  └─ caching-strategies.md                 # guide to choosing a cache strategy and invalidation
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # verifies that extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick into a temp folder, the output must match the golden
+│  ├─ analyze_test.dart                     # the rendered output must pass dart analyze with no warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, produced by kiln ext test --update-goldens
+└─ brick/                                   # Mason brick rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata and its list of variables
+   └─ __brick__/                            # template contents copied into the generated app
+      ├─ lib/extensions/http_cache/         # http_cache extension code in the generated app
+      │  ├─ http_cache_module.dart          # registers HttpCache in the Registry and the interceptor in the HttpPipeline
+      │  ├─ cache_policy.dart               # decides which responses may be stored and for how long
+      │  ├─ cache_settings.dart             # typed settings: cache strategy, TTL, and maximum size
+      │  ├─ memory_http_cache.dart          # HttpCache implementation in process memory
+      │  ├─ cache_store.dart                # cache entry store interface used by the HttpCache implementations
+      │  ├─ storage_http_cache.dart         # persistent HttpCache through the Storage contract
+      │  ├─ cache_interceptor.dart          # cache HttpMiddleware attached to the http.interceptors slot
+      │  ├─ cache_key.dart                  # builds the cache key from the URL, query, and Vary header
+      │  ├─ cache_control_parser.dart       # parses Cache-Control: max-age, no-store, no-cache, stale-while-revalidate
+      │  ├─ etag_validator.dart             # revalidates the ETag through If-None-Match and 304 responses
+      │  ├─ stale_while_revalidate.dart     # serves the stale entry then refreshes it in the background
+      │  └─ cache_invalidation.dart         # drops entries by prefix or tag after a mutation request
+      └─ test/extensions/http_cache/        # tests also generated for the http_cache extension
+         ├─ http_cache_test.dart            # verifies that responses are served from the cache according to the policy
+         ├─ cache_key_test.dart             # verifies that the cache key contains the URL, query, and Vary header
+         ├─ cache_control_parser_test.dart  # verifies that Cache-Control directives are parsed correctly
+         ├─ etag_validator_test.dart        # verifies that the ETag triggers If-None-Match and a 304 response uses the cache
+         ├─ stale_while_revalidate_test.dart  # verifies that the stale entry is served then refreshed in the background
+         ├─ cache_invalidation_test.dart    # verifies that a mutation request drops entries by prefix or tag
+         └─ storage_http_cache_test.dart    # verifies that the persistent cache stores and reads entries through Storage
 ```
 

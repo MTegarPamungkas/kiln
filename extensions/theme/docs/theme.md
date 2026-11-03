@@ -1,27 +1,27 @@
 # Theme
 
-Extension ini mendaftarkan `AppThemeConfig` bertipe ke Registry, sehingga
-`AppShell` memakai `BrandTheme` alih-alih tema bawaan. `AppThemeConfig`
-menyimpan `ThemeData` terang dan gelap serta `modeListenable`; saat controller
-mengubah mode, `AppShell` membangun ulang `MaterialApp` tanpa restart.
+This extension registers a typed `AppThemeConfig` in the Registry, so `AppShell`
+uses `BrandTheme` instead of the default theme. `AppThemeConfig` holds the light
+and dark `ThemeData` plus `modeListenable`; when the controller changes the mode,
+`AppShell` rebuilds `MaterialApp` without a restart.
 
-## Prompt
+## Prompts
 
-| Prompt | Arti | Bawaan |
+| Prompt | Meaning | Default |
 | --- | --- | --- |
-| `seed_color` | Warna seed Material, `#RRGGBB` atau `#AARRGGBB` | `#0F766E` |
-| `font_family` | Font untuk skala teks; kosong memakai font platform | kosong |
-| `corner_radius` | Radius dasar komponen dalam piksel logis | `14` |
-| `density` | `comfortable` atau `compact` | `comfortable` |
+| `seed_color` | Material seed color, `#RRGGBB` or `#AARRGGBB` | `#0F766E` |
+| `font_family` | Font for the text scale; empty uses the platform font | empty |
+| `corner_radius` | Base component radius in logical pixels | `14` |
+| `density` | `comfortable` or `compact` | `comfortable` |
 
-Nilai prompt dirender ke `ThemeConfig.defaults`. Warna yang tidak valid jatuh
-kembali ke teal Kiln agar aplikasi tetap bisa dibangun.
+The prompt values are rendered to `ThemeConfig.defaults`. An invalid color falls
+back to Kiln teal so the app can still be built.
 
-## Mode terang dan gelap
+## Light and dark mode
 
-`ThemeModeController` memiliki `ValueNotifier<ThemeMode>` yang diekspos sebagai
-`modeListenable`. Modul mendaftarkan controller, lalu memanggil `load()` pada
-tahap `ready` untuk memulihkan pilihan terakhir.
+`ThemeModeController` owns a `ValueNotifier<ThemeMode>` that is exposed as
+`modeListenable`. The module registers the controller, then calls `load()` during
+the `ready` stage to restore the last choice.
 
 ```dart
 final controller = registry.read<ThemeModeController>();
@@ -29,30 +29,30 @@ final controller = registry.read<ThemeModeController>();
 await controller.setMode(ThemeMode.light);
 ```
 
-Bila extension `storage` terpasang, `ThemeModeStore` menulis kunci `theme.mode`
-lewat `Storage`. Tanpa storage, penyimpanan dilewati dan pergantian mode tetap
-bekerja selama proses aplikasi berjalan.
+If the `storage` extension is installed, `ThemeModeStore` writes the
+`theme.mode` key through `Storage`. Without storage, persistence is skipped and
+mode switching still works while the app process is running.
 
-`ThemeModeSwitcher` siap dipasang di halaman pengaturan:
+`ThemeModeSwitcher` is ready to be placed on a settings page:
 
 ```dart
 ThemeModeSwitcher(controller: controller)
 ```
 
-## Kontras tinggi
+## High contrast
 
-`ColorSchemes` menyediakan `lightHighContrast` dan `darkHighContrast` dengan
-`contrastLevel: 1`. `BrandTheme.lightHighContrast` dan
-`BrandTheme.darkHighContrast` memakai skema tersebut bila aplikasi perlu
-menyediakan opsi aksesibilitas.
+`ColorSchemes` provides `lightHighContrast` and `darkHighContrast` with
+`contrastLevel: 1`. `BrandTheme.lightHighContrast` and
+`BrandTheme.darkHighContrast` use those schemes if the app needs to offer an
+accessibility option.
 
 ## Status bar
 
-`SystemUiStyle.fromTheme(theme)` menghasilkan gaya status bar dan navigation
-bar sesuai brightness. Panggil `SystemUiStyle.apply(theme)` dari widget root
-bila aplikasi mengelola system UI sendiri.
+`SystemUiStyle.fromTheme(theme)` produces a status bar and navigation bar style
+that matches the brightness. Call `SystemUiStyle.apply(theme)` from the root
+widget if the app manages system UI itself.
 
-## Daftar isi
+## Table of contents
 
-- [Token desain](design-tokens.md)
+- [Design tokens](design-tokens.md)
 - [Rebranding](rebranding.md)

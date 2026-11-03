@@ -1,7 +1,7 @@
 # Notifications
 
-`Notifications` menampilkan, menjadwalkan, dan membatalkan notifikasi lokal.
-Kontraknya ada di `kiln_core`; extension ini menyediakan implementasinya.
+`Notifications` displays, schedules, and cancels local notifications. The
+contract lives in `kiln_core`; this extension provides the implementation.
 
 ```dart
 final notifications = registry.read<Notifications>();
@@ -11,25 +11,25 @@ await notifications.show(
   const NotificationMessage(
     id: 1,
     title: 'Pesanan siap',
-    body: 'Pesanan #42 bisa diambil',
+    body: 'Order #42 is ready for pickup',
     payload: '{"route":"/orders/42"}',
   ),
 );
 ```
 
-## Izin
+## Permission
 
-`requestPermission()` memakai kontrak `Permissions` bila extension `permission`
-terpasang. Bila tidak, ia memanggil plugin langsung. Di iOS dan macOS, izin
-tidak diminta saat start; panggil `requestPermission()` pada momen yang tepat,
-misalnya setelah user menekan tombol pengingat.
+`requestPermission()` uses the `Permissions` contract when the `permission`
+extension is installed. If not, it calls the plugin directly. On iOS and macOS,
+permission is not requested at start; call `requestPermission()` at the right
+moment, for example after the user presses a reminder button.
 
 ## Tap
 
-`taps` mengirim `NotificationTap` untuk tap foreground, tap aksi latar
-belakang, dan payload yang meluncurkan aplikasi. Baca payload dengan
-`NotificationPayload.tryDecode(tap.payload)` lalu teruskan route-nya ke
-navigasi.
+`taps` emits a `NotificationTap` for foreground taps, background action taps,
+and the payload that launched the app. Read the payload with
+`NotificationPayload.tryDecode(tap.payload)` and then pass its route to
+navigation.
 
 ```dart
 final subscription = notifications.taps.listen((tap) {
@@ -40,13 +40,13 @@ final subscription = notifications.taps.listen((tap) {
 });
 ```
 
-## Channel
+## Channels
 
-Channel android didefinisikan di `NotificationChannels`. Tambahkan channel baru
-di sana, lalu tampilkan notifikasi dengan `channelId`. Lihat
+Android channels are defined in `NotificationChannels`. Add new channels there,
+then show notifications with `channelId`. See
 [android-channels.md](android-channels.md).
 
-## Penjadwalan
+## Scheduling
 
-Gunakan `ReminderScheduler` agar jadwal yang sama tidak dibuat berulang setiap
-start. Lihat [scheduling-and-timezones.md](scheduling-and-timezones.md).
+Use `ReminderScheduler` so the same schedule is not created repeatedly on every
+start. See [scheduling-and-timezones.md](scheduling-and-timezones.md).

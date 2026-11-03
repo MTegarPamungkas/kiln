@@ -1,12 +1,12 @@
 # Universal links
 
-Universal link memakai `https` dan memerlukan verifikasi di sisi domain.
-Extension ini hanya menerima host yang tercantum di `hosts` dan, bila diisi,
-path yang cocok dengan `path_prefixes`.
+Universal links use `https` and require verification on the domain side. This
+extension only accepts hosts listed in `hosts` and, when set, paths that match
+`path_prefixes`.
 
 ## Android: assetlinks.json
 
-Publish file berikut di `https://<host>/.well-known/assetlinks.json`:
+Publish the following file at `https://<host>/.well-known/assetlinks.json`:
 
 ```json
 [
@@ -23,8 +23,9 @@ Publish file berikut di `https://<host>/.well-known/assetlinks.json`:
 ]
 ```
 
-Ganti `package_name` dengan `applicationId` aplikasi dan isi fingerprint
-sertifikat penandatangan. Intent filter ditambahkan otomatis oleh manifest:
+Replace `package_name` with the application's `applicationId` and fill in the
+signing certificate fingerprint. The intent filter is added automatically by the
+manifest:
 
 ```yaml
 android:
@@ -34,12 +35,13 @@ android:
     path_prefixes: []
 ```
 
-Bila `path_prefixes` di manifest diisi, Android hanya membuka aplikasi untuk
-path tersebut. Kosongkan untuk semua path.
+If `path_prefixes` is set in the manifest, Android only opens the application for
+those paths. Leave it empty for all paths.
 
 ## iOS: apple-app-site-association
 
-Publish `https://<host>/.well-known/apple-app-site-association` tanpa ekstensi:
+Publish `https://<host>/.well-known/apple-app-site-association` without an
+extension:
 
 ```json
 {
@@ -50,7 +52,7 @@ Publish `https://<host>/.well-known/apple-app-site-association` tanpa ekstensi:
         "components": [
           {
             "/": "/app/*",
-            "comment": "Buka aplikasi untuk path /app"
+            "comment": "Open the app for path /app"
           }
         ]
       }
@@ -59,7 +61,7 @@ Publish `https://<host>/.well-known/apple-app-site-association` tanpa ekstensi:
 }
 ```
 
-Manifest menambahkan associated domain dari `hosts`:
+The manifest adds the associated domain from `hosts`:
 
 ```yaml
 ios:
@@ -67,14 +69,14 @@ ios:
     - applinks:kiln.dev
 ```
 
-Enabled `Associated Domains` pada target iOS di Xcode; entitlement dibuat oleh
-patch manifest.
+Enable `Associated Domains` on the iOS target in Xcode; the entitlement is
+created by the manifest patch.
 
 ## Checklist
 
-1. Host memakai HTTPS dengan sertifikat valid.
-2. Kedua file verifikasi dapat diakses tanpa redirect.
-3. `package_name` / `appIDs` cocok dengan aplikasi yang dipasang.
-4. Scheme kustom dan host di `extension.yaml` sama dengan jawaban prompt.
-5. `hosts` di `DeepLinkConfig` sama dengan host yang diverifikasi.
-6. Uji dengan [testing-links.md](testing-links.md) sebelum rilis.
+1. The host uses HTTPS with a valid certificate.
+2. Both verification files are reachable without redirects.
+3. `package_name` / `appIDs` match the installed application.
+4. The custom scheme and host in `extension.yaml` match the prompt answers.
+5. `hosts` in `DeepLinkConfig` matches the verified host.
+6. Test with [testing-links.md](testing-links.md) before release.

@@ -2,29 +2,29 @@
 
 ## Our pledge
 
-Kami berkomitmen membuat partisipasi dalam proyek ini bebas dari pelecehan bagi
-semua orang, tanpa memandang usia, ukuran tubuh, disabilitas, etnis, identitas
-gender, tingkat pengalaman, kebangsaan, penampilan, ras, agama, atau identitas
-dan orientasi seksual.
+We are committed to making participation in this project free of harassment
+for everyone, regardless of age, body size, disability, ethnicity, gender
+identity, level of experience, nationality, appearance, race, religion, or
+sexual identity and orientation.
 
 ## Expected behavior
 
-- Gunakan bahasa yang ramah dan inklusif.
-- Hormati sudut pandang dan pengalaman yang berbeda.
-- Beri dan terima kritik konstruktif dengan lapang.
-- Fokus pada apa yang terbaik untuk komunitas dan proyek.
+- Use welcoming and inclusive language.
+- Respect differing viewpoints and experiences.
+- Give and accept constructive criticism gracefully.
+- Focus on what is best for the community and the project.
 
 ## Unacceptable behavior
 
-- Pelecehan, komentar merendahkan, dan serangan pribadi.
-- Perhatian seksual yang tidak diinginkan.
-- Doxxing atau publikasi informasi privat tanpa izin.
-- Perilaku lain yang tidak pantas dalam lingkungan profesional.
+- Harassment, derogatory comments, and personal attacks.
+- Unwanted sexual attention.
+- Doxxing or publishing private information without permission.
+- Other behavior that is inappropriate in a professional environment.
 
 ## Enforcement
 
-Maintainer dapat menghapus komentar, menolak kontribusi, atau membatasi akses
-untuk perilaku yang melanggar. Laporkan insiden secara privat kepada
-maintainer repo.
+Maintainers may remove comments, reject contributions, or restrict access for
+behavior that violates this policy. Report incidents privately to the
+repository maintainers.
 
-Teks ini mengadaptasi Contributor Covenant 2.1.
+This text adapts the Contributor Covenant 2.1.

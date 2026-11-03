@@ -1,18 +1,18 @@
-# Setup Firebase
+# Firebase setup
 
-1. Buat project di [Firebase Console](https://console.firebase.google.com).
-2. Daftarkan aplikasi Android, iOS, macOS, dan web yang dipakai.
-3. Di Authentication, aktifkan provider Email/Password, Google, dan Apple
-   sesuai kebutuhan.
-4. Buat database Firestore dalam mode production dan bucket Cloud Storage.
-5. Pasang FlutterFire CLI lalu jalankan `flutterfire configure`:
+1. Create a project in the [Firebase Console](https://console.firebase.google.com).
+2. Register the Android, iOS, macOS, and web applications you use.
+3. In Authentication, enable the Email/Password, Google, and Apple providers as
+   needed.
+4. Create a Firestore database in production mode and a Cloud Storage bucket.
+5. Install the FlutterFire CLI and run `flutterfire configure`:
 
    ```bash
    dart pub global activate flutterfire_cli
    flutterfire configure
    ```
 
-6. Teruskan hasil generate ke module:
+6. Pass the generated result to the module:
 
    ```dart
    FirebaseModule(
@@ -23,22 +23,24 @@
 
 ## Google Sign-In
 
-- Android: tambahkan SHA-1 dan SHA-256 fingerprint debug serta release ke
-  aplikasi Android di Firebase Console, lalu unduh ulang `google-services.json`.
-- iOS/macOS: tambahkan `REVERSED_CLIENT_ID` dari `GoogleService-Info.plist`
-  sebagai URL scheme di Xcode.
-- Web: tambahkan domain aplikasi ke Authorized domains.
+- Android: add the debug and release SHA-1 and SHA-256 fingerprints to the
+  Android application in the Firebase Console, then download
+  `google-services.json` again.
+- iOS/macOS: add the `REVERSED_CLIENT_ID` from `GoogleService-Info.plist` as a
+  URL scheme in Xcode.
+- Web: add the application domain to Authorized domains.
 
-Tidak perlu package `google_sign_in`: `FirebaseSocialAuth` memakai
-`FirebaseAuth.signInWithProvider` yang menjalankan flow native.
+The `google_sign_in` package is not needed: `FirebaseSocialAuth` uses
+`FirebaseAuth.signInWithProvider`, which runs the native flow.
 
 ## Apple Sign-In
 
-- Aktifkan provider Apple di Firebase Console.
-- Tambahkan capability Sign in with Apple pada target iOS/macOS.
-- Isi Service ID dan key di Firebase Console bila memakai web atau Android.
+- Enable the Apple provider in the Firebase Console.
+- Add the Sign in with Apple capability to the iOS/macOS target.
+- Fill in the Service ID and key in the Firebase Console when using web or
+  Android.
 
-## Konfigurasi emulator
+## Emulator configuration
 
-Flavor development memakai emulator secara default. Lihat
-[emulators.md](emulators.md) untuk port dan cara menjalankannya.
+The development flavor uses emulators by default. See
+[emulators.md](emulators.md) for ports and how to run them.

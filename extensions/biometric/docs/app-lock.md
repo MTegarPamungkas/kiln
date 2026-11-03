@@ -1,15 +1,17 @@
 # App lock
 
-`AppLock` mengunci aplikasi ketika user meninggalkan aplikasi lebih lama dari
+`AppLock` locks the application when the user leaves it for longer than
 `grace_seconds`.
 
-Alurnya:
+The flow:
 
-1. `AppLockScope` menerima lifecycle `paused` dan mencatat waktunya.
-2. Saat `resumed`, selisih waktu dibandingkan dengan masa tenggang.
-3. Bila melewati batas, overlay kunci tampil menutupi seluruh aplikasi.
-4. Tombol buka meminta biometrik lewat `BiometricGate`.
-5. Bila autentikasi berhasil, overlay hilang; bila gagal, overlay tetap.
+1. `AppLockScope` receives the `paused` lifecycle event and records the time.
+2. On `resumed`, the elapsed time is compared with the grace period.
+3. If it exceeds the limit, a lock overlay appears covering the whole
+   application.
+4. The unlock button requests biometrics through `BiometricGate`.
+5. If authentication succeeds, the overlay disappears; if it fails, the overlay
+   stays.
 
 ```dart
 AppLockScope(
@@ -18,12 +20,13 @@ AppLockScope(
 )
 ```
 
-Module biometric menambahkan wrapper ini ke slot `app.wrappers`, jadi aplikasi
-hasil generate tidak perlu mengedit `app_shell.dart`. Wrapper berjalan di luar
-`MaterialApp`; overlay memakai `Directionality` dan `Material` sendiri agar
-tetap valid.
+The biometric module adds this wrapper to the `app.wrappers` slot, so a generated
+application does not need to edit `app_shell.dart`. The wrapper runs outside
+`MaterialApp`; the overlay uses its own `Directionality` and `Material` so it
+stays valid.
 
-## Masa tenggang
+## Grace period
 
-Masa tenggang mencegah kunci muncul saat user hanya membuka kamera atau dialog
-izin sistem. Nilai 0 mengunci setiap kali aplikasi kembali dari latar.
+The grace period prevents the lock from appearing when the user merely opens the
+camera or a system permission dialog. A value of 0 locks every time the
+application returns from the background.

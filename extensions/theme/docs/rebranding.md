@@ -1,43 +1,43 @@
 # Rebranding
 
-Rebranding tidak menyentuh fitur. Semua warna turunan berasal dari satu seed,
-dan tipografi, radius, serta kepadatan berasal dari prompt lain di
+Rebranding does not touch the features. All derived colors come from a single
+seed, and typography, radius, and density come from other prompts in
 `ThemeConfig`.
 
-## Mengganti warna seed
+## Changing the seed color
 
-Pasang ulang extension dengan seed baru:
+Reinstall the extension with a new seed:
 
 ```bash
 kiln add theme
 ```
 
-Saat prompt muncul, isi `seed_color` dengan warna merek, misalnya `#1D4ED8`.
-`ColorScheme.fromSeed` menurunkan primary, secondary, tertiary, container,
-surface, dan pasangan `on*` untuk mode terang dan gelap. Tema komponen dan
-`SemanticColors` mengikuti palet yang sama.
+When the prompt appears, fill `seed_color` with the brand color, for example
+`#1D4ED8`. `ColorScheme.fromSeed` derives primary, secondary, tertiary,
+container, surface, and the `on*` counterparts for light and dark mode. The
+component themes and `SemanticColors` follow the same palette.
 
-Bila seed diubah manual, perbarui `ThemeConfig.defaults` di
-`lib/extensions/theme/theme_config.dart`, lalu jalankan ulang aplikasi. Jangan
-mengubah warna komponen satu per satu; perubahan seed sudah cukup.
+If the seed is changed manually, update `ThemeConfig.defaults` in
+`lib/extensions/theme/theme_config.dart`, then restart the app. Do not change
+component colors one by one; changing the seed is enough.
 
-## Mengganti font
+## Changing the font
 
-Isi prompt `font_family` dengan nama family yang tersedia di aplikasi. Daftarkan
-font tersebut lewat `pubspec.yaml` aplikasi atau `google_fonts` sesuai
-kebutuhan. Nilai kosong mempertahankan font platform.
+Fill the `font_family` prompt with a family name available in the app. Register
+that font through the app's `pubspec.yaml` or `google_fonts` as needed. An empty
+value keeps the platform font.
 
-## Mengubah radius dan kepadatan
+## Changing the radius and density
 
-`corner_radius` mengubah `AppRadius` dan bentuk tombol, input, kartu, dialog,
-serta `SnackBar`. `density` mengubah `VisualDensity`, skala `AppSpacing`, tinggi
-`NavigationBar`, dan padding komponen.
+`corner_radius` changes `AppRadius` and the shapes of buttons, inputs, cards,
+dialogs, and `SnackBar`. `density` changes `VisualDensity`, the `AppSpacing`
+scale, the `NavigationBar` height, and component padding.
 
-## Yang tidak perlu diubah
+## What does not need to change
 
-- Kode fitur tetap memakai `context.colors`, `context.spacing`, dan
+- Feature code keeps using `context.colors`, `context.spacing`, and
   `context.semantic`.
-- `AppThemeConfig` tetap didaftarkan oleh `ThemeModule`; jangan mendaftarkan
-  `AppThemeConfig` kedua.
-- `ThemeModeSwitcher` dan `ThemeModeController` tidak bergantung pada nilai
-  prompt, jadi rebranding tidak mengubah perilaku mode.
+- `AppThemeConfig` is still registered by `ThemeModule`; do not register a second
+  `AppThemeConfig`.
+- `ThemeModeSwitcher` and `ThemeModeController` do not depend on prompt values,
+  so rebranding does not change the mode behavior.

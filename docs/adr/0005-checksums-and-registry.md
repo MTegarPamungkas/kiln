@@ -1,19 +1,21 @@
-# 0005 — Checksum arsip dan registry sebagai sumber extension
+# 0005 — Archive checksums and the registry as the extension source
 
-## Keputusan
+## Decision
 
-Distribusi extension memakai arsip `.tgz` dengan SHA-256 di registry index.
-Checksum diverifikasi sebelum instalasi; arsip diekstrak dengan penolakan path
-traversal. Registry menyimpan id, versi, tier, requires, dan compatibility.
+Extension distribution uses `.tgz` archives with a SHA-256 recorded in the
+registry index. Checksums are verified before installation; archives are
+extracted with path traversal rejected. The registry stores the id, version,
+tier, requires, and compatibility.
 
-## Alasan
+## Rationale
 
-Konten extension harus bisa diverifikasi dan dipilih sesuai kompatibilitas
-`kiln_core` proyek.
+Extension content must be verifiable and selectable according to the project's
+`kiln_core` compatibility.
 
-## Konsekuensi
+## Consequences
 
-- `kiln_store` menjadi batas kepercayaan antara registry dan installer.
-- Mode offline memakai cache lokal.
-- Model distribusi final (Git URL, registry terpisah, atau keduanya) masih
-  diparkir dan dicatat di roadmap.
+- `kiln_store` becomes the trust boundary between the registry and the
+  installer.
+- Offline mode uses the local cache.
+- The final distribution model (Git URL, separate registry, or both) is still
+  parked and recorded in the roadmap.

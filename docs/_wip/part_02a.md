@@ -1,79 +1,79 @@
 ## kiln_core
 
-`kiln_core` adalah satu-satunya package yang boleh dikenal kode aplikasi dan
-semua extension. Ia memuat kontrak, model error, runtime modul, state sesi, dan
-utilitas privasi, tanpa dependensi ke plugin Flutter apa pun.
+`kiln_core` is the only package that application code and every extension are
+allowed to know about. It carries the contracts, error models, module runtime,
+session state, and privacy utilities, with no dependency on any Flutter plugin.
 
 ```text
 packages/kiln_core/
-├─ lib/                                           # kode sumber package, diekspor lewat barrel kiln_core.dart
-│  ├─ kiln_core.dart                              # barrel yang meng-export seluruh API publik package
-│  └─ src/                                        # implementasi internal package, tidak diimpor langsung
-│     ├─ contracts/                               # kontrak yang dipenuhi extension
-│     │  ├─ account_management.dart               # kontrak opsional PasswordRecovery, EmailVerification, ProfileUpdate di samping AuthRepository
-│     │  ├─ analytics.dart                        # kontrak Analytics untuk mencatat event pemakaian aplikasi
-│     │  ├─ app_flavor.dart                       # AppFlavor: penanda lingkungan build yang sedang berjalan
-│     │  ├─ auth.dart                             # kontrak AuthRepository untuk masuk dan keluar akun pengguna
-│     │  ├─ connectivity.dart                     # kontrak NetworkMonitor untuk memantau status koneksi jaringan
-│     │  ├─ crash_reporter.dart                   # kontrak CrashReporter untuk melaporkan crash dan error
-│     │  ├─ deep_links.dart                       # kontrak DeepLinks untuk menerima tautan yang membuka aplikasi
-│     │  ├─ env.dart                              # kontrak Env untuk membaca konfigurasi lingkungan
-│     │  ├─ file_storage.dart                     # kontrak FileStorage: upload, download, url, dan hapus file di bucket
-│     │  ├─ http_client.dart                      # kontrak HttpClient untuk mengirim request HTTP
-│     │  ├─ local_db.dart                         # kontrak LocalDatabase untuk data lokal di perangkat
-│     │  ├─ logger.dart                           # kontrak AppLogger untuk mencatat log aplikasi
-│     │  ├─ media_picker.dart                     # kontrak MediaPicker untuk memilih gambar atau media dari perangkat
-│     │  ├─ notifications.dart                    # kontrak Notifications untuk menampilkan dan mengelola notifikasi
-│     │  ├─ permissions.dart                      # kontrak Permissions: cek status, minta izin, dan buka pengaturan
-│     │  ├─ remote_database.dart                  # kontrak RemoteDatabase: CRUD dokumen, RemoteQuery, dan watch
-│     │  ├─ secure_storage.dart                   # kontrak SecureStorage untuk menyimpan data sensitif
-│     │  ├─ social_auth.dart                      # kontrak SocialAuth untuk masuk lewat akun penyedia sosial
-│     │  └─ storage.dart                          # kontrak Storage untuk penyimpanan key-value
-│     ├─ errors/                                  # model error seragam dan hasil operasi bertipe Result
-│     │  ├─ failure.dart                          # kelas Failure, model error seragam untuk semua kontrak
-│     │  ├─ failure_codes.dart                    # kelas FailureCode: kode stabil, mis. network.timeout dan auth.invalid_credentials
-│     │  └─ result.dart                           # tipe Result<T> yang berisi Ok atau Err(Failure)
-│     ├─ runtime/                                 # runtime modul: Registry, urutan init, Lifecycle, bootstrap, dan Slot
-│     │  ├─ registry.dart                         # kontrak Registry untuk mendaftarkan dan mengambil layanan
-│     │  ├─ get_it_registry.dart                  # implementasi Registry berbasis get_it
-│     │  ├─ kiln_module.dart                      # kontrak KilnModule: unit yang mendaftarkan layanan ke Registry saat init
-│     │  ├─ module_graph.dart                     # menghitung urutan init dari requires dan mendeteksi siklus
-│     │  ├─ lifecycle.dart                        # kontrak Lifecycle: onReady, onPause, onResume, dan dispose
-│     │  ├─ bootstrap.dart                        # KilnBootstrap.run: init async dengan timeout dan error handler
-│     │  └─ slot.dart                             # OrderedSlot<T> untuk http.interceptors dan router.routes
-│     ├─ session/                                 # state sesi login: model sesi, controller, dan penyedia token
-│     │  ├─ session.dart                          # model AuthSession dengan userId dan expiresAt
-│     │  ├─ session_controller.dart               # SessionController: status unknown, authenticated, unauthenticated, plus stream
-│     │  └─ token_provider.dart                   # kontrak TokenProvider untuk mengambil dan me-refresh token
-│     ├─ privacy/                                 # persetujuan pengguna dan penyamaran data pribadi
-│     │  ├─ consent.dart                          # ConsentController untuk persetujuan analytics dan crash report
-│     │  └─ pii_redactor.dart                     # PiiRedactor menyamarkan data pribadi untuk logger, analytics, dan crash report
-│     └─ util/                                    # Clock yang bisa di-fake, Debouncer, dan Disposable
-│        ├─ clock.dart                            # Clock: sumber waktu yang bisa di-fake di test
-│        ├─ debouncer.dart                        # Debouncer yang menunda aksi sampai pemanggilan berhenti
-│        └─ disposable.dart                       # kontrak Disposable untuk melepas sumber daya
-├─ test/                                          # test unit kiln_core: kontrak, error, runtime, sesi, dan privasi
-│  ├─ auth_test.dart                              # menguji kontrak AuthRepository dan Failure saat kredensial salah
-│  ├─ failure_test.dart                           # menguji konstruksi dan perbandingan nilai Failure
-│  ├─ http_client_test.dart                       # menguji kontrak HttpClient dan error jaringan sebagai Failure
-│  ├─ registry_test.dart                          # menguji pendaftaran dan pengambilan layanan lewat Registry
-│  ├─ runtime_contracts_test.dart                 # menguji kontrak runtime: Registry dan KilnModule bekerja bersama
-│  ├─ result_test.dart                            # menguji Result<T> sebagai Ok atau Err(Failure)
-│  ├─ failure_codes_test.dart                     # menguji bahwa nilai FailureCode stabil dan unik
-│  ├─ module_graph_test.dart                      # menguji urutan init dari requires dan deteksi siklus
-│  ├─ slot_test.dart                              # menguji bahwa OrderedSlot<T> menjaga urutan item
-│  ├─ lifecycle_test.dart                         # menguji bahwa Lifecycle memanggil onReady, onPause, onResume, dan dispose
-│  ├─ bootstrap_test.dart                         # menguji KilnBootstrap.run: init async, timeout, dan error handler
-│  ├─ session_controller_test.dart                # menguji transisi status SessionController dan stream-nya
-│  ├─ consent_test.dart                           # menguji status persetujuan ConsentController untuk analytics dan crash report
-│  ├─ pii_redactor_test.dart                      # menguji bahwa PiiRedactor menyamarkan data pribadi
-│  ├─ clock_test.dart                             # menguji bahwa Clock bisa di-fake untuk mengatur waktu
-│  └─ debouncer_test.dart                         # menguji bahwa Debouncer hanya menjalankan aksi terakhir
-├─ example/                                       # contoh program yang memakai kiln_core
-│  └─ main.dart                                   # contoh minimal memakai Registry, KilnModule, dan KilnBootstrap
-├─ analysis_options.yaml                          # aturan lint dan analyzer untuk package ini
-├─ CHANGELOG.md                                   # riwayat perubahan package per versi
-├─ pubspec.yaml                                   # metadata dan dependensi package, tanpa plugin Flutter
-└─ README.md                                      # pengantar package dan cara memakai kontraknya
+├─ lib/                                           # package source code, exported through the kiln_core.dart barrel
+│  ├─ kiln_core.dart                              # barrel that exports the package's entire public API
+│  └─ src/                                        # internal package implementation, not imported directly
+│     ├─ contracts/                               # contracts that extensions implement
+│     │  ├─ account_management.dart               # optional PasswordRecovery, EmailVerification, and ProfileUpdate contracts alongside AuthRepository
+│     │  ├─ analytics.dart                        # Analytics contract for recording application usage events
+│     │  ├─ app_flavor.dart                       # AppFlavor: a marker for the build environment currently running
+│     │  ├─ auth.dart                             # AuthRepository contract for signing users in and out
+│     │  ├─ connectivity.dart                     # NetworkMonitor contract for observing network connection status
+│     │  ├─ crash_reporter.dart                   # CrashReporter contract for reporting crashes and errors
+│     │  ├─ deep_links.dart                       # DeepLinks contract for receiving links that open the app
+│     │  ├─ env.dart                              # Env contract for reading environment configuration
+│     │  ├─ file_storage.dart                     # FileStorage contract: upload, download, url, and delete files in a bucket
+│     │  ├─ http_client.dart                      # HttpClient contract for sending HTTP requests
+│     │  ├─ local_db.dart                         # LocalDatabase contract for local data on the device
+│     │  ├─ logger.dart                           # AppLogger contract for recording application logs
+│     │  ├─ media_picker.dart                     # MediaPicker contract for picking images or media from the device
+│     │  ├─ notifications.dart                    # Notifications contract for showing and managing notifications
+│     │  ├─ permissions.dart                      # Permissions contract: check status, request permission, and open settings
+│     │  ├─ remote_database.dart                  # RemoteDatabase contract: document CRUD, RemoteQuery, and watch
+│     │  ├─ secure_storage.dart                   # SecureStorage contract for storing sensitive data
+│     │  ├─ social_auth.dart                      # SocialAuth contract for signing in with social provider accounts
+│     │  └─ storage.dart                          # Storage contract for key-value storage
+│     ├─ errors/                                  # uniform error model and Result-typed operation outcomes
+│     │  ├─ failure.dart                          # Failure class, the uniform error model for all contracts
+│     │  ├─ failure_codes.dart                    # FailureCode class: stable codes, e.g. network.timeout and auth.invalid_credentials
+│     │  └─ result.dart                           # Result<T> type holding either Ok or Err(Failure)
+│     ├─ runtime/                                 # module runtime: Registry, init order, Lifecycle, bootstrap, and Slots
+│     │  ├─ registry.dart                         # Registry contract for registering and resolving services
+│     │  ├─ get_it_registry.dart                  # get_it-based Registry implementation
+│     │  ├─ kiln_module.dart                      # KilnModule contract: a unit that registers services with the Registry on init
+│     │  ├─ module_graph.dart                     # computes init order from requires and detects cycles
+│     │  ├─ lifecycle.dart                        # Lifecycle contract: onReady, onPause, onResume, and dispose
+│     │  ├─ bootstrap.dart                        # KilnBootstrap.run: async init with timeout and an error handler
+│     │  └─ slot.dart                             # OrderedSlot<T> for http.interceptors and router.routes
+│     ├─ session/                                 # login session state: session model, controller, and token provider
+│     │  ├─ session.dart                          # AuthSession model with userId and expiresAt
+│     │  ├─ session_controller.dart               # SessionController: unknown, authenticated, and unauthenticated status, plus a stream
+│     │  └─ token_provider.dart                   # TokenProvider contract for fetching and refreshing tokens
+│     ├─ privacy/                                 # user consent and personal data masking
+│     │  ├─ consent.dart                          # ConsentController for analytics and crash report consent
+│     │  └─ pii_redactor.dart                     # PiiRedactor masks personal data for the logger, analytics, and crash reports
+│     └─ util/                                    # a fakeable Clock, a Debouncer, and a Disposable
+│        ├─ clock.dart                            # Clock: a time source that can be faked in tests
+│        ├─ debouncer.dart                        # Debouncer that postpones an action until calls stop
+│        └─ disposable.dart                       # Disposable contract for releasing resources
+├─ test/                                          # kiln_core unit tests: contracts, errors, runtime, sessions, and privacy
+│  ├─ auth_test.dart                              # tests the AuthRepository contract and the Failure on wrong credentials
+│  ├─ failure_test.dart                           # tests Failure construction and value comparison
+│  ├─ http_client_test.dart                       # tests the HttpClient contract and network errors as Failures
+│  ├─ registry_test.dart                          # tests registering and resolving services through the Registry
+│  ├─ runtime_contracts_test.dart                 # tests the runtime contracts: Registry and KilnModule working together
+│  ├─ result_test.dart                            # tests Result<T> as Ok or Err(Failure)
+│  ├─ failure_codes_test.dart                     # verifies that FailureCode values are stable and unique
+│  ├─ module_graph_test.dart                      # tests init order from requires and cycle detection
+│  ├─ slot_test.dart                              # verifies that OrderedSlot<T> preserves item order
+│  ├─ lifecycle_test.dart                         # verifies that Lifecycle calls onReady, onPause, onResume, and dispose
+│  ├─ bootstrap_test.dart                         # tests KilnBootstrap.run: async init, timeout, and error handler
+│  ├─ session_controller_test.dart                # tests SessionController status transitions and its stream
+│  ├─ consent_test.dart                           # tests the ConsentController consent status for analytics and crash reports
+│  ├─ pii_redactor_test.dart                      # verifies that PiiRedactor masks personal data
+│  ├─ clock_test.dart                             # verifies that Clock can be faked to control time
+│  └─ debouncer_test.dart                         # verifies that Debouncer only runs the last action
+├─ example/                                       # an example program that uses kiln_core
+│  └─ main.dart                                   # a minimal example using Registry, KilnModule, and KilnBootstrap
+├─ analysis_options.yaml                          # lint and analyzer rules for this package
+├─ CHANGELOG.md                                   # package change history per version
+├─ pubspec.yaml                                   # package metadata and dependencies, without Flutter plugins
+└─ README.md                                      # package introduction and how to use its contracts
 ```
 

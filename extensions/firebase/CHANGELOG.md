@@ -12,10 +12,11 @@
 
 ## 0.1.0
 
-- AuthRepository, SocialAuth, AccountManagement, dan TokenProvider di atas
-  Firebase Auth lewat gateway yang bisa di-fake.
-- Firestore RemoteDatabase dengan mapper RemoteQuery, penolakan kombinasi
-  indeks komposit, dan watch realtime.
-- Cloud Storage FileStorage dengan progress unggah.
-- Session bridge ke SessionController, setup emulator flavor development,
-  konfigurasi bertipe, hook peringatan FlutterFire, serta dokumentasi setup.
+- AuthRepository, SocialAuth, AccountManagement, and TokenProvider on top of
+  Firebase Auth through a gateway that can be faked.
+- Firestore RemoteDatabase with a RemoteQuery mapper, rejection of composite
+  index combinations, and realtime watch.
+- Cloud Storage FileStorage with upload progress.
+- Session bridge to SessionController, emulator setup for the development
+  flavor, typed configuration, FlutterFire warning hook, and setup
+  documentation.

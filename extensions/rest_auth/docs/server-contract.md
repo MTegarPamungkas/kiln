@@ -1,7 +1,7 @@
 # Server contract
 
-Parser menerima camelCase dan snake_case, serta token di level atas, di dalam
-`data`, `tokens`, atau `auth`.
+The parser accepts camelCase and snake_case, as well as tokens at the top level,
+inside `data`, `tokens`, or `auth`.
 
 ## Login
 
@@ -11,7 +11,7 @@ Parser menerima camelCase dan snake_case, serta token di level atas, di dalam
 {"email":"user@kiln.dev","password":"password123"}
 ```
 
-Respons sukses:
+Successful response:
 
 ```json
 {
@@ -27,13 +27,14 @@ Respons sukses:
 }
 ```
 
-Respons 401 dianggap kredensial salah. Status lain dipetakan oleh
+A 401 response is treated as invalid credentials. Other statuses are mapped by
 `rest_auth_failure_mapper`.
 
 ## Register
 
-`POST /auth/register` dengan `email`, `password`, dan `displayName` opsional.
-Respons sama seperti login. `data.tokens` dan `data.user` juga diterima.
+`POST /auth/register` with `email`, `password`, and an optional `displayName`.
+The response is the same as login. `data.tokens` and `data.user` are also
+accepted.
 
 ## Refresh
 
@@ -43,12 +44,13 @@ Respons sama seperti login. `data.tokens` dan `data.user` juga diterima.
 {"refreshToken":"<token>"}
 ```
 
-Respons minimal berisi access token baru. Bila server merotasi refresh token,
-sertakan field `refreshToken`; bila tidak, refresh token lama dipertahankan.
+The response contains at least the new access token. If the server rotates the
+refresh token, include the `refreshToken` field; if not, the old refresh token is
+kept.
 
-## Logout dan me
+## Logout and me
 
-`POST /auth/logout` memakai Bearer dan boleh mengembalikan apa saja. SignOut
-tetap membersihkan token walau server gagal.
+`POST /auth/logout` uses Bearer and may return anything. SignOut still clears the
+tokens even if the server fails.
 
-`GET /auth/me` mengembalikan objek user dengan `id`, `email`, dan nama.
+`GET /auth/me` returns the user object with `id`, `email`, and name.

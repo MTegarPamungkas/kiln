@@ -1,48 +1,48 @@
-# Referensi CLI
+# CLI reference
 
-## Perintah
+## Commands
 
-| Perintah | Fungsi |
+| Command | Purpose |
 | --- | --- |
-| `kiln create <name>` | Buat proyek dari `app_basic`; `l10n` otomatis terpasang, extension lain opsional |
-| `kiln add <extension...>` | Pasang extension secara transaksional |
-| `kiln remove <extension>` | Lepas extension; file yang diedit dilewati |
-| `kiln repair [extension...]` | Pulihkan file generated + `extensions.g.dart`; ARB dilindungi |
-| `kiln list` | Extension terpasang/tersedia |
-| `kiln info <extension>` | Manifest lengkap satu extension |
-| `kiln graph` | Graf requires, format `text`/`mermaid` |
-| `kiln doctor` | Periksa hash, codegen, jurnal, dependency, platform |
-| `kiln upgrade` | Upgrade extension dari registry (atau rencana dari katalog) |
-| `kiln rollback` | Batalkan transaksi terakhir/terhenti |
-| `kiln config` | Registry, mirror, mode offline |
-| `kiln cache` | Lihat/bersihkan cache |
-| `kiln store` | `search`, `info`, dan `install` dari registry |
-| `kiln completion <shell>` | Skrip bash/zsh/fish |
+| `kiln create <name>` | Create a project from `app_basic`; `l10n` is installed automatically, other extensions are optional |
+| `kiln add <extension...>` | Install extensions transactionally |
+| `kiln remove <extension>` | Remove an extension; edited files are skipped |
+| `kiln repair [extension...]` | Restore generated files + `extensions.g.dart`; ARB files are protected |
+| `kiln list` | Installed/available extensions |
+| `kiln info <extension>` | Full manifest of a single extension |
+| `kiln graph` | Requires graph, `text`/`mermaid` format |
+| `kiln doctor` | Check hashes, codegen, journal, dependencies, platform |
+| `kiln upgrade` | Upgrade extensions from the registry (or plan from the catalog) |
+| `kiln rollback` | Undo the last/interrupted transaction |
+| `kiln config` | Registry, mirror, offline mode |
+| `kiln cache` | Inspect/clear the cache |
+| `kiln store` | `search`, `info`, and `install` from the registry |
+| `kiln completion <shell>` | bash/zsh/fish script |
 | `kiln ext ...` | `new`, `validate`, `test`, `pack`, `publish` |
-| `kiln version` | Versi CLI dan `kiln_core` |
+| `kiln version` | CLI and `kiln_core` versions |
 
-## Flag umum
+## Common flags
 
 - `--verbose` / `--quiet`
-- `--json` pada perintah yang mendukung keluaran mesin.
-- `--yes` untuk mode non-interaktif.
-- `--dry-run` pada `add`/`remove`/`repair`.
-- `--answer nama=nilai` pada `add`/`create`/`repair`.
-- `--force` pada `remove` untuk menghapus file yang sudah diedit, dan pada
-  `repair` untuk menimpa ARB.
-- `--core-path` pada `create` untuk memakai workspace lokal.
+- `--json` on commands that support machine-readable output.
+- `--yes` for non-interactive mode.
+- `--dry-run` on `add`/`remove`/`repair`.
+- `--answer name=value` on `add`/`create`/`repair`.
+- `--force` on `remove` to delete files that were already edited, and on
+  `repair` to overwrite ARB files.
+- `--core-path` on `create` to use a local workspace.
 
-## Exit code
+## Exit codes
 
-| Kode | Arti |
+| Code | Meaning |
 | --- | --- |
-| 0 | Sukses |
-| 64 | Argumen salah |
-| 65 | Masalah proyek/manifest/prompt |
-| 66 | Konflik dependency/file |
-| 69 | Kegagalan jaringan |
-| 70 | Verifikasi gagal |
-| 71 | Kesalahan internal |
+| 0 | Success |
+| 64 | Invalid arguments |
+| 65 | Project/manifest/prompt problem |
+| 66 | Dependency/file conflict |
+| 69 | Network failure |
+| 70 | Verification failed |
+| 71 | Internal error |
 
 ## Registry
 
@@ -55,22 +55,23 @@ kiln upgrade --yes
 kiln ext publish extensions/connectivity --registry="$(pwd)/registry"
 ```
 
-- `store install` mengunduh arsip, memverifikasi SHA-256, mengecek trust
-  policy, lalu memasang lewat transaksi installer.
-- `upgrade` memilih versi registry yang kompatibel, menjalankan migrasi
-  terpilih, lalu mengganti extension.
-- `ext publish` dan `tool/registry.dart` menulis `index.json` plus
-  `archives/<id>-<version>.tgz` ke registry lokal.
-- `kiln cache clean` menghapus index dan arsip yang di-cache; mode offline
-  memakai cache yang tersisa.
+- `store install` downloads the archive, verifies its SHA-256, checks the trust
+  policy, then installs it through the installer transaction.
+- `upgrade` picks a compatible registry version, runs the selected migrations,
+  then replaces the extension.
+- `ext publish` and `tool/registry.dart` write `index.json` plus
+  `archives/<id>-<version>.tgz` to the local registry.
+- `kiln cache clean` deletes the cached index and archives; offline mode uses
+  whatever remains in the cache.
 
-## Batasan
+## Limitations
 
-- Publish ke registry HTTP belum didukung; publish ke folder lokal lalu dorong
-  dengan Git atau rilis.
-- Product flavor native Android/iOS tidak dibuat oleh extension flavors.
-- `kiln_lints` menunggu `custom_lint` mendukung analyzer 14.
-- Katalog bawaan fase 2: `analytics`, `appwrite`, `biometric`, `bloc`,
+- Publishing to an HTTP registry is not supported yet; publish to a local
+  folder and then push it with Git or a release.
+- Native Android/iOS product flavors are not generated by the flavors
+  extension.
+- `kiln_lints` is waiting for `custom_lint` to support analyzer 14.
+- Phase 2 bundled catalog: `analytics`, `appwrite`, `biometric`, `bloc`,
   `connectivity`, `deep_link`, `dio`, `env`, `firebase`, `flavors`,
   `go_router`, `http_cache`, `http_retry`, `image_picker`, `l10n`, `local_db`,
   `logger`, `notifications`, `permission`, `rest_auth`, `riverpod`,

@@ -1,7 +1,7 @@
-# State dengan Riverpod
+# State with Riverpod
 
-`registryProvider` diisi oleh wrapper aplikasi. Fitur membaca kontrak lewat
-`kilnProvider<T>()`:
+`registryProvider` is populated by the app wrapper. Features read contracts
+through `kilnProvider<T>()`:
 
 ```dart
 final profileProvider = FutureProvider<Profile>((ref) async {
@@ -11,5 +11,5 @@ final profileProvider = FutureProvider<Profile>((ref) async {
 });
 ```
 
-Gunakan `ProviderScope` dari wrapper aplikasi; test dapat memakai
-`registryOverrides` untuk memasang fake Registry.
+Use the `ProviderScope` from the app wrapper; tests can use
+`registryOverrides` to install a fake Registry.

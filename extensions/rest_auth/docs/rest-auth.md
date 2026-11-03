@@ -1,7 +1,8 @@
 # REST auth
 
-Extension ini memasang `AuthRepository` tanpa backend SDK. Semua endpoint
-diisi lewat prompt dan dapat diganti tanpa mengubah kode fitur.
+This extension installs `AuthRepository` without a backend SDK. All endpoints
+are filled in through the prompt and can be changed without modifying feature
+code.
 
 ```dart
 final auth = registry.read<AuthRepository>();
@@ -12,34 +13,34 @@ final session = await auth.signIn(
 );
 ```
 
-## Endpoint
+## Endpoints
 
-Prompt `base_url` ditambah path login, register, refresh, logout, dan me.
-`RestAuthConfig.endpoint` menggabungkan base URL dengan path sehingga
-`https://api.kiln.dev/v1` dan `/auth/login` menjadi
+The `base_url` prompt plus the login, register, refresh, logout, and me paths.
+`RestAuthConfig.endpoint` joins the base URL with the path so that
+`https://api.kiln.dev/v1` and `/auth/login` become
 `https://api.kiln.dev/v1/auth/login`.
 
-Dua endpoint opsional tidak punya prompt:
+Two optional endpoints have no prompt:
 
 - `forgotPasswordPath`
 - `verifyEmailPath`
 
-Isi keduanya lewat `RestAuthConfig` di kode bootstrap bila backend menyediakan
-reset password dan verifikasi email.
+Set both through `RestAuthConfig` in the bootstrap code if the backend provides
+password reset and email verification.
 
-## Token
+## Tokens
 
-Token disimpan di `SecureStorage` dengan kunci berawalan `rest_auth.`. User
-terakhir juga di-cache agar aplikasi bisa dibuka offline; saat online,
-`initialize()` memuat ulang profil dari endpoint me.
+Tokens are stored in `SecureStorage` under keys prefixed with `rest_auth.`. The
+last user is also cached so the app can be opened offline; when online,
+`initialize()` reloads the profile from the me endpoint.
 
 ## HTTP
 
-Bila `http_pipeline` tersedia, module menambahkan dua middleware:
+When `http_pipeline` is available, the module adds two middleware:
 
-| Priority | Middleware | Tugas |
+| Priority | Middleware | Responsibility |
 | --- | --- | --- |
-| 10 | `AuthMiddleware` | Menambahkan `Authorization: Bearer` |
-| 11 | `UnauthorizedHandler` | Refresh, ulang sekali, signOut bila ditolak |
+| 10 | `AuthMiddleware` | Adds `Authorization: Bearer` |
+| 11 | `UnauthorizedHandler` | Refresh, retry once, signOut if rejected |
 
-Lihat [token-refresh.md](token-refresh.md) untuk detail alur refresh.
+See [token-refresh.md](token-refresh.md) for details of the refresh flow.

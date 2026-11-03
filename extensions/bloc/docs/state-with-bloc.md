@@ -1,7 +1,7 @@
-# State dengan Bloc
+# State with Bloc
 
-Fitur memakai `Cubit`/`Bloc` dan membaca layanan dari Registry. Jangan
-menyimpan Registry di global.
+Features use `Cubit`/`Bloc` and read services from the Registry. Do not store the
+Registry globally.
 
 ```dart
 final class ProfileCubit extends BaseCubit<AsyncState<Profile>> {
@@ -22,5 +22,5 @@ final class ProfileCubit extends BaseCubit<AsyncState<Profile>> {
 }
 ```
 
-Gunakan `BlocProvider` di widget terdekat. `SessionCubit` sudah disediakan
-global lewat wrapper aplikasi.
+Use `BlocProvider` in the nearest widget. `SessionCubit` is already provided
+globally through the application wrapper.

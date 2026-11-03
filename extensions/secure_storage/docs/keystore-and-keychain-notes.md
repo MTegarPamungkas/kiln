@@ -1,8 +1,10 @@
-# Keystore dan Keychain
+# Keystore and Keychain
 
-- Data Keychain iOS dapat bertahan setelah aplikasi dihapus. `FirstRunWipe`
-  membersihkan sisa instalasi lama pada start pertama.
-- Android Keystore dapat kehilangan kunci setelah restore atau perubahan
-  kredensial perangkat; aplikasi harus siap menerima `Failure`.
-- Web memakai IndexedDB terenkripsi dan tidak sekuat Keychain/Keystore native.
-- `android.allow_backup=false` mencegah data terenkripsi ikut backup.
+- iOS Keychain data can survive after the app is deleted. `FirstRunWipe` clears
+  leftovers from an old installation on the first start.
+- The Android Keystore can lose keys after a restore or a change to the device
+  credentials; the app must be ready to accept a `Failure`.
+- The web uses encrypted IndexedDB and is not as strong as native
+  Keychain/Keystore.
+- `android.allow_backup=false` prevents encrypted data from being included in
+  backups.

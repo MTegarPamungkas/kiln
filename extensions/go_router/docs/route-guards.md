@@ -1,8 +1,8 @@
-# Route guard
+# Route guards
 
 ## Interface
 
-Guard adalah aturan redirect sinkron yang dievaluasi sebelum route tampil:
+A guard is a synchronous redirect rule evaluated before a route is shown:
 
 ```dart
 abstract interface class RouteGuard {
@@ -10,14 +10,14 @@ abstract interface class RouteGuard {
 }
 ```
 
-`RouteGuardContext` membawa `location`, `name`, dan `isAuthenticated`. Guard
-tidak boleh memanggil `go` atau `push` sendiri; cukup kembalikan lokasi tujuan.
-Nilai `null` berarti guard ini tidak keberatan dan evaluasi berlanjut.
+`RouteGuardContext` carries `location`, `name`, and `isAuthenticated`. A guard
+must not call `go` or `push` itself; just return the destination location. A
+`null` value means this guard has no objection and evaluation continues.
 
-## Urutan
+## Order
 
-`evaluateRouteGuards` menjalankan guard sesuai urutan penyusunan dan berhenti
-pada redirect pertama:
+`evaluateRouteGuards` runs guards in composition order and stops at the first
+redirect:
 
 ```dart
 final guards = <RouteGuard>[
@@ -26,33 +26,33 @@ final guards = <RouteGuard>[
 ];
 ```
 
-Guard yang mengembalikan lokasi yang sama dianggap tidak melakukan redirect,
-sehingga tidak terjadi loop. Guard yang lambat sebaiknya membaca data yang
-sudah tersedia; redirect router tidak menunggu proses jaringan.
+A guard that returns the same location is treated as not redirecting, so no
+loop occurs. Slow guards should read data that is already available; router
+redirects do not wait for network work.
 
 ## AuthRedirect
 
-`AppRouter` menambahkan `AuthRedirect` otomatis bila `SessionController`
-terdaftar:
+`AppRouter` adds `AuthRedirect` automatically when a `SessionController` is
+registered:
 
-- Belum masuk di route lain: diarahkan ke `/sign-in`.
-- Belum masuk di `/sign-in`: dibiarkan.
-- Sudah masuk di `/sign-in`: diarahkan ke `/`.
-- Sudah masuk di route lain: dibiarkan.
+- Not signed in on another route: redirected to `/sign-in`.
+- Not signed in on `/sign-in`: left alone.
+- Signed in on `/sign-in`: redirected to `/`.
+- Signed in on another route: left alone.
 
-Status `unknown` diperlakukan sebagai belum masuk. Restorasi sesi harus selesai
-sebelum UI pertama tampil, atau aplikasi akan singgah di `/sign-in` lebih dulu.
+An `unknown` status is treated as not signed in. Session restoration must finish
+before the first UI is shown, or the app will stop at `/sign-in` first.
 
-## Refresh saat sesi berubah
+## Refresh when the session changes
 
-`SessionRefreshListenable` meneruskan `SessionController.changes` ke
-`refreshListenable` milik `GoRouter`. Saat pengguna masuk atau keluar,
-go_router mengevaluasi ulang redirect tanpa membangun ulang seluruh aplikasi.
-Listenable ini dibuang bersama router di `AppRouter.dispose`.
+`SessionRefreshListenable` forwards `SessionController.changes` to the
+`refreshListenable` of `GoRouter`. When the user signs in or out, go_router
+re-evaluates redirects without rebuilding the whole app. This listenable is
+disposed together with the router in `AppRouter.dispose`.
 
-## Guard khusus
+## Custom guards
 
-Tambahkan guard lewat konstruktor `AppRouter`:
+Add guards through the `AppRouter` constructor:
 
 ```dart
 final router = AppRouter(
@@ -64,6 +64,6 @@ final router = AppRouter(
 );
 ```
 
-Guard tambahan berjalan setelah guard bawaan. Untuk mengganti perilaku
-sign-in, ganti `AuthRedirect` di `AppRouter` atau sediakan guard yang menangani
-lokasi tersebut sebelum guard bawaan.
+Extra guards run after the built-in guards. To change the sign-in behavior,
+replace `AuthRedirect` in `AppRouter` or provide a guard that handles that
+location before the built-in guards.

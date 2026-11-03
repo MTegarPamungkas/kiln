@@ -1,4 +1,4 @@
-# Menulis extension
+# Writing an extension
 
 ## 1. Scaffold
 
@@ -6,12 +6,12 @@
 kiln ext new hello --name "Hello extension" --provides hello
 ```
 
-Perintah ini membuat:
+This command creates:
 
 ```text
 extensions/hello/
 ├─ extension.yaml
-├─ pubspec.yaml          # dependency dev untuk menjalankan test extension
+├─ pubspec.yaml          # dev dependency for running extension tests
 ├─ README.md
 ├─ CHANGELOG.md
 ├─ docs/
@@ -25,13 +25,13 @@ extensions/hello/
 
 ## 2. Manifest
 
-Isi `id`, `name`, `category`, `tier`, `provides`, `requires`, prompt, slot,
-dependency, patch native, dan compatibility. Lihat
+Fill in `id`, `name`, `category`, `tier`, `provides`, `requires`, prompts,
+slots, dependencies, native patches, and compatibility. See
 [extension-manifest.md](../extension-manifest.md).
 
 ## 3. Module
 
-Module mendaftarkan kontrak, bukan implementasi ke kode aplikasi:
+A module registers contracts, not implementations, into the application code:
 
 ```dart
 final class HelloModule extends KilnModule {
@@ -50,21 +50,21 @@ final class HelloModule extends KilnModule {
 }
 ```
 
-Kontrak yang dipakai aplikasi didefinisikan di `kiln_core`. Jangan membuat
-fasad statis atau global registry. Kode aplikasi membaca layanan lewat
+Contracts used by the application are defined in `kiln_core`. Do not create a
+static facade or a global registry. Application code reads services through
 `RegistryScope`/`Registry`.
 
-## 4. Aturan
+## 4. Rules
 
-- Extension tidak mengimpor extension lain.
-- Bergantung pada capability, bukan id.
-- Sediakan gateway untuk plugin yang sulit dites.
-- Petakan error package menjadi `Failure` dengan `FailureCode` stabil.
-- Patch native harus idempoten dan punya id stabil.
-- Jangan mengedit file milik extension lain atau `extensions.g.dart`.
-- Prompt rahasia tidak ditulis ke `kiln.yaml`.
+- An extension does not import other extensions.
+- Depend on capabilities, not ids.
+- Provide a gateway for plugins that are hard to test.
+- Map package errors to `Failure` with a stable `FailureCode`.
+- Native patches must be idempotent and have stable ids.
+- Do not edit files owned by another extension or `extensions.g.dart`.
+- Secret prompts are not written to `kiln.yaml`.
 
-## 5. Uji dan kemas
+## 5. Test and pack
 
 ```bash
 kiln ext validate extensions/hello
@@ -72,4 +72,4 @@ kiln ext test extensions/hello
 kiln ext pack extensions/hello
 ```
 
-`pack` menghasilkan `hello-0.1.0.tgz`. `publish` menunggu fase registry.
+`pack` produces `hello-0.1.0.tgz`. `publish` waits for the registry phase.

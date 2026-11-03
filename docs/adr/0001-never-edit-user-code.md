@@ -1,19 +1,20 @@
-# 0001 — Kiln tidak pernah mengedit kode milik pengguna
+# 0001 — Kiln never edits user-owned code
 
-## Keputusan
+## Decision
 
-Kiln hanya memiliki file yang dicatat di lockfile: hasil render extension dan
-`lib/extensions/extensions.g.dart`. `kiln remove` menghapus file hanya bila
-hash-nya masih sama dengan lockfile. File yang diedit pengguna dilewati kecuali
-`--force`.
+Kiln only owns the files recorded in the lockfile: extension render output and
+`lib/extensions/extensions.g.dart`. `kiln remove` deletes a file only while its
+hash still matches the lockfile. Files edited by the user are skipped unless
+`--force` is given.
 
-## Alasan
+## Rationale
 
-Pengguna harus bisa memperbaiki dan mengembangkan kode hasil generate tanpa
-takut ditimpa. Kepemilikan berbasis hash membuat batas ini eksplisit.
+Users must be able to fix and grow generated code without fearing it will be
+overwritten. Hash-based ownership makes that boundary explicit.
 
-## Konsekuensi
+## Consequences
 
-- Tidak ada update yang menimpa edit pengguna secara diam-diam.
-- Konflik dilaporkan dan pengguna memilih `--force` atau menyelesaikan manual.
-- `kiln doctor` adalah alat utama untuk mendeteksi perubahan.
+- No update silently overwrites a user's edits.
+- Conflicts are reported and the user either passes `--force` or resolves them
+  manually.
+- `kiln doctor` is the primary tool for detecting changes.

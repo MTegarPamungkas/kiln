@@ -1,18 +1,18 @@
-# 0003 — Hook berjalan dengan konfirmasi berdasarkan trust tier
+# 0003 — Hooks run only after trust-tier confirmation
 
-## Keputusan
+## Decision
 
-Hook hanya diizinkan untuk extension `official`/`verified` atau setelah
-persetujuan eksplisit pengguna. Fase fondasi tidak mengeksekusi hook otomatis;
-hook yang ada dilaporkan.
+Hooks are allowed only for `official`/`verified` extensions or after explicit
+user approval. The foundation phase does not execute hooks automatically;
+existing hooks are reported.
 
-## Alasan
+## Rationale
 
-Hook menjalankan kode arbitrer di mesin pengguna. Permukaan kepercayaan harus
-sekecil mungkin. Validasi deklaratif (prompt) lebih aman daripada hook.
+Hooks run arbitrary code on the user's machine. The trust surface must be as
+small as possible. Declarative validation (prompts) is safer than hooks.
 
-## Konsekuensi
+## Consequences
 
-- `dio` tidak memakai hook; validasi URL/int dilakukan `PromptSpec`.
-- `codegen` kelak membutuhkan hook karena menjalankan `build_runner`.
-- `firebase` dapat memakai `manual_steps` + doctor daripada hook.
+- `dio` uses no hooks; URL/int validation is done by `PromptSpec`.
+- `codegen` will need a hook later because it runs `build_runner`.
+- `firebase` can use `manual_steps` + doctor instead of a hook.

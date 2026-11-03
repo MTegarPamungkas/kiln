@@ -1,18 +1,19 @@
-# Slot
+# Slots
 
-Slot adalah titik sambung antar extension tanpa saling mengimpor. Pembuka slot
-menentukan tipe item dan urutan; penempel hanya menyumbang item.
+A slot is an attachment point between extensions without them importing each
+other. The opener of a slot defines the item type and the ordering;
+contributors only add items.
 
-| Slot | Dibuka oleh | Item | Penempel |
+| Slot | Opened by | Item | Contributors |
 | --- | --- | --- | --- |
-| `registry` | bootstrap | `KilnModule` | semua module |
+| `registry` | bootstrap | `KilnModule` | all modules |
 | `http.interceptors` | `dio` | `HttpMiddleware` | `connectivity`, `rest_auth`, `http_retry`, `http_cache`, `logger`, `crash_report` |
-| `router.routes` | `go_router` | `AppRoute` dari `app_basic` | extension komunitas |
+| `router.routes` | `go_router` | `AppRoute` from `app_basic` | community extensions |
 | `app.wrappers` | `app_basic` | `AppWrapper` | `flavors`, `biometric` |
 
-Prioritas kecil berjalan lebih dulu. Item dengan prioritas sama mempertahankan
-urutan pemasangan. `OrderedSlot<T>` di `kiln_core` menyediakan API ini dan
-menyimpan pemilik item untuk `remove`.
+A lower priority runs first. Items with the same priority keep the installation
+order. `OrderedSlot<T>` in `kiln_core` provides this API and tracks item owners
+for `remove`.
 
-`http.interceptors` membawa `HttpMiddleware` dari `kiln_core`, bukan
-`Interceptor` dio, supaya transport tetap bisa diganti.
+`http.interceptors` carries `HttpMiddleware` from `kiln_core`, not dio's
+`Interceptor`, so the transport stays swappable.

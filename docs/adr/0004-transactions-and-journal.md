@@ -1,19 +1,21 @@
-# 0004 — Perubahan diterapkan lewat transaksi dengan jurnal
+# 0004 — Changes are applied through transactions with a journal
 
-## Keputusan
+## Decision
 
-`add` dan `remove` menulis perubahan di dalam `Transaction` dengan snapshot di
-`.kiln/backups` dan jurnal di `.kiln/journal`. Commit memindahkan jurnal ke
-riwayat backup; `kiln rollback` memulihkan transaksi terhenti atau terakhir.
+`add` and `remove` write their changes inside a `Transaction` with snapshots in
+`.kiln/backups` and a journal in `.kiln/journal`. Commit moves the journal into
+the backup history; `kiln rollback` restores an interrupted or the last
+transaction.
 
-## Alasan
+## Rationale
 
-Instalasi menyentuh banyak file: render, pubspec, patch native, codegen, dan
-lockfile. Kegagalan di tengah jalan harus bisa dibalik.
+An installation touches many files: render output, pubspec, native patches,
+codegen, and the lockfile. A failure halfway through must be reversible.
 
-## Konsekuensi
+## Consequences
 
-- File baru dihapus saat rollback; file lama dipulihkan dari snapshot.
-- `doctor` melaporkan jurnal yang masih berjalan.
-- Backup dibersihkan saat rollback, tetapi dipertahankan setelah commit untuk
-  rollback berikutnya.
+- New files are deleted on rollback; existing files are restored from the
+  snapshot.
+- `doctor` reports journals that are still open.
+- Backups are cleaned up during rollback but kept after commit for the next
+  rollback.

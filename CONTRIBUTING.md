@@ -17,35 +17,38 @@ cd ../kiln_cli && dart test
 cd ../../extensions/dio && dart test
 ```
 
-Setelah mengubah brick atau manifest extension:
+After changing a brick or an extension manifest:
 
 ```bash
 dart run tool/bundle.dart
 dart run tool/bundle.dart --check
 ```
 
-## Aturan desain
+## Design rules
 
-- Kode aplikasi dan extension hanya bergantung pada kontrak `kiln_core`.
-- Extension bergantung pada capability, bukan id extension lain.
-- Akses layanan lewat Registry; tidak ada fasad statis atau global registry.
-- Kontrak melempar `Failure`; `Result<T>` adalah helper untuk kode fitur.
-- Semua perubahan instalasi lewat transaksi dengan jurnal dan rollback.
-- Jangan mengedit file milik pengguna. `remove` hanya menghapus file yang
-  hash-nya masih cocok.
-- Extension tidak mengimpor extension lain; gunakan slot.
-- Komentar kode dalam bahasa Inggris; teks UI mengikuti bahasa produk.
+- Application and extension code depends only on the `kiln_core` contracts.
+- Extensions depend on capabilities, not on other extension ids.
+- Access services through the Registry; there is no static facade or global
+  registry.
+- Contracts throw `Failure`; `Result<T>` is a helper for feature code.
+- All installation changes go through a transaction with a journal and
+  rollback.
+- Never edit files owned by the user. `remove` deletes only files whose hash
+  still matches.
+- Extensions never import another extension; use slots.
+- Code comments are in English; UI text follows the product language.
 
-## Dependency
+## Dependencies
 
-Gunakan versi terbaru yang bisa di-resolve toolchain. Jalankan
-`flutter pub outdated`; jangan menurunkan versi tanpa alasan. Dua pin yang
-didokumentasikan di `README.md` (`test` dan `kiln_lints`) mengikuti Flutter SDK
-dan `custom_lint`.
+Use the newest versions the toolchain can resolve. Run
+`flutter pub outdated`; do not downgrade a version without a reason. The two
+pins documented in `README.md` (`test` and `kiln_lints`) follow the Flutter SDK
+and `custom_lint`.
 
-## Pull request
+## Pull requests
 
-- Jelaskan alasan perubahan, bukan hanya isinya.
-- Sertakan test untuk perilaku baru atau bug yang diperbaiki.
-- Pastikan `dart analyze` bersih, semua suite hijau, dan bundle check lulus.
-- Jangan campur refactor besar dengan perubahan perilaku.
+- Explain why the change is needed, not only what it contains.
+- Include tests for new behavior or for the bug being fixed.
+- Make sure `dart analyze` is clean, all suites are green, and the bundle
+  check passes.
+- Do not mix large refactors with behavior changes.

@@ -1,8 +1,8 @@
 # Schema versioning
 
-`SchemaMigrator` menyimpan versi di koleksi `_schema` dan menjalankan langkah
-migrasi yang belum diterapkan. Tambahkan langkah baru di urutan berikutnya;
-jangan mengubah langkah yang sudah dirilis.
+`SchemaMigrator` stores the version in the `_schema` collection and runs the
+migration steps that have not been applied yet. Add new steps in the next
+position; do not change steps that have already been released.
 
-`BackupExport` mengekspor koleksi yang dipilih ke JSON dan memulihkannya lewat
-`import`.
+`BackupExport` exports the selected collections to JSON and restores them
+through `import`.

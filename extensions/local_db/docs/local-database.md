@@ -9,5 +9,5 @@ final tasks = await database.query(
 );
 ```
 
-`TypedCollection<T>` mengubah dokumen menjadi model. `watch` memancarkan
-snapshot koleksi setiap kali data berubah.
+`TypedCollection<T>` turns documents into models. `watch` emits a snapshot of the
+collection every time the data changes.

@@ -1,7 +1,7 @@
-# Catatan review store
+# Store review notes
 
-Hanya minta izin yang benar-benar dipakai. App Store dan Play Store dapat
-menolak aplikasi yang meminta izin tanpa alasan jelas.
+Only request permissions that are actually used. The App Store and Play Store
+can reject apps that request permissions without a clear reason.
 
-Karena itu prompt `kinds` membatasi kind aktif, dan rationale harus menjelaskan
-manfaat izin sebelum dialog sistem muncul.
+That is why the `kinds` prompt limits the active kinds, and the rationale must
+explain the benefit of the permission before the system dialog appears.

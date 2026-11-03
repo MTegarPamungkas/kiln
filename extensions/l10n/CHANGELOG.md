@@ -13,12 +13,12 @@
 
 ## 0.1.0
 
-- Rilis awal: controller locale dan penyimpanan pilihan lewat `Storage` bila
-  tersedia.
-- Terjemahan bersumber dari file ARB (`lib/l10n/app_<locale>.arb`) dan
-  `flutter gen-l10n`; installer mengaktifkan `flutter.generate`.
-- Resolusi locale regional seperti `id_ID` dipetakan ke `id`.
-- Placeholder dan plural mengikuti aturan ARB/intl, bukan formatter sendiri.
-- Format tanggal/angka/mata uang menurut locale, dan pesan ramah untuk setiap
-  `FailureCode` dari ARB.
-- Widget `LanguageSwitcher` dalam gaya dropdown dan segmented.
+- Initial release: locale controller and persisting the choice through
+  `Storage` when available.
+- Translations sourced from ARB files (`lib/l10n/app_<locale>.arb`) and
+  `flutter gen-l10n`; the installer enables `flutter.generate`.
+- Regional locale resolution such as `id_ID` maps to `id`.
+- Placeholders and plurals follow ARB/intl rules, not a custom formatter.
+- Date/number/currency formatting per locale, and friendly messages for each
+  `FailureCode` from ARB.
+- `LanguageSwitcher` widget in dropdown and segmented styles.

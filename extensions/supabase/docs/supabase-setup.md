@@ -1,51 +1,54 @@
-# Persiapan Supabase
+# Supabase setup
 
-Extension ini butuh satu project Supabase. Semua nilai yang dirender berasal
-dari `extension.yaml`; nilai lain ada di `SupabaseConfig.defaults`.
+This extension needs one Supabase project. All rendered values come from
+`extension.yaml`; other values live in `SupabaseConfig.defaults`.
 
-## 1. Ambil URL dan anon key
+## 1. Get the URL and anon key
 
-Di dashboard Supabase buka **Project settings > API**:
+In the Supabase dashboard open **Project settings > API**:
 
-- **Project URL** diisi ke prompt `url`, misalnya
+- **Project URL** goes into the `url` prompt, for example
   `https://abcdefgh.supabase.co`.
-- **anon (publishable) key** diisi ke prompt `anon_key`.
+- **anon (publishable) key** goes into the `anon_key` prompt.
 
-Jangan pernah memakai **service role key** di aplikasi. Key itu melewati semua
-policy RLS dan hanya untuk server.
+Never use the **service role key** in the app. That key bypasses all RLS policies
+and is for the server only.
 
-## 2. Skema PostgREST
+## 2. PostgREST schema
 
-Prompt `schema` menentukan schema yang dipakai `RemoteDatabase` dan realtime.
-Bawaannya `public`. Bila tabel tinggal di schema lain, ekspos schema tersebut di
-**Project settings > API > Exposed schemas**, lalu isi prompt dengan namanya.
+The `schema` prompt determines the schema used by `RemoteDatabase` and realtime.
+It defaults to `public`. If the tables live in another schema, expose that schema
+in **Project settings > API > Exposed schemas**, then fill the prompt with its
+name.
 
-## 3. Konfigurasi bertipe
+## 3. Typed configuration
 
-`SupabaseConfig.defaults` dirender ke `lib/extensions/supabase/supabase_config.dart`.
-Nilai yang sering disesuaikan:
+`SupabaseConfig.defaults` is rendered to
+`lib/extensions/supabase/supabase_config.dart`. Values that are often adjusted:
 
-- `storageBucket` (bawaan `public`) — bucket untuk `FileStorage`.
-- `authRedirectUrl` (bawaan `kiln-auth://auth-callback`) — dikirim ke Supabase
-  untuk konfirmasi email, reset password, dan OAuth.
-- `signedUrlLifetime` (bawaan 1 jam) — masa berlaku `FileStorage.url`.
-- `authTimeout` (bawaan 5 menit) — batas menunggu sesi setelah OAuth.
-- `usePkce` (bawaan `true`) — alur PKCE wajib untuk aplikasi mobile.
-- `detectSessionInUri` (bawaan `false`) — biarkan mati karena callback dibaca
-  `SupabaseLinkHandler` lewat kontrak `DeepLinks`.
+- `storageBucket` (default `public`) — the bucket for `FileStorage`.
+- `authRedirectUrl` (default `kiln-auth://auth-callback`) — sent to Supabase for
+  email confirmation, password reset, and OAuth.
+- `signedUrlLifetime` (default 1 hour) — the validity period of
+  `FileStorage.url`.
+- `authTimeout` (default 5 minutes) — the limit for waiting for a session after
+  OAuth.
+- `usePkce` (default `true`) — the PKCE flow is required for mobile apps.
+- `detectSessionInUri` (default `false`) — leave it off because the callback is
+  read by `SupabaseLinkHandler` through the `DeepLinks` contract.
 
-`SupabaseConfig.validate()` bisa dipanggil lebih awal untuk memastikan URL,
-anon key, schema, dan redirect valid. Pesan error tidak pernah memuat anon key.
+`SupabaseConfig.validate()` can be called early to make sure the URL, anon key,
+schema, and redirect are valid. Error messages never contain the anon key.
 
-## 4. Inisialisasi
+## 4. Initialization
 
-`SupabaseModule.ready` memanggil `SupabaseClientProvider.load()` yang membuat
-klien dengan `Supabase.initialize` (PKCE, auto refresh token, sesi persisten).
-Klien dipakai bersama oleh semua gateway, jadi jangan membuat klien Supabase
-kedua di aplikasi.
+`SupabaseModule.ready` calls `SupabaseClientProvider.load()`, which creates the
+client with `Supabase.initialize` (PKCE, auto refresh token, persistent session).
+The client is shared by all gateways, so do not create a second Supabase client
+in the app.
 
-## 5. Bucket storage
+## 5. Storage bucket
 
-`FileStorage` memakai satu bucket. Buat bucket tersebut di **Storage**, lalu
-tambahkan policy pada `storage.objects` untuk folder yang dipakai aplikasi.
-`url()` selalu mengembalikan signed URL, jadi bucket boleh privat.
+`FileStorage` uses a single bucket. Create that bucket in **Storage**, then add
+policies on `storage.objects` for the folders the app uses. `url()` always
+returns a signed URL, so the bucket may be private.

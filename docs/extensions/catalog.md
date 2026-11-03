@@ -1,9 +1,9 @@
-# Katalog extension
+# Extension catalog
 
-Katalog ini dihasilkan dari manifest extension oleh
-`tool/gen_catalog_docs.dart`. Jangan diedit manual.
+This catalog is generated from extension manifests by
+`tool/gen_catalog_docs.dart`. Do not edit it manually.
 
-| Id | Nama | Versi | Kategori | Tier | Provides |
+| ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
 | `appwrite` | Appwrite | 0.1.1 | auth | official | `auth`, `remote_database`, `file_storage` |

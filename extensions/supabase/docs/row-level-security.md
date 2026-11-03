@@ -1,10 +1,9 @@
 # Row level security
 
-`RemoteDatabase` mengirim request sebagai user yang sedang masuk, jadi RLS
-adalah satu-satunya lapisan yang membatasi data. Anon key hanya memberi akses
-sesuai policy.
+`RemoteDatabase` sends requests as the signed-in user, so RLS is the only layer
+that restricts data. The anon key only grants access according to the policies.
 
-## Tabel dokumen
+## Document table
 
 ```sql
 create table public.tasks (
@@ -18,7 +17,7 @@ create table public.tasks (
 alter table public.tasks enable row level security;
 ```
 
-## Policy untuk pemilik baris
+## Policies for the row owner
 
 ```sql
 create policy "tasks_select_own"
@@ -39,18 +38,18 @@ create policy "tasks_delete_own"
   using (owner_id = auth.uid());
 ```
 
-Dengan policy ini:
+With these policies:
 
-- `read` untuk baris milik user lain menghasilkan `null`, bukan error, karena
-  `SupabaseRemoteDatabase` memakai `maybeSingle()`.
-- `update` dan `delete` untuk baris yang tidak terlihat menghasilkan
+- `read` for another user's row returns `null` rather than an error, because
+  `SupabaseRemoteDatabase` uses `maybeSingle()`.
+- `update` and `delete` for rows that are not visible return
   `Failure(remote_database.not_found)`.
-- `insert` dengan `owner_id` orang lain gagal dengan
-  `Failure(remote_database.query_failed)` berkategori `authorization`.
+- `insert` with someone else's `owner_id` fails with
+  `Failure(remote_database.query_failed)` in the `authorization` category.
 
 ## Storage
 
-Policy storage mengikuti folder per user:
+Storage policies follow a per-user folder:
 
 ```sql
 create policy "avatars_owner_read"
@@ -62,17 +61,16 @@ create policy "avatars_owner_write"
   with check (bucket_id = 'public' and owner = auth.uid());
 ```
 
-`FileStorage.delete` dan `upload` memakai user yang sama, jadi policy `delete`
-dan `update` perlu ditambahkan bila aplikasi mengganti berkas dengan
-`upsert`.
+`FileStorage.delete` and `upload` use the same user, so `delete` and `update`
+policies need to be added if the app replaces files with `upsert`.
 
 ## Realtime
 
-RLS juga berlaku untuk realtime. Agar `watch` menerima perubahan, tabel harus
-masuk publikasi `supabase_realtime`:
+RLS also applies to realtime. For `watch` to receive changes, the table must be
+part of the `supabase_realtime` publication:
 
 ```sql
 alter publication supabase_realtime add table public.tasks;
 ```
 
-User hanya menerima perubahan baris yang lolos policy `select`.
+The user only receives changes to rows that pass the `select` policy.

@@ -2,29 +2,31 @@
 
 ## Android
 
-- **Activity destroyed saat memilih.** Android bisa membunuh activity ketika
-  kamera terbuka. Panggil `LostDataRecovery.recover()` saat start untuk
-  mengambil hasil yang tertinggal.
-- **Photo picker.** Android 13 ke atas memakai photo picker sistem sehingga
-  tidak butuh izin penyimpanan untuk galeri.
-- **Kamera.** Membuka kamera lewat intent tidak membutuhkan izin `CAMERA` bila
-  aplikasi tidak mendeklarasikannya. Bila izin itu dideklarasikan, aplikasi
-  harus memintanya sendiri; precheck menangani ini lewat kontrak `Permissions`.
+- **Activity destroyed while picking.** Android can kill the activity while the
+  camera is open. Call `LostDataRecovery.recover()` on start to retrieve the
+  leftover result.
+- **Photo picker.** Android 13 and above use the system photo picker, so no
+  storage permission is needed for the gallery.
+- **Camera.** Opening the camera through an intent does not require the `CAMERA`
+  permission if the app does not declare it. If that permission is declared,
+  the app must request it itself; the precheck handles this through the
+  `Permissions` contract.
 
-## iOS dan macOS
+## iOS and macOS
 
-Extension menambahkan `NSPhotoLibraryUsageDescription` dan
-`NSCameraUsageDescription` ke `Info.plist`, serta entitlement file dan kamera
-untuk macOS. Teks izin bisa diganti di `extension.yaml` sebelum install.
+The extension adds `NSPhotoLibraryUsageDescription` and
+`NSCameraUsageDescription` to `Info.plist`, plus file and camera entitlements
+for macOS. The permission text can be changed in `extension.yaml` before
+install.
 
 ## Web
 
-`XFile.path` berupa blob URL dan tidak bisa dipakai lintas sesi. Selalu unggah
-dari `PickedImage.bytes`, bukan dari path. `PickedImageX.toImageProvider`
-memakai `MemoryImage`; tanpa byte ia melempar `Failure(media.invalid)`.
+`XFile.path` is a blob URL and cannot be used across sessions. Always upload
+from `PickedImage.bytes`, not from the path. `PickedImageX.toImageProvider` uses
+`MemoryImage`; without bytes it throws `Failure(media.invalid)`.
 
-## Batas ukuran
+## Size limits
 
-Batas diperiksa setelah byte dibaca. Untuk mencegah memori berlebih pada file
-sangat besar, pertahankan `max_bytes` yang wajar dan gunakan `maxWidth`,
-`maxHeight`, dan `imageQuality` agar plugin mengecilkan gambar sebelum dibaca.
+Limits are checked after the bytes are read. To prevent excessive memory use on
+very large files, keep `max_bytes` reasonable and use `maxWidth`, `maxHeight`,
+and `imageQuality` so the plugin shrinks the image before it is read.

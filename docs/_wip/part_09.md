@@ -1,105 +1,105 @@
-## Extension: platform
+## Extensions: platform
 
-Empat extension yang membungkus kemampuan perangkat. Hampir semuanya punya
-`*_gateway.dart`: plugin platform sulit dites, jadi logika (pemetaan status,
-stream, penjadwalan) dipisah dari panggilan plugin dan dites dengan fake.
+Four extensions that wrap device capabilities. Nearly all of them have a
+`*_gateway.dart`: platform plugins are hard to test, so the logic (status mapping,
+streams, scheduling) is separated from the plugin calls and tested with fakes.
 
-`permission` adalah yang paling banyak menyentuh file native (manifest
-Android, plist iOS, flag Podfile), jadi ia mendapat prompt `kinds` supaya hanya
-izin yang dipilih yang ditambahkan ke proyek.
+`permission` touches the most native files (Android manifest, iOS plist, Podfile
+flags), so it gets a `kinds` prompt so that only the selected permissions are
+added to the project.
 
 ### permission
 
 ```text
 extensions/permission/
-├─ extension.yaml                           # manifest: provides: permission · category: platform · exclusive · prompts: kinds (multi-pilih) · patch per kind: android, plist, podfile PERMISSION_*
-├─ README.md                                # pengantar extension permission: fungsi, cara pasang, dan contoh pakai
-├─ CHANGELOG.md                             # catatan perubahan extension permission per versi
-├─ docs/                                    # dokumentasi extension permission untuk pengguna dan kontributor
-│  ├─ permissions.md                        # daftar kind izin yang didukung beserta patch native-nya
-│  ├─ permission-flow.md                    # menjelaskan alur izin: status, rationale, request, buka settings
-│  └─ store-review-notes.md                 # menjelaskan kenapa hanya izin terpilih yang ditambahkan (App Store dan Play)
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason: template yang dirender ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason: nama, versi, dan variabel template
-   └─ __brick__/                            # isi template yang dirender ke proyek aplikasi
-      ├─ lib/extensions/permission/                 # kode extension permission yang dirender ke lib aplikasi
-      │  ├─ permission_module.dart                  # mendaftarkan implementasi Permissions ke Registry
-      │  ├─ device_permissions.dart                 # implementasi kontrak Permissions di atas PermissionGateway
-      │  ├─ permission_config.dart                  # konfigurasi bertipe: kind yang aktif, teks rationale bawaan
-      │  ├─ permission_gateway.dart                 # membungkus permission_handler (SdkPermissionGateway) agar bisa di-fake di test
-      │  ├─ permission_failure_mapper.dart          # mengubah error plugin menjadi Failure(permission atau unavailable)
-      │  ├─ permission_kind_guard.dart              # menolak kind yang tidak diaktifkan dengan Failure(configuration), bukan crash native
-      │  ├─ permission_flow.dart                    # menjalankan ensure(kind): status, rationale, request, ke settings bila permanen
-      │  ├─ permission_group.dart                   # meminta beberapa kind sekaligus, mis. kamera dan mikrofon untuk video
-      │  ├─ permission_status_cache.dart            # mengurangi panggilan platform berulang, cache dibatalkan saat onResume
-      │  ├─ permission_resume_observer.dart         # mengecek ulang status setelah user kembali dari settings (Lifecycle)
-      │  └─ widgets/                                # widget izin siap pakai: gate dan dialog
-      │     ├─ permission_gate.dart                 # menampilkan child hanya bila granted, selain itu fallback
-      │     ├─ permission_rationale_dialog.dart     # dialog yang menjelaskan alasan izin sebelum permintaan sistem muncul
-      │     └─ open_settings_dialog.dart            # dialog yang mengarahkan user ke settings saat izin ditolak permanen
-      └─ test/extensions/permission/                # test yang ikut dirender ke aplikasi dan jalan di sana
-         ├─ device_permissions_test.dart            # menguji bahwa DevicePermissions meneruskan status dan permintaan ke gateway fake
-         ├─ permission_module_test.dart             # menguji bahwa module mendaftarkan Permissions ke Registry
-         ├─ permission_config_test.dart             # menguji nilai bawaan kind aktif dan teks rationale
-         ├─ permission_failure_mapper_test.dart     # menguji pemetaan error plugin ke Failure permission atau unavailable
-         ├─ permission_kind_guard_test.dart         # menguji bahwa kind nonaktif menghasilkan Failure(configuration)
-         ├─ permission_flow_test.dart               # menguji alur ensure: status, rationale, request, dan arahan ke settings
-         ├─ permission_group_test.dart              # menguji permintaan beberapa kind sekaligus dan penggabungan hasilnya
-         ├─ permission_status_cache_test.dart       # menguji bahwa status di-cache dan dibatalkan saat onResume
-         ├─ permission_resume_observer_test.dart    # menguji pengecekan ulang status setelah user kembali dari settings
-         ├─ permission_gate_test.dart               # menguji bahwa PermissionGate menampilkan child hanya bila granted
-         ├─ permission_dialogs_test.dart            # menguji teks dan aksi dialog rationale serta dialog buka settings
-         └─ permissions_contract_test.dart          # menjalankan suite kontrak Permissions dari kiln_testing ke implementasi ini
+├─ extension.yaml                           # manifest: provides: permission · category: platform · exclusive · prompts: kinds (multi-select) · patch per kind: android, plist, podfile PERMISSION_*
+├─ README.md                                # introduction to the permission extension: what it does, how to install it, and usage examples
+├─ CHANGELOG.md                             # changelog of the permission extension per version
+├─ docs/                                    # permission extension documentation for users and contributors
+│  ├─ permissions.md                        # list of supported permission kinds with their native patches
+│  ├─ permission-flow.md                    # explains the permission flow: status, rationale, request, open settings
+│  └─ store-review-notes.md                 # explains why only the selected permissions are added (App Store and Play)
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick to a temp folder, the result must match the golden
+│  ├─ analyze_test.dart                     # the rendered result must pass dart analyze without warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, generated via kiln ext test --update-goldens
+└─ brick/                                   # Mason brick: templates rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata: name, version, and template variables
+   └─ __brick__/                            # template contents rendered into the application project
+      ├─ lib/extensions/permission/                 # permission extension code rendered into the application lib
+      │  ├─ permission_module.dart                  # registers the Permissions implementation with the Registry
+      │  ├─ device_permissions.dart                 # Permissions contract implementation on top of PermissionGateway
+      │  ├─ permission_config.dart                  # typed configuration: active kinds, default rationale text
+      │  ├─ permission_gateway.dart                 # wraps permission_handler (SdkPermissionGateway) so it can be faked in tests
+      │  ├─ permission_failure_mapper.dart          # maps plugin errors to Failure(permission or unavailable)
+      │  ├─ permission_kind_guard.dart              # rejects kinds that are not enabled with Failure(configuration), not a native crash
+      │  ├─ permission_flow.dart                    # runs ensure(kind): status, rationale, request, to settings when permanently denied
+      │  ├─ permission_group.dart                   # requests several kinds at once, e.g. camera and microphone for video
+      │  ├─ permission_status_cache.dart            # reduces repeated platform calls, the cache is invalidated on onResume
+      │  ├─ permission_resume_observer.dart         # re-checks the status after the user returns from settings (Lifecycle)
+      │  └─ widgets/                                # ready-made permission widgets: gate and dialogs
+      │     ├─ permission_gate.dart                 # shows the child only when granted, otherwise the fallback
+      │     ├─ permission_rationale_dialog.dart     # dialog that explains the reason for the permission before the system prompt appears
+      │     └─ open_settings_dialog.dart            # dialog that sends the user to settings when the permission is permanently denied
+      └─ test/extensions/permission/                # tests that are also rendered into the app and run there
+         ├─ device_permissions_test.dart            # tests that DevicePermissions forwards status and requests to the fake gateway
+         ├─ permission_module_test.dart             # tests that the module registers Permissions with the Registry
+         ├─ permission_config_test.dart             # tests the default active kinds and rationale text
+         ├─ permission_failure_mapper_test.dart     # tests mapping plugin errors to Failure permission or unavailable
+         ├─ permission_kind_guard_test.dart         # tests that a disabled kind yields Failure(configuration)
+         ├─ permission_flow_test.dart               # tests the ensure flow: status, rationale, request, and the route to settings
+         ├─ permission_group_test.dart              # tests requesting several kinds at once and merging their results
+         ├─ permission_status_cache_test.dart       # tests that status is cached and invalidated on onResume
+         ├─ permission_resume_observer_test.dart    # tests re-checking the status after the user returns from settings
+         ├─ permission_gate_test.dart               # tests that PermissionGate shows the child only when granted
+         ├─ permission_dialogs_test.dart            # tests the text and actions of the rationale and open settings dialogs
+         └─ permissions_contract_test.dart          # runs the Permissions contract suite from kiln_testing against this implementation
 ```
 
 ### connectivity
 
 ```text
 extensions/connectivity/
-├─ extension.yaml                           # manifest: provides: connectivity · category: connectivity · exclusive · prompts: probe_url (opsional), probe_interval
-├─ README.md                                # pengantar extension connectivity: fungsi, cara pasang, dan contoh pakai
-├─ CHANGELOG.md                             # catatan perubahan extension connectivity per versi
-├─ docs/                                    # dokumentasi extension connectivity untuk pengguna dan kontributor
-│  ├─ connectivity.md                       # panduan memakai NetworkMonitor, konfigurasi, dan widget status jaringan
-│  └─ offline-handling.md                   # menjelaskan beda online di jaringan dan server terjangkau; kapan memakai probe
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason: template yang dirender ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason: nama, versi, dan variabel template
-   └─ __brick__/                            # isi template yang dirender ke proyek aplikasi
-      ├─ lib/extensions/connectivity/               # kode extension connectivity yang dirender ke lib aplikasi
-      │  ├─ connectivity_module.dart                # mendaftarkan NetworkMonitor ke Registry
-      │  ├─ device_network_monitor.dart             # implementasi kontrak NetworkMonitor di atas ConnectivityGateway
-      │  ├─ connectivity_config.dart                # konfigurasi bertipe: URL probe, interval, timeout, jendela debounce
-      │  ├─ connectivity_gateway.dart               # membungkus connectivity_plus (SdkConnectivityGateway) agar bisa di-fake di test
-      │  ├─ connectivity_failure_mapper.dart        # mengubah error plugin menjadi Failure(unavailable)
-      │  ├─ reachability_probe.dart                 # mengirim HEAD ke URL probe lewat kontrak HttpClient (readOrNull), opsional
-      │  ├─ status_stabilizer.dart                  # meredam Wi-Fi yang naik turun, memakai Debouncer dari kiln_core
-      │  ├─ reconnect_trigger.dart                  # menjalankan aksi tertunda saat status berubah ke online
-      │  ├─ offline_guard_middleware.dart           # middleware http.interceptors (when: http_pipeline), gagal cepat Failure(network) saat offline
-      │  └─ widgets/                                # widget siap pakai untuk menampilkan status jaringan
-      │     ├─ offline_banner.dart                  # menampilkan spanduk saat offline, tidak muncul selama status masih unknown
-      │     └─ network_status_builder.dart          # membangun widget sesuai NetworkStatus terkini
-      └─ test/extensions/connectivity/              # test yang ikut dirender ke aplikasi dan jalan di sana
-         ├─ device_network_monitor_test.dart        # menguji bahwa status dan stream NetworkMonitor mengikuti gateway fake
-         ├─ connectivity_module_test.dart           # menguji bahwa module mendaftarkan NetworkMonitor ke Registry
-         ├─ connectivity_config_test.dart           # menguji nilai bawaan URL probe, interval, timeout, dan jendela debounce
-         ├─ connectivity_failure_mapper_test.dart   # menguji pemetaan error plugin menjadi Failure(unavailable)
-         ├─ reachability_probe_test.dart            # menguji probe HEAD: sukses, gagal, dan dilewati bila HttpClient tidak ada
-         ├─ status_stabilizer_test.dart             # menguji bahwa Wi-Fi yang naik turun diredam sesuai jendela debounce
-         ├─ reconnect_trigger_test.dart             # menguji bahwa aksi tertunda jalan saat status berubah ke online
-         ├─ offline_guard_middleware_test.dart      # menguji bahwa request gagal cepat dengan Failure(network) saat offline
-         ├─ offline_banner_test.dart                # menguji spanduk muncul saat offline dan tersembunyi saat status unknown
-         ├─ network_status_builder_test.dart        # menguji bahwa builder dipanggil sesuai NetworkStatus
-         └─ connectivity_contract_test.dart         # menjalankan suite kontrak NetworkMonitor dari kiln_testing ke implementasi ini
+├─ extension.yaml                           # manifest: provides: connectivity · category: connectivity · exclusive · prompts: probe_url (optional), probe_interval
+├─ README.md                                # introduction to the connectivity extension: what it does, how to install it, and usage examples
+├─ CHANGELOG.md                             # changelog of the connectivity extension per version
+├─ docs/                                    # connectivity extension documentation for users and contributors
+│  ├─ connectivity.md                       # guide to using NetworkMonitor, its configuration, and the network status widgets
+│  └─ offline-handling.md                   # explains the difference between being online on the network and the server being reachable; when to use the probe
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick to a temp folder, the result must match the golden
+│  ├─ analyze_test.dart                     # the rendered result must pass dart analyze without warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, generated via kiln ext test --update-goldens
+└─ brick/                                   # Mason brick: templates rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata: name, version, and template variables
+   └─ __brick__/                            # template contents rendered into the application project
+      ├─ lib/extensions/connectivity/               # connectivity extension code rendered into the application lib
+      │  ├─ connectivity_module.dart                # registers NetworkMonitor with the Registry
+      │  ├─ device_network_monitor.dart             # NetworkMonitor contract implementation on top of ConnectivityGateway
+      │  ├─ connectivity_config.dart                # typed configuration: probe URL, interval, timeout, debounce window
+      │  ├─ connectivity_gateway.dart               # wraps connectivity_plus (SdkConnectivityGateway) so it can be faked in tests
+      │  ├─ connectivity_failure_mapper.dart        # maps plugin errors to Failure(unavailable)
+      │  ├─ reachability_probe.dart                 # sends a HEAD to the probe URL through the HttpClient contract (readOrNull), optional
+      │  ├─ status_stabilizer.dart                  # dampens flapping Wi-Fi using the Debouncer from kiln_core
+      │  ├─ reconnect_trigger.dart                  # runs pending actions when the status changes to online
+      │  ├─ offline_guard_middleware.dart           # http.interceptors middleware (when: http_pipeline), fails fast with Failure(network) when offline
+      │  └─ widgets/                                # ready-made widgets for showing network status
+      │     ├─ offline_banner.dart                  # shows a banner when offline, does not appear while the status is still unknown
+      │     └─ network_status_builder.dart          # builds a widget according to the current NetworkStatus
+      └─ test/extensions/connectivity/              # tests that are also rendered into the app and run there
+         ├─ device_network_monitor_test.dart        # tests that NetworkMonitor status and stream follow the fake gateway
+         ├─ connectivity_module_test.dart           # tests that the module registers NetworkMonitor with the Registry
+         ├─ connectivity_config_test.dart           # tests the default probe URL, interval, timeout, and debounce window
+         ├─ connectivity_failure_mapper_test.dart   # tests mapping plugin errors to Failure(unavailable)
+         ├─ reachability_probe_test.dart            # tests the HEAD probe: success, failure, and skipped when HttpClient is absent
+         ├─ status_stabilizer_test.dart             # tests that flapping Wi-Fi is dampened according to the debounce window
+         ├─ reconnect_trigger_test.dart             # tests that pending actions run when the status changes to online
+         ├─ offline_guard_middleware_test.dart      # tests that requests fail fast with Failure(network) when offline
+         ├─ offline_banner_test.dart                # tests that the banner appears when offline and is hidden while the status is unknown
+         ├─ network_status_builder_test.dart        # tests that the builder is called according to the NetworkStatus
+         └─ connectivity_contract_test.dart         # runs the NetworkMonitor contract suite from kiln_testing against this implementation
 ```
 
 ### notifications
@@ -107,49 +107,49 @@ extensions/connectivity/
 ```text
 extensions/notifications/
 ├─ extension.yaml                           # manifest: provides: notifications · category: notifications · exclusive · prompts: default_channel, small_icon, exact_alarms · platform: android, ios
-├─ README.md                                # pengantar extension notifications: fungsi, cara pasang, dan contoh pakai
-├─ CHANGELOG.md                             # catatan perubahan extension notifications per versi
-├─ docs/                                    # dokumentasi extension notifications untuk pengguna dan kontributor
-│  ├─ notifications.md                      # panduan memakai Notifications: izin, channel, penjadwalan, dan tap
-│  ├─ android-channels.md                   # cara mendefinisikan dan memakai channel notifikasi Android
-│  ├─ scheduling-and-timezones.md           # menjelaskan zona waktu perangkat, DST, dan batas penjadwalan
-│  └─ troubleshooting-delivery.md           # panduan masalah pengiriman: optimasi baterai Android, delegate iOS, batas web
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason: template yang dirender ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason: nama, versi, dan variabel template
-   └─ __brick__/                            # isi template yang dirender ke proyek aplikasi
-      ├─ lib/extensions/notifications/              # kode extension notifications yang dirender ke lib aplikasi
-      │  ├─ notifications_module.dart               # mendaftarkan implementasi Notifications ke Registry
-      │  ├─ device_notifications.dart               # implementasi kontrak Notifications di atas NotificationGateway
-      │  ├─ notification_gateway.dart               # interface yang membungkus plugin notifikasi agar bisa di-fake di test
-      │  ├─ plugin_notification_gateway.dart        # implementasi gateway yang memanggil plugin notifikasi di perangkat
-      │  ├─ notifications_config.dart               # konfigurasi bertipe: channel bawaan, ikon kecil, suara, kebijakan alarm eksak
-      │  ├─ notification_failure_mapper.dart        # mengubah error plugin menjadi Failure(notifications, permission, atau unavailable)
-      │  ├─ notification_channels.dart              # mendefinisikan channel Android yang dibuat saat start
-      │  ├─ timezone_resolver.dart                  # menentukan tz.local dari zona perangkat, bukan UTC
-      │  ├─ notification_payload.dart               # menyandikan payload JSON bertipe (route, argumen) dengan batas ukuran
-      │  ├─ notification_id_allocator.dart          # membuat id stabil dari kunci string, mencegah tabrakan id
-      │  ├─ notification_tap_hub.dart               # menggabungkan tap foreground, tap latar belakang, dan launchTap
-      │  ├─ background_tap_handler.dart             # menerima tap di latar belakang lewat fungsi top-level @pragma('vm:entry-point')
-      │  ├─ notification_permission_flow.dart       # meminta izin pada momen yang tepat lewat kontrak Permissions (readOrNull)
-      │  └─ reminder_scheduler.dart                 # menjadwalkan ulang pengingat secara idempoten per kunci, aman dipanggil setiap start
-      └─ test/extensions/notifications/             # test yang ikut dirender ke aplikasi dan jalan di sana
-         ├─ device_notifications_test.dart          # menguji bahwa DeviceNotifications meneruskan perintah ke gateway fake
-         ├─ notifications_module_test.dart          # menguji bahwa module mendaftarkan Notifications ke Registry
-         ├─ notifications_config_test.dart          # menguji nilai bawaan channel, ikon kecil, suara, dan kebijakan alarm eksak
-         ├─ notification_failure_mapper_test.dart   # menguji pemetaan error plugin ke Failure notifications, permission, atau unavailable
-         ├─ notification_channels_test.dart         # menguji bahwa channel Android didefinisikan saat start
-         ├─ timezone_resolver_test.dart             # menguji bahwa tz.local mengikuti zona perangkat, bukan UTC
-         ├─ notification_payload_test.dart          # menguji payload JSON bertipe: round-trip route dan argumen, serta batas ukuran
-         ├─ notification_id_allocator_test.dart     # menguji bahwa id stabil per kunci string dan tidak bertabrakan
-         ├─ notification_tap_hub_test.dart          # menguji bahwa tap foreground, latar belakang, dan launchTap digabung
-         ├─ notification_permission_flow_test.dart  # menguji permintaan izin lewat Permissions, termasuk saat kontrak tidak terdaftar
-         ├─ reminder_scheduler_test.dart            # menguji bahwa penjadwalan ulang idempoten per kunci
-         └─ notifications_contract_test.dart        # menjalankan suite kontrak Notifications dari kiln_testing ke implementasi ini
+├─ README.md                                # introduction to the notifications extension: what it does, how to install it, and usage examples
+├─ CHANGELOG.md                             # changelog of the notifications extension per version
+├─ docs/                                    # notifications extension documentation for users and contributors
+│  ├─ notifications.md                      # guide to using Notifications: permissions, channels, scheduling, and taps
+│  ├─ android-channels.md                   # how to define and use Android notification channels
+│  ├─ scheduling-and-timezones.md           # explains the device time zone, DST, and scheduling limits
+│  └─ troubleshooting-delivery.md           # delivery troubleshooting guide: Android battery optimization, iOS delegate, web limits
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick to a temp folder, the result must match the golden
+│  ├─ analyze_test.dart                     # the rendered result must pass dart analyze without warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, generated via kiln ext test --update-goldens
+└─ brick/                                   # Mason brick: templates rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata: name, version, and template variables
+   └─ __brick__/                            # template contents rendered into the application project
+      ├─ lib/extensions/notifications/              # notifications extension code rendered into the application lib
+      │  ├─ notifications_module.dart               # registers the Notifications implementation with the Registry
+      │  ├─ device_notifications.dart               # Notifications contract implementation on top of NotificationGateway
+      │  ├─ notification_gateway.dart               # interface that wraps the notification plugin so it can be faked in tests
+      │  ├─ plugin_notification_gateway.dart        # gateway implementation that calls the notification plugin on the device
+      │  ├─ notifications_config.dart               # typed configuration: default channel, small icon, sound, exact alarm policy
+      │  ├─ notification_failure_mapper.dart        # maps plugin errors to Failure(notifications, permission, or unavailable)
+      │  ├─ notification_channels.dart              # defines the Android channels created at startup
+      │  ├─ timezone_resolver.dart                  # determines tz.local from the device time zone, not UTC
+      │  ├─ notification_payload.dart               # encodes a typed JSON payload (route, arguments) with a size limit
+      │  ├─ notification_id_allocator.dart          # builds stable ids from a string key, preventing id collisions
+      │  ├─ notification_tap_hub.dart               # merges foreground taps, background taps, and launchTap
+      │  ├─ background_tap_handler.dart             # receives taps in the background via a top-level @pragma('vm:entry-point') function
+      │  ├─ notification_permission_flow.dart       # requests permission at the right moment through the Permissions contract (readOrNull)
+      │  └─ reminder_scheduler.dart                 # reschedules reminders idempotently per key, safe to call on every start
+      └─ test/extensions/notifications/             # tests that are also rendered into the app and run there
+         ├─ device_notifications_test.dart          # tests that DeviceNotifications forwards commands to the fake gateway
+         ├─ notifications_module_test.dart          # tests that the module registers Notifications with the Registry
+         ├─ notifications_config_test.dart          # tests the default channel, small icon, sound, and exact alarm policy
+         ├─ notification_failure_mapper_test.dart   # tests mapping plugin errors to Failure notifications, permission, or unavailable
+         ├─ notification_channels_test.dart         # tests that the Android channels are defined at startup
+         ├─ timezone_resolver_test.dart             # tests that tz.local follows the device time zone, not UTC
+         ├─ notification_payload_test.dart          # tests the typed JSON payload: route and argument round trip, plus the size limit
+         ├─ notification_id_allocator_test.dart     # tests that ids are stable per string key and do not collide
+         ├─ notification_tap_hub_test.dart          # tests that foreground taps, background taps, and launchTap are merged
+         ├─ notification_permission_flow_test.dart  # tests the permission request through Permissions, including when the contract is not registered
+         ├─ reminder_scheduler_test.dart            # tests that rescheduling is idempotent per key
+         └─ notifications_contract_test.dart        # runs the Notifications contract suite from kiln_testing against this implementation
 ```
 
 ### image_picker
@@ -157,48 +157,48 @@ extensions/notifications/
 ```text
 extensions/image_picker/
 ├─ extension.yaml                           # manifest: provides: media · category: media · exclusive · prompts: max_bytes, allowed_types · ios: plist · macos: device.camera
-├─ README.md                                # pengantar extension image_picker: fungsi, cara pasang, dan contoh pakai
-├─ CHANGELOG.md                             # catatan perubahan extension image_picker per versi
-├─ docs/                                    # dokumentasi extension image_picker untuk pengguna dan kontributor
-│  ├─ image-picker.md                       # panduan memakai MediaPicker untuk memilih gambar dari kamera dan galeri
-│  ├─ upload-flow.md                        # menjelaskan alur dari PickedImage ke FileStorage tanpa mengimpor backend
-│  └─ platform-notes.md                     # catatan platform: activity dihancurkan di Android, HEIC di iOS, batas web
-├─ test/                                    # test tingkat extension, jalan di repo kiln dan bukan di aplikasi user
-│  ├─ manifest_test.dart                    # memastikan extension.yaml valid terhadap extension.schema.json
-│  ├─ render_test.dart                      # merender brick ke folder temp, hasilnya harus sama dengan golden
-│  ├─ analyze_test.dart                     # hasil render harus lolos dart analyze tanpa peringatan
-│  └─ goldens/rendered/                     # hasil render acuan untuk render_test, generate lewat kiln ext test --update-goldens
-└─ brick/                                   # brick Mason: template yang dirender ke aplikasi user
-   ├─ brick.yaml                            # metadata brick Mason: nama, versi, dan variabel template
-   └─ __brick__/                            # isi template yang dirender ke proyek aplikasi
-      ├─ lib/extensions/image_picker/               # kode extension image_picker yang dirender ke lib aplikasi
-      │  ├─ image_picker_module.dart                # mendaftarkan implementasi MediaPicker ke Registry
-      │  ├─ device_media_picker.dart                # implementasi kontrak MediaPicker di atas ImagePickerGateway
-      │  ├─ image_picker_gateway.dart               # membungkus plugin image_picker agar bisa di-fake di test
-      │  ├─ media_picker_config.dart                # konfigurasi bertipe: dimensi dan kualitas bawaan, ukuran maksimum, tipe yang boleh
-      │  ├─ media_failure_mapper.dart               # mengubah error PlatformException menjadi Failure(permission, unavailable, atau cancelled)
-      │  ├─ mime_sniffer.dart                       # mendeteksi jpeg, png, webp, heic, gif dari byte awal, bukan mimeType plugin
-      │  ├─ image_validator.dart                    # memvalidasi ukuran dan tipe gambar, gagal menjadi Failure(validation)
-      │  ├─ camera_permission_precheck.dart         # mengecek kontrak Permissions dulu (readOrNull) supaya penolakan jelas
-      │  ├─ lost_data_recovery.dart                 # memulihkan hasil pilihan saat activity Android dihancurkan
-      │  ├─ picked_image_x.dart                     # tambahan pada PickedImage: toImageProvider dan ukuran terbaca ("1,2 MB")
-      │  ├─ picked_image_upload_adapter.dart        # mengubah PickedImage menjadi masukan FileStorage, keduanya tipe dari kiln_core
-      │  └─ widgets/                                # widget siap pakai untuk memilih gambar
-      │     ├─ image_source_sheet.dart              # bottom sheet untuk memilih sumber gambar, kamera atau galeri
-      │     └─ avatar_picker.dart                   # avatar bulat yang bisa diganti, menampilkan Failure dengan ramah
-      └─ test/extensions/image_picker/              # test yang ikut dirender ke aplikasi dan jalan di sana
-         ├─ device_media_picker_test.dart           # menguji bahwa pilihan gambar dari gateway fake menjadi hasil MediaPicker
-         ├─ image_picker_module_test.dart           # menguji bahwa module mendaftarkan MediaPicker ke Registry
-         ├─ media_picker_config_test.dart           # menguji nilai bawaan dimensi, kualitas, ukuran maksimum, dan tipe
-         ├─ media_failure_mapper_test.dart          # menguji pemetaan PlatformException ke Failure permission, unavailable, atau cancelled
-         ├─ mime_sniffer_test.dart                  # menguji deteksi tipe dari byte awal: jpeg, png, webp, heic, gif
-         ├─ image_validator_test.dart               # menguji bahwa ukuran atau tipe tidak valid menjadi Failure(validation)
-         ├─ camera_permission_precheck_test.dart    # menguji pengecekan izin kamera lewat Permissions sebelum membuka kamera
-         ├─ lost_data_recovery_test.dart            # menguji pemulihan hasil pilihan setelah activity Android dihancurkan
-         ├─ picked_image_x_test.dart                # menguji toImageProvider dan format ukuran terbaca ("1,2 MB")
-         ├─ picked_image_upload_adapter_test.dart   # menguji bahwa PickedImage diubah menjadi masukan FileStorage yang benar
-         ├─ image_source_sheet_test.dart            # menguji bottom sheet memilih sumber kamera atau galeri
-         ├─ avatar_picker_test.dart                 # menguji bahwa avatar berganti setelah memilih dan Failure tampil ramah
-         └─ media_picker_contract_test.dart         # menjalankan suite kontrak MediaPicker dari kiln_testing ke implementasi ini
+├─ README.md                                # introduction to the image_picker extension: what it does, how to install it, and usage examples
+├─ CHANGELOG.md                             # changelog of the image_picker extension per version
+├─ docs/                                    # image_picker extension documentation for users and contributors
+│  ├─ image-picker.md                       # guide to using MediaPicker to pick images from the camera and gallery
+│  ├─ upload-flow.md                        # explains the flow from PickedImage to FileStorage without importing a backend
+│  └─ platform-notes.md                     # platform notes: activity destroyed on Android, HEIC on iOS, web limits
+├─ test/                                    # extension-level tests, run in the kiln repo and not in the user app
+│  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
+│  ├─ render_test.dart                      # renders the brick to a temp folder, the result must match the golden
+│  ├─ analyze_test.dart                     # the rendered result must pass dart analyze without warnings
+│  └─ goldens/rendered/                     # reference render output for render_test, generated via kiln ext test --update-goldens
+└─ brick/                                   # Mason brick: templates rendered into the user app
+   ├─ brick.yaml                            # Mason brick metadata: name, version, and template variables
+   └─ __brick__/                            # template contents rendered into the application project
+      ├─ lib/extensions/image_picker/               # image_picker extension code rendered into the application lib
+      │  ├─ image_picker_module.dart                # registers the MediaPicker implementation with the Registry
+      │  ├─ device_media_picker.dart                # MediaPicker contract implementation on top of ImagePickerGateway
+      │  ├─ image_picker_gateway.dart               # wraps the image_picker plugin so it can be faked in tests
+      │  ├─ media_picker_config.dart                # typed configuration: default dimensions and quality, maximum size, allowed types
+      │  ├─ media_failure_mapper.dart               # maps PlatformException errors to Failure(permission, unavailable, or cancelled)
+      │  ├─ mime_sniffer.dart                       # detects jpeg, png, webp, heic, gif from the leading bytes, not the plugin mimeType
+      │  ├─ image_validator.dart                    # validates image size and type, failing with Failure(validation)
+      │  ├─ camera_permission_precheck.dart         # checks the Permissions contract first (readOrNull) so denials are clear
+      │  ├─ lost_data_recovery.dart                 # recovers the picked result when the Android activity is destroyed
+      │  ├─ picked_image_x.dart                     # extensions on PickedImage: toImageProvider and a readable size ("1,2 MB")
+      │  ├─ picked_image_upload_adapter.dart        # converts PickedImage into FileStorage input, both types from kiln_core
+      │  └─ widgets/                                # ready-made widgets for picking images
+      │     ├─ image_source_sheet.dart              # bottom sheet for choosing the image source, camera or gallery
+      │     └─ avatar_picker.dart                   # round avatar that can be replaced, showing Failures in a friendly way
+      └─ test/extensions/image_picker/              # tests that are also rendered into the app and run there
+         ├─ device_media_picker_test.dart           # tests that an image pick from the fake gateway becomes a MediaPicker result
+         ├─ image_picker_module_test.dart           # tests that the module registers MediaPicker with the Registry
+         ├─ media_picker_config_test.dart           # tests the default dimensions, quality, maximum size, and types
+         ├─ media_failure_mapper_test.dart          # tests mapping PlatformException to Failure permission, unavailable, or cancelled
+         ├─ mime_sniffer_test.dart                  # tests type detection from the leading bytes: jpeg, png, webp, heic, gif
+         ├─ image_validator_test.dart               # tests that an invalid size or type yields Failure(validation)
+         ├─ camera_permission_precheck_test.dart    # tests the camera permission check through Permissions before opening the camera
+         ├─ lost_data_recovery_test.dart            # tests recovering the picked result after the Android activity is destroyed
+         ├─ picked_image_x_test.dart                # tests toImageProvider and the readable size format ("1,2 MB")
+         ├─ picked_image_upload_adapter_test.dart   # tests that PickedImage is converted into correct FileStorage input
+         ├─ image_source_sheet_test.dart            # tests the bottom sheet choosing the camera or gallery source
+         ├─ avatar_picker_test.dart                 # tests that the avatar changes after picking and Failures are shown in a friendly way
+         └─ media_picker_contract_test.dart         # runs the MediaPicker contract suite from kiln_testing against this implementation
 ```
 
