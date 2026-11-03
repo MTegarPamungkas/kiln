@@ -3,6 +3,7 @@ import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/analytics/analytics_config.dart';
 import 'package:{{app_name}}/extensions/analytics/analytics_gateway.dart';
 import 'package:{{app_name}}/extensions/analytics/analytics_module.dart';
+import 'package:{{app_name}}/extensions/analytics/analytics_support.dart';
 import 'package:{{app_name}}/extensions/analytics/consent_gate_analytics.dart';
 import 'package:{{app_name}}/extensions/analytics/posthog_analytics.dart';
 import 'package:{{app_name}}/extensions/analytics/session_identity_listener.dart';
@@ -30,6 +31,7 @@ void main() {
 
       expect(registry.read<Analytics>(), isA<ConsentGateAnalytics>());
       expect(registry.read<AnalyticsConfig>(), AnalyticsConfig.defaults);
+      expect(registry.read<AnalyticsSupport>(), isA<AnalyticsSupport>());
       expect(registry.read<AnalyticsGateway>(), same(gateway));
       expect(registry.read<PosthogAnalytics>(), isA<PosthogAnalytics>());
       expect(
@@ -57,9 +59,9 @@ void main() {
 
       final consent = registry.read<ConsentController>();
       consent.grant(ConsentCategory.analytics);
-      registry
-          .read<SessionController>()
-          .setSession(const AuthSession(userId: 'user-1'));
+      registry.read<SessionController>().setSession(
+        const AuthSession(userId: 'user-1'),
+      );
       final listener = registry.read<SessionIdentityListener>();
       await listener.idle;
 
@@ -87,10 +89,7 @@ void main() {
 
       expect(gateway.setupCalls, 0);
       expect(gateway.events, isEmpty);
-      expect(
-        registry.read<SessionIdentityListener>().isRunning,
-        isTrue,
-      );
+      expect(registry.read<SessionIdentityListener>().isRunning, isTrue);
 
       await module.dispose();
     });
@@ -136,9 +135,9 @@ void main() {
 
       gateway.failure = null;
       registry.read<ConsentController>().grant(ConsentCategory.analytics);
-      registry
-          .read<SessionController>()
-          .setSession(const AuthSession(userId: 'user-1'));
+      registry.read<SessionController>().setSession(
+        const AuthSession(userId: 'user-1'),
+      );
       await listener.idle;
       expect(gateway.identities, hasLength(1));
 

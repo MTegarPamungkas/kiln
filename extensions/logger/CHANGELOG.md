@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Add `LoggerSupport` with file-sink and sink configuration details.
+- When file logging is unavailable, report the degradation while the console,
+  memory, and breadcrumb sinks keep working.
+
 ## 0.1.0
 
 - Added `LoggerModule` along with `AppLogger`, per-flavor level configuration,

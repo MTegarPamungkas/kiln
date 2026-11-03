@@ -2,6 +2,7 @@ import 'package:kiln_core/kiln_core.dart';
 
 import 'analytics_config.dart';
 import 'analytics_gateway.dart';
+import 'analytics_support.dart';
 import 'consent_gate_analytics.dart';
 import 'noop_analytics.dart';
 import 'pii_scrubbing_analytics.dart';
@@ -26,6 +27,7 @@ final class AnalyticsModule extends KilnModule {
   final AnalyticsGateway Function() _gatewayFactory;
   AnalyticsGateway? _gateway;
   SessionIdentityListener? _listener;
+  Future<void>? _setup;
 
   @override
   String get id => 'analytics';
@@ -58,10 +60,22 @@ final class AnalyticsModule extends KilnModule {
 
     registry
       ..registerSingleton<AnalyticsConfig>(_config)
+      ..registerSingleton<AnalyticsSupport>(
+        AnalyticsSupport(config: _config, flavor: flavor, probe: _ensureSetup),
+      )
       ..registerSingleton<AnalyticsGateway>(gateway)
       ..registerSingleton<PosthogAnalytics>(posthog)
       ..registerSingleton<Analytics>(analytics)
       ..registerSingleton<SessionIdentityListener>(listener);
+  }
+
+  Future<void> _ensureSetup() {
+    return _setup ??= _gateway!.setup(_config);
+  }
+
+  @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<AnalyticsSupport>().check();
   }
 
   @override
@@ -69,9 +83,16 @@ final class AnalyticsModule extends KilnModule {
     final flavor = registry.readOrNull<AppFlavor>();
     if (_config.isActiveFor(flavor)) {
       try {
-        await _gateway?.setup(_config);
-      } on Object {
-        // PostHog may be unreachable or unsupported; the app still starts.
+        await _ensureSetup();
+      } on Object catch (error) {
+        registry.readOrNull<SupportRegistry>()?.record(
+          id,
+          SupportInfo.unsupported(
+            SupportState.unavailable,
+            message: 'Analytics could not start: $error',
+            details: <String, Object?>{'error': '$error'},
+          ),
+        );
       }
     }
     _listener?.start();

@@ -1,19 +1,31 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T15:01:33.270768Z",
+  "generated_at": "2026-11-03T15:08:10.494062Z",
   "extensions": [
     {
       "id": "analytics",
       "name": "Analytics",
       "description": "PostHog product analytics with consent gating and PII scrubbing.",
       "category": "analytics",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/analytics-0.1.0.tgz",
           "sha256": "43e33d42db3c4e22d9f5cee7d95aa840e0d154fa819c8d9de72a3a1b3be832d7",
+          "provides": [
+            "analytics"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/analytics-0.1.1.tgz",
+          "sha256": "53c33caec25b55f424ae07fc1070ab39ed478af9062159b8b6b94bcee2b0294d",
           "provides": [
             "analytics"
           ],
@@ -716,13 +728,25 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/logger-0.1.0.tgz",
           "sha256": "3f6d4b076c22220f63b59814102f35ccbcb4ce75c146b63c287f07f90c2b7ba7",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/logger-0.1.1.tgz",
+          "sha256": "65cc69d9bfce92f8fd40451076a6672204a10e784896d39b14067c7606783a65",
           "provides": [
             "logger"
           ],
@@ -992,13 +1016,25 @@
       "name": "Key-value storage",
       "description": "Persistent key-value storage backed by shared_preferences.",
       "category": "storage",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/storage-0.1.0.tgz",
           "sha256": "58fd6a9af05dac24e7017b0534a75bca78779e2470840ece4aeda4d3b2e979a7",
+          "provides": [
+            "storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/storage-0.1.1.tgz",
+          "sha256": "42d36ed1f57b1e2b5c86b5c8f29ec3efe6f70645aa8d3bd5282a5a8ac1c2cf5a",
           "provides": [
             "storage"
           ],

@@ -6,6 +6,7 @@ import 'console_logger.dart';
 import 'file_log_sink.dart';
 import 'http_log_middleware.dart';
 import 'logger_config.dart';
+import 'logger_support.dart';
 import 'log_level_controller.dart';
 import 'log_sink.dart';
 import 'memory_log_sink.dart';
@@ -83,6 +84,7 @@ final class LoggerModule extends KilnModule {
 
     registry
       ..registerSingleton<LoggerConfig>(effectiveConfig)
+      ..registerSingleton<LoggerSupport>(LoggerSupport(config: effectiveConfig))
       ..registerSingleton<LogLevelController>(levels)
       ..registerSingleton<MemoryLogSink>(memory)
       ..registerSingleton<AppLogger>(logger);
@@ -97,6 +99,11 @@ final class LoggerModule extends KilnModule {
         priority: HttpLogMiddleware.priority,
       );
     }
+  }
+
+  @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<LoggerSupport>().check();
   }
 
   @override

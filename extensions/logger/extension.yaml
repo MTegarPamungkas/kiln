@@ -1,6 +1,6 @@
 id: logger
 name: Logger
-version: 0.1.0
+version: 0.1.1
 description: Structured application logging with redaction, rotating files, and crash breadcrumbs.
 category: logging
 tier: official

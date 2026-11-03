@@ -1,6 +1,6 @@
 id: analytics
 name: Analytics
-version: 0.1.0
+version: 0.1.1
 description: PostHog product analytics with consent gating and PII scrubbing.
 category: analytics
 tier: official

@@ -9,6 +9,7 @@ final class FakeStorageGateway implements StorageGateway {
   final Map<String, String> values;
   bool failReads = false;
   bool failWrites = false;
+  Object? keysError;
 
   @override
   Future<void> clear() async {
@@ -24,7 +25,13 @@ final class FakeStorageGateway implements StorageGateway {
   }
 
   @override
-  Future<Set<String>> keys() async => values.keys.toSet();
+  Future<Set<String>> keys() async {
+    final error = keysError;
+    if (error != null) {
+      throw error;
+    }
+    return values.keys.toSet();
+  }
 
   @override
   Future<String?> read(String key) async {

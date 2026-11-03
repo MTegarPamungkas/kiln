@@ -8,6 +8,9 @@ import 'log_sink.dart';
 /// File logging is only available where `dart:io` exists.
 const bool fileLogSinkSupported = false;
 
+/// Web builds have no file system, so the probe always reports false.
+Future<bool> probeFileLogSink() async => false;
+
 /// Stub used when the application is compiled for the web.
 ///
 /// The module checks [fileLogSinkSupported] before constructing the sink; the

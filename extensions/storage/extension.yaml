@@ -1,6 +1,6 @@
 id: storage
 name: Key-value storage
-version: 0.1.0
+version: 0.1.1
 description: Persistent key-value storage backed by shared_preferences.
 category: storage
 tier: official
