@@ -1,6 +1,6 @@
 name: kiln_core
 description: Contracts, failures, registry runtime, sessions, and privacy utilities for Kiln.
-version: 0.1.2
+version: 0.1.3
 publish_to: none
 
 environment:

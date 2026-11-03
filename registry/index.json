@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T17:25:28.123012Z",
+  "generated_at": "2026-11-03T18:05:47.483308Z",
   "extensions": [
     {
       "id": "analytics",
@@ -208,6 +208,28 @@
           "sha256": "861de4da8b3b1236abdb72d61f6475b82897daed81e2417d0d4a4eec938be7ce",
           "provides": [
             "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "description": "Add events to the device calendar through the native calendar UI.",
+      "category": "calendar",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/calendar-0.1.0.tgz",
+          "sha256": "8adf8a7fd24b3dbaeab7f3f6eeec635984d2c078229abf893719d69ecffc2ba2",
+          "provides": [
+            "calendar"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",
@@ -489,6 +511,40 @@
           "sha256": "6a637605919d0f8212427c6ec3851f36c984b473da50520f1cef334e6bc5b19a",
           "provides": [
             "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "geolocation",
+      "name": "Geolocation",
+      "description": "Device location with permission-aware reads and streaming updates.",
+      "category": "location",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/geolocation-0.1.0.tgz",
+          "sha256": "1dc4930363286f45910dc48fa856ea4ae843eddd6af020f593d83018016fd57f",
+          "provides": [
+            "location"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/geolocation-0.1.1.tgz",
+          "sha256": "6d9e7a4eb91799fdf93d698c8ea0b0409678c931c9904c1c93d596a3880d90d8",
+          "provides": [
+            "location"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",
@@ -1051,6 +1107,40 @@
           "sha256": "e6d68827067a8788bf76c0b94a4c7e660058b2412633ad5e8c68eb58a1151d6c",
           "provides": [
             "secure_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "share",
+      "name": "Share",
+      "description": "Native share sheet for text, links, and files.",
+      "category": "share",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/share-0.1.0.tgz",
+          "sha256": "e6086a57d7ab5513c8820279bba4505561b3a0c8ea73ab8f07900379f394e3c0",
+          "provides": [
+            "share"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/share-0.1.1.tgz",
+          "sha256": "91688406374a3bd1f1d0abb5677df8c1a5f3183f87741fee6dccb607f93f8d81",
+          "provides": [
+            "share"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",

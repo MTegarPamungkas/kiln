@@ -9,12 +9,14 @@ This catalog is generated from extension manifests by
 | `appwrite` | Appwrite | 0.1.2 | auth | official | `auth`, `remote_database`, `file_storage` |
 | `biometric` | Biometric | 0.1.4 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.1.3 | state | official | `state_bloc` |
+| `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
 | `connectivity` | Connectivity | 0.1.1 | connectivity | official | `connectivity` |
 | `deep_link` | Deep links | 0.1.2 | deep_link | official | `deep_links` |
 | `dio` | Dio HTTP client | 0.2.4 | network | official | `http_client`, `http_pipeline` |
 | `env` | Environment | 0.1.1 | config | official | `env` |
 | `firebase` | Firebase | 0.2.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `flavors` | Flavors | 0.1.1 | flavor | official | `flavor` |
+| `geolocation` | Geolocation | 0.1.0 | location | official | `location` |
 | `go_router` | GoRouter | 0.2.1 | navigation | official | `navigation` |
 | `http_cache` | HTTP cache | 0.1.1 | network | official | `http_cache` |
 | `http_retry` | HTTP retry | 0.1.1 | network | official |  |
@@ -27,9 +29,10 @@ This catalog is generated from extension manifests by
 | `rest_auth` | REST auth | 0.1.2 | auth | official | `auth` |
 | `riverpod` | Riverpod state management | 0.1.2 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.1 | storage | official | `secure_storage` |
+| `share` | Share | 0.1.0 | share | official | `share` |
 | `social_login` | Social login | 0.1.1 | social | official | `social_login` |
 | `storage` | Key-value storage | 0.1.1 | storage | official | `storage` |
-| `supabase` | Supabase | 0.1.2 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
+| `supabase` | Supabase | 0.1.3 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `theme` | Theme | 0.1.1 | theme | official | `theme` |
 
 ## analytics
@@ -65,6 +68,14 @@ State management with Bloc and Cubit.
 
 - Provides: `state_bloc`
 - Dependencies: `bloc: ^9.2.1`, `flutter_bloc: ^9.1.1`, `bloc_concurrency: ^0.3.0`, `rxdart: ^0.28.0`
+
+## calendar
+
+Add events to the device calendar through the native calendar UI.
+
+- Provides: `calendar`
+- Dependencies: `add_2_calendar: ^3.1.1`
+- Platforms: android, ios
 
 ## connectivity
 
@@ -116,6 +127,14 @@ Dart-level app flavors, entry points, and launch configurations.
 - Provides: `flavor`
 - Prompts: flavors
 - Platforms: android, ios, macos, web, windows, linux
+
+## geolocation
+
+Device location with permission-aware reads and streaming updates.
+
+- Provides: `location`
+- Dependencies: `geolocator: ^14.0.1`
+- Platforms: android, ios, macos, web, windows
 
 ## go_router
 
@@ -215,6 +234,14 @@ Keychain and Keystore storage for secrets and tokens.
 - Provides: `secure_storage`
 - Dependencies: `flutter_secure_storage: ^11.2.0`
 - Platforms: android, ios, macos, web, windows, linux
+
+## share
+
+Native share sheet for text, links, and files.
+
+- Provides: `share`
+- Dependencies: `share_plus: ^13.3.1`
+- Platforms: android, ios, macos, web, windows
 
 ## social_login
 

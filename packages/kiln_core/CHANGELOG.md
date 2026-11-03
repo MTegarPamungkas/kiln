@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Add `LocationProvider`, `ShareService`, and `CalendarService` contracts.
+
 ## 0.1.2
 
 - Add `SupportInfo`, `SupportState`, and `SupportRegistry` so extensions can

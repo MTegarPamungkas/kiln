@@ -1,0 +1,11 @@
+{
+  "extension": "share",
+  "files": {
+    "lib/extensions/share/device_share_service.dart": "0df29cefffda40739d2d1568fcab64b3bf150bef66bdc47e74b7d34ec7bb239f",
+    "lib/extensions/share/sdk_share_gateway.dart": "a8a8c057b0cacedcd67a47996dbfdb29ffce2d33702560db4fecc0b089bf4bd2",
+    "lib/extensions/share/share_gateway.dart": "092cea9e569d23d7f140fdbcde5b6a0591c13f944c42c33bdb3551d796137ce6",
+    "lib/extensions/share/share_module.dart": "1ffae7d23702171627d8ab2444ed3ba4e0c9e213fb7a5129a1e4a632ebee1883",
+    "lib/extensions/share/share_support.dart": "965764565ed552dd32d13cc122cb226f07dc72c78996026a0370d2b1678f2361",
+    "test/extensions/share/share_test.dart": "334ea8e4031cab60ec78156a9dffc23b9127bbab0f4cfd0f6b31dc0b58caa02e"
+  }
+}

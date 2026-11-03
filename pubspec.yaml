@@ -11,12 +11,14 @@ workspace:
   - extensions/appwrite
   - extensions/biometric
   - extensions/bloc
+  - extensions/calendar
   - extensions/connectivity
   - extensions/deep_link
   - extensions/dio
   - extensions/env
   - extensions/firebase
   - extensions/flavors
+  - extensions/geolocation
   - extensions/go_router
   - extensions/http_cache
   - extensions/http_retry
@@ -29,6 +31,7 @@ workspace:
   - extensions/rest_auth
   - extensions/riverpod
   - extensions/secure_storage
+  - extensions/share
   - extensions/social_login
   - extensions/storage
   - extensions/supabase

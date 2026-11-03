@@ -97,12 +97,14 @@ must not prompt the user.
 | `appwrite` | endpoint, project, database, bucket | `notConfigured` |
 | `biometric` | platform, hardware, enrollment | `unsupportedPlatform`, `unsupportedDevice`, `permissionDenied` |
 | `bloc` | app wrapper and observer wiring | always supported |
+| `calendar` | native calendar UI on Android/iOS | `unsupportedPlatform` on other targets |
 | `connectivity` | platform connectivity check | `unsupportedPlatform`, `unavailable` |
 | `deep_link` | initial link probe | `unsupportedPlatform`, `unavailable` |
 | `dio` | base URL and timeouts | `notConfigured` |
 | `env` | required build-time keys | `notConfigured` |
 | `firebase` | options and Firebase initialization | `notConfigured`, `unavailable` |
 | `flavors` | registered `AppFlavor` | `notConfigured` |
+| `geolocation` | service enabled and permission without prompting | `unavailable`, `permissionDenied`, `unsupportedPlatform` |
 | `go_router` | initial location and route count | `notConfigured` |
 | `http_cache` | TTL, entry count, status codes, backend | `notConfigured` |
 | `http_retry` | attempts and delays | `notConfigured` |
@@ -115,6 +117,7 @@ must not prompt the user.
 | `rest_auth` | endpoints and secure token store | `notConfigured`, `unsupportedPlatform`, `unavailable` |
 | `riverpod` | app wrapper wiring | always supported |
 | `secure_storage` | Keychain/Keystore/WebCrypto read | `unsupportedPlatform`, `unavailable` |
+| `share` | platform share sheet | `unsupportedPlatform` on Linux |
 | `social_login` | provider platform and credentials | `unsupportedPlatform`, `notConfigured` |
 | `storage` | SharedPreferences read | `unsupportedPlatform`, `unavailable` |
 | `supabase` | config and client load | `notConfigured`, `unavailable` |

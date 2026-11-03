@@ -145,6 +145,8 @@ The bundled catalog provides:
   sign-in, app lock, and protected storage.
 - `go_router`, `deep_link`, `theme`, and `l10n` for navigation, incoming links,
   theming, and ARB-based localization.
+- `geolocation`, `share`, and `calendar` for device position, the native share
+  sheet, and calendar events.
 - `env`, `flavors`, `logger`, and `analytics` for build-time configuration,
   per-flavor entry points, logging, and consent-based analytics.
 

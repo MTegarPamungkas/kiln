@@ -20,11 +20,12 @@ The foundation phase runs end-to-end:
 - `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`, `cache`,
   `store`, `completion`, and `ext new/validate/test/pack` are available.
 - Generated projects pass `flutter analyze` and `flutter test`.
-- Twenty-six built-in extensions: `analytics`, `appwrite`, `biometric`,
-  `bloc`, `connectivity`, `deep_link`, `dio`, `env`, `firebase`, `flavors`,
-  `go_router`, `http_cache`, `http_retry`, `image_picker`, `l10n`, `local_db`,
-  `logger`, `notifications`, `permission`, `rest_auth`, `riverpod`,
-  `secure_storage`, `social_login`, `storage`, `supabase`, and `theme`.
+- Twenty-nine built-in extensions: `analytics`, `appwrite`, `biometric`,
+  `bloc`, `calendar`, `connectivity`, `deep_link`, `dio`, `env`, `firebase`,
+  `flavors`, `geolocation`, `go_router`, `http_cache`, `http_retry`,
+  `image_picker`, `l10n`, `local_db`, `logger`, `notifications`, `permission`,
+  `rest_auth`, `riverpod`, `secure_storage`, `share`, `social_login`,
+  `storage`, `supabase`, and `theme`.
 - `kiln create --state bloc` and `--state riverpod` generate an application
   with state management, the session bridge, and a counter example already
   wired up.

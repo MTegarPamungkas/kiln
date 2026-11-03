@@ -66,7 +66,7 @@
 - [x] `SupportInfo`, `SupportState`, `SupportRegistry`, and `KilnModule.support`.
 - [x] Bootstrap probes runtime support, records it, and skips `ready()` for
       unsupported extensions.
-- [x] All 26 extensions report platform, device, and configuration readiness;
+- [x] All 29 extensions report platform, device, and configuration readiness;
       unsupported calls return typed failures instead of blocking startup.
 - [x] `kiln create` defaults to the minimal template; `go_router` sample shell
       and auth redirect are opt-in.

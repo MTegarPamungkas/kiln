@@ -7,12 +7,14 @@ import 'analytics_bundle.dart';
 import 'appwrite_bundle.dart';
 import 'biometric_bundle.dart';
 import 'bloc_bundle.dart';
+import 'calendar_bundle.dart';
 import 'connectivity_bundle.dart';
 import 'deep_link_bundle.dart';
 import 'dio_bundle.dart';
 import 'env_bundle.dart';
 import 'firebase_bundle.dart';
 import 'flavors_bundle.dart';
+import 'geolocation_bundle.dart';
 import 'go_router_bundle.dart';
 import 'http_cache_bundle.dart';
 import 'http_retry_bundle.dart';
@@ -25,6 +27,7 @@ import 'permission_bundle.dart';
 import 'rest_auth_bundle.dart';
 import 'riverpod_bundle.dart';
 import 'secure_storage_bundle.dart';
+import 'share_bundle.dart';
 import 'social_login_bundle.dart';
 import 'storage_bundle.dart';
 import 'supabase_bundle.dart';
@@ -35,12 +38,14 @@ final List<AvailableExtension> bundledExtensions = <AvailableExtension>[
   appwriteExtension,
   biometricExtension,
   blocExtension,
+  calendarExtension,
   connectivityExtension,
   deepLinkExtension,
   dioExtension,
   envExtension,
   firebaseExtension,
   flavorsExtension,
+  geolocationExtension,
   goRouterExtension,
   httpCacheExtension,
   httpRetryExtension,
@@ -53,6 +58,7 @@ final List<AvailableExtension> bundledExtensions = <AvailableExtension>[
   restAuthExtension,
   riverpodExtension,
   secureStorageExtension,
+  shareExtension,
   socialLoginExtension,
   storageExtension,
   supabaseExtension,
