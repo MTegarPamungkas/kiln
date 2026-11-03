@@ -1,15 +1,15 @@
 # storage
 
-Implementasi `Storage` dari `kiln_core` di atas `shared_preferences`.
+Implementation of `Storage` from `kiln_core` on top of `shared_preferences`.
 
-Extension ini menyediakan capability `storage`. Kode aplikasi membaca kontrak
-dari Registry; tidak ada fasad statis.
+This extension provides the `storage` capability. Application code reads the contract
+from the Registry; there is no static facade.
 
-Isi brick:
+Brick contents:
 
-- gateway `SharedPreferencesAsync` yang bisa di-fake,
-- `SharedPreferencesStorage` dengan prefix per aplikasi,
-- `StorageKey<T>` bertipe,
-- `TtlStorage` memakai `Clock`,
-- `NamespacedStorage` untuk pemilik lain seperti `http_cache`,
-- `StorageMigrator` untuk versi skema key.
+- a `SharedPreferencesAsync` gateway that can be faked,
+- `SharedPreferencesStorage` with a per-app prefix,
+- typed `StorageKey<T>`,
+- `TtlStorage` using a `Clock`,
+- `NamespacedStorage` for other owners such as `http_cache`,
+- `StorageMigrator` for key schema versions.

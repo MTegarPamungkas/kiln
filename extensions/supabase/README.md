@@ -1,41 +1,41 @@
 # supabase
 
-Implementasi kontrak `kiln_core` di atas `supabase_flutter`: `AuthRepository`,
-`SocialAuth`, `AccountManagement`, `RemoteDatabase`, dan `FileStorage`, plus
-`TokenProvider`, jembatan sesi, dan penerima callback email.
+Implementation of the `kiln_core` contracts on top of `supabase_flutter`: `AuthRepository`,
+`SocialAuth`, `AccountManagement`, `RemoteDatabase`, and `FileStorage`, plus
+`TokenProvider`, the session bridge, and the email callback handler.
 
-- `SupabaseAuthRepository` memakai email dan password Supabase, menyimpan sesi
-  di memori, dan meneruskan `onAuthStateChange` ke `authStateChanges`.
-- `SupabaseSocialAuth` menukar ID token Google atau Apple lewat
-  `signInWithIdToken`; tanpa sumber ID token, ekstensi membuka alur OAuth di
-  browser dan menunggu callback deep link.
-- `SupabaseAccountManagement` menangani reset password, verifikasi email, dan
-  perubahan `display_name`/`avatar_url`.
-- `SupabaseRemoteDatabase` memetakan `RemoteQuery` ke filter PostgREST dan
-  memakai realtime untuk `watch`.
-- `SupabaseFileStorage` memakai satu bucket dan selalu membuat signed URL.
-- `SupabaseSessionBridge` meneruskan sesi ke `SessionController`, sedangkan
-  `SupabaseTokenProvider` membaca access token sesi aktif.
-- `SupabaseLinkHandler` menangani `code` (PKCE) dan `token_hash`/`type`
-  (verifikasi email) lewat kontrak `DeepLinks`.
+- `SupabaseAuthRepository` uses Supabase email and password, keeps the session
+  in memory, and forwards `onAuthStateChange` to `authStateChanges`.
+- `SupabaseSocialAuth` exchanges a Google or Apple ID token through
+  `signInWithIdToken`; without an ID token source, the extension opens the OAuth
+  flow in the browser and waits for the deep link callback.
+- `SupabaseAccountManagement` handles password reset, email verification, and
+  changes to `display_name`/`avatar_url`.
+- `SupabaseRemoteDatabase` maps `RemoteQuery` to PostgREST filters and
+  uses realtime for `watch`.
+- `SupabaseFileStorage` uses a single bucket and always creates signed URLs.
+- `SupabaseSessionBridge` forwards the session to `SessionController`, while
+  `SupabaseTokenProvider` reads the access token of the active session.
+- `SupabaseLinkHandler` handles `code` (PKCE) and `token_hash`/`type`
+  (email verification) through the `DeepLinks` contract.
 
-## Cara pasang
+## How to install
 
 ```bash
 kiln ext add supabase
 ```
 
-Isi prompt `url` dan `anon_key` dari dashboard Supabase. Setelah render,
-lengkapi langkah manual di `extension.yaml`:
+Fill the `url` and `anon_key` prompts from the Supabase dashboard. After
+rendering, complete the manual steps in `extension.yaml`:
 
-1. `configure_auth_redirect` — samakan `authRedirectUrl` dengan scheme yang
-   dipakai extension `deep_link`.
-2. `enable_realtime` — tambahkan tabel yang di-`watch` ke publikasi
-   `supabase_realtime`.
-3. `create_storage_bucket` — buat bucket `public` atau ubah
+1. `configure_auth_redirect` — match `authRedirectUrl` with the scheme used by
+   the `deep_link` extension.
+2. `enable_realtime` — add the tables being `watch`ed to the
+   `supabase_realtime` publication.
+3. `create_storage_bucket` — create a `public` bucket or change
    `SupabaseConfig.storageBucket`.
 
-## Contoh pemakaian
+## Usage example
 
 ```dart
 final auth = registry.read<AuthRepository>();
@@ -52,8 +52,8 @@ final tasks = await db.query(
 );
 ```
 
-Dokumentasi lanjutan:
+Further documentation:
 
-- [Persiapan Supabase](docs/supabase-setup.md)
+- [Supabase setup](docs/supabase-setup.md)
 - [Row level security](docs/row-level-security.md)
-- [Konfirmasi email dan redirect](docs/email-confirmation-and-redirects.md)
+- [Email confirmation and redirect](docs/email-confirmation-and-redirects.md)

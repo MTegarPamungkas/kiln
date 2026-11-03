@@ -1,16 +1,16 @@
 # bloc
 
-State management Kiln berbasis `flutter_bloc`.
+Kiln state management based on `flutter_bloc`.
 
-Extension ini exclusive di kategori `state`, menyediakan `state_bloc`, dan
-menambahkan `SessionCubit` global lewat slot `app.wrappers`. Brick juga memuat
-fondasi Cubit/Bloc yang dipakai fitur:
+This extension is exclusive in the `state` category, provides `state_bloc`, and
+adds a global `SessionCubit` through the `app.wrappers` slot. The brick also includes
+the Cubit/Bloc foundation used by features:
 
-- `BaseCubit` dengan `safeEmit` dan `runGuarded`.
-- `AsyncState` dan `AsyncCubit` untuk load/refresh/retry.
-- `AppBlocObserver` dengan redaksi PII.
-- `SessionCubit` yang membungkus `SessionController`.
-- Contoh fitur counter.
+- `BaseCubit` with `safeEmit` and `runGuarded`.
+- `AsyncState` and `AsyncCubit` for load/refresh/retry.
+- `AppBlocObserver` with PII redaction.
+- `SessionCubit` that wraps `SessionController`.
+- counter feature example.
 
 ```bash
 kiln add bloc

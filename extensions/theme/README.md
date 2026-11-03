@@ -1,30 +1,30 @@
 # theme
 
-Extension tema untuk aplikasi Kiln. Ia mengganti `AppThemeConfig` bawaan dengan
-`ThemeData` terang dan gelap yang dibangun dari satu warna seed, menambahkan
-token desain, warna semantik, dan kontrol mode terang atau gelap.
+Theme extension for Kiln apps. It replaces the default `AppThemeConfig` with
+light and dark `ThemeData` built from a single seed color, and adds design
+tokens, semantic colors, and light or dark mode control.
 
-- `BrandTheme` merakit `ThemeData` dari `ColorScheme.fromSeed`, skala teks, dan
-  tema komponen.
-- `ThemeModeController` menyimpan `ThemeMode` hidup lewat `modeListenable`
-  sehingga `AppShell` ikut membangun ulang.
-- `ThemeModeStore` menyimpan pilihan mode lewat kontrak `Storage` bila
-  extension storage terpasang.
-- `AppSpacing`, `AppRadius`, dan `SemanticColors` tersedia sebagai
-  `ThemeExtension`; akses cepat lewat `context.spacing`, `context.radii`, dan
+- `BrandTheme` assembles `ThemeData` from `ColorScheme.fromSeed`, the text scale, and
+  component themes.
+- `ThemeModeController` keeps the live `ThemeMode` through `modeListenable`
+  so that `AppShell` rebuilds as well.
+- `ThemeModeStore` persists the mode choice through the `Storage` contract when
+  the storage extension is installed.
+- `AppSpacing`, `AppRadius`, and `SemanticColors` are available as
+  `ThemeExtension`s; quick access through `context.spacing`, `context.radii`, and
   `context.semantic`.
-- `ThemeModeSwitcher` menampilkan pilihan Sistem, Terang, dan Gelap.
+- `ThemeModeSwitcher` shows the System, Light, and Dark options.
 
-## Pasang
+## Install
 
 ```bash
 kiln add theme
 ```
 
-Prompt yang ditanyakan: `seed_color`, `font_family`, `corner_radius`, dan
+Prompts requested: `seed_color`, `font_family`, `corner_radius`, and
 `density`.
 
-## Pakai
+## Usage
 
 ```dart
 final controller = registry.read<ThemeModeController>();
@@ -42,6 +42,6 @@ final primary = context.colors.primary;
 ThemeModeSwitcher(controller: registry.read<ThemeModeController>())
 ```
 
-Dokumentasi lengkap ada di [docs/theme.md](docs/theme.md),
-[docs/design-tokens.md](docs/design-tokens.md), dan
+Full documentation is in [docs/theme.md](docs/theme.md),
+[docs/design-tokens.md](docs/design-tokens.md), and
 [docs/rebranding.md](docs/rebranding.md).

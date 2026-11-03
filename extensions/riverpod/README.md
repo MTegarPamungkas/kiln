@@ -1,19 +1,19 @@
 # riverpod
 
-State management Kiln berbasis `flutter_riverpod`.
+Kiln state management based on `flutter_riverpod`.
 
-Extension ini exclusive di kategori `state`, menyediakan `state_riverpod`, dan
-menambahkan `ProviderScope` lewat slot `app.wrappers`. Registry di-override ke
-provider, sehingga fitur dapat membaca kontrak dengan:
+This extension is exclusive in the `state` category, provides `state_riverpod`, and
+adds `ProviderScope` through the `app.wrappers` slot. The Registry is overridden to
+providers, so features can read contracts with:
 
 ```dart
 final client = ref.watch(kilnProvider<HttpClient>());
 ```
 
-Isi brick:
+Brick contents:
 
-- `kiln_providers.dart` — `registryProvider` dan `kilnProvider<T>()`.
-- `provider_overrides.dart` — override Registry untuk test.
-- `async_value_x.dart` — akses failure/data yang ringkas.
-- `session_notifier.dart` — membungkus `SessionController`.
-- contoh fitur counter.
+- `kiln_providers.dart` — `registryProvider` and `kilnProvider<T>()`.
+- `provider_overrides.dart` — Registry overrides for tests.
+- `async_value_x.dart` — concise failure/data access.
+- `session_notifier.dart` — wraps `SessionController`.
+- counter feature example.

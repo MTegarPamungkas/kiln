@@ -1,21 +1,21 @@
 # kiln_core
 
-Kontrak dan runtime dasar untuk aplikasi Kiln.
+Core contracts and runtime for Kiln applications.
 
-Isi utama:
+Main contents:
 
-- kontrak HTTP, storage, auth, platform, observability, dan konfigurasi;
-- `Failure`, `FailureCode`, dan `Result<T>`;
+- HTTP, storage, auth, platform, observability, and configuration contracts;
+- `Failure`, `FailureCode`, and `Result<T>`;
 - `Registry`, `KilnModule`, `ModuleGraph`, `KilnBootstrap`, `OrderedSlot`;
 - `SessionController`, `ConsentController`, `PiiRedactor`, `Clock`,
   `Debouncer`.
 
-Package ini tidak bergantung pada plugin Flutter. Aplikasi dan extension hanya
-boleh mengenal kontrak di sini.
+This package does not depend on Flutter plugins. Applications and extensions may
+only know about the contracts defined here.
 
 ```dart
 final registry = await KilnBootstrap.run(modules: kilnModules());
 final client = registry.read<HttpClient>();
 ```
 
-Lihat [docs/architecture.md](../../docs/architecture.md).
+See [docs/architecture.md](../../docs/architecture.md).

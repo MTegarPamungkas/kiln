@@ -10,7 +10,7 @@ Custom lint rules that keep Kiln applications on contracts.
 | `no_edit_generated_files` | off | Generated files must be regenerated, not edited. |
 | `require_failure_handling` | on | Empty catch blocks in features are rejected. |
 
-## Pasang
+## Install
 
 ```yaml
 dev_dependencies:
@@ -26,13 +26,13 @@ analyzer:
     - custom_lint
 ```
 
-Jalankan:
+Run:
 
 ```bash
 dart run custom_lint
 ```
 
-`no_edit_generated_files` bersifat opt-in:
+`no_edit_generated_files` is opt-in:
 
 ```yaml
 custom_lint:
@@ -42,12 +42,12 @@ custom_lint:
 
 ## Analyzer version
 
-`custom_lint_builder` 0.8.1 masih memakai `analyzer ^8`, jadi package ini juga
-memakai analyzer 8. Saat upstream merilis dukungan analyzer 14, `analyzer` dan
-`custom_lint_builder` dinaikkan bersama tanpa mengubah API rule.
+`custom_lint_builder` 0.8.1 still uses `analyzer ^8`, so this package uses
+analyzer 8 as well. When upstream ships analyzer 14 support, `analyzer` and
+`custom_lint_builder` are bumped together without changing the rule API.
 
-## Catatan Windows
+## Windows notes
 
-`custom_lint` 0.8.1 gagal memuat plugin path dependency bila path proyek
-mengandung spasi. Jalankan proyek dari path tanpa spasi, atau tunggu perbaikan
-upstream, bila memakai plugin lewat path lokal.
+`custom_lint` 0.8.1 fails to load a path-dependency plugin when the project path
+contains spaces. Run the project from a path without spaces, or wait for the
+upstream fix, if you use the plugin through a local path.

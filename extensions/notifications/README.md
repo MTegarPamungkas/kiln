@@ -1,18 +1,21 @@
 # notifications
 
-Implementasi `Notifications` dari `kiln_core` di atas
+An implementation of `Notifications` from `kiln_core` on top of
 `flutter_local_notifications`.
 
-- Channel Android dibuat saat start; id dan ikon kecil berasal dari prompt.
-- Izin notifikasi diminta lewat kontrak `Permissions` bila terpasang, lalu jatuh
-  ke plugin bila kontrak tidak tersedia.
-- `NotificationPayload` membawa route dan argumen bertipe sebagai JSON dengan
-  batas ukuran.
-- `NotificationTapHub` menggabungkan tap foreground, tap latar belakang, dan
-  payload yang meluncurkan aplikasi.
-- `ReminderScheduler` menjadwalkan ulang pengingat secara idempoten per kunci.
-- `TimezoneResolver` memakai zona perangkat, bukan UTC.
+- The Android channel is created at start; its id and small icon come from the
+  prompt.
+- Notification permission is requested through the `Permissions` contract when
+  it is installed, then falls back to the plugin when the contract is not
+  available.
+- `NotificationPayload` carries the route and typed arguments as JSON with a
+  size limit.
+- `NotificationTapHub` merges foreground taps, background taps, and the payload
+  that launched the app.
+- `ReminderScheduler` reschedules reminders idempotently per key.
+- `TimezoneResolver` uses the device time zone, not UTC.
 
-Setelah install, receiver Android untuk penjadwalan sudah ditambahkan otomatis
-lewat `android.receivers`. Bila `exact_alarms` dipilih, selesaikan langkah izin
-alarm eksak di [docs/troubleshooting-delivery.md](docs/troubleshooting-delivery.md).
+After install, the Android receivers for scheduling have already been added
+automatically through `android.receivers`. If `exact_alarms` is selected,
+complete the exact alarm permission step in
+[docs/troubleshooting-delivery.md](docs/troubleshooting-delivery.md).

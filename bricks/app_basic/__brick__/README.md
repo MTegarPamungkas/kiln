@@ -1,27 +1,27 @@
 # {{name}}
 
-Aplikasi Flutter yang dibuat dengan Kiln.
+A Flutter app generated with Kiln.
 
-## Menjalankan
+## Running
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-## Struktur
+## Structure
 
-- `lib/app/` — kerangka aplikasi, registry, dan shell MaterialApp. `KilnApp`
-  meneruskan lifecycle Flutter ke `LifecycleController` dan mengakhiri sesi
-  saat `expiresAt` terlewati. Daftarkan `AppHome` di registry untuk mengganti
-  halaman utama tanpa mengubah shell.
-- `lib/core/` — theme, seam `CoreCopy` yang diisi extension l10n, dan
-  penanganan error.
-- `lib/l10n/` — file ARB; semua teks aplikasi berasal dari sini.
-- `lib/extensions/` — kode extension yang dipasang lewat `kiln add`.
-- `kiln.yaml` — konfigurasi proyek dan jawaban prompt extension.
+- `lib/app/` — app skeleton, registry, and MaterialApp shell. `KilnApp`
+  forwards the Flutter lifecycle to `LifecycleController` and ends the session
+  once `expiresAt` has passed. Register `AppHome` in the registry to replace
+  the home page without modifying the shell.
+- `lib/core/` — theme, the `CoreCopy` seam filled by the l10n extension, and
+  error handling.
+- `lib/l10n/` — ARB files; all app text comes from here.
+- `lib/extensions/` — extension code installed via `kiln add`.
+- `kiln.yaml` — project configuration and extension prompt answers.
 
-Tambahkan extension tanpa mengedit kerangka aplikasi:
+Add extensions without editing the app skeleton:
 
 ```bash
 kiln add dio

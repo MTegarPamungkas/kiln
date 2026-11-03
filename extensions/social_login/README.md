@@ -1,15 +1,15 @@
 # social_login
 
-Jalur masuk Google dan Apple yang mengembalikan `SocialCredential` untuk
-backend `SocialAuth` yang terpasang.
+Google and Apple sign-in paths that return `SocialCredential` for the
+installed `SocialAuth` backend.
 
-- Gateway Google dan Apple dapat di-fake di test.
-- `SocialLoginConfig` menyimpan client id dan provider yang aktif.
-- `NonceGenerator` membuat nonce acak dan hash SHA-256 untuk Apple.
-- `SocialAvailability` menyaring provider sesuai platform.
-- `SocialSignOutListener` mengeluarkan sesi Google saat `AuthRepository`
-  memanggil signOut.
-- `SocialLoginButtons` dan `SocialLoginPanel` siap dipakai.
+- The Google and Apple gateways can be faked in tests.
+- `SocialLoginConfig` stores the client id and the active providers.
+- `NonceGenerator` creates a random nonce and a SHA-256 hash for Apple.
+- `SocialAvailability` filters providers by platform.
+- `SocialSignOutListener` signs out the Google session when `AuthRepository`
+  calls signOut.
+- `SocialLoginButtons` and `SocialLoginPanel` are ready to use.
 
-Setup Google: [docs/google-setup.md](docs/google-setup.md). Setup Apple:
+Google setup: [docs/google-setup.md](docs/google-setup.md). Apple setup:
 [docs/apple-setup.md](docs/apple-setup.md).

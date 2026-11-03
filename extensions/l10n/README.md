@@ -1,20 +1,20 @@
 # l10n
 
-Extension lokalisasi untuk Kiln dengan sumber terjemahan file ARB dan
+Localization extension for Kiln with ARB file translation sources and
 `flutter gen-l10n`.
 
-- `AppLocalizations` dihasilkan dari `lib/l10n/app_<locale>.arb`.
-- `L10nModule` mendaftarkan `AppLocalizationsConfig`, `L10nConfig`,
-  `LocaleController`, delegate hasil generate, dan `FailureMessages`.
-- `LocaleController` menyimpan pilihan locale; `null` berarti mengikuti locale
-  perangkat. Pilihan disimpan lewat `Storage` bila extension `storage` terpasang.
-- `LanguageSwitcher` menampilkan bahasa dari `L10nConfig.supportedLocales`.
-- `LocaleFormatters` menyediakan format tanggal, angka, dan mata uang.
+- `AppLocalizations` is generated from `lib/l10n/app_<locale>.arb`.
+- `L10nModule` registers `AppLocalizationsConfig`, `L10nConfig`,
+  `LocaleController`, the generated delegates, and `FailureMessages`.
+- `LocaleController` stores the locale choice; `null` means follow the device
+  locale. The choice is persisted through `Storage` when the `storage` extension is installed.
+- `LanguageSwitcher` displays the languages from `L10nConfig.supportedLocales`.
+- `LocaleFormatters` provides date, number, and currency formats.
 
-## Pasang
+## Install
 
-`kiln create` selalu memasang `l10n`. Untuk proyek yang dibuat sebelum aturan
-ini, tambahkan manual:
+`kiln create` always installs `l10n`. For projects created before this
+rule, add it manually:
 
 ```bash
 kiln add l10n
@@ -22,10 +22,10 @@ flutter pub get
 kiln doctor
 ```
 
-Installer menambahkan `flutter: generate: true` ke pubspec. Saat `pub get`,
-Flutter menjalankan gen-l10n dari `l10n.yaml` dan folder `lib/l10n`.
+The installer adds `flutter: generate: true` to the pubspec. During `pub get`,
+Flutter runs gen-l10n from `l10n.yaml` and the `lib/l10n` folder.
 
-## Pakai
+## Usage
 
 ```dart
 final l10n = AppLocalizations.of(context);
@@ -35,7 +35,7 @@ Text(l10n.helloName('Ana'));
 Text(l10n.itemsCount(3));
 ```
 
-Mengubah bahasa dari UI:
+Changing the language from the UI:
 
 ```dart
 final controller = registry.read<LocaleController>();
@@ -43,13 +43,13 @@ final controller = registry.read<LocaleController>();
 LanguageSwitcher(controller: controller);
 ```
 
-Pesan kegagalan otomatis terpakai bila `FailurePresenter.fromRegistry` dipakai:
+Failure messages are applied automatically when `FailurePresenter.fromRegistry` is used:
 
 ```dart
 final presenter = FailurePresenter.fromRegistry(registry);
 showSnackBar(SnackBar(content: Text(presenter.present(failure))));
 ```
 
-Rincian ada di [docs/l10n.md](docs/l10n.md),
-[docs/adding-a-language.md](docs/adding-a-language.md), dan
+Details are in [docs/l10n.md](docs/l10n.md),
+[docs/adding-a-language.md](docs/adding-a-language.md), and
 [docs/formatting.md](docs/formatting.md).

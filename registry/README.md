@@ -1,17 +1,17 @@
 # Kiln registry
 
-Registry lokal yang dihasilkan dari folder `extensions/` oleh:
+A local registry generated from the `extensions/` folder by:
 
 ```bash
 dart run tool/registry.dart
 ```
 
-Isinya:
+It contains:
 
-- `index.json` — daftar extension, versi, checksum, dan compatibility.
-- `archives/<id>-<version>.tgz` — arsip extension yang sudah dipaketkan.
+- `index.json` — the list of extensions, versions, checksums, and compatibility.
+- `archives/<id>-<version>.tgz` — packaged extension archives.
 
-## Memakai registry
+## Using the registry
 
 ```bash
 kiln config --registry="$(pwd)/registry"
@@ -20,25 +20,25 @@ kiln store install http_retry
 kiln upgrade
 ```
 
-Untuk registry HTTP, arahkan `--registry` atau `kiln config --registry` ke URL
-yang menyajikan `index.json` dan folder `archives/`. Mirror opsional dapat
-dikonfigurasi dengan `kiln config --mirror=<url>`.
+For an HTTP registry, point `--registry` or `kiln config --registry` at a URL
+that serves `index.json` and the `archives/` folder. An optional mirror can be
+configured with `kiln config --mirror=<url>`.
 
-`kiln ext publish --registry=<folder>` menambahkan satu versi baru ke registry
-lokal lalu memperbarui `index.json`. Publish ke URL HTTP tidak didukung; dorong
-folder registry dengan Git atau mekanisme rilis lain.
+`kiln ext publish --registry=<folder>` adds one new version to the local
+registry and then updates `index.json`. Publishing to an HTTP URL is not
+supported; push the registry folder with Git or another release mechanism.
 
-## Verifikasi
+## Verification
 
-Setiap arsip diverifikasi memakai SHA-256 dari index sebelum dipasang. Arsip
-dengan path traversal ditolak. Extension community atau yang memiliki hook
-meminta konfirmasi sebelum dipasang.
+Each archive is verified using the SHA-256 from the index before it is
+installed. Archives with path traversal are rejected. Community extensions, or
+extensions that have hooks, ask for confirmation before they are installed.
 
-## Pemeriksaan CI
+## CI check
 
 ```bash
 dart run tool/registry.dart --check
 ```
 
-Perintah ini membandingkan index dan arsip hasil generate dengan isi folder
-`registry/`.
+This command compares the generated index and archives with the contents of the
+`registry/` folder.

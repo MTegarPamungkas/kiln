@@ -1,17 +1,18 @@
 # rest_auth
 
-`AuthRepository` di atas `HttpClient` dan `SecureStorage`.
+`AuthRepository` on top of `HttpClient` and `SecureStorage`.
 
-- `RestAuth` mengirim email dan kata sandi ke endpoint login/register,
-  menyimpan token, lalu memancarkan `AuthSession`.
-- `TokenRefresher` melakukan refresh single-flight: permintaan paralel berbagi
-  satu hasil refresh.
-- `JwtExpiry` membaca `exp` tanpa verifikasi untuk refresh sebelum token mati.
-- `AuthMiddleware` menambahkan header Bearer (priority 10);
-  `UnauthorizedHandler` refresh sekali, mengulang satu request, lalu signOut.
-- `RestAccountManagement` memakai endpoint opsional reset password dan
-  verifikasi email.
-- `RestSessionBridge` mengisi `SessionController` untuk guard navigasi.
+- `RestAuth` sends the email and password to the login/register endpoint,
+  stores the token, then emits `AuthSession`.
+- `TokenRefresher` performs a single-flight refresh: parallel requests share a
+  single refresh result.
+- `JwtExpiry` reads `exp` without verification in order to refresh before the
+  token dies.
+- `AuthMiddleware` adds the Bearer header (priority 10);
+  `UnauthorizedHandler` refreshes once, retries one request, then signs out.
+- `RestAccountManagement` uses the optional password reset and email
+  verification endpoints.
+- `RestSessionBridge` populates `SessionController` for navigation guards.
 
-Bentuk JSON server ada di [docs/server-contract.md](docs/server-contract.md),
-alur refresh di [docs/token-refresh.md](docs/token-refresh.md).
+The server JSON shape is in [docs/server-contract.md](docs/server-contract.md),
+the refresh flow is in [docs/token-refresh.md](docs/token-refresh.md).

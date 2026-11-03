@@ -1,36 +1,36 @@
 # go_router
 
-Navigasi deklaratif untuk aplikasi Kiln di atas `go_router`. Extension ini
-mengisi seam `RouterConfig<Object>` yang dibaca `app_shell.dart`, jadi
-`app.dart` tidak perlu diedit.
+Declarative navigation for Kiln apps on top of `go_router`. This extension
+fills the `RouterConfig<Object>` seam read by `app_shell.dart`, so
+`app.dart` does not need to be edited.
 
-- `GoRouterModule` mendaftarkan `RouterConfig<Object>`, `AppRouter`, dan
-  `AppRouterConfig`, lalu membuka slot `router.routes`.
-- `AppRouter` membangun `GoRouter` dari lokasi awal, route slot, guard, dan
-  `SessionController`.
-- `AuthRedirect` mengirim pengunjung yang belum masuk ke `/sign-in` dan
-  memindahkan pengunjung yang sudah masuk menjauh dari halaman itu.
-- `DeepLinkRouteMapper` dan `NotificationRouteMapper` mengubah tautan masuk dan
-  payload notifikasi menjadi lokasi route.
-- `NavigationObserver` mencatat navigasi ke `AppLogger` dan mengirim screen ke
-  `Analytics` bila kontraknya tersedia.
-- `NotFoundPage`, `ShellScaffold`, dan `route_transitions.dart` menyediakan UI
-  awal yang bisa diganti aplikasi.
+- `GoRouterModule` registers `RouterConfig<Object>`, `AppRouter`, and
+  `AppRouterConfig`, then opens the `router.routes` slot.
+- `AppRouter` builds `GoRouter` from the initial location, slot routes, guards,
+  and `SessionController`.
+- `AuthRedirect` sends visitors who are not signed in to `/sign-in` and
+  moves visitors who are signed in away from that page.
+- `DeepLinkRouteMapper` and `NotificationRouteMapper` turn incoming links and
+  notification payloads into route locations.
+- `NavigationObserver` logs navigation to `AppLogger` and sends screens to
+  `Analytics` when the contract is available.
+- `NotFoundPage`, `ShellScaffold`, and `route_transitions.dart` provide starter
+  UI that the app can replace.
 
-## Pasang
+## Install
 
 ```bash
 kiln ext add go_router
 ```
 
-Extension ini `exclusive` untuk kategori navigasi dan menyediakan capability
-`navigation`. `deep_links`, `notifications`, `analytics`, dan `logger` bersifat
-opsional; integrasinya aktif otomatis bila kontraknya terdaftar di Registry.
+This extension is `exclusive` for the navigation category and provides the
+`navigation` capability. `deep_links`, `notifications`, `analytics`, and `logger` are
+optional; their integration activates automatically when the contracts are registered in the Registry.
 
-## Menambah route
+## Adding a route
 
-Fitur lain tidak perlu mengimpor `go_router`. Cukup kontribusikan `AppRoute`
-dari `app_basic` ke slot `router.routes`:
+Other features do not need to import `go_router`. Just contribute an `AppRoute`
+from `app_basic` to the `router.routes` slot:
 
 ```dart
 final slots = registry.read<SlotRegistry>();
@@ -43,11 +43,11 @@ slots.open<AppRoute>(SlotNames.routerRoutes).add(
 );
 ```
 
-Route harus dikontribusikan sebelum `GoRouterModule.register` dijalankan.
-Modul yang menyediakan route dapat dideklarasikan sebagai dependency capability
-`navigation` agar urutannya benar.
+Routes must be contributed before `GoRouterModule.register` runs.
+Modules that provide routes can declare the `navigation` capability
+as a dependency so that the order is correct.
 
-## Navigasi dari widget
+## Navigating from a widget
 
 ```dart
 context.go('/orders/42');
@@ -55,6 +55,6 @@ context.push('/orders/42');
 context.pop();
 ```
 
-Panduan lengkap ada di [docs/navigation.md](docs/navigation.md),
-[docs/route-guards.md](docs/route-guards.md), dan
+The full guide is in [docs/navigation.md](docs/navigation.md),
+[docs/route-guards.md](docs/route-guards.md), and
 [docs/deep-links-and-routing.md](docs/deep-links-and-routing.md).

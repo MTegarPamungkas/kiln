@@ -1,14 +1,14 @@
 # flavors
 
-Nilai flavor Dart, entry point per flavor, dan konfigurasi launch VS Code.
+Dart flavor values, per-flavor entry points, and VS Code launch configuration.
 
-- `AppFlavors` mendefinisikan development, staging, dan production.
-- `main_development.dart`, `main_staging.dart`, dan `main_production.dart`
-  menjalankan aplikasi dengan flavor masing-masing.
-- `FlavorsModule` menambahkan `FlavorBanner` ke slot `app.wrappers`.
-- `ReleaseGuard` memperingatkan build release yang memakai flavor
-  non-production.
-- `FlavorX.valueFor` memilih nilai per flavor.
+- `AppFlavors` defines development, staging, and production.
+- `main_development.dart`, `main_staging.dart`, and `main_production.dart`
+  run the app with their respective flavor.
+- `FlavorsModule` adds `FlavorBanner` to the `app.wrappers` slot.
+- `ReleaseGuard` warns about release builds that use a non-production
+  flavor.
+- `FlavorX.valueFor` selects a value per flavor.
 
-Flavor di sini adalah nilai Dart, bukan product flavor native Android/iOS.
-Lihat [docs/native-flavors-not-included.md](docs/native-flavors-not-included.md).
+Flavors here are Dart values, not native Android/iOS product flavors.
+See [docs/native-flavors-not-included.md](docs/native-flavors-not-included.md).

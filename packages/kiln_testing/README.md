@@ -1,6 +1,6 @@
 # kiln_testing
 
-Fake, contract suite, dan harness untuk aplikasi serta extension Kiln.
+Fakes, contract suites, and harnesses for Kiln applications and extensions.
 
 ```dart
 final registry = createTestRegistry();
@@ -8,8 +8,8 @@ final storage = InMemoryStorage();
 final client = FakeHttpClient();
 ```
 
-Contract suite memastikan setiap implementasi kontrak yang sama bisa saling
-menggantikan. Harness menyediakan `pumpApp`, matcher `Result`, async helper, dan
-golden helper.
+Contract suites ensure that every implementation of the same contract is
+interchangeable. The harness provides `pumpApp`, `Result` matchers, async
+helpers, and golden helpers.
 
-Lihat [docs/extensions/testing-extensions.md](../../docs/extensions/testing-extensions.md).
+See [docs/extensions/testing-extensions.md](../../docs/extensions/testing-extensions.md).

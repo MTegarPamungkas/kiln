@@ -1,16 +1,16 @@
 # Demo extension
 
-Extension Kiln untuk `tooling` yang menyediakan kapabilitas `demo`.
+A Kiln extension for `tooling` that provides the `demo` capability.
 
-## Pasang
+## Install
 
 ```bash
 kiln add demo
 ```
 
-## Struktur
+## Structure
 
-- `extension.yaml` — manifest dan prompt.
-- `brick/` — template yang dirender ke proyek pengguna.
-- `test/` — test manifest, render, dan analyze tingkat extension.
-- `docs/` — dokumentasi pemakaian.
+- `extension.yaml` — manifest and prompts.
+- `brick/` — templates rendered into the user project.
+- `test/` — manifest, render, and extension-level analyze tests.
+- `docs/` — usage documentation.

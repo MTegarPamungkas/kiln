@@ -1,16 +1,17 @@
 # permission
 
-Implementasi `Permissions` dari `kiln_core` di atas `permission_handler`.
+An implementation of `Permissions` from `kiln_core` on top of
+`permission_handler`.
 
-- Hanya kind yang dipilih saat install yang aktif; kind lain menghasilkan
+- Only the kind selected at install is active; other kinds produce
   `Failure(configuration)`.
-- Status di-cache dan cache dibersihkan saat app kembali dari settings.
-- `PermissionFlow` menjalankan status, rationale, request, dan arahan ke
-  settings untuk izin permanen.
-- `PermissionGroup` meminta beberapa izin sekaligus.
-- `PermissionGate`, `PermissionRationaleDialog`, dan `OpenSettingsDialog`
-  tersedia untuk UI.
+- Status is cached and the cache is cleared when the app returns from settings.
+- `PermissionFlow` runs status, rationale, request, and directions to settings
+  for permanently denied permissions.
+- `PermissionGroup` requests several permissions at once.
+- `PermissionGate`, `PermissionRationaleDialog`, and `OpenSettingsDialog` are
+  available for the UI.
 
-Catatan native: entri manifest Android dan Info.plist iOS harus disesuaikan
-dengan kind yang dipilih. `permission_handler` tidak menambahkan entri native
-secara otomatis.
+Native notes: Android manifest entries and the iOS Info.plist must be adjusted
+to match the selected kind. `permission_handler` does not add native entries
+automatically.

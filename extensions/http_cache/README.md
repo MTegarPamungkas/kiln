@@ -1,15 +1,15 @@
 # http_cache
 
-Middleware cache respons HTTP untuk `HttpPipeline`.
+HTTP response cache middleware for `HttpPipeline`.
 
-- Cache memori secara default; memakai `Storage` bila extension storage
-  terpasang.
-- Menghormati `Cache-Control: max-age`, `no-store`, `no-cache`, dan
+- In-memory cache by default; uses `Storage` when the storage extension
+  is installed.
+- Honors `Cache-Control: max-age`, `no-store`, `no-cache`, and
   `stale-while-revalidate`.
-- Mendukung `ETag`/`If-None-Match` dan respons 304.
-- Invalidasi entri setelah request mutasi.
-- Kunci cache memuat method, URL, query, dan header `Vary` umum.
-- Batas jumlah entri dengan eviction entri tertua.
+- Supports `ETag`/`If-None-Match` and 304 responses.
+- Invalidates entries after a mutation request.
+- Cache key includes method, URL, query, and common `Vary` headers.
+- Entry count limit with eviction of the oldest entries.
 
 ```bash
 kiln add http_cache

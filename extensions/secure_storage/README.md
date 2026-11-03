@@ -1,15 +1,15 @@
 # secure_storage
 
-Implementasi `SecureStorage` dari `kiln_core` di atas Keychain/Keystore.
+Implementation of `SecureStorage` from `kiln_core` on top of Keychain/Keystore.
 
-Isi brick:
+Brick contents:
 
-- gateway `FlutterSecureStorage` yang bisa di-fake,
-- konfigurasi Android/iOS/Web,
-- prefix per namespace,
-- `SecureTokenStore` yang memenuhi `TokenProvider`,
-- `FirstRunWipe` untuk sisa Keychain iOS,
-- `SecureStorageHealthCheck` untuk probe tulis-baca-hapus.
+- a `FlutterSecureStorage` gateway that can be faked,
+- Android/iOS/Web configuration,
+- per-namespace prefix,
+- a `SecureTokenStore` that satisfies `TokenProvider`,
+- `FirstRunWipe` for leftover iOS Keychain entries,
+- `SecureStorageHealthCheck` for a write-read-delete probe.
 
-Extension ini mengatur `android.allow_backup=false` agar data terenkripsi tidak
-ikut backup lintas instalasi.
+This extension sets `android.allow_backup=false` so that encrypted data is not
+carried over by backups across installations.

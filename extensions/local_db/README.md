@@ -1,15 +1,15 @@
 # local_db
 
-Implementasi `LocalDatabase` dari `kiln_core` di atas Sembast.
+Implementation of `LocalDatabase` from `kiln_core` on top of Sembast.
 
-Fitur:
+Features:
 
-- koleksi dokumen key-value,
-- query `where`, `orderBy`, `limit`, dan `offset`,
-- stream perubahan koleksi,
-- transaksi atomik,
-- typed collection dengan `fromJson`/`toJson`,
-- backup ekspor/impor JSON,
-- antrean sinkronisasi untuk RemoteDatabase,
-- migrasi skema,
-- enkripsi AES-GCM opsional dengan kunci dari SecureStorage.
+- key-value document collections,
+- `where`, `orderBy`, `limit`, and `offset` queries,
+- collection change streams,
+- atomic transactions,
+- typed collections with `fromJson`/`toJson`,
+- JSON export/import backup,
+- sync queue for RemoteDatabase,
+- schema migrations,
+- optional AES-GCM encryption with keys from SecureStorage.

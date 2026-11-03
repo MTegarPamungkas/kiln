@@ -1,12 +1,12 @@
 # connectivity
 
-Memantau status jaringan dan menyediakan `offline_guard` untuk HTTP.
+Monitors network status and provides `offline_guard` for HTTP.
 
-- `NetworkMonitor` dari `kiln_core` diimplementasikan di atas
+- `NetworkMonitor` from `kiln_core` is implemented on top of
   `connectivity_plus`.
-- Status distabilkan dengan `Debouncer` agar Wi-Fi yang naik turun tidak
-  memicu perubahan berlebihan.
-- `ReconnectTrigger` menjalankan aksi tertunda saat kembali online.
-- `OfflineGuardMiddleware` (priority 5) menghentikan request saat offline.
-- `OfflineBanner` dan `NetworkStatusBuilder` siap dipakai di UI.
-- `ReachabilityProbe` opsional memakai `HttpClient` untuk mengecek server.
+- Status is stabilized with a `Debouncer` so Wi-Fi that goes up and down does
+  not trigger excessive changes.
+- `ReconnectTrigger` runs pending actions when back online.
+- `OfflineGuardMiddleware` (priority 5) stops requests while offline.
+- `OfflineBanner` and `NetworkStatusBuilder` are ready to use in the UI.
+- `ReachabilityProbe` optionally uses `HttpClient` to check the server.

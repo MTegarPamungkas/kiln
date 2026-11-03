@@ -1,44 +1,44 @@
 # deep_link
 
-Implementasi `DeepLinks` dari `kiln_core` di atas plugin `app_links`.
+Implementation of `DeepLinks` from `kiln_core` on top of the `app_links` plugin.
 
-- `DeviceDeepLinks` menangkap tautan peluncuran setelah `start()` dan
-  meneruskan tautan yang masuk ke listener.
-- `LinkAllowlist` menolak scheme dan host yang tidak dikonfigurasi, termasuk
-  pencocokan path prefix per segmen.
-- `LinkNormalizer` menurunkan huruf scheme dan host, merapikan path, membuang
-  parameter pelacak, dan menghapus fragment.
-- `LinkDeduplicator` mengabaikan tautan yang sama dalam jendela waktu dari
+- `DeviceDeepLinks` captures the launch link after `start()` and forwards
+  incoming links to the listener.
+- `LinkAllowlist` rejects schemes and hosts that are not configured, including
+  per-segment path prefix matching.
+- `LinkNormalizer` lowercases the scheme and host, tidies the path, strips
+  tracking parameters, and removes the fragment.
+- `LinkDeduplicator` ignores the same link within the time window from
   `Clock`.
-- `PendingLinkBuffer` menyimpan tautan yang tiba sebelum listener pertama
-  terpasang, lalu memutarnya ulang satu kali.
-- `AppLinkBuilder` membangun tautan keluar dengan scheme proyek atau universal
+- `PendingLinkBuffer` stores links that arrive before the first listener is
+  attached, then replays them once.
+- `AppLinkBuilder` builds outgoing links with the project scheme or a universal
   link.
-- Error plugin diubah menjadi `Failure(deep_link, kind: deepLink)` oleh
+- Plugin errors are converted into `Failure(deep_link, kind: deepLink)` by
   `mapDeepLinkError`.
 
-## Cara pasang
+## How to install
 
 ```bash
 kiln add deep_link
 ```
 
-Prompt yang tersedia:
+Available prompts:
 
-| Prompt | Isi | Default |
+| Prompt | Content | Default |
 | --- | --- | --- |
-| `scheme` | scheme kustom tanpa `://` | `kiln` |
-| `hosts` | host universal link yang diizinkan | `kiln.dev` |
-| `path_prefixes` | prefix path yang diizinkan untuk universal link | kosong |
+| `scheme` | custom scheme without `://` | `kiln` |
+| `hosts` | allowed universal link hosts | `kiln.dev` |
+| `path_prefixes` | allowed path prefixes for universal links | empty |
 
-`hosts` dan `path_prefixes` bertipe `multi`, sehingga pilihannya diambil dari
-`options` di `extension.yaml`. Tambahkan host atau prefix Anda ke `options`
-sebelum menjalankan `kiln add` bila belum tercantum.
+`hosts` and `path_prefixes` are of type `multi`, so the choices are taken from
+`options` in `extension.yaml`. Add your host or prefix to `options` before
+running `kiln add` if it is not listed yet.
 
-## Konfigurasi
+## Configuration
 
-Setelan runtime ada di `DeepLinkConfig`. Nilai default dirender dari prompt;
-opsi normalisasi dapat diubah lewat konstruktor:
+Runtime settings live in `DeepLinkConfig`. Default values are rendered from the
+prompts; normalization options can be changed through the constructor:
 
 ```dart
 const config = DeepLinkConfig(
@@ -51,7 +51,7 @@ const config = DeepLinkConfig(
 );
 ```
 
-## Pemakaian
+## Usage
 
 ```dart
 final deepLinks = registry.read<DeepLinks>();
@@ -66,26 +66,26 @@ if (initial != null) {
 }
 ```
 
-`DeepLinkModule.ready` memanggil `start()` secara otomatis saat bootstrap,
-sehingga listener boleh dipasang kapan saja: tautan yang tiba lebih dahulu
-disimpan dan diputar ulang satu kali.
+`DeepLinkModule.ready` calls `start()` automatically during bootstrap, so the
+listener can be attached at any time: links that arrive earlier are stored and
+replayed once.
 
-Tautan peluncuran tidak dikirim ke `links`; baca `initialLink` agar navigasi
-tidak terjadi dua kali.
+The launch link is not sent to `links`; read `initialLink` so that navigation
+does not happen twice.
 
-## Batas penting
+## Important limits
 
-- Native memakai `url_schemes: [kiln]` dan host `kiln.dev` yang statis di
-  `extension.yaml`. Bila prompt `scheme` atau `hosts` diubah, perbarui bagian
-  `android` dan `ios` pada manifest lalu pasang ulang agar intent filter dan
-  associated domain ikut berubah.
-- Hanya scheme kustom yang dikonfigurasi dan `https` yang diterima; `http`
-  ditolak.
-- Bila `hosts` kosong, seluruh tautan `https` ditolak dan hanya scheme kustom
-  yang bekerja.
-- Bila `path_prefixes` kosong, semua path pada host yang diizinkan diterima.
+- Native uses `url_schemes: [kiln]` and the static host `kiln.dev` in
+  `extension.yaml`. If the `scheme` or `hosts` prompts are changed, update the
+  `android` and `ios` sections of the manifest and reinstall so that the intent
+  filter and associated domain change as well.
+- Only the configured custom scheme and `https` are accepted; `http` is
+  rejected.
+- If `hosts` is empty, every `https` link is rejected and only the custom scheme
+  works.
+- If `path_prefixes` is empty, all paths on the allowed hosts are accepted.
 
-Panduan lanjutan:
+Further guides:
 
 - [docs/deep-links.md](docs/deep-links.md)
 - [docs/universal-links.md](docs/universal-links.md)

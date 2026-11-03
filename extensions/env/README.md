@@ -1,14 +1,14 @@
 # env
 
-Konfigurasi build-time bertipe dari `--dart-define`.
+Typed build-time configuration from `--dart-define`.
 
-- `BuildEnv` membaca nilai yang dikompilasi ke aplikasi, bukan file saat runtime.
-- `EnvSchema` mendefinisikan key aktif, tipe, wajib, dan rahasia.
-- `EnvValidator` mengumpulkan semua key wajib yang hilang menjadi satu
+- `BuildEnv` reads values compiled into the app, not files at runtime.
+- `EnvSchema` defines the active keys, types, required flags, and secrets.
+- `EnvValidator` collects every missing required key into a single
   `Failure(configuration)`.
-- `EnvX` menyediakan pembaca `uri`, `duration`, `boolValue`, dan `enumValue`.
-- `EnvDescribe` menyamarkan nilai rahasia untuk log.
-- `EnvDebugPage` hanya tampil di flavor non-production.
+- `EnvX` provides `uri`, `duration`, `boolValue`, and `enumValue` readers.
+- `EnvDescribe` redacts secret values for logs.
+- `EnvDebugPage` only appears in non-production flavors.
 
-Key yang tersedia saat ini: `api_base_url`, `api_key`, `feature_flags`, dan
-`enable_debug_tools`. Lihat [docs/env.md](docs/env.md) untuk menambah key.
+The keys available today are `api_base_url`, `api_key`, `feature_flags`, and
+`enable_debug_tools`. See [docs/env.md](docs/env.md) for adding keys.

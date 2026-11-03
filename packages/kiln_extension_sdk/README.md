@@ -1,12 +1,12 @@
 # kiln_extension_sdk
 
-Mesin di balik `kiln add` dan `kiln remove`.
+The engine behind `kiln add` and `kiln remove`.
 
-- `manifest/` — model, validator, prompt, compatibility, contribution.
-- `resolver/` — capability index, dependency graph, plan, conflict.
-- `renderer/` — Mason bundle, template vars, collision, hook policy.
-- `installer/` — lockfile, pubspec, codegen, transaction, ownership, patch
-  native, verifier.
+- `manifest/` — models, validator, prompts, compatibility, contributions.
+- `resolver/` — capability index, dependency graph, plan, conflicts.
+- `renderer/` — Mason bundle, template vars, collisions, hook policy.
+- `installer/` — lockfile, pubspec, codegen, transaction, ownership, native
+  patches, verifier.
 - `migrator/` — migration model, loader, runner.
 
 ```dart
@@ -17,12 +17,12 @@ final installer = ExtensionInstaller(
 final result = await installer.add(requested: ['dio']);
 ```
 
-Semua perubahan file berjalan di dalam transaksi dengan jurnal dan rollback.
+All file changes run inside a transaction with a journal and rollback.
 
-## Manifest native Android
+## Android native manifest
 
-Selain permission dan URL scheme, extension bisa mendeklarasikan broadcast
-`receiver` yang ditambahkan ke `AndroidManifest.xml` saat install:
+Besides permissions and URL schemes, an extension can declare broadcast
+`receiver`s that are added to `AndroidManifest.xml` at install time:
 
 ```yaml
 android:
@@ -38,13 +38,13 @@ android:
         - android.intent.action.MY_PACKAGE_REPLACED
 ```
 
-Receiver ditulis sebelum `</application>` dengan marker `kiln:android.receiver.*`,
-sehingga `kiln remove` bisa menghapusnya kembali tanpa menyentuh receiver lain.
+Receivers are written before `</application>` with the `kiln:android.receiver.*`
+marker, so `kiln remove` can remove them again without touching other receivers.
 
-### Native kondisional
+### Conditional native entries
 
-Native entry bisa bergantung pada jawaban prompt. Semua pasangan nilai di
-`when` harus cocok; list dibandingkan per elemen:
+A native entry can depend on prompt answers. Every value pair in `when` must
+match; lists are compared element by element:
 
 ```yaml
 conditional:
@@ -55,5 +55,5 @@ conditional:
         - android.permission.SCHEDULE_EXACT_ALARM
 ```
 
-Jawaban disimpan di `kiln.yaml`, sehingga `kiln remove` dan `kiln upgrade` bisa
-merekonstruksi patch yang sama. Jangan memakai prompt `secret` untuk kondisi.
+Answers are stored in `kiln.yaml`, so `kiln remove` and `kiln upgrade` can
+reconstruct the same patch. Do not use a `secret` prompt for conditions.

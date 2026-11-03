@@ -7,55 +7,56 @@ slots, never by importing each other.
 
 ## Status
 
-Fase fondasi sudah berjalan end-to-end:
+The foundation phase runs end-to-end:
 
-- `kiln create` menghasilkan aplikasi dari brick `app_basic`.
-- `kiln add dio` memasang extension secara transaksional, termasuk patch
-  Android, dependency pubspec, lockfile, dan `extensions.g.dart`.
+- `kiln create` generates an application from the `app_basic` brick.
+- `kiln add dio` installs an extension transactionally, including Android
+  patches, pubspec dependencies, lockfile, and `extensions.g.dart`.
 - `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`, `cache`,
-  `store`, `completion`, dan `ext new/validate/test/pack` tersedia.
-- Proyek hasil generate lolos `flutter analyze` dan `flutter test`.
-- Dua puluh enam extension bawaan: `analytics`, `appwrite`, `biometric`,
+  `store`, `completion`, and `ext new/validate/test/pack` are available.
+- Generated projects pass `flutter analyze` and `flutter test`.
+- Twenty-six built-in extensions: `analytics`, `appwrite`, `biometric`,
   `bloc`, `connectivity`, `deep_link`, `dio`, `env`, `firebase`, `flavors`,
   `go_router`, `http_cache`, `http_retry`, `image_picker`, `l10n`, `local_db`,
   `logger`, `notifications`, `permission`, `rest_auth`, `riverpod`,
-  `secure_storage`, `social_login`, `storage`, `supabase`, dan `theme`.
-- `kiln create --state bloc` dan `--state riverpod` menghasilkan aplikasi yang
-  sudah terpasang state management, session bridge, dan contoh counter.
-- `dio + http_retry + http_cache` merakit pipeline HTTP dengan urutan priority:
-  request id/user agent, retry, lalu cache.
-- Storage group: `storage` (SharedPreferences, typed key, TTL, migrasi),
-  `secure_storage` (gateway, token store, first-run wipe, health check), dan
-  `local_db` (Sembast, query, watch, transaksi, backup, sync queue, migrasi,
-  enkripsi AES-GCM opsional).
+  `secure_storage`, `social_login`, `storage`, `supabase`, and `theme`.
+- `kiln create --state bloc` and `--state riverpod` generate an application
+  with state management, the session bridge, and a counter example already
+  wired up.
+- `dio + http_retry + http_cache` assembles an HTTP pipeline in priority order:
+  request id/user agent, retry, then cache.
+- Storage group: `storage` (SharedPreferences, typed keys, TTL, migration),
+  `secure_storage` (gateway, token store, first-run wipe, health check), and
+  `local_db` (Sembast, queries, watch, transactions, backup, sync queue,
+  migration, optional AES-GCM encryption).
 - Platform group: `connectivity` (NetworkMonitor, probe, offline guard),
-  `permission` (kind bertipe, flow rationale, widget gate), `notifications`
-  (channel, payload bertipe, tap hub, reminder scheduler), dan `image_picker`
-  (MIME sniffer, validasi, lost data recovery, adapter unggah).
-- Auth/backend group: `rest_auth` (token store, refresh single-flight, 401
-  handler), `appwrite`, `firebase`, dan `supabase` (auth, remote database,
-  file storage, akun), plus `social_login` dan `biometric` (app lock dan
-  penyimpanan terlindungi).
-- Navigasi/UI group: `go_router` (route slot, guard, deep link dan tap
-  notifikasi), `deep_link` (allowlist, normalisasi, dedup, builder), `theme`
-  (warna, token desain, mode terang/gelap) dan `l10n` (ARB + gen-l10n,
-  locale, plural, format, pesan Failure).
-- Tooling group: `env` (nilai build-time bertipe), `flavors` (entry point dan
-  banner), `logger` (sink, redaksi, breadcrumb, HTTP log), dan `analytics`
+  `permission` (typed kinds, rationale flow, widget gate), `notifications`
+  (channels, typed payloads, tap hub, reminder scheduler), and `image_picker`
+  (MIME sniffer, validation, lost data recovery, upload adapter).
+- Auth/backend group: `rest_auth` (token store, single-flight refresh, 401
+  handler), `appwrite`, `firebase`, and `supabase` (auth, remote database,
+  file storage, accounts), plus `social_login` and `biometric` (app lock and
+  protected storage).
+- Navigation/UI group: `go_router` (route slot, guards, deep links and
+  notification taps), `deep_link` (allowlist, normalization, dedup, builder),
+  `theme` (colors, design tokens, light/dark mode) and `l10n` (ARB + gen-l10n,
+  locales, plurals, formatting, Failure messages).
+- Tooling group: `env` (typed build-time values), `flavors` (entry points and
+  banners), `logger` (sinks, redaction, breadcrumbs, HTTP logs), and `analytics`
   (PostHog, consent gate, PII scrubbing).
 - Registry: `kiln_store` (client, cache, checksum, trust, pack/publish),
-  `registry/` berisi index dan arsip, serta `kiln store install`,
-  `kiln upgrade`, dan `kiln ext publish`.
-- `kiln_lints`: lima custom lint (`no_cross_extension_import`,
+  `registry/` holds the index and archives, plus `kiln store install`,
+  `kiln upgrade`, and `kiln ext publish`.
+- `kiln_lints`: five custom lints (`no_cross_extension_import`,
   `prefer_contract_over_impl`, `no_plugin_in_features`,
-  `no_edit_generated_files`, `require_failure_handling`) pada analyzer 8.
-- Phase 4: contoh `examples/minimal`, `full_stack`, `backend_swap`, dan
-  `custom_extension`; golden render per extension; workflow drift, docs, dan
-  release.
-- Setiap extension disertai test manifest, render, analyze, serta test brick
-  yang berjalan di aplikasi hasil generate.
+  `no_edit_generated_files`, `require_failure_handling`) on analyzer 8.
+- Phase 4: the `examples/minimal`, `full_stack`, `backend_swap`, and
+  `custom_extension` examples; per-extension golden renders; drift, docs, and
+  release workflows.
+- Every extension ships with manifest, render, and analyze tests, plus brick
+  tests that run on the generated application.
 
-Lihat [getting-started.md](docs/getting-started.md) dan
+See [getting-started.md](docs/getting-started.md) and
 [roadmap.md](docs/roadmap.md).
 
 ## Packages
@@ -91,25 +92,25 @@ cd ../kiln_cli && dart test
 cd ../../extensions/dio && dart test
 ```
 
-Pemeriksaan kualitas yang dipakai CI:
+Quality checks used by CI:
 
 ```bash
-dart run tool/verify_extensions.dart --check   # golden render per extension
-dart run tool/check_docs.dart --check          # tautan dan code fence docs
-dart run tool/check_drift.dart --check         # constraint vs versi pub.dev
-dart run tool/registry.dart --check            # index dan arsip registry
+dart run tool/verify_extensions.dart --check   # per-extension golden render
+dart run tool/check_docs.dart --check          # doc links and code fences
+dart run tool/check_drift.dart --check         # constraints vs pub.dev versions
+dart run tool/registry.dart --check            # registry index and archives
 dart run tool/bundle.dart --check
 dart run tool/gen_catalog_docs.dart --check
 ```
 
-`dart run tool/verify_extensions.dart --analyze [--only <id>]` merender
-app_basic plus satu extension ke fixture bersama dan menjalankan
+`dart run tool/verify_extensions.dart --analyze [--only <id>]` renders
+app_basic plus one extension into a shared fixture and runs
 `flutter pub get` + `flutter analyze`.
 
-Workflow GitHub: `ci`, `extensions`, `bundles_check`, `smoke` (nightly),
-`drift` (nightly), `docs`, dan `release` (tag `v*`).
+GitHub workflows: `ci`, `extensions`, `bundles_check`, `smoke` (nightly),
+`drift` (nightly), `docs`, and `release` (`v*` tags).
 
-Membuat aplikasi dari source:
+Creating an application from source:
 
 ```bash
 dart run packages/kiln_cli/bin/kiln.dart create my_app \

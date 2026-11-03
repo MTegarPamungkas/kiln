@@ -1,48 +1,48 @@
 # kiln_store
 
-Klien registry, verifikasi arsip, trust policy, dan publisher extension untuk
-Kiln. Package ini tidak bergantung pada Flutter sehingga bisa dipakai CLI, tool
-registry, maupun skrip rilis.
+Registry client, archive verification, trust policy, and extension publisher for
+Kiln. This package does not depend on Flutter, so it can be used by the CLI, the
+registry tool, and release scripts.
 
-## Isi package
+## Package contents
 
-| Berkas | Tanggung jawab |
+| File | Responsibility |
 | --- | --- |
-| `registry_config.dart` | URL utama, mirror, ref, dan normalisasi path lokal/`file:` |
-| `registry_client.dart` | Mengambil `index.json` dan arsip lewat HTTP, `file:`, atau folder lokal |
-| `registry_index.dart` | Model `index.json` (`RegistryIndex`, `RegistryExtension`, `RegistryVersion`) |
-| `version_resolver.dart` | Memilih versi tertinggi yang cocok dengan `kiln_core` (dan Dart) |
-| `search_index.dart` | Pencarian lokal berdasarkan id, nama, deskripsi, dan kategori |
-| `checksum_verifier.dart` | Verifikasi SHA-256 arsip sebelum dipasang |
-| `trust_policy.dart` | Level official/verified/community dan konfirmasi hook |
-| `archive_packer.dart` | Membuat `.tar.gz` deterministik dari folder extension |
-| `archive_unpacker.dart` | Mengekstrak arsip dan menolak path traversal serta link |
-| `publisher.dart` | Validasi manifest lalu menulis arsip dan `index.json` |
-| `local_cache.dart` | Cache index dan arsip di disk |
-| `offline_mode.dart` | Memakai cache saat offline atau jaringan gagal |
-| `kiln_store_exception.dart` | Error dengan `code`, `message`, `suggestion`, `details` |
+| `registry_config.dart` | Base URL, mirror, ref, and normalization of local/`file:` paths |
+| `registry_client.dart` | Fetches `index.json` and archives over HTTP, `file:`, or a local folder |
+| `registry_index.dart` | `index.json` models (`RegistryIndex`, `RegistryExtension`, `RegistryVersion`) |
+| `version_resolver.dart` | Picks the highest version compatible with `kiln_core` (and Dart) |
+| `search_index.dart` | Local search by id, name, description, and category |
+| `checksum_verifier.dart` | SHA-256 verification of archives before install |
+| `trust_policy.dart` | Trust levels (official/verified/community) and hook confirmation |
+| `archive_packer.dart` | Builds a deterministic `.tar.gz` from an extension folder |
+| `archive_unpacker.dart` | Extracts archives and rejects path traversal and links |
+| `publisher.dart` | Validates the manifest, then writes the archive and `index.json` |
+| `local_cache.dart` | On-disk cache for the index and archives |
+| `offline_mode.dart` | Uses the cache when offline or when the network fails |
+| `kiln_store_exception.dart` | Errors with `code`, `message`, `suggestion`, `details` |
 
-## Konfigurasi registry
+## Registry configuration
 
 ```dart
 final config = RegistryConfig(
-  url: 'https://raw.githubusercontent.com/contoh/registry/main',
-  mirror: 'https://mirror.contoh.dev/kiln',
+  url: 'https://raw.githubusercontent.com/example/registry/main',
+  mirror: 'https://mirror.example.dev/kiln',
 );
 
 config.indexUri;        // .../index.json
-config.mirrorIndexUri;  // .../index.json atau null
+config.mirrorIndexUri;  // .../index.json or null
 config.resolve('archives/dio-0.2.0.tgz');
 ```
 
-`url` dan `mirror` menerima URL HTTP(S), URI `file:`, atau path filesystem
-(termasuk `C:\registry` di Windows). Path lokal dinormalisasi menjadi `file:`
-saat URI dibutuhkan. Placeholder `{ref}` diganti dengan `ref` ketika path
-diselesaikan, sehingga satu konfigurasi bisa mengikuti branch atau tag.
+`url` and `mirror` accept HTTP(S) URLs, `file:` URIs, or filesystem paths
+(including `C:\registry` on Windows). Local paths are normalized to `file:`
+when a URI is needed. The `{ref}` placeholder is replaced with `ref` when the
+path is resolved, so a single configuration can follow a branch or tag.
 
-`RegistryConfig.fromMap`/`toJson` dipakai oleh konfigurasi CLI.
+`RegistryConfig.fromMap`/`toJson` are used by the CLI configuration.
 
-## Mengambil index dan arsip
+## Fetching the index and archives
 
 ```dart
 final cache = LocalCache(Directory(cacheDir));
@@ -58,13 +58,13 @@ final bytes = await client.downloadArchive(
 );
 ```
 
-`fetchIndex` memakai registry utama lebih dulu lalu mirror sebagai fallback;
-`useMirror: true` membalik urutannya. Respons non-200, file yang hilang, dan
-kegagalan jaringan menjadi `KilnStoreException` dengan kode
-`store.fetch_failed`. `downloadArchive` selalu memverifikasi SHA-256 dan menulis
-ke cache bila tersedia.
+`fetchIndex` uses the primary registry first and the mirror as a fallback;
+`useMirror: true` reverses the order. Non-200 responses, missing files, and
+network failures become a `KilnStoreException` with the code
+`store.fetch_failed`. `downloadArchive` always verifies the SHA-256 and writes
+to the cache when one is available.
 
-## Memilih versi dan mencari extension
+## Selecting versions and searching extensions
 
 ```dart
 final selected = const VersionResolver().resolve(
@@ -77,11 +77,11 @@ final selected = const VersionResolver().resolve(
 final matches = SearchIndex(index).search('http');
 ```
 
-Resolver hanya menerima versi yang lolos constraint `compatibility['kiln']`
-(dan `compatibility['dart']` bila diberikan), melewati prerelease kecuali
-`allowPrerelease: true`, dan tidak pernah memilih versi yang sama atau lebih
-rendah dari versi terpasang. Constraint yang tidak ada dianggap kompatibel;
-constraint rusak dilewati.
+The resolver only accepts versions that satisfy the `compatibility['kiln']`
+constraint (and `compatibility['dart']` when provided), skips prereleases
+unless `allowPrerelease: true`, and never selects a version equal to or lower
+than the installed version. A missing constraint is treated as compatible; a
+malformed constraint is skipped.
 
 ## Trust policy
 
@@ -91,11 +91,11 @@ if (!decision.allowed) { /* tolak */ }
 if (decision.requiresConfirmation) { /* minta konfirmasi */ }
 ```
 
-Official selalu diizinkan. Verified dan community mengikuti `allowed`
-(bawaan: semua tier). Community meminta konfirmasi bila `confirmCommunity`, dan
-extension dengan hook meminta konfirmasi bila `confirmHooks`.
+Official is always allowed. Verified and community follow `allowed` (default:
+all tiers). Community asks for confirmation when `confirmCommunity` is set, and
+extensions with hooks ask for confirmation when `confirmHooks` is set.
 
-## Arsip
+## Archives
 
 ```dart
 final bytes = const ArchivePacker().pack(extensionRoot);
@@ -105,17 +105,17 @@ final sha256 = sha256Hex(bytes);
 const ChecksumVerifier().verify(bytes, expectedSha256);
 ```
 
-Packer menulis path relatif POSIX, mengurutkan entri, memakai timestamp dan mode
-tetap, serta melewati `.dart_tool`, `.git`, `build`, `.kiln`, dan arsip `.tgz`
-yang dihasilkan. Karena itu isi yang sama menghasilkan byte yang sama, yang
-dibutuhkan oleh `tool/registry.dart --check`.
+Packer writes POSIX relative paths, sorts entries, uses fixed timestamps and
+modes, and skips `.dart_tool`, `.git`, `build`, `.kiln`, and the `.tgz` archives
+it generates. Because of this, identical content produces identical bytes, which
+`tool/registry.dart --check` requires.
 
-Unpacker memvalidasi seluruh entri sebelum menulis apa pun, lalu menolak path
-absolut, drive letter, segmen kosong, `..`, backslash, symlink, hard link, dan
-special file dengan kode `store.unsafe_archive`. Arsip yang bukan `.tar.gz`
-ditolak dengan `store.invalid_archive`.
+Unpacker validates every entry before writing anything, then rejects absolute
+paths, drive letters, empty segments, `..`, backslashes, symlinks, hard links,
+and special files with the code `store.unsafe_archive`. Archives that are not
+`.tar.gz` are rejected with `store.invalid_archive`.
 
-## Cache dan mode offline
+## Cache and offline mode
 
 ```dart
 final mode = OfflineMode(client: client, cache: cache, offline: true);
@@ -123,12 +123,13 @@ final index = await mode.index();
 final bytes = await mode.archive('dio', '0.2.0');
 ```
 
-Mode offline tidak pernah menyentuh jaringan: index dibaca dari cache atau
-melempar `store.offline_missing`, dan arsip yang belum tercache juga melempar
-`store.offline_missing` (setelah memastikan id/versi ada di index). Dalam mode
-online, kegagalan mengambil index jatuh ke cache bila tersedia.
+Offline mode never touches the network: the index is read from the cache or a
+`store.offline_missing` error is thrown, and an archive that is not cached also
+throws `store.offline_missing` (after confirming the id/version exists in the
+index). In online mode, a failure to fetch the index falls back to the cache
+when one is available.
 
-Layout cache:
+Cache layout:
 
 ```text
 <cache>/index.json
@@ -141,19 +142,19 @@ Layout cache:
 final result = await Publisher().publish(
   extensionRoot: extension,
   registryRoot: registry,
-  archiveBaseUrl: Uri.parse('https://cdn.contoh.dev/kiln'), // opsional
+  archiveBaseUrl: Uri.parse('https://cdn.example.dev/kiln'), // optional
 );
 ```
 
-Publisher memvalidasi `extension.yaml` dengan `ManifestValidator`, menolak versi
-duplikat kecuali `force: true`, menulis
-`registry/archives/<id>-<version>.tgz`, menghitung SHA-256, lalu memperbarui
-`registry/index.json`. Extension lain dan versi lain dipertahankan; extension
-diurutkan berdasarkan id dan versi secara menaik. `latest` selalu versi
-tertinggi. Tanpa `archiveBaseUrl`, URL arsip disimpan relatif sebagai
+Publisher validates `extension.yaml` with `ManifestValidator`, rejects
+duplicate versions unless `force: true`, writes
+`registry/archives/<id>-<version>.tgz`, computes the SHA-256, and then updates
+`registry/index.json`. Other extensions and versions are preserved; extensions
+are sorted by id and versions in ascending order. `latest` is always the highest
+version. Without `archiveBaseUrl`, the archive URL is stored relative as
 `archives/<id>-<version>.tgz`.
 
-## Menjalankan test
+## Running tests
 
 ```bash
 cd packages/kiln_store
@@ -161,5 +162,5 @@ dart test
 dart analyze
 ```
 
-Fixture berada di `test/fixtures/registry/`: `index.json`, `valid.tgz`, dan
-`zip-slip.tgz` (arsip berbahaya untuk menguji penolakan path traversal).
+Fixtures live in `test/fixtures/registry/`: `index.json`, `valid.tgz`, and
+`zip-slip.tgz` (a malicious archive for testing path traversal rejection).

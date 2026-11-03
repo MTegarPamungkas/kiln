@@ -1,34 +1,34 @@
 # appwrite
 
-Implementasi `AuthRepository`, `RemoteDatabase`, dan `FileStorage` dari
-`kiln_core` di atas [Appwrite](https://appwrite.io).
+Implementation of `AuthRepository`, `RemoteDatabase`, and `FileStorage` from
+`kiln_core` on top of [Appwrite](https://appwrite.io).
 
-- `AppwriteAuth` memakai `Account` Appwrite untuk masuk, daftar, keluar, dan
-  memulihkan sesi yang masih aktif.
-- `AppwriteAccountManagement` menangani reset password, verifikasi email, dan
-  perubahan profil.
-- `AppwriteSessionBridge` meneruskan sesi ke `SessionController` dan menyediakan
-  `TokenProvider` berupa JWT Appwrite berumur pendek.
-- `AppwriteRemoteDatabase` memetakan `RemoteQuery` ke query TablesDB dan
-  meneruskan perubahan realtime lewat `watch`.
-- `AppwriteFileStorage` mengunggah, mengunduh, menautkan, dan menghapus berkas
-  di bucket yang dipilih.
-- Semua panggilan SDK berada di balik gateway, sehingga aplikasi bisa menguji
-  alurnya tanpa jaringan.
+- `AppwriteAuth` uses the Appwrite `Account` to sign in, sign up, sign out, and
+  restore a session that is still active.
+- `AppwriteAccountManagement` handles password reset, email verification, and
+  profile changes.
+- `AppwriteSessionBridge` forwards the session to `SessionController` and provides
+  a `TokenProvider` in the form of a short-lived Appwrite JWT.
+- `AppwriteRemoteDatabase` maps `RemoteQuery` to TablesDB queries and
+  forwards realtime changes through `watch`.
+- `AppwriteFileStorage` uploads, downloads, links, and deletes files
+  in the selected bucket.
+- All SDK calls sit behind a gateway, so the app can test
+  its flows without a network.
 
-## Memasang
+## Installing
 
 ```bash
 kiln add appwrite
 ```
 
-Prompt yang diminta: `endpoint`, `project_id`, `database_id`, dan `bucket_id`.
-Setelah install, ikuti [docs/appwrite-setup.md](docs/appwrite-setup.md) dan
-selesaikan dua langkah manual yang dicatat `kiln doctor`: menambahkan platform
-aplikasi dan mendaftarkan redirect URL `kiln://auth/recovery` serta
+Prompts requested: `endpoint`, `project_id`, `database_id`, and `bucket_id`.
+After installing, follow [docs/appwrite-setup.md](docs/appwrite-setup.md) and
+complete the two manual steps recorded by `kiln doctor`: add the app
+platform and register the redirect URLs `kiln://auth/recovery` and
 `kiln://auth/verify`.
 
-## Contoh pemakaian
+## Usage example
 
 ```dart
 final auth = registry.read<AuthRepository>();
@@ -54,6 +54,6 @@ final stored = await storage.upload(
 );
 ```
 
-Pemetaan query, izin dokumen, dan perbedaan perilaku dibahas di
-[docs/collections-and-permissions.md](docs/collections-and-permissions.md) dan
+Query mapping, document permissions, and behavior differences are covered in
+[docs/collections-and-permissions.md](docs/collections-and-permissions.md) and
 [docs/backend-swap-notes.md](docs/backend-swap-notes.md).

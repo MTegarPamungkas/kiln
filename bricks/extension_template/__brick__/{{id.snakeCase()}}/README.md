@@ -1,16 +1,16 @@
 # {{name}}
 
-Extension Kiln untuk `{{category}}` yang menyediakan kapabilitas `{{provides}}`.
+A Kiln extension for `{{category}}` that provides the `{{provides}}` capability.
 
-## Pasang
+## Install
 
 ```bash
 kiln add {{id.snakeCase()}}
 ```
 
-## Struktur
+## Structure
 
-- `extension.yaml` — manifest dan prompt.
-- `brick/` — template yang dirender ke proyek pengguna.
-- `test/` — test manifest, render, dan analyze tingkat extension.
-- `docs/` — dokumentasi pemakaian.
+- `extension.yaml` — manifest and prompts.
+- `brick/` — templates rendered into the user project.
+- `test/` — manifest, render, and extension-level analyze tests.
+- `docs/` — usage documentation.

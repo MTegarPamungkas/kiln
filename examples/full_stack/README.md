@@ -1,22 +1,22 @@
 # full_stack
 
-Aplikasi Flutter yang dibuat dengan Kiln.
+A Flutter app generated with Kiln.
 
-## Menjalankan
+## Running
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-## Struktur
+## Structure
 
-- `lib/app/` — kerangka aplikasi, registry, dan shell MaterialApp.
-- `lib/core/` — theme, lokalisasi, dan penanganan error.
-- `lib/extensions/` — kode extension yang dipasang lewat `kiln add`.
-- `kiln.yaml` — konfigurasi proyek dan jawaban prompt extension.
+- `lib/app/` — app skeleton, registry, and MaterialApp shell.
+- `lib/core/` — theme, localization, and error handling.
+- `lib/extensions/` — extension code installed via `kiln add`.
+- `kiln.yaml` — project configuration and extension prompt answers.
 
-Tambahkan extension tanpa mengedit kerangka aplikasi:
+Add extensions without editing the app skeleton:
 
 ```bash
 kiln add dio

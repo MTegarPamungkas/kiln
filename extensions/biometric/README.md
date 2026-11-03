@@ -1,16 +1,16 @@
 # biometric
 
-Biometrik lokal, kunci aplikasi, dan penyimpanan rahasia yang dilindungi.
+Local biometrics, app lock, and protected secret storage.
 
-- `Biometric` membungkus `canAuthenticate`, `availableBiometrics`, dan
-  `authenticate` lewat gateway yang bisa di-fake.
-- `BiometricAvailability` membedakan available, notEnrolled, noHardware, dan
+- `Biometric` wraps `canAuthenticate`, `availableBiometrics`, and
+  `authenticate` through a gateway that can be faked.
+- `BiometricAvailability` distinguishes available, notEnrolled, noHardware, and
   unsupportedPlatform.
-- `BiometricGate` menjalankan aksi setelah autentikasi dan menyimpan masa
-  tenggang memakai `Clock`.
-- `AppLock` mengunci aplikasi setelah pause melewati batas;
-  `AppLockScope` menutup layar dan menyediakan tombol buka.
-- `BiometricProtectedStorage` meminta autentikasi sebelum `read`.
+- `BiometricGate` runs an action after authentication and stores the grace
+  period using `Clock`.
+- `AppLock` locks the app after a pause exceeds the limit;
+  `AppLockScope` covers the screen and provides an unlock button.
+- `BiometricProtectedStorage` requests authentication before `read`.
 
-Panduan kunci aplikasi: [docs/app-lock.md](docs/app-lock.md). Persyaratan
-platform: [docs/platform-requirements.md](docs/platform-requirements.md).
+App lock guide: [docs/app-lock.md](docs/app-lock.md). Platform requirements:
+[docs/platform-requirements.md](docs/platform-requirements.md).

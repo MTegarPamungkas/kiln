@@ -1,28 +1,28 @@
 # firebase
 
-Implementasi kontrak `kiln_core` di atas Firebase:
+Implementation of the `kiln_core` contracts on top of Firebase:
 
-- `AuthRepository` di `FirebaseAuthRepository` lewat gateway `FirebaseAuthGateway`.
-- `SocialAuth` di `FirebaseSocialAuth` memakai `signInWithProvider` Firebase Auth
-  untuk Google dan Apple.
-- `AccountManagement` untuk reset password, verifikasi email, dan ubah profil.
-- `TokenProvider` di `FirebaseIdTokenProvider` memakai `getIdToken`, termasuk
-  refresh paksa saat menerima `401`.
-- `RemoteDatabase` di `FirestoreRemoteDatabase` dengan query bertipe dan
-  `watch` realtime.
-- `FileStorage` di `FirebaseFileStorage` dengan progress unggah.
-- `FirebaseSessionBridge` meneruskan `authStateChanges` ke `SessionController`.
+- `AuthRepository` in `FirebaseAuthRepository` through the `FirebaseAuthGateway` gateway.
+- `SocialAuth` in `FirebaseSocialAuth` uses Firebase Auth `signInWithProvider`
+  for Google and Apple.
+- `AccountManagement` for password reset, email verification, and profile updates.
+- `TokenProvider` in `FirebaseIdTokenProvider` uses `getIdToken`, including a
+  forced refresh when a `401` is received.
+- `RemoteDatabase` in `FirestoreRemoteDatabase` with typed queries and realtime
+  `watch`.
+- `FileStorage` in `FirebaseFileStorage` with upload progress.
+- `FirebaseSessionBridge` forwards `authStateChanges` to `SessionController`.
 
-## Pemasangan
+## Installation
 
 ```bash
 kiln ext add firebase
 ```
 
-Lalu selesaikan langkah manual `firebase_flutterfire_configure`:
-lihat [docs/flutterfire-configure.md](docs/flutterfire-configure.md).
+Then complete the manual `firebase_flutterfire_configure` step:
+see [docs/flutterfire-configure.md](docs/flutterfire-configure.md).
 
-## Pemakaian
+## Usage
 
 ```dart
 final registry = await KilnBootstrap.run(
@@ -39,34 +39,35 @@ final auth = registry.read<AuthRepository>();
 await auth.signIn(email: 'user@kiln.dev', password: 'password123');
 
 final database = registry.read<RemoteDatabase>();
-await database.create('tasks', {'title': 'Belajar Kiln', 'done': false});
+await database.create('tasks', {'title': 'Learn Kiln', 'done': false});
 ```
 
-`FirebaseOptions` wajib diberikan ke `FirebaseModule`. Bila memakai output
-FlutterFire CLI, teruskan `DefaultFirebaseOptions.currentPlatform`. Bila build
-mengisi konfigurasi sendiri, teruskan `FirebaseOptions` yang sesuai dan ubah
-prompt `options_source` menjadi `explicit`.
+`FirebaseOptions` must be provided to `FirebaseModule`. If you use the output of
+the FlutterFire CLI, pass `DefaultFirebaseOptions.currentPlatform`. If the build
+supplies its own configuration, pass the matching `FirebaseOptions` and change
+the `options_source` prompt to `explicit`.
 
-Untuk `FileStorage`, options tersebut harus memuat `storageBucket`
-(misalnya `project-id.appspot.com`). Tanpa bucket, `FirebaseStorage.instance`
-gagal dengan `firebase_storage/no-bucket`.
+For `FileStorage`, those options must include `storageBucket`
+(for example `project-id.appspot.com`). Without a bucket,
+`FirebaseStorage.instance` fails with `firebase_storage/no-bucket`.
 
-`FirebaseModule` menginisialisasi Firebase di `ready()`, jadi aplikasi tidak
-perlu memanggil `Firebase.initializeApp` sebelum `KilnBootstrap.run`.
+`FirebaseModule` initializes Firebase in `ready()`, so the app does not need to
+call `Firebase.initializeApp` before `KilnBootstrap.run`.
 
-## Perilaku penting
+## Important behavior
 
-- Semua akses SDK berada di balik `FirebaseAuthGateway`, `FirestoreGateway`,
-  dan `FirebaseStorageGateway`, sehingga test tidak butuh aplikasi Firebase.
-- Kombinasi query yang membutuhkan indeks komposit ditolak lebih awal dengan
-  `Failure(validation.unsupported_value)`, bukan dibiarkan gagal di SDK.
-- `RemoteQuery.offset` diterjemahkan menjadi cursor `startAfterDocument`
-  karena Cloud Firestore 7 tidak lagi menyediakan `Query.offset`. Hasil dan
-  biaya bacanya setara dengan offset Firestore.
-- Flavor `development` diarahkan ke Firebase Emulator Suite secara default.
-  Staging dan production tidak pernah diarahkan ke localhost.
-- Hook Mason hanya memberi peringatan bila `flutterfire` atau
-  `lib/firebase_options.dart` belum tersedia; instalasi tidak pernah gagal.
+- All SDK access sits behind `FirebaseAuthGateway`, `FirestoreGateway`,
+  and `FirebaseStorageGateway`, so tests do not need a Firebase app.
+- Query combinations that require a composite index are rejected up front with
+  `Failure(validation.unsupported_value)` instead of being left to fail in the
+  SDK.
+- `RemoteQuery.offset` is translated into a `startAfterDocument` cursor
+  because Cloud Firestore 7 no longer provides `Query.offset`. The results and
+  read cost are equivalent to a Firestore offset.
+- The `development` flavor points at the Firebase Emulator Suite by default.
+  Staging and production never point at localhost.
+- The Mason hook only warns when `flutterfire` or
+  `lib/firebase_options.dart` is not available; installation never fails.
 
-Dokumentasi lain: [setup](docs/firebase-setup.md),
+Other documentation: [setup](docs/firebase-setup.md),
 [emulator](docs/emulators.md), [security rules](docs/security-rules.md).
