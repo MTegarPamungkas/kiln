@@ -1,0 +1,27 @@
+{
+  "extension": "permission",
+  "files": {
+    "lib/extensions/permission/device_permissions.dart": "65148f8525803274419011511ee5de452841bf8cd98af2883e554c559cabbe8e",
+    "lib/extensions/permission/permission_config.dart": "8109dc8f8b0da8f22e0343ad2f9a321b691d1fa02b9e6de4eb38122c48e2f326",
+    "lib/extensions/permission/permission_failure_mapper.dart": "179a1960fb03956ea99307e57b968235713ee0ea554529facf83e599a89eb29a",
+    "lib/extensions/permission/permission_flow.dart": "d0e3eed993ad9b8b8e32ae8452138933c7df1315f80622fe0e12f4a1e8c60e85",
+    "lib/extensions/permission/permission_gateway.dart": "551bd161cbd3e9b51a24883c11273bdc5768912cc2f3d204e82c154cb47e9428",
+    "lib/extensions/permission/permission_group.dart": "181bab105c18bbe43aeefb53c49b0d8b8c71c34e688e094f5ea08439216a4537",
+    "lib/extensions/permission/permission_kind_guard.dart": "92e37c90473fcd3912825d919e07462e39e5f328ec24d8ab97f5adf1e2af0b04",
+    "lib/extensions/permission/permission_module.dart": "81f8658c4880c356fa6980183aae98c0786eecead1f0f592ed8852eac9e7295e",
+    "lib/extensions/permission/permission_resume_observer.dart": "9da133f73bc828eb152ee3b760f64111ca5e5b2ff91b2612b5285f9aaff0708b",
+    "lib/extensions/permission/permission_status_cache.dart": "26180d34d859dfe13cf42c6a5780565bf1199d0b40cd710105f632254bc1f25a",
+    "lib/extensions/permission/widgets/permission_dialogs.dart": "3878fdb61e15db3faf86dde5ee9ad99f308dc32e8b2c99f734e70db48d9138bf",
+    "lib/extensions/permission/widgets/permission_gate.dart": "0e9b288064d6abfdfbd9bf9241cde245ca96c6337d06e077b3c4f8e992a9f358",
+    "test/extensions/permission/device_permissions_test.dart": "e9540f28d7fea88193c8e76523ffe1ca51c2d50e1d41bbc8a3b04e6f32ca0e3c",
+    "test/extensions/permission/permission_flow_test.dart": "ac5f9930ea5b293ec7988d5c9d71b9a2676e17388e3d656d42227d7d15c5354f",
+    "test/extensions/permission/permission_group_test.dart": "1e05ffbbd543e30cd1d5e01fa56a5dbf16ef9ed1dc6e0d4604f6600963dbcf3e",
+    "test/extensions/permission/permission_kind_guard_test.dart": "79b101e3c0479d7efaf8a09b59ecc50a24c8bcec1a021ddb350d43af24f0622e",
+    "test/extensions/permission/permission_module_test.dart": "dfcc949c9ba6e4c0133ee327170a267cfa367b65324c8f627376ad86cccd8b44",
+    "test/extensions/permission/permission_resume_observer_test.dart": "a950f60d211bf53f9d58b231766ee0654dd5444977d0d2e3533f1c36771378a2",
+    "test/extensions/permission/permission_status_cache_test.dart": "624f58541e26f2d21ababb50026c2af4c231af01ebfee7a324893ac8abbb32cb",
+    "test/extensions/permission/permissions_contract_test.dart": "fc6e70442b06d6064ec9e4b3a186f56c709bb0129df1844501665f8aaf4a0260",
+    "test/extensions/permission/test_support.dart": "89c17c01639490c0fb4181a844d32150237d0b47f318e15c7be6026cde939f0e",
+    "test/extensions/permission/widgets_test.dart": "44bda3d4f27a1a21e2fae7fb99ca7392a4de14eb4ef3ca7e185fbbc07c4fd676"
+  }
+}

@@ -1,0 +1,22 @@
+name: logger
+description: Logging files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: logger
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  file_sink:
+    type: boolean
+    description: Write logs to rotating files
+    default: true
+  http_logging:
+    type: boolean
+    description: Log HTTP requests through the shared pipeline
+    default: true

@@ -1,0 +1,31 @@
+{
+  "extension": "rest_auth",
+  "files": {
+    "lib/extensions/rest_auth/auth_middleware.dart": "2e8f578ec7692236936df20efb06d515af3fb34b8f685bfa1f6a0856316d1b01",
+    "lib/extensions/rest_auth/auth_response_parser.dart": "cfa5d9ed8eb82b0367c5dad0a8612471e53b43569bdacafc453a3e331a6282b9",
+    "lib/extensions/rest_auth/jwt_expiry.dart": "8db328537c517ccfb7a2c0f8e22493434bd2a7234d9fd4eca940cad27331850c",
+    "lib/extensions/rest_auth/rest_account_management.dart": "824f5f2ed0cacb196cd23704c2c548d1971f5f6b3c504ac3a9051b759d1b5a02",
+    "lib/extensions/rest_auth/rest_auth.dart": "ed7746b5effc54e6e855592b9983797ceef3ab12c89239023fc197f12bcc2454",
+    "lib/extensions/rest_auth/rest_auth_config.dart": "0b8ce1fbc95340bf011fae10e41e3af0832319ebcd44300200a63db683f32962",
+    "lib/extensions/rest_auth/rest_auth_failure_mapper.dart": "77b7e411b0966d2455af03d6fd693fe294e8b6a58cdb41e7c7bacc36296531c0",
+    "lib/extensions/rest_auth/rest_auth_module.dart": "37692ff455854ae11922ab15e9a2454e949fc1d81e6d2fbecd9bd96d4d4f2f01",
+    "lib/extensions/rest_auth/rest_session_bridge.dart": "099135b0de3534cb60311780f517622ea72365a19106952b1fcc365de8ea18ab",
+    "lib/extensions/rest_auth/rest_token_store.dart": "ea05ba88aa1f5d6570554ba8ae8489ca17e662f3d4e3652287cc91542ee39c89",
+    "lib/extensions/rest_auth/token_refresher.dart": "7afdc43b14f2ce757f0285ee8559a530061b169abb1cc48f3517bb2947a8a46a",
+    "lib/extensions/rest_auth/unauthorized_handler.dart": "a6b0d8eeb313104806214c7a37abc0c3cd31b9372f9d04590da2c667a5ad1e55",
+    "test/extensions/rest_auth/auth_middleware_test.dart": "7d2151280777abfa83b2f95c7295c501b61904137ff54691cac3af6ebb61988e",
+    "test/extensions/rest_auth/auth_response_parser_test.dart": "1eb7b040712fce68afe7a8f8e8c2284ae1538593aa40fd052e4a2233229a6121",
+    "test/extensions/rest_auth/jwt_expiry_test.dart": "6f3a0a367b21860bc204b5776322bb908588e64bb198e728cef38cde5ccaaf8d",
+    "test/extensions/rest_auth/rest_account_management_test.dart": "3195d01afbf5a2205b36c00d8728e780f7ece2dbe2f162a7844410a2ec967028",
+    "test/extensions/rest_auth/rest_auth_config_test.dart": "fc577d12843bb6b113456ae8500903beae6bd42ed7be259ac7a93064ef671432",
+    "test/extensions/rest_auth/rest_auth_contract_test.dart": "70dcf6ea626c21cbe4dcf2acac02f6937a8d8b76314209bb25848355f6c6bddf",
+    "test/extensions/rest_auth/rest_auth_failure_mapper_test.dart": "8e5f92398da06b13bab935a235cb2acf7dc3a91743846b9b4c00d19612c06b0a",
+    "test/extensions/rest_auth/rest_auth_module_test.dart": "80220177b64ea39244eadbbf8041ce442ae70aefc060b0ef2eddf17672d75343",
+    "test/extensions/rest_auth/rest_auth_test.dart": "f73189c0e39119038380837d756026f7065476b447adcd5e3902c2cdfdb315c8",
+    "test/extensions/rest_auth/rest_session_bridge_test.dart": "cf9359b7a0ad569be52e59e7baac410f4cd914916fd2070840f40cba914e4dee",
+    "test/extensions/rest_auth/rest_token_store_test.dart": "0f92b5b9190b58c97b488e7830d673c9ad264f31ad063ec19621b7d4ba1c8b81",
+    "test/extensions/rest_auth/test_support.dart": "fe2e71890bb678cf54d706e6a71455a2b2556c4f93fd90bca8db625e9dbb5826",
+    "test/extensions/rest_auth/token_refresher_test.dart": "e16e5825b3b32b26b6a8d5b033c04b9b86d7c1c3806c3b425a4326e66a9d6008",
+    "test/extensions/rest_auth/unauthorized_handler_test.dart": "6e0775186337492aec6d1ea5751e5ddfc8cde9988c07dba635359c6bdd632950"
+  }
+}

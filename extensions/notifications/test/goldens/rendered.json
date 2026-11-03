@@ -1,0 +1,32 @@
+{
+  "extension": "notifications",
+  "files": {
+    "lib/extensions/notifications/background_tap_handler.dart": "af57bf6f5cd699db2283cdcc376d353a258370f3b7a1870b2e2fb1e399685371",
+    "lib/extensions/notifications/device_notifications.dart": "192d69418df6776d7be0f1f4e0b53a006f81af09273bbc5cd0dfec2dacd7b5cc",
+    "lib/extensions/notifications/notification_channels.dart": "30937b12c82e05cb8e96cbb7ef18cd99e9c490c11aeb3ea5d8884669ebee1fec",
+    "lib/extensions/notifications/notification_failure_mapper.dart": "4461c425715ab9c4187f23e4bb15dae2a692055e7336da82c483b4474858d06e",
+    "lib/extensions/notifications/notification_gateway.dart": "5d06e0766554515cd6b9ac97e29abfa37b44ddc847e07d5086c88c4f0530e163",
+    "lib/extensions/notifications/notification_id_allocator.dart": "aedcb16befb58f50a8dfcfd944bec7872c97198b956db645cd95a7031aebb6c7",
+    "lib/extensions/notifications/notification_payload.dart": "c18ba923738feb0e0011b1fef7ea6fc303e15abad867f12b3625778635a30411",
+    "lib/extensions/notifications/notification_permission_flow.dart": "39baa55ec555350d17a3d1c0ed0f262c219f6ee28c55f26b6c18a2292c9fcee9",
+    "lib/extensions/notifications/notification_tap_hub.dart": "368e163b031f41ad742dab3b5833ecb7e5b80a34f4f8af5c3cc8fdec0fc182e1",
+    "lib/extensions/notifications/notifications_config.dart": "863876d958d006a01dbdc55958ba874fbef9d1f580000fef295e4c2c52fe7b5e",
+    "lib/extensions/notifications/notifications_module.dart": "5d6a44ed3fba906887779d2b61e7945ee227034186d78485f42c28aaa6278e84",
+    "lib/extensions/notifications/plugin_notification_gateway.dart": "7fba975651c7ecd1e4eb6843d642123ddbe7dbc889e9f09364c2d992417ec95b",
+    "lib/extensions/notifications/reminder_scheduler.dart": "b62187d60d5c853f8e6cf708a41ff048dbb6b129251b9b732468ff1d08249c06",
+    "lib/extensions/notifications/timezone_resolver.dart": "6341c505cd5016accfbd7ef0bafb30684a6f490ff1585d608df7858c4de45bdb",
+    "test/extensions/notifications/device_notifications_test.dart": "34288886c0e1373d54a15563edb87f276bcaeb3e4a90d375ccafcfea5800a081",
+    "test/extensions/notifications/notification_channels_test.dart": "87579ca510945c6f41c71f38671e0c8b4019317eb53a2d6679058fd188f5f6e8",
+    "test/extensions/notifications/notification_failure_mapper_test.dart": "30a438f26575ae6df47bea804ffd40e6279396798e2cab0fce38e00fd99d16e6",
+    "test/extensions/notifications/notification_id_allocator_test.dart": "64cb04e4e53fa11281befb374972a09e2892477e7270f817fdeee24afffdc4c0",
+    "test/extensions/notifications/notification_payload_test.dart": "b46fa1357f491550539a15a3e05cf0045f6176ef3276024a2d6dc8db5dbeead6",
+    "test/extensions/notifications/notification_permission_flow_test.dart": "3854ff001b847c9393361163f49b94a8264050efa8c2d8cbadac97ce69769407",
+    "test/extensions/notifications/notification_tap_hub_test.dart": "b2b88441bdd0659029144b29fe213df75124f5ef836a9e8034bcfd0c5fc8bff7",
+    "test/extensions/notifications/notifications_config_test.dart": "be305a104f83fe690745e220d8b568ddd6b427381fe1abfaa3e2eea9558e6f5e",
+    "test/extensions/notifications/notifications_contract_test.dart": "db6ea8ce44aa0c22a3b2b53613cb711dfb41f69138f83fa4310e59b4c08f08d8",
+    "test/extensions/notifications/notifications_module_test.dart": "cabb6d22f6103e721825cd31c1a771d73ce9b26462cea11301654fa3207000c1",
+    "test/extensions/notifications/reminder_scheduler_test.dart": "89270d0e5774e3265dd46a0eff026b28be865e26e529fd6072c49d445cea919b",
+    "test/extensions/notifications/test_support.dart": "9d6f0439d7479f405caa55a010475d659c3df901c18902bdebc2116c36908ef7",
+    "test/extensions/notifications/timezone_resolver_test.dart": "0c2182e594623e8bad7427c4b6be76c185f16359932050da177eef0a1f38b033"
+  }
+}

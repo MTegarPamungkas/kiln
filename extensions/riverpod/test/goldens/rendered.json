@@ -1,0 +1,21 @@
+{
+  "extension": "riverpod",
+  "files": {
+    "lib/app/provider_root.dart": "84d8cd62294d74052b954489d5a4b7a38b9b3f4b8d8b36e0b46cd1ad68ed1ca7",
+    "lib/core/riverpod/app_provider_observer.dart": "edb9ff1d75707005dfa07b27862b41de49323d19dfb0135626deac64fe8879e1",
+    "lib/core/riverpod/async_value_x.dart": "4c3e18af1273aaf16bafa738e48de65e675a959c6e6dfc5fc043cbb1f50a9cb4",
+    "lib/core/riverpod/kiln_providers.dart": "1d7c9905f5ba27a4e53dfb1a7ed984e99864c01537de0bd34da9da350d7d4818",
+    "lib/core/riverpod/provider_overrides.dart": "7eea7badd2914d29454ca9dad7b2332ea74d54c57dec5fb468de951718cad5a2",
+    "lib/core/riverpod/session_notifier.dart": "6f7900ea5d0524b88c76bcf1e4ed18828a22a29683d2f2cc8306c463a795641c",
+    "lib/extensions/riverpod/riverpod_module.dart": "8353d1230cf45ad87618c349eb6720e12069238fe36692c585f1f9833cfa606e",
+    "lib/features/counter/counter_page.dart": "b46d7bbdb12801d15c606e1a6b010611a884e910e286c45f950dc6ab18652657",
+    "lib/features/counter/counter_provider.dart": "0a7418f3b0736937ee5b5ce46965a7facbc73b38de61228ca08b7431f3e183ae",
+    "test/extensions/riverpod/core/riverpod/async_value_x_test.dart": "a8550bee98af8487a1288cd28ff1ba5050609a1629da6bd2199021365917f671",
+    "test/extensions/riverpod/core/riverpod/kiln_providers_test.dart": "abf2d08e1b14cd34e3e1bf52a0f24268ba4e10125e2aa176e1c935c73188d965",
+    "test/extensions/riverpod/core/riverpod/session_notifier_test.dart": "c1574d5aebb9d1119cbb071fac470befe4928f07bd3cfb9d879567005a63b699",
+    "test/extensions/riverpod/counter_page_test.dart": "36f1464739b981648456ab3baf6a8433d9993eb83589f6bcb59a1095de52a8ef",
+    "test/extensions/riverpod/counter_provider_test.dart": "5b689fe75413706d680ce664dbcdaf9b8078c886ba7bbd8c5aa4a2c8280e43e7",
+    "test/extensions/riverpod/riverpod_bootstrap_test.dart": "699e9c78ca8c1d6e10b766c20ba77df9ec62154b29561b96db7ff484500fce13",
+    "test/extensions/riverpod/riverpod_module_test.dart": "d141846ec01fa699ef51fc4a9f07f637e0127d42b652c8cd9dd48b748e8a2d7f"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "extension": "env",
+  "files": {
+    "env/.gitignore": "63667e2a04a43c99efdf3ae2e43614c1839c40593b7b47e81e4b7997719eacb4",
+    "env/development.example.json": "d8d5eca1cccb0537bcf123ba89881e85f33391c186ec29f9a04068d572ac1ee6",
+    "env/production.example.json": "662577200876319846eadf070ef5dff899fefcc811d5d16c89f09a6f8765cfb6",
+    "env/staging.example.json": "662577200876319846eadf070ef5dff899fefcc811d5d16c89f09a6f8765cfb6",
+    "lib/extensions/env/build_env.dart": "371642ee4614eddf2a2f513bd65a768f85f203738882b54c290b25fba350e736",
+    "lib/extensions/env/build_env_values.dart": "d406062d3297d14438c392b4646b9e85ce86350f79bbdd599e23cfb9e08b8008",
+    "lib/extensions/env/env_describe.dart": "45d94132f275f24cc33325b1b0f34c6dda243965b3529315f599ca6d5b9bf5e1",
+    "lib/extensions/env/env_keys.dart": "3ae7fba368ccff82170f770c31bbe0cfc09d3fcd6f9cee6560fd6adeb3cd9dfd",
+    "lib/extensions/env/env_module.dart": "7855ffa90710208bb398a8ab7c8d693fcb245d6eb6f5b0b42f954296a0fb31d8",
+    "lib/extensions/env/env_schema.dart": "01037a629bab051c1c0e70d404cbd3cab74dca798691bc087189c1ae7461be53",
+    "lib/extensions/env/env_validator.dart": "bc33c77a83b66a3a16902f3cda59a88d392aafa30393a4c8ed9b6a1a8b5facc5",
+    "lib/extensions/env/env_x.dart": "28b46f75f9e720fbab77e80a4f9c9bc32a5dfe1908180307077e55f346115509",
+    "lib/extensions/env/widgets/env_debug_page.dart": "3a746f92dbdd591e35ec297f143edbb0b29034f2f45855f2f650ed93b41d0913",
+    "test/extensions/env/build_env_test.dart": "417eb7eb4cbd36db6c05ece91ed58116bcff766199677a015b221c5fc2c14843",
+    "test/extensions/env/env_debug_page_test.dart": "9e4cf1f563f3cbf3083bdbb44934de89cee49d8ee9e388250160d718634bf2ab",
+    "test/extensions/env/env_describe_test.dart": "0fde5865374aed7aca70fb893b8867c0006aaada2426cd4c7641ffb08015487e",
+    "test/extensions/env/env_example_files_test.dart": "7804dd68e8751936859c2e0672d4af5901dcfdb712b2d05e8c1b7148d3e2261d",
+    "test/extensions/env/env_module_test.dart": "2d581c58039c58c28a8277125956fc46ea340f01d5b2a31da52bad74458ce5ed",
+    "test/extensions/env/env_schema_test.dart": "e2188abad81e6e1797dca847078f05bdea6f990a024427e1e585e1dbe07f9263",
+    "test/extensions/env/env_validator_test.dart": "13d75eda78a83c79bb58b6824bc19cff880d9e9b97b424db06ab0b18f74ef18e",
+    "test/extensions/env/env_x_test.dart": "02e052d54b9fe8bc74e0782629366ccf02651352a43d0345633bf4d30e77c69d"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kiln.dev/schemas/registry-index.schema.json",
+  "title": "Kiln extension registry index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "extensions"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "extensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "latest", "tier", "versions"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(_[a-z0-9]+)*$" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string" },
+          "latest": { "type": "string" },
+          "tier": { "enum": ["official", "verified", "community"] },
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["version", "url", "sha256"],
+              "properties": {
+                "version": { "type": "string" },
+                "url": { "type": "string" },
+                "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "requires": { "type": "array", "items": { "type": "string" } },
+                "provides": { "type": "array", "items": { "type": "string" } },
+                "compatibility": { "type": "object", "additionalProperties": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

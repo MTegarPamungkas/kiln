@@ -1,0 +1,27 @@
+{
+  "extension": "deep_link",
+  "files": {
+    "lib/extensions/deep_link/app_link_builder.dart": "f38194980c5a0271c4a65ed19f552dea7dc9cf4a697d8565954b3d74fef2bfd2",
+    "lib/extensions/deep_link/app_links_gateway.dart": "cc7662648f626b67e94c9cc5a03a8feb5b46b34bfa54b867d06fefe9137cd1b6",
+    "lib/extensions/deep_link/deep_link_config.dart": "2f2cac01d5a1a077139c4d22e47ee8954d0e576b477996f3fc0dac0e8576884b",
+    "lib/extensions/deep_link/deep_link_failure_mapper.dart": "2f70eb271917450bbb70c9d649e07a851c4b1af5b5eab3f2a483e61f75aaa9a6",
+    "lib/extensions/deep_link/deep_link_gateway.dart": "e8de4886fae477bbbd467454ba0427f8c022647aa514fcd747c377bcf10098c7",
+    "lib/extensions/deep_link/deep_link_module.dart": "9925bfe09028545c5c16bce2ef8dae21d91e15f12918207a26e6526d02f344c1",
+    "lib/extensions/deep_link/device_deep_links.dart": "11aa735d4097bc8722e4fcba42abce3ea72847c562791e2a7f6e730e13788998",
+    "lib/extensions/deep_link/link_allowlist.dart": "db148d67533413cdbe7cce95c76c9dd6d3bc61f37b5b3d687df1eb8d37ae2c02",
+    "lib/extensions/deep_link/link_deduplicator.dart": "61d88e2ac815e03eedb822e750702871a5263c2b17753f37702260b4b76d3b61",
+    "lib/extensions/deep_link/link_normalizer.dart": "51b36c14255d8ae675ee03db9e42214199c7baf5e947f66ac67a18b8997ae945",
+    "lib/extensions/deep_link/pending_link_buffer.dart": "b4adac4dee648a73836c223c2e5682471701a096477f544cf5a672f53a401922",
+    "test/extensions/deep_link/app_link_builder_test.dart": "f1a1649299c206e1ade1fc1c788afce0eb3ae02795084ca67cc083a9d5a869ab",
+    "test/extensions/deep_link/deep_link_config_test.dart": "0433d22dbd3c854619c33cb6f546bc0c61eb679fe3542c184fe23956e1ac7c7f",
+    "test/extensions/deep_link/deep_link_failure_mapper_test.dart": "05d1a976f5699489231145aeff225d7a432331e842e487f3a114ab11c70e825e",
+    "test/extensions/deep_link/deep_link_module_test.dart": "e2a373f062d4a427e65d02f6f7cebbed022efb490057993cd227d5471843879f",
+    "test/extensions/deep_link/deep_links_contract_test.dart": "39820ebfed02649b12e719b02fa5d3267457bcbb44a960aef8bb1e963f30200f",
+    "test/extensions/deep_link/device_deep_links_test.dart": "8d17606ba6a2e53617bccf00a0bb46c9e6ddedfee912daec9f7c834a171ea7e4",
+    "test/extensions/deep_link/link_allowlist_test.dart": "af593e48d28d98735b0945936fabe82e70e53eccb18185b42aabbdcf474c5450",
+    "test/extensions/deep_link/link_deduplicator_test.dart": "d512e8b84af209412ff9423abd534618665cf320c965f723c2beec83bac38fc3",
+    "test/extensions/deep_link/link_normalizer_test.dart": "0e41f4bd13b7d0587d2dabeddfbe09eebc1537698435e49649d97e0cfd3d53c8",
+    "test/extensions/deep_link/pending_link_buffer_test.dart": "b95f0a92337308b82af5c044aa20141faed366ab62d8a444dce52621eb440b0e",
+    "test/extensions/deep_link/test_support.dart": "3209d807ca9884114ffe29a90aa53fc714230198e9723ad0af3d24df9ee16043"
+  }
+}

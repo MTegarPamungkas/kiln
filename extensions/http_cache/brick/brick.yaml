@@ -1,0 +1,26 @@
+name: http_cache
+description: HTTP cache files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: http_cache
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  default_ttl_seconds:
+    type: number
+    description: Default cache TTL in seconds
+    default: 60
+  max_entries:
+    type: number
+    description: Maximum cached responses
+    default: 100
+  stale_while_revalidate:
+    type: boolean
+    description: Serve stale responses while refreshing
+    default: true

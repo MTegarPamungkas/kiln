@@ -1,0 +1,57 @@
+id: dio
+name: Dio HTTP client
+version: 0.2.3
+description: HTTP client and middleware pipeline built on dio.
+category: network
+tier: official
+provides:
+  - http_client
+  - http_pipeline
+slots:
+  - name: http.interceptors
+    item: HttpMiddleware
+    description: Middleware executed around every request.
+prompts:
+  - name: base_url
+    type: url
+    label: API base URL
+    required: true
+  - name: connect_timeout
+    type: int
+    label: Connect timeout in seconds
+    default: 15
+    min: 1
+    max: 120
+  - name: api_key_header
+    type: string
+    label: API key header name (optional)
+    description: Header used for API-key authentication, for example X-API-Key. The key itself comes from --dart-define=KILN_API_KEY.
+    default: ""
+  - name: api_key_query
+    type: string
+    label: API key query parameter (optional)
+    description: Query parameter used for API-key authentication, for example key. Used only when api_key_header is empty.
+    default: ""
+  - name: api_key_prefix
+    type: string
+    label: API key value prefix (optional)
+    description: Prefix added before the key in the header, for example "Bearer ".
+    default: ""
+dependencies:
+  dio: ^5.11.1
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.INTERNET
+macos:
+  entitlements:
+    com.apple.security.network.client: true
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

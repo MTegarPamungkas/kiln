@@ -1,0 +1,25 @@
+{
+  "extension": "storage",
+  "files": {
+    "lib/extensions/storage/json_codec.dart": "848df86249ff66eb4199dbd9cbb8c037dfcedec0b5ebb32be1fd71e538598436",
+    "lib/extensions/storage/namespaced_storage.dart": "2a3526046d6e9dc702abc470502ab85ab121a869168bd56a60057977562f5c9f",
+    "lib/extensions/storage/shared_preferences_storage.dart": "861bd728b3245f717a290245e7af319483c4e8163c8895e1ea66a25d8064ea1c",
+    "lib/extensions/storage/storage_config.dart": "1d54ea7f151c606d7ae200c05468ae56cf36f6524510386e94c069381f6cd4a7",
+    "lib/extensions/storage/storage_failure_mapper.dart": "4086da77d7b93d0dff7dd873e49262db7547da5ea4624484a260d3f8a8ac355f",
+    "lib/extensions/storage/storage_gateway.dart": "7a6fdd435010ac6944119661dd4588115f1705f4ca5180c248b484429ba01fe0",
+    "lib/extensions/storage/storage_migrator.dart": "7615e625fef408b4accddf9b06995b494d221050c63b2d948a498b95013aeaf1",
+    "lib/extensions/storage/storage_module.dart": "6e5acebda4a5e2cfa6ada3d39e3b8aeddf7cc3eea4c7203c66aaf0aab368efc4",
+    "lib/extensions/storage/ttl_storage.dart": "31634cf824c3c2b91703ff49154fae6d3c1866006d49f115d8c5fc967b6801cb",
+    "lib/extensions/storage/typed_key.dart": "2055262db64c00ef68090858cea2041f6f845e1699d5c058411d8acb22c473c5",
+    "test/extensions/storage/json_codec_test.dart": "b0603d3371e2c2f1e327a638c24ac225fb3377dd82ad2bfcfe0c9c1d1e8127ca",
+    "test/extensions/storage/namespaced_storage_test.dart": "a24e6e3d550644351caf4e74d8b7159d8cc854889f8d7dfcc9ae43ea912dff2f",
+    "test/extensions/storage/shared_preferences_storage_test.dart": "b7b8f65093dbf9f2fe9a3e6480b6337bd6749befc5a699f67b74c54eab9586e9",
+    "test/extensions/storage/storage_contract_test.dart": "9b67ba79d30fffb90c091440eac751f013d27300c29d0cd09074905355f19b3e",
+    "test/extensions/storage/storage_failure_mapper_test.dart": "c9ba93de96591b96de98bec86e81fc60f7076cabab346f6667b203c941b70a66",
+    "test/extensions/storage/storage_migrator_test.dart": "d1d51053af4c8824d0b1a430737ceb8bccededff5dcfe0a41ca51ec5c95ec431",
+    "test/extensions/storage/storage_module_test.dart": "0606993f0931207f98f20827bb372ac70ae4a98a96491611c1290e31d92dcab3",
+    "test/extensions/storage/test_support.dart": "01d69a4507cde577f0aaa3865b317b74b7d3739ec9bf38eb3004b18c40ad7cf5",
+    "test/extensions/storage/ttl_storage_test.dart": "3cfa5b20d210b5f4131a1b14f3f765bc3775ecf734ed47a7c37baae74d060fb5",
+    "test/extensions/storage/typed_key_test.dart": "acbed5e150236bc656f0d7039373de2b77be226c7f8da0b3ebfd91e253dbd72f"
+  }
+}

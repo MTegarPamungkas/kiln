@@ -1,0 +1,24 @@
+id: secure_storage
+name: Secure storage
+version: 0.1.0
+description: Keychain and Keystore storage for secrets and tokens.
+category: storage
+tier: official
+provides:
+  - secure_storage
+optional_requires:
+  - storage
+dependencies:
+  flutter_secure_storage: ^11.2.0
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  allow_backup: false
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

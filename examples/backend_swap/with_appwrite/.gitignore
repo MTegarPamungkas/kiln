@@ -1,0 +1,17 @@
+# Flutter and Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+coverage/
+*.iml
+.idea/
+
+# Kiln local state
+.kiln/backups/
+.kiln/journal/
+.kiln/logs/
+
+# Local environment values
+env/*.json
+!env/*.example.json

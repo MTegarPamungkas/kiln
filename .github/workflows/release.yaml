@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart analyze
+      - run: dart run tool/lint_extensions.dart
+      - run: dart run tool/bundle.dart --check
+      - run: dart run tool/gen_catalog_docs.dart --check
+      - run: dart run tool/verify_extensions.dart --check
+      - run: dart run tool/registry.dart --check
+      - run: dart run tool/check_docs.dart --check
+      - name: Package registry and CLI sources
+        run: |
+          mkdir -p dist
+          tar -czf "dist/kiln-registry-${GITHUB_REF_NAME}.tgz" registry
+          tar -czf "dist/kiln-monorepo-sources-${GITHUB_REF_NAME}.tgz" \
+            packages extensions bricks schemas tool registry docs
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.tgz

@@ -1,0 +1,44 @@
+id: permission
+name: Permission
+version: 0.1.0
+description: Typed permission checks and requests with rationale flow.
+category: platform
+tier: official
+exclusive: true
+provides:
+  - permission
+dependencies:
+  permission_handler: ^13.0.2
+prompts:
+  - name: kinds
+    type: multi
+    label: Permissions enabled for this app
+    options:
+      - camera
+      - microphone
+      - photos
+      - notifications
+      - location
+      - locationAlways
+      - contacts
+      - calendar
+      - bluetooth
+      - storage
+    default:
+      - camera
+      - microphone
+      - photos
+      - notifications
+      - location
+      - contacts
+      - storage
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

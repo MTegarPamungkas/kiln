@@ -1,0 +1,14 @@
+name: secure_storage
+description: Secure storage files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: secure_storage
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app

@@ -1,0 +1,26 @@
+name: biometric
+description: Biometric files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: biometric
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  reason:
+    type: string
+    description: Authentication prompt
+    default: Buka aplikasi dengan biometrik
+  grace_seconds:
+    type: number
+    description: Grace period in seconds
+    default: 30
+  biometric_only:
+    type: boolean
+    description: Reject device credentials
+    default: true

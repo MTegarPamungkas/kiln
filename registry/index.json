@@ -1,0 +1,820 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-03T08:32:38.006742Z",
+  "extensions": [
+    {
+      "id": "analytics",
+      "name": "Analytics",
+      "description": "PostHog product analytics with consent gating and PII scrubbing.",
+      "category": "analytics",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/analytics-0.1.0.tgz",
+          "sha256": "a9cf01051a2fd996968ebc0ed1a3344f9b4389e3bf4abe95950a4bab661dc1c9",
+          "provides": [
+            "analytics"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "appwrite",
+      "name": "Appwrite",
+      "description": "Appwrite auth, remote database, and file storage backends.",
+      "category": "auth",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/appwrite-0.1.0.tgz",
+          "sha256": "867aa1261c871ec75d332ea6944b2acf3dbc1e0909a030bf9841c180d8d8286f",
+          "provides": [
+            "auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/appwrite-0.1.1.tgz",
+          "sha256": "f69c6f89c6fc34707bca28a88210ab9b63b823b7359b05ce4a4143a0fbf30989",
+          "provides": [
+            "auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "biometric",
+      "name": "Biometric",
+      "description": "Biometric authentication, app lock, and protected storage.",
+      "category": "security",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/biometric-0.1.0.tgz",
+          "sha256": "2fdba0eb4e86643a30f6acd17a2071d692b293d73d7904bb9063f5359d8fd36f",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/biometric-0.1.1.tgz",
+          "sha256": "ea1f9ebbae0d45e1ac0b49ad94ae39e2aa0cd8b0d678bb940506532946bd9c80",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bloc",
+      "name": "Bloc state management",
+      "description": "State management with Bloc and Cubit.",
+      "category": "state",
+      "latest": "0.1.2",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/bloc-0.1.0.tgz",
+          "sha256": "a7a04aa36f9c7c1bde4501206c790a6d825f913131f87058f4475646d7cb0184",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/bloc-0.1.1.tgz",
+          "sha256": "f08e55c699ae572870b82b37bf8ae6f387fe7d44b76e7aed77e7342c049b83ea",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/bloc-0.1.2.tgz",
+          "sha256": "61a6825537a1a5fb333d1ee6736145f3acc618d61200a057534c8111bd215692",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "connectivity",
+      "name": "Connectivity",
+      "description": "Network status monitoring and an offline guard middleware.",
+      "category": "connectivity",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/connectivity-0.1.0.tgz",
+          "sha256": "37d0ceb737f8d75d074cde9dafdbb5dbc35cba1305f86f6accb59cbc5a83a8db",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "deep_link",
+      "name": "Deep links",
+      "description": "Incoming deep links with allowlisting, normalization, and deduplication.",
+      "category": "deep_link",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/deep_link-0.1.0.tgz",
+          "sha256": "2235575ad4a6c4f0f704b7f208e585c348f1b7a098987f535856916a5f2a9127",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/deep_link-0.1.1.tgz",
+          "sha256": "cde7d50ce85813d71507a174192050e0299663651db62a20d0599e5089d053d6",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dio",
+      "name": "Dio HTTP client",
+      "description": "HTTP client and middleware pipeline built on dio.",
+      "category": "network",
+      "latest": "0.2.3",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.2.0",
+          "url": "archives/dio-0.2.0.tgz",
+          "sha256": "03f25cd9b7f2f88b66566c9181e82f4840178b40778ba519d35c49804a882baf",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/dio-0.2.1.tgz",
+          "sha256": "39f3c1dbe574918e8a94372a6873550697ca425acdc6db61f67b221bc431f48b",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.2",
+          "url": "archives/dio-0.2.2.tgz",
+          "sha256": "8e393c35fef4da5468f79d8213a0313de8ebe3aafad81c283400cfe0e2ab38ef",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.3",
+          "url": "archives/dio-0.2.3.tgz",
+          "sha256": "4eb6ceaf06c30ad450e7629378b28481f705fdadf2f9386fc454b0441beb2aff",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "env",
+      "name": "Environment",
+      "description": "Typed build-time configuration from --dart-define values.",
+      "category": "config",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/env-0.1.0.tgz",
+          "sha256": "1803e6f4867adb9fc01221d92294e1c8986d5591323e44e824ae220d09d4f52b",
+          "provides": [
+            "env"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "firebase",
+      "name": "Firebase",
+      "description": "Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.",
+      "category": "auth",
+      "latest": "0.2.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/firebase-0.1.0.tgz",
+          "sha256": "d24204adfaf31a39e90ba2efb9e1bb08d3c0a5e4970ccefcabc808087b1c058e",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/firebase-0.2.0.tgz",
+          "sha256": "07cc0746170244834c7d162d3e58dd0cced0d87ac2a8adf354465b5e1886df42",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "flavors",
+      "name": "Flavors",
+      "description": "Dart-level app flavors, entry points, and launch configurations.",
+      "category": "flavor",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/flavors-0.1.0.tgz",
+          "sha256": "c219771b3812671b8b095516bab018b37c58b2e06d8956a53b0c48a41f61c245",
+          "provides": [
+            "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "go_router",
+      "name": "GoRouter",
+      "description": "Declarative routing with route slots, guards, and deep link mapping.",
+      "category": "navigation",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/go_router-0.1.0.tgz",
+          "sha256": "ee4138017080c3e6441ce776530c2925187236653742dc651463a36c86d88a41",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "http_cache",
+      "name": "HTTP cache",
+      "description": "Caches HTTP responses with TTL, ETag, and invalidation.",
+      "category": "network",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/http_cache-0.1.0.tgz",
+          "sha256": "9784071602f4581cb540ce8ca4beb16f88d15170c2334b19359b34247d8b5195",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "http_retry",
+      "name": "HTTP retry",
+      "description": "Retries temporary HTTP failures with backoff and a retry budget.",
+      "category": "network",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/http_retry-0.1.0.tgz",
+          "sha256": "31555709742cfde804fcf85156127012dbadc5e20e70c7d47452bed4ad8eec70",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "image_picker",
+      "name": "Image picker",
+      "description": "Camera and gallery image picking with validation and upload handoff.",
+      "category": "media",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/image_picker-0.1.0.tgz",
+          "sha256": "cacaf64cb121f6ab421df0c0f68ebd1d09ffd63e99d833e078bc5b2b44ab1d8d",
+          "provides": [
+            "media"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "l10n",
+      "name": "Localization",
+      "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
+      "category": "l10n",
+      "latest": "0.1.2",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/l10n-0.1.0.tgz",
+          "sha256": "d90d456f070d4518605b506cdfcbab37bfdbe6261bf2c8c39c98522a91ad3633",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/l10n-0.1.1.tgz",
+          "sha256": "caddf3ee22c394b6f9536169041bb2f699f5e71f28ae01357a6d2815766333b2",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/l10n-0.1.2.tgz",
+          "sha256": "1aeec5eb76f54ff991c824940d44b32443f4c659f2f9e7cb19b8c4d12201bc20",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "local_db",
+      "name": "Local database",
+      "description": "Offline-first document database backed by Sembast.",
+      "category": "database",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/local_db-0.1.0.tgz",
+          "sha256": "a788fc4f64e8d87520dadb69a590644aa3d826a23f081c94d5c95c6e337b93c1",
+          "provides": [
+            "local_db"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "logger",
+      "name": "Logger",
+      "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
+      "category": "logging",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/logger-0.1.0.tgz",
+          "sha256": "8bc4e70c882772aabee8f8a6da78b28f21534de55c2d2c18b042e5dd0efbe75a",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "description": "Local notifications with channels, scheduling, and tap routing.",
+      "category": "notifications",
+      "latest": "0.1.3",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/notifications-0.1.0.tgz",
+          "sha256": "6a8152fb690ab3cbd7e0df4abee01edb2f63a193e1f16a6091b73a425face480",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/notifications-0.1.1.tgz",
+          "sha256": "d5ce1d14c20ad6578eac0202cf88eb1d28800c7b84481e5cada8eae8424e112a",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/notifications-0.1.2.tgz",
+          "sha256": "f440f2f9c1f017c458d84f678438ec68c67f0e58587d7b1b4e41a88d368e6167",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/notifications-0.1.3.tgz",
+          "sha256": "db969bc2f90009c37dbe94e6f4954501ccdb1cef1c6de1389b15f669e8ef324d",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "permission",
+      "name": "Permission",
+      "description": "Typed permission checks and requests with rationale flow.",
+      "category": "platform",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/permission-0.1.0.tgz",
+          "sha256": "17b156a689b7bee26b7d7761707baad7d14f9b653388a34ac63e00e555ad899e",
+          "provides": [
+            "permission"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rest_auth",
+      "name": "REST auth",
+      "description": "Email and password authentication against a REST API.",
+      "category": "auth",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/rest_auth-0.1.0.tgz",
+          "sha256": "37acbc2e01ebf73e191e115d9144fb72649afa7db68edd04275597875a34ed42",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/rest_auth-0.1.1.tgz",
+          "sha256": "2d51ce6cceea2e6f4d0e101ed6b34e3e4cb07e82a643a603f652516fe6d0f434",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "riverpod",
+      "name": "Riverpod state management",
+      "description": "State management with Riverpod providers and Notifier.",
+      "category": "state",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/riverpod-0.1.0.tgz",
+          "sha256": "3173cf363984b4eeac6fd3ecf102dd54cf647de075b9c8869b37d526c130a804",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/riverpod-0.1.1.tgz",
+          "sha256": "a84e41d6fb70bc3f5b34d8b964898a875b567efe36bfe96965b8fc3aeaf1e056",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "secure_storage",
+      "name": "Secure storage",
+      "description": "Keychain and Keystore storage for secrets and tokens.",
+      "category": "storage",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/secure_storage-0.1.0.tgz",
+          "sha256": "2a5c7254c137e0a994b1a29d760eeb8beea2dca7984a7f5a82d5b0bb4cd9441a",
+          "provides": [
+            "secure_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "social_login",
+      "name": "Social login",
+      "description": "Google and Apple credential sign-in for a social auth backend.",
+      "category": "social",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/social_login-0.1.0.tgz",
+          "sha256": "0a09ced5c3335e2421a28f3cb6c26eb23283be9c1904a48ff98706ac8a205435",
+          "requires": [
+            "social_auth"
+          ],
+          "provides": [
+            "social_login"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "name": "Key-value storage",
+      "description": "Persistent key-value storage backed by shared_preferences.",
+      "category": "storage",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/storage-0.1.0.tgz",
+          "sha256": "77845bf84f4a7b5af15cd9f4f0ccd84d57a4eb3a0dfead9c5f4fde0dc2da404d",
+          "provides": [
+            "storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase",
+      "description": "Supabase auth, PostgREST database, realtime, and storage for Kiln.",
+      "category": "auth",
+      "latest": "0.1.1",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/supabase-0.1.0.tgz",
+          "sha256": "885c54d4e560aa1ed4548a30c5015f0fea28e206fa62d218ce5be238a3d1748f",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/supabase-0.1.1.tgz",
+          "sha256": "f202c0f05cc5a6a2f653844b0fb0ee669ad860b570e2f2dd89e096ed8ae17ccb",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "theme",
+      "name": "Theme",
+      "description": "Brand color, typography, design tokens, and light or dark mode for Kiln apps.",
+      "category": "theme",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/theme-0.1.0.tgz",
+          "sha256": "a1cfbf071e839950b22bf6bed42e7fb6a1f4326f7f500681d149d63807df9301",
+          "provides": [
+            "theme"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    }
+  ]
+}

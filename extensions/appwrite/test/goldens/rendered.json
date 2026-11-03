@@ -1,0 +1,31 @@
+{
+  "extension": "appwrite",
+  "files": {
+    "lib/extensions/appwrite/appwrite_account.dart": "b6adb0a273a7137b06c35959010d9a0796c99583fb3180ae0a34c0c95eb8e0b9",
+    "lib/extensions/appwrite/appwrite_account_management.dart": "d12c389af89155a8db6cb07c8973ad1d4278ff71a8abb022c671a834c1dc8f6f",
+    "lib/extensions/appwrite/appwrite_auth.dart": "598dcaecddef8eb43c69bc0cb50a155975fb8a41982cbff1968a8fa6fe6a198c",
+    "lib/extensions/appwrite/appwrite_client_factory.dart": "2b5c3fb7c18f2c780cffab6e976165029cdab056ce1223586358620277cc76e7",
+    "lib/extensions/appwrite/appwrite_config.dart": "59d49fa509e0c96729d769e928e2b032990fa7b2d50ae7b60c2dfec45b0afdd6",
+    "lib/extensions/appwrite/appwrite_database_gateway.dart": "382a2c752e0ae913a56946b156d7acb28561b5f8915d437945527172cd7aeb09",
+    "lib/extensions/appwrite/appwrite_failure_mapper.dart": "c7f031d8d881529aa029328a7171a42045ed7dae76d4d29a30f0f8782e84d148",
+    "lib/extensions/appwrite/appwrite_file_storage.dart": "12d26b6683a023d14e98cadf1e74ffec5006a2cd6a603ae723ffff331afa02ed",
+    "lib/extensions/appwrite/appwrite_module.dart": "a76689dce398c239d643ffb574c57c1086fd8d2904bc88692a24afb26040a91b",
+    "lib/extensions/appwrite/appwrite_query_mapper.dart": "e768045d69bff9757853c589561420cc7c0c1158af8999fb1799c8d5bdd05889",
+    "lib/extensions/appwrite/appwrite_realtime_gateway.dart": "8a5d908cafae74759ea395af8574ed6d0b85101e5d6af274f0d1c022c9418a41",
+    "lib/extensions/appwrite/appwrite_remote_database.dart": "3dd93780c26588d6e9b9b797dc52cb108f2e0535daaa9e84c4afd6fa3aed7b06",
+    "lib/extensions/appwrite/appwrite_session_bridge.dart": "a95ac29995ce7068cede3c256f6cfe72d93c29fe6c673546931a30b492e70a55",
+    "lib/extensions/appwrite/appwrite_storage_gateway.dart": "55fcc05d46795d1f73e304101ab31555d0803f499d4c83f5bb4506db32f42213",
+    "test/extensions/appwrite/appwrite_account_management_test.dart": "2e2d312c2e668792a543a01bb9c489d70e1c66971ecc7af025912ea98336cece",
+    "test/extensions/appwrite/appwrite_auth_test.dart": "2b5ef52f3034cae3303dd25318a10c4d989e6f8e6d31dc10c0046859f07b517d",
+    "test/extensions/appwrite/appwrite_config_test.dart": "4b74cd9e990b8f816edfc40194acbe8dab7a52ee61a13478322d099a277b4cae",
+    "test/extensions/appwrite/appwrite_contract_test.dart": "aeb566be2c52ed8e37c7be8941ef81e0c841ceaa60958e928a63275417ba1f0a",
+    "test/extensions/appwrite/appwrite_failure_mapper_test.dart": "bfc511e07be32c3e46533115db215edf133802aa024ac73f41a304be3dbfeb0f",
+    "test/extensions/appwrite/appwrite_file_storage_test.dart": "8dbf99931e421892e065809bab154422327a8df17f061f48e406cf66ac2b6943",
+    "test/extensions/appwrite/appwrite_module_test.dart": "dca5618137c1ceca89499a8d8ce3c98b35c89c828c124926c265d5a8ef7083ac",
+    "test/extensions/appwrite/appwrite_query_mapper_test.dart": "30fff1ead369cb04de027869ba52ac2bb10db242c88fb52717718ab176c83aad",
+    "test/extensions/appwrite/appwrite_realtime_gateway_test.dart": "247bf7680f2f9426162af74bdbb0d4cc2faf136ab1daa25e3618351d4b8900ff",
+    "test/extensions/appwrite/appwrite_remote_database_test.dart": "6b894cd69c4d8837482b7dd851cc536ef743d03316e8972bf14b0e811de8bff6",
+    "test/extensions/appwrite/appwrite_session_bridge_test.dart": "686ba1d24b9e2a2a1d7502b62793bf9f0a2270e027db7d6fe24ab5a557bf913d",
+    "test/extensions/appwrite/test_support.dart": "e21d642bcf2c95265d354e09f8a85ef4ca0b21209ce5ac1aff2339cb191d39d9"
+  }
+}

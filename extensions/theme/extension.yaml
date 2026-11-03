@@ -1,0 +1,45 @@
+id: theme
+name: Theme
+version: 0.1.0
+description: Brand color, typography, design tokens, and light or dark mode for Kiln apps.
+category: theme
+tier: official
+exclusive: true
+provides:
+  - theme
+optional_requires:
+  - storage
+prompts:
+  - name: seed_color
+    type: string
+    label: Seed color for the Material color scheme (hex)
+    description: Accepts #RRGGBB or #AARRGGBB; invalid values fall back to Kiln teal.
+    default: "#0F766E"
+  - name: font_family
+    type: string
+    label: Font family for the text theme
+    description: Leave empty to keep the platform default font.
+    default: ""
+  - name: corner_radius
+    type: int
+    label: Base corner radius in logical pixels
+    default: 14
+    min: 0
+    max: 40
+  - name: density
+    type: enum
+    label: Layout density
+    default: comfortable
+    options:
+      - comfortable
+      - compact
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

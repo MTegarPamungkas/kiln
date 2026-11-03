@@ -1,0 +1,13 @@
+id: demo
+name: Demo extension
+version: 0.1.0
+description: Demo extension for Kiln.
+category: tooling
+tier: community
+provides:
+  - demo
+
+requires: []
+
+
+prompts: []

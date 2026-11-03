@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart analyze
+      - run: dart run tool/lint_extensions.dart
+      - run: dart run tool/bundle.dart --check
+      - run: dart run tool/gen_catalog_docs.dart --check
+      - run: dart run tool/verify_extensions.dart --check
+      - run: dart run tool/registry.dart --check
+      - run: dart run tool/check_docs.dart --check
+      - name: kiln_core
+        working-directory: packages/kiln_core
+        run: dart test
+      - name: kiln_testing
+        working-directory: packages/kiln_testing
+        run: flutter test
+      - name: kiln_extension_sdk
+        working-directory: packages/kiln_extension_sdk
+        run: dart test
+      - name: kiln_store
+        working-directory: packages/kiln_store
+        run: dart test
+      - name: kiln_cli
+        working-directory: packages/kiln_cli
+        run: dart test
+      - name: kiln_lints
+        working-directory: packages/kiln_lints
+        run: dart test
+      - name: Extension suites
+        run: |
+          for extension in extensions/*; do
+            if [ -f "$extension/pubspec.yaml" ]; then
+              (cd "$extension" && dart test)
+            fi
+          done

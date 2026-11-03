@@ -1,0 +1,38 @@
+id: analytics
+name: Analytics
+version: 0.1.0
+description: PostHog product analytics with consent gating and PII scrubbing.
+category: analytics
+tier: official
+exclusive: true
+provides:
+  - analytics
+optional_requires:
+  - flavor
+dependencies:
+  posthog_flutter: ^5.58.3
+prompts:
+  - name: api_key
+    type: secret
+    label: PostHog project API key
+    description: Leave empty to keep analytics disabled at runtime.
+    default: ""
+    required: false
+    secret: true
+  - name: host
+    type: url
+    label: PostHog ingestion host
+    default: https://us.i.posthog.com
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.INTERNET
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

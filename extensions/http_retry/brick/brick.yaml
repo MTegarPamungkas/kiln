@@ -1,0 +1,30 @@
+name: http_retry
+description: Retry middleware files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: http_retry
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  max_attempts:
+    type: number
+    description: Maximum attempts
+    default: 3
+  initial_delay_ms:
+    type: number
+    description: Initial backoff in milliseconds
+    default: 250
+  max_delay_ms:
+    type: number
+    description: Maximum backoff in milliseconds
+    default: 8000
+  jitter:
+    type: boolean
+    description: Add jitter to backoff
+    default: true

@@ -1,0 +1,54 @@
+id: image_picker
+name: Image picker
+version: 0.1.0
+description: Camera and gallery image picking with validation and upload handoff.
+category: media
+tier: official
+exclusive: true
+provides:
+  - media
+optional_requires:
+  - permission
+  - file_storage
+dependencies:
+  image_picker: ^1.2.4
+prompts:
+  - name: max_bytes
+    type: int
+    label: Maximum image size in bytes
+    default: 5242880
+    min: 102400
+    max: 52428800
+  - name: allowed_types
+    type: multi
+    label: Allowed image MIME types
+    default:
+      - image/jpeg
+      - image/png
+      - image/webp
+      - image/heic
+      - image/gif
+    options:
+      - image/jpeg
+      - image/png
+      - image/webp
+      - image/heic
+      - image/gif
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+ios:
+  plist:
+    NSPhotoLibraryUsageDescription: Memilih foto untuk diunggah.
+    NSCameraUsageDescription: Mengambil foto untuk diunggah.
+macos:
+  entitlements:
+    com.apple.security.files.user-selected.read-only: true
+    com.apple.security.device.camera: true
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

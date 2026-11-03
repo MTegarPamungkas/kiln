@@ -1,0 +1,23 @@
+{
+  "extension": "secure_storage",
+  "files": {
+    "lib/extensions/secure_storage/first_run_wipe.dart": "a26c07f8b2ed6b6cf6c75e77ee2a6c108a78ab5782747285dc4c56d3428bc1de",
+    "lib/extensions/secure_storage/keystore_secure_storage.dart": "4c33d8b5c7218a90a612a7f9e3657b4bda690688e331b51f3c3fd0873dba94ba",
+    "lib/extensions/secure_storage/namespaced_secure_storage.dart": "8b967b163e34acadd6dc282babc058028c979da8b046c4015ca73f49712a3c2f",
+    "lib/extensions/secure_storage/secure_storage_config.dart": "7e6566c4f6a6e7a1a53b83a09f674a30f61c6e1b0b9105caf4421a0c418ba70d",
+    "lib/extensions/secure_storage/secure_storage_failure_mapper.dart": "aec9826f439f5da06ceb780bf02fa2b50e30fa41fb403037189e3ca589b486e5",
+    "lib/extensions/secure_storage/secure_storage_gateway.dart": "e05210422042fcffc86c6412b041529a7c0ee9e24ca5c7ce7a9a3f996aee4d9d",
+    "lib/extensions/secure_storage/secure_storage_health_check.dart": "1a29326c01ffff693c803889cbe483ba45f5e626b19bd59fa369b19e4006cd01",
+    "lib/extensions/secure_storage/secure_storage_module.dart": "dc093c5a29337b709e4c4d47152e946aac427991a6e67fea6a861eb0e5b56e74",
+    "lib/extensions/secure_storage/secure_token_store.dart": "e3d286965c9aabbc751a7f0a88869f9390534d84dfd4aaae428d11de4095ab1c",
+    "test/extensions/secure_storage/first_run_wipe_test.dart": "8c0f535212838d8f24053f837d28f552b05ed45cd59880a72d074924f27f38b9",
+    "test/extensions/secure_storage/keystore_secure_storage_test.dart": "ee28ddb0f16c930e7684b4bb711604837107db464bd6b74c30c1a54aa13c7479",
+    "test/extensions/secure_storage/namespaced_secure_storage_test.dart": "f80afe157f5830f8459fb01fbd841e63cc7d6a8a532e0d29086d7983e01852fa",
+    "test/extensions/secure_storage/secure_storage_contract_test.dart": "f60584f2d6ddb62e5897281ce3a13e7e930e86702ee146901264684449fa5465",
+    "test/extensions/secure_storage/secure_storage_failure_mapper_test.dart": "6720327d4de2af3903db745b7bbcb40a3b59a9653ef065da36b8e2b677929a0a",
+    "test/extensions/secure_storage/secure_storage_health_check_test.dart": "4a57eb01322e90ca891d0688cca341c07e68654664ea24d047042fbbb55e5381",
+    "test/extensions/secure_storage/secure_storage_module_test.dart": "6cd62227a6540e3165f4da69419f5f57932cdc4f0fb808c26fe06e8c796ff2c3",
+    "test/extensions/secure_storage/secure_token_store_test.dart": "851abcb98a871ef6d484170afdb89a0ed8b45a1b2a13728a95de70519e816b0b",
+    "test/extensions/secure_storage/test_support.dart": "881b48bc4e3af47c59f62d6688f70d4f026fa8760198eb32486948d833567512"
+  }
+}

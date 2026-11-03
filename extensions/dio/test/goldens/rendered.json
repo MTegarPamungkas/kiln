@@ -1,0 +1,27 @@
+{
+  "extension": "dio",
+  "files": {
+    "lib/extensions/dio/cancellation.dart": "31e26a39d97bef14ecd43c7d4499ea27a1565def69e964286d1556897ab78022",
+    "lib/extensions/dio/dio_client.dart": "f5a5e3f15870dedcf3913d547e711ea2eb18f9fd83164090d225420156cfd2b4",
+    "lib/extensions/dio/dio_config.dart": "d8d2d7caf8f687b6e9d6b8f7f986e64f7c99ae5eb89c341dc0326d3158b06b4e",
+    "lib/extensions/dio/dio_failure_mapper.dart": "55c6dc2348085f57e7491e9646d663b9f0774827dc32412407d2807b58bb62e5",
+    "lib/extensions/dio/dio_module.dart": "6d43b478ccab8142a8522169007139fd81adafda82b3ffc126b285ef0fb630bc",
+    "lib/extensions/dio/dio_test_adapter.dart": "c1dd03a9722d094f7d2503c9489e3e4ea499dc5ad55fd372ba172677c14aeaae",
+    "lib/extensions/dio/download_helper.dart": "e8ffaa4ee60526bc10115fb4d8e8f0fdd505d217dfde61f164c4a6c0dfdacf31",
+    "lib/extensions/dio/interceptors/interceptor_slot.dart": "5da434d2e559e011a6210b3c6bc6d63aa7e92c7bbcdfc11b97268d4582606f2e",
+    "lib/extensions/dio/interceptors/request_id_interceptor.dart": "53ac01929736cc329263ec4296a1ad844b005ad651278827dbdec0034afefd82",
+    "lib/extensions/dio/interceptors/user_agent_interceptor.dart": "2efa50201a2ce4cb5eaaf8c77e39d84964e40a6890c797aae70955f6accd6211",
+    "lib/extensions/dio/multipart_helper.dart": "0936cc2aa9767cb99274a646ae5f0531947c66419a0a941bddbd30b8e9391cb7",
+    "test/extensions/dio/cancellation_test.dart": "1a0fd0762ef9ac5c9c38f47d2230a18ea6c154c6a59b7dd3f028d391fedb5d64",
+    "test/extensions/dio/dio_client_test.dart": "3394a14637344dfd97551aada921a8639c81805b59e6c983e4058c080f4d3838",
+    "test/extensions/dio/dio_config_test.dart": "5f18dd7e1af559be1e4c34937a1928eca40bf9b96577efe827613001fe50fa2d",
+    "test/extensions/dio/dio_failure_mapper_test.dart": "360c09ffaadfd29eac03805d815e4c9a3b19cfebeed6c8ae7af063e700a99842",
+    "test/extensions/dio/dio_module_test.dart": "f5a84127bd21e8d4579bc327d1d35611dde71c52ab3d470c2c7fbf75f541be9e",
+    "test/extensions/dio/download_helper_test.dart": "cca70f8f8ce953570fda70008dcecbe8a5e9486ec92163aa3f0318b5a48af3e8",
+    "test/extensions/dio/http_client_contract_test.dart": "8a5ca4ae142fa477cc55bea6c7748e1994ef939343cffaab73f6fd69eaedcdd2",
+    "test/extensions/dio/interceptor_slot_test.dart": "64cb5c98378a8c6a5cd8154add7e3b2df9b4f7fe5c2eba2bedfa7f7c6ca27f92",
+    "test/extensions/dio/multipart_helper_test.dart": "e50d946d1ff9889cba310358c2df68688108941f9d9a5d73c13e485fc36d14f0",
+    "test/extensions/dio/request_id_interceptor_test.dart": "64d6aaae143a1a58530213a4bc119f0994d19f4d363f1913a807ae57a856affb",
+    "test/extensions/dio/user_agent_interceptor_test.dart": "e13fa4b7c350611eb09a717876e1cfc633b952d2ca5cde47c331d5035deb727b"
+  }
+}

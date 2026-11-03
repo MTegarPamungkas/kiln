@@ -1,0 +1,59 @@
+{
+  "@@locale": "id",
+  "appTitle": "Kiln App",
+  "readyTitle": "Aplikasi siap",
+  "readyBody": "Kerangka Kiln berjalan. Mulai bangun fitur di folder lib/features.",
+  "starterHint": "Tambahkan extension lewat kiln add, lalu jalankan kiln doctor.",
+  "errorTitle": "Aplikasi gagal dimulai",
+  "errorBody": "Periksa konfigurasi proyek, lalu jalankan ulang aplikasi.",
+  "failureTitle": "Terjadi kesalahan",
+  "failureBody": "Silakan coba lagi. Bila masalah berlanjut, hubungi dukungan.",
+  "actionRetry": "Coba lagi",
+  "actionCancel": "Batal",
+  "actionOk": "OK",
+  "actionSave": "Simpan",
+  "actionClose": "Tutup",
+  "languageLabel": "Bahasa",
+  "languageFollowSystem": "Ikuti sistem",
+  "languageName": "Bahasa Indonesia",
+  "itemsCount": "{count, plural, =0{Tidak ada item} other{{count} item}}",
+  "@itemsCount": {
+    "description": "Number of items in a list",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "helloName": "Halo, {name}!",
+  "@helloName": {
+    "description": "Greeting with the user's name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "failureNetwork": "Terjadi masalah jaringan. Periksa koneksi lalu coba lagi.",
+  "failureNetworkOffline": "Tidak ada koneksi internet. Periksa jaringan lalu coba lagi.",
+  "failureAuth": "Sesi atau kredensial tidak valid. Masuk kembali untuk melanjutkan.",
+  "failureAuthExpired": "Sesi berakhir. Silakan masuk kembali.",
+  "failureAuthEmail": "Verifikasi email Anda terlebih dahulu.",
+  "failurePermission": "Izin dibutuhkan untuk melanjutkan. Buka pengaturan aplikasi.",
+  "failurePermissionPermanently": "Izin diblokir. Aktifkan lewat pengaturan aplikasi.",
+  "failureValidation": "Data yang dimasukkan belum valid.",
+  "failureConfiguration": "Konfigurasi aplikasi belum lengkap.",
+  "failureStorage": "Data gagal disimpan atau dibaca. Coba lagi.",
+  "failureSecureStorage": "Penyimpanan aman tidak tersedia di perangkat ini.",
+  "failureDatabase": "Basis data lokal sedang bermasalah. Coba lagi.",
+  "failureRemoteDatabase": "Server data tidak dapat dihubungi. Coba lagi.",
+  "failureFile": "Berkas tidak dapat diproses. Coba lagi.",
+  "failureNotifications": "Notifikasi tidak tersedia. Periksa izin notifikasi.",
+  "failureDeepLink": "Tautan tidak valid atau tidak dapat dibuka.",
+  "failureMedia": "Media tidak dapat dibuka atau diambil.",
+  "failureCache": "Cache tidak tersedia. Data akan dimuat ulang.",
+  "failureSession": "Sesi berakhir. Silakan masuk kembali.",
+  "failureCancelled": "Tindakan dibatalkan.",
+  "failureUnavailable": "Fitur ini belum tersedia.",
+  "failureUnexpected": "Terjadi kesalahan tak terduga. Coba lagi."
+}

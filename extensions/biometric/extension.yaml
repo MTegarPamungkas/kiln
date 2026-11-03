@@ -1,0 +1,40 @@
+id: biometric
+name: Biometric
+version: 0.1.1
+description: Biometric authentication, app lock, and protected storage.
+category: security
+tier: official
+exclusive: true
+provides:
+  - biometric
+dependencies:
+  local_auth: ^3.0.2
+prompts:
+  - name: reason
+    type: string
+    label: Prompt shown during authentication
+    default: Buka aplikasi dengan biometrik
+  - name: grace_seconds
+    type: int
+    label: Grace period in seconds
+    default: 30
+    min: 0
+    max: 600
+  - name: biometric_only
+    type: bool
+    label: Reject device credentials
+    default: true
+platforms:
+  - android
+  - ios
+  - macos
+android:
+  permissions:
+    - android.permission.USE_BIOMETRIC
+  activity: FlutterFragmentActivity
+ios:
+  plist:
+    NSFaceIDUsageDescription: Gunakan Face ID untuk membuka aplikasi.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

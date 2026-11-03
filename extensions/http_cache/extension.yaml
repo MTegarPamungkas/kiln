@@ -1,0 +1,39 @@
+id: http_cache
+name: HTTP cache
+version: 0.1.0
+description: Caches HTTP responses with TTL, ETag, and invalidation.
+category: network
+tier: official
+provides:
+  - http_cache
+requires:
+  - http_client
+  - http_pipeline
+optional_requires:
+  - storage
+contributes:
+  - slot: http.interceptors
+    item: HttpMiddleware
+    priority: 30
+    when:
+      - http_pipeline
+prompts:
+  - name: default_ttl_seconds
+    type: int
+    label: Default cache TTL in seconds
+    default: 60
+    min: 0
+    max: 86400
+  - name: max_entries
+    type: int
+    label: Maximum cached responses
+    default: 100
+    min: 1
+    max: 10000
+  - name: stale_while_revalidate
+    type: bool
+    label: Serve stale responses while refreshing
+    default: true
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

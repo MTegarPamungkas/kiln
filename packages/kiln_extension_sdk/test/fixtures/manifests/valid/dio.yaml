@@ -1,0 +1,35 @@
+id: dio
+name: Dio HTTP client
+version: 0.2.0
+description: HTTP client with a replaceable middleware pipeline.
+category: network
+tier: official
+provides:
+  - http_client
+  - http_pipeline
+slots:
+  - name: http.interceptors
+    item: HttpMiddleware
+    description: Middleware executed around every request.
+prompts:
+  - name: base_url
+    type: url
+    label: API base URL
+    required: true
+  - name: connect_timeout
+    type: int
+    label: Connect timeout in seconds
+    default: 15
+    min: 1
+    max: 120
+dependencies:
+  dio: ^5.9.0
+android:
+  permissions:
+    - android.permission.INTERNET
+macos:
+  entitlements:
+    com.apple.security.network.client: true
+compatibility:
+  kiln: ">=0.2.0 <0.3.0"
+  dart: ">=3.9.0"

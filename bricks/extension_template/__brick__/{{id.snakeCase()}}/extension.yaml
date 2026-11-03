@@ -1,0 +1,19 @@
+id: {{id.snakeCase()}}
+name: {{name}}
+version: 0.1.0
+description: {{name}} for Kiln.
+category: {{category}}
+tier: community
+provides:
+  - {{provides}}
+{{#requires}}
+requires: [{{requires}}]
+{{/requires}}
+{{#with_native_patch}}
+android:
+  permissions:
+    - android.permission.INTERNET
+ios:
+  plist: {}
+{{/with_native_patch}}
+prompts: []

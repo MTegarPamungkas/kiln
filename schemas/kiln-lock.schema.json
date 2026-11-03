@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kiln.dev/schemas/kiln-lock.schema.json",
+  "title": "Kiln lockfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lock_version", "core", "extensions"],
+  "properties": {
+    "lock_version": { "type": "integer", "const": 2 },
+    "core": { "type": "string" },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["version", "source", "files"],
+        "properties": {
+          "version": { "type": "string" },
+          "source": { "enum": ["bundled", "store"] },
+          "dependencies": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "files": {
+            "type": "object",
+            "additionalProperties": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+          },
+          "patches": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "manual_steps": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "yaml.schemas": {
+    "./schemas/extension.schema.json": "extensions/*/extension.yaml",
+    "./schemas/kiln.schema.json": ["kiln.yaml", "*/kiln.yaml"],
+    "./schemas/kiln-lock.schema.json": ["kiln.lock.yaml", "*/kiln.lock.yaml"],
+    "./schemas/migration.schema.json": "extensions/*/migrations/*.yaml",
+    "./schemas/registry-index.schema.json": "registry/index.json"
+  },
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.rulers": [80]
+  }
+}

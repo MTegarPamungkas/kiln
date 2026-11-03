@@ -1,0 +1,17 @@
+id: http_retry
+name: HTTP retry
+version: 0.1.0
+description: Retries temporary HTTP failures with backoff.
+category: network
+tier: official
+requires:
+  - http_client
+  - http_pipeline
+contributes:
+  - slot: http.interceptors
+    item: HttpMiddleware
+    priority: 20
+    when:
+      - http_pipeline
+dependencies:
+  http_retry: ^0.0.1

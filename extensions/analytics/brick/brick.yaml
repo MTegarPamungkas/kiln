@@ -1,0 +1,22 @@
+name: analytics
+description: Analytics files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: analytics
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  api_key:
+    type: string
+    description: PostHog project API key
+    default: ""
+  host:
+    type: string
+    description: PostHog ingestion host
+    default: https://us.i.posthog.com

@@ -1,0 +1,75 @@
+/// Settings for incoming and outgoing deep links.
+final class DeepLinkConfig {
+  const DeepLinkConfig({
+    this.scheme = 'kiln',
+    this.allowedHosts = const <String>[],
+    this.pathPrefixes = const <String>[],
+    this.stripTrackingParameters = true,
+    this.trackingParameters = defaultTrackingParameters,
+    this.dropFragment = true,
+    this.deduplicationWindow = const Duration(seconds: 2),
+  });
+
+  /// Settings rendered from the install prompts.
+  static const defaults = DeepLinkConfig(
+    scheme: 'kiln',
+    allowedHosts: <String>[
+      'kiln.dev',
+    ],
+    pathPrefixes: <String>[
+    ],
+  );
+
+  /// Query parameters removed by the link normalizer unless disabled.
+  static const Set<String> defaultTrackingParameters = <String>{
+    'fbclid',
+    'gclid',
+    'igshid',
+    'mc_cid',
+    'mc_eid',
+    'utm_campaign',
+    'utm_content',
+    'utm_medium',
+    'utm_source',
+    'utm_term',
+  };
+
+  /// Custom scheme that opens the app, for example `kiln`.
+  final String scheme;
+
+  /// Hosts accepted for `https` app links.
+  ///
+  /// An empty list rejects every web link; the custom scheme keeps working.
+  final List<String> allowedHosts;
+
+  /// Path prefixes accepted for `https` app links.
+  ///
+  /// An empty list accepts every path on the allowed hosts.
+  final List<String> pathPrefixes;
+
+  /// Whether tracking query parameters are dropped while normalizing.
+  final bool stripTrackingParameters;
+
+  /// Query parameters considered tracking when [stripTrackingParameters].
+  final Set<String> trackingParameters;
+
+  /// Whether fragments are removed while normalizing.
+  final bool dropFragment;
+
+  /// How long the same link is ignored after it was last accepted.
+  final Duration deduplicationWindow;
+
+  /// The scheme without separators or casing.
+  String get schemeName {
+    final value = scheme.trim().toLowerCase();
+    final separator = value.indexOf('://');
+    final withoutSuffix = separator < 0 ? value : value.substring(0, separator);
+    return withoutSuffix.replaceAll(':', '');
+  }
+
+  /// Whether `https` app links are accepted at all.
+  bool get allowsUniversalLinks => allowedHosts.isNotEmpty;
+
+  /// Whether `https` app links must match a configured path prefix.
+  bool get restrictsPaths => pathPrefixes.isNotEmpty;
+}

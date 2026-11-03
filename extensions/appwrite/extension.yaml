@@ -1,0 +1,50 @@
+id: appwrite
+name: Appwrite
+version: 0.1.1
+description: Appwrite auth, remote database, and file storage backends.
+category: auth
+tier: official
+exclusive: true
+provides:
+  - auth
+  - remote_database
+  - file_storage
+dependencies:
+  appwrite: ^28.2.0
+  http: ^1.6.0
+  shared_preferences: ^2.3.0
+prompts:
+  - name: endpoint
+    type: url
+    label: Appwrite API endpoint
+    default: https://cloud.appwrite.io/v1
+  - name: project_id
+    type: string
+    label: Appwrite project id
+    default: kiln_demo
+  - name: database_id
+    type: string
+    label: Appwrite database id
+    default: kiln
+  - name: bucket_id
+    type: string
+    label: Appwrite storage bucket id
+    default: kiln_files
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.INTERNET
+manual_steps:
+  - id: appwrite_platform
+    description: Add the Android, iOS, or web platform that matches this app in the Appwrite console before signing in.
+  - id: appwrite_redirect_urls
+    description: Appwrite 2.x accepts the appwrite-callback-<project-id>:// scheme for mobile deep links without a console allow list. Keep the defaults in AppwriteAccountManagement or replace them (and the Android intent filter) when the app uses another scheme.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

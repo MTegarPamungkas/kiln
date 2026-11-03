@@ -1,0 +1,69 @@
+id: deep_link
+name: Deep links
+version: 0.1.1
+description: Incoming deep links with allowlisting, normalization, and deduplication.
+category: deep_link
+tier: official
+exclusive: true
+provides:
+  - deep_links
+dependencies:
+  app_links: ^7.2.2
+prompts:
+  - name: scheme
+    type: string
+    label: URI scheme that opens the app
+    description: Custom scheme without the "://" separator. Android and iOS platform setup stay on kiln; update extension.yaml after changing the scheme.
+    default: kiln
+    required: true
+  - name: hosts
+    type: multi
+    label: Allowed hosts for https app links
+    description: Universal link hosts accepted by the allowlist. Add your own host to options before installing when it is not listed.
+    default:
+      - kiln.dev
+    options:
+      - kiln.dev
+      - app.kiln.dev
+      - localhost
+  - name: path_prefixes
+    type: multi
+    label: Allowed path prefixes for https app links
+    description: Leave empty to accept every path on the allowed hosts. Add your own prefix to options before installing when it is not listed.
+    default: []
+    options:
+      - /app
+      - /auth
+      - /orders
+      - /profile
+      - /share
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  url_schemes:
+    - kiln
+  app_links:
+    hosts:
+      - kiln.dev
+    path_prefixes: []
+ios:
+  url_schemes:
+    - kiln
+  associated_domains:
+    - applinks:kiln.dev
+macos:
+  url_schemes:
+    - kiln
+manual_steps:
+  - id: deep_link_platform_scheme
+    description: Android, iOS, and macOS platform setup registers the kiln scheme. Update android.url_schemes, ios.url_schemes, and macos.url_schemes in extension.yaml, then reinstall, when the scheme prompt changes.
+  - id: deep_link_universal_links
+    description: Publish assetlinks.json on every Android host and apple-app-site-association on every iOS host as described in the deep_link extension docs.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

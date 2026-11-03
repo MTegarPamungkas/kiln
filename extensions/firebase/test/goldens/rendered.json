@@ -1,0 +1,32 @@
+{
+  "extension": "firebase",
+  "files": {
+    "lib/extensions/firebase/firebase_account_management.dart": "0e5c1c62d8515868760a8fcee60a5b0263220aea45a3f05607960cd35c3b91b4",
+    "lib/extensions/firebase/firebase_app.dart": "32a3ecf59e7c18c63b956c359c40485f19abbdcacc36583ea1606e3211c7e853",
+    "lib/extensions/firebase/firebase_auth_repository.dart": "97c72ecd4a008a14304628c267860eac6e2add7fa84ddd389b49acaed417df3c",
+    "lib/extensions/firebase/firebase_config.dart": "b1e31df6835db2c4db0d8fee17d6d3cc3f75c55d7fa52c8fe8c324aa3b95a805",
+    "lib/extensions/firebase/firebase_emulator.dart": "5974b8660a5d7350ee25cac6dfe95b0c4deb10f8b115516e979764a4e4c44728",
+    "lib/extensions/firebase/firebase_failure_mapper.dart": "fdb7544ebd267c790d33b932a9879c9425759d24a8e6b211519424a672a4e04f",
+    "lib/extensions/firebase/firebase_file_storage.dart": "3d1ae896ee85cffa47799354febde04d92eb066ee85beba255c267b33b21b4d9",
+    "lib/extensions/firebase/firebase_gateway.dart": "3acb2bdb473ea9fe8ba0e5fa49d952b501778a2d672cd4609307d050949be1d2",
+    "lib/extensions/firebase/firebase_id_token_provider.dart": "a101ee2b0330135f013c46f05bc3c80a9d2705eb84a09f0862909e965d1d33b9",
+    "lib/extensions/firebase/firebase_module.dart": "f6fe8a9941f2c26d14c7ca656960ee576c7d900d89edc4b4e2ffa1d772951bec",
+    "lib/extensions/firebase/firebase_session_bridge.dart": "fbcecdd122613ac81da03390e163da1235074372c79ad9c20c8abcc06cc2b683",
+    "lib/extensions/firebase/firebase_storage_gateway.dart": "0304333270e26ae06f277904d2eb05344f58d1c9228f02b29a9ae0f495caf239",
+    "lib/extensions/firebase/firestore_gateway.dart": "7d5fb73e3c79a6ca1ddd8fa5145fd5d2392fd1e35f42e240c2254429e3fd3da5",
+    "lib/extensions/firebase/firestore_query_mapper.dart": "91c4ebabc0245d93ccfaa603454f82e2f00ca0a7a9028e2323fe39668daf23bd",
+    "lib/extensions/firebase/firestore_remote_database.dart": "1b0da4db649cf1204e31787482b62f3ce3acf461c994262e78a5525c3c211096",
+    "test/extensions/firebase/firebase_account_management_test.dart": "a767fa84f0b7f3c71d480f7ec182c7f52d87fa93806d955e55f77be1f7757ce9",
+    "test/extensions/firebase/firebase_auth_test.dart": "176601db79d41d71bdd62dbfc723b9c7ee7db5391d2fcd0aa484fa5602460ed2",
+    "test/extensions/firebase/firebase_config_test.dart": "95c5a2ed18e90cd2a259dc20ad4da0cd1520df0dfe1cc05e06e4d44f5a6ffec5",
+    "test/extensions/firebase/firebase_contract_test.dart": "ff16f2017e0d28b6e40598ae881b7dbafa91e072258e4655b8389e1ff96713d4",
+    "test/extensions/firebase/firebase_emulator_test.dart": "12864c99ebb98093fc450f918ecc48929686570691dae5f38e3db342f04ecb88",
+    "test/extensions/firebase/firebase_failure_mapper_test.dart": "f7474e79896cf19dcd569c3541e9eef311189e7f4ff1b032b7a7b17c9cb9ca2b",
+    "test/extensions/firebase/firebase_file_storage_test.dart": "473811dfb4402abcd746b5cf1fc78c81fd672ee8f63f27363c14fdbd5fd56d49",
+    "test/extensions/firebase/firebase_id_token_provider_test.dart": "251b0661faa1379738fa2a2e7635e955fd226bff99d640642aedd5460c94b345",
+    "test/extensions/firebase/firebase_module_test.dart": "2ded38455b240db1df71df66dfbd0ed1230849bfdf09c0555e9ae2883c127d7e",
+    "test/extensions/firebase/firebase_session_bridge_test.dart": "31b4354cac6e1da418ba06cb89af0636b5aa7fd94ba74070254beaaec4653018",
+    "test/extensions/firebase/firestore_query_mapper_test.dart": "ed8233db66a431656fa5eb8d6e425fa0dcb923f7cae19bd28d2903a3380961a6",
+    "test/extensions/firebase/firestore_remote_database_test.dart": "901bb0c5802e699511f0ba27177a5b7243f42057fb2eec6f8bf5fc5be4e422c7"
+  }
+}

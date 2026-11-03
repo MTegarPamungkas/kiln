@@ -1,0 +1,26 @@
+{
+  "extension": "http_cache",
+  "files": {
+    "lib/extensions/http_cache/cache_control_parser.dart": "eb6f6be49dd1eefe037450502b7008df745589e314e5db7e8efe951986a0423b",
+    "lib/extensions/http_cache/cache_interceptor.dart": "5c9d3c28d6f42b0d0b9768e3601427aeb8f242725fbbc788f6c0531d53b57d71",
+    "lib/extensions/http_cache/cache_invalidation.dart": "f6f7e667c6dd81c52721e1285c85726232852481b203e0322433ea399eb159f4",
+    "lib/extensions/http_cache/cache_key.dart": "70d1dbd06ac29915b9782ce552f4f9124bf8b9756975fd4cc2c9faf641087535",
+    "lib/extensions/http_cache/cache_policy.dart": "926d704f88dc9a7b8dee102613bc2719030846ae4aefbe89f36d1a584a92f462",
+    "lib/extensions/http_cache/cache_settings.dart": "810acfdb619110a779dd9326c4d336dc0c36bfd9ce2d79461212f633de900027",
+    "lib/extensions/http_cache/cache_store.dart": "275cdc9358229d2d6bb605f29fcec6cc887c7cb1db25e64955296ef9ab9a87b7",
+    "lib/extensions/http_cache/etag_validator.dart": "482289e0f8e0ff052535b90fce461658c4beda6d65a7ddd5e84690e9243aeb3e",
+    "lib/extensions/http_cache/http_cache_module.dart": "ea1180af7f7c6983def08f4e305dd3d66dc5829781b40ee98168355903321077",
+    "lib/extensions/http_cache/memory_http_cache.dart": "acb3a6645c376115971ddc92ffc1e5a4a6893c5f15347a088997bc101e87fe4e",
+    "lib/extensions/http_cache/stale_while_revalidate.dart": "b6997228332a169d0a394222e4698485f7f5bbf9bea66c72dff8028458bb1a0f",
+    "lib/extensions/http_cache/storage_http_cache.dart": "41d989fe774098ed257f6f82ea7afe06b3391a6507818bba25f9684e3ce64730",
+    "test/extensions/http_cache/cache_control_parser_test.dart": "5518fe741fc7e8a25f1519294b4397f098313afecf03663e4f700b1b4e1c472b",
+    "test/extensions/http_cache/cache_interceptor_test.dart": "27bc6241f04d27d6ffe77614f0b3822c82ef09dfd57969d72323b2ec55f4f73a",
+    "test/extensions/http_cache/cache_invalidation_test.dart": "2a4ddf9aa6434b3842cb03b866796f46afc30e00960c95bd52c76ac68a689542",
+    "test/extensions/http_cache/cache_key_test.dart": "55c7bf799a4196b750e1226ada0407bd29836ab79b8ff09fe0014bf29772b43f",
+    "test/extensions/http_cache/etag_validator_test.dart": "cc8083b0ef2a55989217e9fdd3f35d2c2a13a2d09a17fb1124e65edc7cbd518e",
+    "test/extensions/http_cache/http_cache_module_test.dart": "c240187db954829c2d5e8c78c37a2600fb9e814266c00572d26cf48525000e9b",
+    "test/extensions/http_cache/memory_http_cache_test.dart": "b0e8c9b5d68fd007b410425d8f0dd88126e27255f9ad2ebf141fd0527b8f2c94",
+    "test/extensions/http_cache/stale_while_revalidate_test.dart": "2f3a52cdd7d8610701ee4da6cf93623ff53b54e752605481c0426d507cb9b560",
+    "test/extensions/http_cache/storage_http_cache_test.dart": "876772f62afec0792316caa6121db14d8beddbba61c01badf139aa1ad3840ec1"
+  }
+}

@@ -1,0 +1,29 @@
+name: app_basic
+description: Basic Kiln application shell used by kiln create.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  name:
+    type: string
+    description: Package name of the generated application
+    default: my_app
+  description:
+    type: string
+    description: Short application description
+    default: A Kiln application.
+  org:
+    type: string
+    description: Organization identifier
+    default: com.example
+  state:
+    type: string
+    description: State management choice (none, bloc, or riverpod)
+    default: none
+  platforms:
+    type: list
+    description: Platforms enabled for the project
+    default:
+      - android
+      - ios
+      - web

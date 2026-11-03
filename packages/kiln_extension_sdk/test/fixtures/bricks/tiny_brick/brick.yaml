@@ -1,0 +1,14 @@
+name: tiny_brick
+description: Minimal brick used by SDK tests.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: demo
+  name:
+    type: string
+    description: Extension display name
+    default: Demo

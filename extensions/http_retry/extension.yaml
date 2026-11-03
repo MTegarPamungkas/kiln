@@ -1,0 +1,41 @@
+id: http_retry
+name: HTTP retry
+version: 0.1.0
+description: Retries temporary HTTP failures with backoff and a retry budget.
+category: network
+tier: official
+requires:
+  - http_client
+  - http_pipeline
+contributes:
+  - slot: http.interceptors
+    item: HttpMiddleware
+    priority: 20
+    when:
+      - http_pipeline
+prompts:
+  - name: max_attempts
+    type: int
+    label: Maximum attempts
+    default: 3
+    min: 1
+    max: 10
+  - name: initial_delay_ms
+    type: int
+    label: Initial backoff in milliseconds
+    default: 250
+    min: 0
+    max: 5000
+  - name: max_delay_ms
+    type: int
+    label: Maximum backoff in milliseconds
+    default: 8000
+    min: 0
+    max: 60000
+  - name: jitter
+    type: bool
+    label: Add jitter to backoff
+    default: true
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

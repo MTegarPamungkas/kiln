@@ -1,0 +1,17 @@
+name: kiln_core
+description: Contracts, failures, registry runtime, sessions, and privacy utilities for Kiln.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  get_it: ^9.3.0
+  meta: ^1.19.0
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.31.1

@@ -1,0 +1,39 @@
+id: flavors
+name: Flavors
+version: 0.1.0
+description: Dart-level app flavors, entry points, and launch configurations.
+category: flavor
+tier: official
+exclusive: true
+provides:
+  - flavor
+slots:
+  - name: app.wrappers
+    item: AppWrapper
+    description: Visual wrapper for the active flavor.
+contributes:
+  - slot: app.wrappers
+    item: FlavorBanner
+    description: Shows a DEV or STG ribbon outside production.
+prompts:
+  - name: flavors
+    type: multi
+    label: Application flavors
+    default:
+      - development
+      - staging
+      - production
+    options:
+      - development
+      - staging
+      - production
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"
