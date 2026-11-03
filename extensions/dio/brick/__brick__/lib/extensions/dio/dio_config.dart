@@ -1,3 +1,5 @@
+import 'package:kiln_core/kiln_core.dart';
+
 /// Typed configuration for the dio HTTP client.
 class DioConfig {
   const DioConfig({
@@ -38,4 +40,34 @@ class DioConfig {
   final String apiKeyPrefix;
 
   bool get hasApiKey => apiKey.trim().isNotEmpty;
+
+  /// Returns null when valid, or a configuration [Failure] otherwise.
+  Failure? validate() {
+    final trimmed = baseUrl.trim();
+    if (trimmed.isEmpty) {
+      return const Failure(
+        code: FailureCode.configurationMissing,
+        message: 'The API base URL is required.',
+        kind: FailureKind.configuration,
+      );
+    }
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null ||
+        uri.host.isEmpty ||
+        !(uri.isScheme('http') || uri.isScheme('https'))) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'The API base URL must be an absolute HTTP or HTTPS URL.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (connectTimeout <= Duration.zero || receiveTimeout <= Duration.zero) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'HTTP timeouts must be greater than zero.',
+        kind: FailureKind.configuration,
+      );
+    }
+    return null;
+  }
 }

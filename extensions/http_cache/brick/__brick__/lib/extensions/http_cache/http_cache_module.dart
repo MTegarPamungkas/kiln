@@ -2,6 +2,7 @@ import 'package:kiln_core/kiln_core.dart';
 
 import 'cache_interceptor.dart';
 import 'cache_settings.dart';
+import 'http_cache_support.dart';
 import 'memory_http_cache.dart';
 import 'storage_http_cache.dart';
 
@@ -16,10 +17,7 @@ final class HttpCacheModule extends KilnModule {
   Set<String> get provides => const <String>{'http_cache'};
 
   @override
-  Set<String> get requires => const <String>{
-    'http_client',
-    'http_pipeline',
-  };
+  Set<String> get requires => const <String>{'http_client', 'http_pipeline'};
 
   @override
   Set<String> get optionalRequires => const <String>{'storage'};
@@ -29,10 +27,7 @@ final class HttpCacheModule extends KilnModule {
     final clock = registry.readOrNull<Clock>() ?? const SystemClock();
     final storage = registry.readOrNull<Storage>();
     final HttpCache cache = storage == null
-        ? MemoryHttpCache(
-            settings: HttpCacheSettings.defaults,
-            clock: clock,
-          )
+        ? MemoryHttpCache(settings: HttpCacheSettings.defaults, clock: clock)
         : StorageHttpCache(
             storage: storage,
             settings: HttpCacheSettings.defaults,
@@ -40,6 +35,9 @@ final class HttpCacheModule extends KilnModule {
           );
 
     registry.registerSingleton<HttpCache>(cache);
+    registry.registerSingleton<HttpCacheSupport>(
+      HttpCacheSupport(settings: HttpCacheSettings.defaults, storage: storage),
+    );
     registry.read<HttpPipeline>().use(
       CacheInterceptor(
         cache: cache,
@@ -48,5 +46,10 @@ final class HttpCacheModule extends KilnModule {
       ),
       priority: 30,
     );
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<HttpCacheSupport>().info;
   }
 }

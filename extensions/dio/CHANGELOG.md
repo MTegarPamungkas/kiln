@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+- Add `DioConfig.validate` and `DioSupport` for base URL and timeout checks.
+- Report an invalid HTTP configuration as `notConfigured` through
+  `SupportRegistry`.
+
 ## 0.2.3
 
 - Add API-key support through `--dart-define=KILN_API_KEY`, sent as a header or

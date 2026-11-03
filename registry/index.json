@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T14:52:08.716547Z",
+  "generated_at": "2026-11-03T15:01:33.270768Z",
   "extensions": [
     {
       "id": "analytics",
@@ -277,7 +277,7 @@
       "name": "Dio HTTP client",
       "description": "HTTP client and middleware pipeline built on dio.",
       "category": "network",
-      "latest": "0.2.3",
+      "latest": "0.2.4",
       "tier": "official",
       "versions": [
         {
@@ -323,6 +323,19 @@
           "version": "0.2.3",
           "url": "archives/dio-0.2.3.tgz",
           "sha256": "4eb6ceaf06c30ad450e7629378b28481f705fdadf2f9386fc454b0441beb2aff",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.4",
+          "url": "archives/dio-0.2.4.tgz",
+          "sha256": "d824722f25048ee6e1a8099075999a8fde40c8031898467d72df053ad7495c29",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -487,13 +500,29 @@
       "name": "HTTP cache",
       "description": "Caches HTTP responses with TTL, ETag, and invalidation.",
       "category": "network",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/http_cache-0.1.0.tgz",
           "sha256": "058b01d16e0f27bc88772e0e2fb7e4f7e1144adcbd2f95ff3685fef883162f43",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/http_cache-0.1.1.tgz",
+          "sha256": "f775d90c6175c6caffe3ebfcbe29482d724889c169bf2bdaf0fcef7adfdf0a30",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -513,13 +542,26 @@
       "name": "HTTP retry",
       "description": "Retries temporary HTTP failures with backoff and a retry budget.",
       "category": "network",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/http_retry-0.1.0.tgz",
           "sha256": "bc3cc2000c4462c8356b2993dfe840bc4e10d87bef8634a81630b3dc3d835d90",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/http_retry-0.1.1.tgz",
+          "sha256": "e3cab3a0851472e176c4fb7dd139325bf3beceb871deba6c1cdb103120ee08a0",
           "requires": [
             "http_client",
             "http_pipeline"

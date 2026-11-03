@@ -1,3 +1,5 @@
+import 'package:kiln_core/kiln_core.dart';
+
 /// Typed cache configuration.
 final class HttpCacheSettings {
   const HttpCacheSettings({
@@ -27,4 +29,30 @@ final class HttpCacheSettings {
   final int maxEntries;
   final bool staleWhileRevalidate;
   final Set<int> cacheableStatusCodes;
+
+  /// Returns null when valid, or a configuration [Failure] otherwise.
+  Failure? validate() {
+    if (defaultTtl.isNegative) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Cache TTL cannot be negative.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (maxEntries < 1) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Cache maxEntries must be at least one.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (cacheableStatusCodes.isEmpty) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Cache needs at least one cacheable status code.',
+        kind: FailureKind.configuration,
+      );
+    }
+    return null;
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/http_retry/http_retry_module.dart';
+import 'package:{{app_name}}/extensions/http_retry/http_retry_support.dart';
 
 void main() {
   test('module adds the retry middleware to the pipeline', () {
@@ -11,5 +12,6 @@ void main() {
     const HttpRetryModule().register(registry);
 
     expect(registry.read<HttpPipeline>().middleware, hasLength(1));
+    expect(registry.read<HttpRetrySupport>(), isA<HttpRetrySupport>());
   });
 }
