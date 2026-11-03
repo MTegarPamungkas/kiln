@@ -27,8 +27,6 @@ void main() {
         'lib/extensions/go_router/deep_link_route_mapper.dart',
         'lib/extensions/go_router/notification_route_mapper.dart',
         'lib/extensions/go_router/navigation_observer.dart',
-        'lib/extensions/go_router/not_found_page.dart',
-        'lib/extensions/go_router/shell_scaffold.dart',
         'lib/extensions/go_router/route_transitions.dart',
         'lib/extensions/go_router/sign_in_page_builder.dart',
         'test/extensions/go_router/app_router_test.dart',
@@ -41,8 +39,6 @@ void main() {
         'test/extensions/go_router/deep_link_route_mapper_test.dart',
         'test/extensions/go_router/notification_route_mapper_test.dart',
         'test/extensions/go_router/navigation_observer_test.dart',
-        'test/extensions/go_router/not_found_page_test.dart',
-        'test/extensions/go_router/shell_scaffold_test.dart',
         'test/extensions/go_router/test_support.dart',
       ]),
     );

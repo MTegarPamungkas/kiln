@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed the counter demo provider and page. The extension keeps the provider scope, observer, and registry bridge.
+
 ## 0.1.2
 
 - Add `RiverpodSupport` with app-wrapper details.

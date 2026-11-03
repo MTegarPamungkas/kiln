@@ -10,7 +10,6 @@ the Cubit/Bloc foundation used by features:
 - `AsyncState` and `AsyncCubit` for load/refresh/retry.
 - `AppBlocObserver` with PII redaction.
 - `SessionCubit` that wraps `SessionController`.
-- counter feature example.
 
 ```bash
 kiln add bloc

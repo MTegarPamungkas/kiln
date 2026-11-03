@@ -23,7 +23,6 @@ final class GoRouterSupport {
         'initial_location': location,
         'routes': routeCount,
         'auth_redirect': config.enableAuthRedirect,
-        'sample_shell': config.includeSampleShell,
       },
     );
   }

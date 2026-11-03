@@ -2,7 +2,7 @@
 
 Implementation of `AppLogger` from `kiln_core`: leveled logging, composable
 sinks, personal data redaction, rotating log files, an in-memory buffer, crash
-breadcrumbs, and a debug log page.
+breadcrumbs, and an in-memory buffer.
 
 - `LoggerModule` registers `AppLogger`, `LoggerConfig`, `LogLevelController`,
   `MemoryLogSink`, and `FileLogSink` when the file sink is active.
@@ -13,7 +13,7 @@ breadcrumbs, and a debug log page.
   before they reach a sink.
 - `HttpLogMiddleware` logs the method, URL without query, status, and duration;
   the `Authorization` header is redacted and bodies are never logged.
-- `DebugLogPage` only shows the contents of `MemoryLogSink` in non-production flavors.
+- Applications read `MemoryLogSink` and render their own log viewer.
 
 ```dart
 final logger = registry.read<AppLogger>();

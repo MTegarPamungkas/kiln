@@ -1,6 +1,6 @@
 id: image_picker
 name: Image picker
-version: 0.1.1
+version: 0.2.0
 description: Camera and gallery image picking with validation and upload handoff.
 category: media
 tier: official

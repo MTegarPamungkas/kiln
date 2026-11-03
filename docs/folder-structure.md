@@ -682,12 +682,8 @@ extensions/bloc/                            # state management extension based o
       │  │  └─ session_cubit.dart           # wraps the SessionController from kiln_core
       │  └─ features/                       # sample feature that uses Bloc state
       │     └─ counter/                     # counter feature as a Cubit usage example
-      │        ├─ counter_cubit.dart        # Cubit that holds the counter value and changes it
-      │        └─ counter_page.dart         # counter page that reads CounterCubit through BlocBuilder
       └─ test/                              # tests that are generated into the user app together with the code
          ├─ bootstrap_test.dart             # tests that bootstrap installs the Bloc observer and prepares the Registry
-         ├─ counter_cubit_test.dart         # tests that CounterCubit changes state according to the action
-         ├─ counter_page_test.dart          # tests that CounterPage shows the counter value and reacts to the button
          └─ core/bloc/                      # tests for the Bloc foundation in core/bloc
             ├─ app_bloc_observer_test.dart  # tests that the observer records transitions and errors with PII masked
             ├─ base_cubit_test.dart         # tests that safeEmit does not emit when isClosed and that runGuarded yields a Failure
@@ -727,12 +723,8 @@ extensions/riverpod/                        # state management extension based o
       │  │  └─ session_notifier.dart        # wraps the SessionController from kiln_core
       │  └─ features/                       # sample feature that uses Riverpod state
       │     └─ counter/                     # counter feature as a provider usage example
-      │        ├─ counter_page.dart         # counter page that reads state from the provider
-      │        └─ counter_provider.dart     # provider that holds the counter value and changes it
       └─ test/                              # tests that are generated into the user app together with the code
          ├─ bootstrap_test.dart             # tests that bootstrap prepares the ProviderScope with the Registry
-         ├─ counter_page_test.dart          # tests that CounterPage shows the counter value and reacts to the button
-         ├─ counter_provider_test.dart      # tests that the counter provider changes state according to the action
          └─ core/riverpod/                  # tests for the Riverpod foundation in core/riverpod
             ├─ kiln_providers_test.dart     # tests that registryProvider and kilnProvider<T>() resolve contracts from the Registry
             ├─ app_provider_observer_test.dart  # tests that the observer records provider errors with PII masked
@@ -1255,8 +1247,6 @@ extensions/social_login/
       │  ├─ apple_credential_gateway.dart  # wraps sign_in_with_apple so it can be faked: interface and SdkAppleCredentialGateway
       │  ├─ social_sign_out_listener.dart  # signs out of the Google session when AuthRepository.signOut is called
       │  └─ widgets/  # ready-made widgets for social login
-      │     ├─ social_login_buttons.dart  # Google and Apple buttons following the brand guidelines, respecting availability
-      │     └─ social_login_panel.dart  # ready-made panel with a loading state and Failure messages
       └─ test/extensions/social_login/  # tests for the social_login extension code in the generated app
          ├─ social_login_test.dart  # tests the SocialLogin flow for Google and Apple with faked gateways
          ├─ social_login_failure_mapper_test.dart  # tests mapping of Google and Apple SDK errors into Failure
@@ -1265,8 +1255,6 @@ extensions/social_login/
          ├─ nonce_generator_test.dart  # tests nonce randomness and the correctness of the SHA-256 hash
          ├─ social_availability_test.dart  # tests the providers available per platform
          ├─ social_sign_out_listener_test.dart  # tests that AuthRepository signOut triggers signing out of Google
-         ├─ social_login_buttons_test.dart  # tests that the buttons appear according to provider availability
-         ├─ social_login_panel_test.dart  # tests the loading state and Failure messages on the panel
          └─ social_auth_contract_test.dart  # runs the social_auth contract suite from kiln_testing against this implementation
 ```
 
@@ -1347,8 +1335,6 @@ extensions/go_router/                       # navigation extension: router, guar
       │  ├─ deep_link_route_mapper.dart      # turns a Uri from the DeepLinks contract into a route location (readOrNull)
       │  ├─ notification_route_mapper.dart   # turns a NotificationTap payload into a route location (readOrNull)
       │  ├─ navigation_observer.dart         # logs to AppLogger and sends the screen to Analytics (readOrNull)
-      │  ├─ not_found_page.dart              # shows a page for unknown routes
-      │  ├─ shell_scaffold.dart              # ShellRoute with bottom navigation, holding sample tabs
       │  └─ route_transitions.dart           # configures page transitions per platform
       └─ test/extensions/go_router/         # go_router extension tests generated into the user app
          ├─ app_router_test.dart              # tests building the GoRouter from routes, guards, and configuration
@@ -1361,8 +1347,6 @@ extensions/go_router/                       # navigation extension: router, guar
          ├─ deep_link_route_mapper_test.dart  # tests mapping a Uri from DeepLinks into a route location
          ├─ notification_route_mapper_test.dart  # tests mapping a NotificationTap payload into a route location
          ├─ navigation_observer_test.dart     # tests that navigation is logged in AppLogger and the screen is sent to Analytics
-         ├─ not_found_page_test.dart          # tests that an unknown route shows the not found page
-         └─ shell_scaffold_test.dart          # tests that the ShellRoute shows bottom navigation and switches tabs
 ```
 
 ### deep_link
@@ -1442,7 +1426,6 @@ extensions/theme/                           # app theme extension: colors, typog
       │  ├─ theme_mode_store.dart            # stores the mode choice through Storage when installed (readOrNull)
       │  ├─ theme_context_x.dart             # shortcut access through context.colors, context.spacing, and context.semantic
       │  └─ widgets/                         # ready-made widgets for changing the theme
-      │     └─ theme_mode_switcher.dart      # shows the System, Light, and Dark choices
       └─ test/extensions/theme/             # theme extension tests generated into the user app
          ├─ brand_theme_test.dart             # tests that the light and dark ThemeData are built from the configuration
          ├─ theme_module_test.dart            # tests that the module registers the theme configuration with the Registry
@@ -1453,7 +1436,6 @@ extensions/theme/                           # app theme extension: colors, typog
          ├─ semantic_colors_test.dart         # tests the success, warning, and info colors as a ThemeExtension
          ├─ theme_mode_controller_test.dart   # tests that changing ThemeMode notifies the listeners
          ├─ theme_mode_store_test.dart        # tests storing the mode choice through Storage and the behavior without Storage
-         ├─ theme_mode_switcher_test.dart     # tests that choosing System, Light, or Dark changes ThemeMode
          ├─ contrast_test.dart                # tests the text-to-background contrast ratio
          └─ theme_golden_test.dart            # tests the light and dark color swatches against the goldens
 ```
@@ -1490,7 +1472,6 @@ extensions/l10n/                            # localization extension: locale, me
       │  ├─ locale_formatters.dart           # formats dates, numbers, and currencies according to the locale
       │  ├─ failure_messages.dart            # maps a FailureCode to a friendly ARB getter
       │  └─ widgets/                         # ready-made widget for choosing a language
-      │     └─ language_switcher.dart        # shows the language choices for changing the app locale
       └─ test/extensions/l10n/              # l10n extension tests generated into the user app
          ├─ l10n_test.dart                    # tests the ARB delegate, placeholders, and plurals per locale
          ├─ l10n_module_test.dart             # tests that the module registers the localization configuration with the Registry
@@ -1500,7 +1481,6 @@ extensions/l10n/                            # localization extension: locale, me
          ├─ locale_store_test.dart            # tests storing the locale choice through Storage and the behavior without Storage
          ├─ locale_formatters_test.dart       # tests date, number, and currency formatting according to the locale
          ├─ failure_messages_test.dart        # tests that every FailureCode has a friendly ARB message
-         ├─ language_switcher_test.dart       # tests that choosing a language changes the app locale
          └─ l10n_coverage_test.dart           # tests that keys and ARB metadata match in every language
 ```
 
@@ -1537,7 +1517,6 @@ extensions/permission/
       │  ├─ permission_module.dart                  # registers the Permissions implementation with the Registry
       │  ├─ device_permissions.dart                 # Permissions contract implementation on top of PermissionGateway
       │  ├─ permission_config.dart                  # typed configuration: active kinds, default rationale text
-      │  ├─ permission_gateway.dart                 # wraps permission_handler (SdkPermissionGateway) so it can be faked in tests
       │  ├─ permission_failure_mapper.dart          # maps plugin errors into Failure(permission or unavailable)
       │  ├─ permission_kind_guard.dart              # rejects a kind that is not enabled with Failure(configuration) instead of a native crash
       │  ├─ permission_flow.dart                    # runs ensure(kind): status, rationale, request, to settings when permanently denied
@@ -1545,7 +1524,6 @@ extensions/permission/
       │  ├─ permission_status_cache.dart            # reduces repeated platform calls, the cache is cleared on onResume
       │  ├─ permission_resume_observer.dart         # rechecks the status after the user returns from settings (Lifecycle)
       │  └─ widgets/                                # ready-made permission widgets: gate and dialogs
-      │     ├─ permission_gate.dart                 # shows the child only when granted, otherwise the fallback
       │     ├─ permission_rationale_dialog.dart     # dialog explaining the reason for the permission before the system prompt appears
       │     └─ open_settings_dialog.dart            # dialog pointing the user to settings when the permission is permanently denied
       └─ test/extensions/permission/                # tests rendered into the app that run there
@@ -1558,8 +1536,6 @@ extensions/permission/
          ├─ permission_group_test.dart              # tests requesting several kinds at once and merging their results
          ├─ permission_status_cache_test.dart       # tests that the status is cached and cleared on onResume
          ├─ permission_resume_observer_test.dart    # tests rechecking the status after the user returns from settings
-         ├─ permission_gate_test.dart               # tests that PermissionGate shows the child only when granted
-         ├─ permission_dialogs_test.dart            # tests the text and actions of the rationale dialog and the open settings dialog
          └─ permissions_contract_test.dart          # runs the Permissions contract suite from kiln_testing against this implementation
 ```
 
@@ -1592,8 +1568,6 @@ extensions/connectivity/
       │  ├─ reconnect_trigger.dart                  # runs deferred actions when the status changes to online
       │  ├─ offline_guard_middleware.dart           # http.interceptors middleware (when: http_pipeline), fails fast with Failure(network) when offline
       │  └─ widgets/                                # ready-made widgets for showing network status
-      │     ├─ offline_banner.dart                  # shows a banner while offline, hidden while the status is still unknown
-      │     └─ network_status_builder.dart          # builds the widget according to the current NetworkStatus
       └─ test/extensions/connectivity/              # tests rendered into the app that run there
          ├─ device_network_monitor_test.dart        # tests that the NetworkMonitor status and stream follow the fake gateway
          ├─ connectivity_module_test.dart           # tests that the module registers NetworkMonitor with the Registry
@@ -1603,8 +1577,6 @@ extensions/connectivity/
          ├─ status_stabilizer_test.dart             # tests that flapping Wi-Fi is damped according to the debounce window
          ├─ reconnect_trigger_test.dart             # tests that deferred actions run when the status changes to online
          ├─ offline_guard_middleware_test.dart      # tests that requests fail fast with Failure(network) when offline
-         ├─ offline_banner_test.dart                # tests that the banner appears when offline and is hidden while the status is unknown
-         ├─ network_status_builder_test.dart        # tests that the builder is called according to NetworkStatus
          └─ connectivity_contract_test.dart         # runs the NetworkMonitor contract suite from kiln_testing against this implementation
 ```
 
@@ -1690,8 +1662,6 @@ extensions/image_picker/
       │  ├─ picked_image_x.dart                     # extensions on PickedImage: toImageProvider and a readable size ("1,2 MB")
       │  ├─ picked_image_upload_adapter.dart        # turns PickedImage into FileStorage input, both types from kiln_core
       │  └─ widgets/                                # ready-made widgets for picking images
-      │     ├─ image_source_sheet.dart              # bottom sheet for choosing the image source, camera or gallery
-      │     └─ avatar_picker.dart                   # round avatar that can be replaced, presenting Failure in a friendly way
       └─ test/extensions/image_picker/              # tests rendered into the app that run there
          ├─ device_media_picker_test.dart           # tests that the image picked from the fake gateway becomes the MediaPicker result
          ├─ image_picker_module_test.dart           # tests that the module registers MediaPicker with the Registry
@@ -1703,8 +1673,6 @@ extensions/image_picker/
          ├─ lost_data_recovery_test.dart            # tests recovering the picked result after the Android activity is destroyed
          ├─ picked_image_x_test.dart                # tests toImageProvider and the readable size format ("1,2 MB")
          ├─ picked_image_upload_adapter_test.dart   # tests that PickedImage is turned into the correct FileStorage input
-         ├─ image_source_sheet_test.dart            # tests the bottom sheet choosing the camera or gallery source
-         ├─ avatar_picker_test.dart                 # tests that the avatar changes after picking and Failure is presented in a friendly way
          └─ media_picker_contract_test.dart         # runs the MediaPicker contract suite from kiln_testing against this implementation
 ```
 
@@ -1764,7 +1732,6 @@ extensions/env/
       │  ├─ env_x.dart  # reads Env values as uri(key), duration(key), and enumValue(key)
       │  ├─ env_describe.dart  # builds an Env summary for logs and debugging, secret values masked
       │  └─ widgets/  # debug widgets for the env extension
-      │     └─ env_debug_page.dart  # shows the env debug page only for non-production flavors
       └─ test/extensions/env/  # unit and widget tests for the env extension in the user app
          ├─ build_env_test.dart  # tests that BuildEnv reads build-time values according to the Env contract
          ├─ env_module_test.dart  # tests that the module registers Env with the Registry
@@ -1772,7 +1739,6 @@ extensions/env/
          ├─ env_validator_test.dart  # tests that all missing required keys are reported together in one Failure
          ├─ env_x_test.dart  # tests that uri, duration, and enumValue parse Env values correctly
          ├─ env_describe_test.dart  # tests that the Env summary masks secret values
-         ├─ env_debug_page_test.dart  # tests that the debug page only appears in non-production flavors
          └─ env_example_files_test.dart  # tests that every schema key exists in all the sample files
 ```
 
@@ -1804,13 +1770,11 @@ extensions/flavors/
       │  └─ extensions/flavors/  # flavors extension Dart code in the user app
       │     ├─ app_flavors.dart  # defines the app flavor list from the AppFlavor contract
       │     ├─ flavors_module.dart  # registers FlavorBanner with the app.wrappers slot
-      │     ├─ flavor_banner.dart  # shows a DEV or STG ribbon in the screen corner, not in production
       │     ├─ release_guard.dart  # reports non-production release builds through Logger, asserts in debug
       │     └─ flavor_x.dart  # picks a value per flavor through flavor.when(development: ..., production: ...)
       └─ test/extensions/flavors/  # unit and widget tests for the flavors extension in the user app
          ├─ app_flavors_test.dart  # tests that the flavor list and its values follow the AppFlavor contract
          ├─ flavors_module_test.dart  # tests that the module registers FlavorBanner with the app.wrappers slot
-         ├─ flavor_banner_test.dart  # tests that the ribbon appears in development and staging, not production
          ├─ release_guard_test.dart  # tests that non-production release builds are reported through Logger
          ├─ flavor_x_test.dart  # tests that flavor.when picks the branch matching the flavor
          └─ launch_config_test.dart  # tests that launch.json is valid and points at existing main files
@@ -1850,7 +1814,6 @@ extensions/logger/
       │  ├─ log_exporter.dart  # collects the memory and file logs, already masked, for sharing
       │  ├─ http_log_middleware.dart  # contribution to http.interceptors (when: [http_pipeline]) that logs method, URL, status, duration
       │  └─ widgets/  # debug widgets for the logger extension
-      │     └─ debug_log_page.dart  # shows the log screen from MemoryLogSink, non-production flavors only
       └─ test/extensions/logger/  # unit and widget tests for the logger extension in the user app
          ├─ console_logger_test.dart  # tests that ConsoleLogger prints logs according to level
          ├─ logger_module_test.dart  # tests that the module registers AppLogger with the Registry
@@ -1864,7 +1827,6 @@ extensions/logger/
          ├─ log_level_controller_test.dart  # tests that the level can be changed at runtime only in non-production
          ├─ log_exporter_test.dart  # tests that memory and file logs are exported in masked form
          ├─ http_log_middleware_test.dart  # tests that the Authorization header is masked and the body is not logged
-         ├─ debug_log_page_test.dart  # tests that the page shows the MemoryLogSink contents in non-production
          └─ logger_contract_test.dart  # runs the AppLogger contract suite from kiln_testing against this implementation
 ```
 

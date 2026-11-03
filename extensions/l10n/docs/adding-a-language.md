@@ -25,7 +25,7 @@ Follow these steps when adding a new language, for example French (`fr`).
    enabled.
 
 5. Add the native language name to the `_languageNames` map in
-   `widgets/language_switcher.dart` if it is not there yet.
+   `L10nConfig.supportedLocales`; the application renders its own picker.
 6. Run the tests:
 
    ```bash

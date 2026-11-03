@@ -15,34 +15,17 @@ The `router.routes` slot is opened by the module. Slot items are of type
 
 ## Default routes
 
-`AppRoutes` holds the extension's route paths and names:
+`AppRoutes` holds the default locations:
 
 - `/` with the name `home`
-- `/explore` with the name `explore`
 - `/sign-in` with the name `signIn`
 
-Only `/sign-in` is always registered. The auth redirect and the sample `/` and
-`/explore` shell are opt-in:
-
-```dart
-registry.registerSingleton<AppRouterConfig>(
-  const AppRouterConfig(
-    includeSampleShell: true,
-    enableAuthRedirect: true,
-  ),
-);
-```
-
-With the defaults (`false`/`false`) the router resolves only the routes the
+`/sign-in` is registered only when the application registers a
+`SignInPageBuilder`. With the defaults the router resolves only the routes the
 application contributes, which keeps auth policy and navigation structure in
 the app.
 
-When `includeSampleShell` is `true`, replace the contents of `_HomeTab` and
-`_ExploreTab` in `shell_scaffold.dart`, or replace the whole
-`buildShellRoute()` with the app's shell. Leave the switch off to skip the
-sample routes entirely.
-
-To claim `/` without the demo shell, contribute a route through the slot:
+Claim `/` by contributing a route through the slot:
 
 ```dart
 registry.read<SlotRegistry>().open<AppRoute>(SlotNames.routerRoutes).add(
@@ -56,8 +39,8 @@ registry.read<SlotRegistry>().open<AppRoute>(SlotNames.routerRoutes).add(
 
 ## Custom sign-in page
 
-`SignInPageBuilder` replaces the built-in sign-in page when
-`enableAuthRedirect` is on. Register both before `GoRouterModule.register`:
+`SignInPageBuilder` supplies the sign-in page when `enableAuthRedirect` is on.
+Register both before `GoRouterModule.register`:
 
 ```dart
 final class AppSignInPage implements SignInPageBuilder {
@@ -151,5 +134,6 @@ final config = AppRouterConfig(
 );
 ```
 
-If `errorBuilder` is not set, `NotFoundPage` is displayed. Do not enable
-`debugLogDiagnostics` in release builds.
+The application supplies `errorBuilder`; the extension does not ship an error
+screen. When it is omitted, go_router renders its own default error page. Do
+not enable `debugLogDiagnostics` in release builds.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `ThemeModeSwitcher`. The extension exposes theme data and the mode controller; applications render their own appearance controls.
+
 ## 0.1.1
 
 - Add `ThemeConfig.validate` and `ThemeSupport` with seed, density, and

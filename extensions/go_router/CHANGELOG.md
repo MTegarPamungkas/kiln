@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Removed the bundled not found page, sample shell, and default sign-in page. The application supplies an error builder and sign-in page; enabling auth redirect now requires a `SignInPageBuilder`.
+
 ## 0.2.1
 
 - Add `GoRouterSupport` with the initial location, route count, auth redirect,

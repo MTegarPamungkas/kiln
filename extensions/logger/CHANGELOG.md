@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `DebugLogPage`. Applications read log sinks and render their own log viewer.
+
 ## 0.1.1
 
 - Add `LoggerSupport` with file-sink and sink configuration details.

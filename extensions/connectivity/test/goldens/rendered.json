@@ -11,8 +11,6 @@
     "lib/extensions/connectivity/reachability_probe.dart": "d47b4c98eadb3efe7b946a8886beaffde7896a1da57a0dd1f1c69537f9d8c3bc",
     "lib/extensions/connectivity/reconnect_trigger.dart": "2ccda1203c56108a61ec9b409632dd93767f67d339ece0ae0aae5fc6d172f7b3",
     "lib/extensions/connectivity/status_stabilizer.dart": "93f9f72fa1a6b59197c9033fd53555d1efc1fa981e72b874e26ce323b518e81b",
-    "lib/extensions/connectivity/widgets/network_status_builder.dart": "7c8a48291b647c74c7c5cffd0d34ca602416fad1797810d73e6aada242d077ce",
-    "lib/extensions/connectivity/widgets/offline_banner.dart": "bbc8a45d1e9a7ffff56d6d46fdaf4199e703bad98dc72bfa32fe38dc6f449520",
     "test/extensions/connectivity/connectivity_config_test.dart": "cdc598ffde26fd062d5e0d79c5bc0db87973f7e3f8dd0bffe5c3b041bfe878b4",
     "test/extensions/connectivity/connectivity_contract_test.dart": "324ad191482353c4aa1283990cadd569bdc2f6ebf48fd946c31badcc4d3a027a",
     "test/extensions/connectivity/connectivity_failure_mapper_test.dart": "de913c46b5e26dcd3e84106b638e20e43a8659d089035545144a754738faeff7",
@@ -23,7 +21,6 @@
     "test/extensions/connectivity/reachability_probe_test.dart": "2fc9b7dec93d6aebb9d0d51623459bf2e3c766200b29f19c8a5676dbbe83f7af",
     "test/extensions/connectivity/reconnect_trigger_test.dart": "d48474b25d3683b3dadaa4b24d7ed5db10e2646510c4c2bfc7a08744087c2556",
     "test/extensions/connectivity/status_stabilizer_test.dart": "a7fdb42e50936a9f2f20290d616e3bc42adfc38fd80e1d638c0bac30793daef3",
-    "test/extensions/connectivity/test_support.dart": "40918fff2af1316fc46d56a3058d177adda60e34102914050016a139ab76136c",
-    "test/extensions/connectivity/widgets_test.dart": "9380df62667a369f4be6586942c435bbce639f6f774f4892d83ba2253b69e4fa"
+    "test/extensions/connectivity/test_support.dart": "40918fff2af1316fc46d56a3058d177adda60e34102914050016a139ab76136c"
   }
 }

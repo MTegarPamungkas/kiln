@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T18:48:52.669962Z",
+  "generated_at": "2026-11-03T19:15:46.306477Z",
   "extensions": [
     {
       "id": "analytics",
@@ -175,7 +175,7 @@
       "name": "Bloc state management",
       "description": "State management with Bloc and Cubit.",
       "category": "state",
-      "latest": "0.1.3",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -225,6 +225,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/bloc-0.2.0.tgz",
+          "sha256": "b0667b376c7d9bf2947e03166d01fb30a1dfc752cea8d96b7c89d3fe736a49fc",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -255,7 +267,7 @@
       "name": "Connectivity",
       "description": "Network status monitoring and an offline guard middleware.",
       "category": "connectivity",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -274,6 +286,18 @@
           "version": "0.1.1",
           "url": "archives/connectivity-0.1.1.tgz",
           "sha256": "bad170dcb52b388909ae743d7ef392396181fc85fced8c1f107fd5ced3e69e9e",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/connectivity-0.2.0.tgz",
+          "sha256": "a12ba63179acb28c235b4ec2fa9ee805d241845b6ac119391d5ca301df159368",
           "provides": [
             "connectivity"
           ],
@@ -410,7 +434,7 @@
       "name": "Environment",
       "description": "Typed build-time configuration from --dart-define values.",
       "category": "config",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -429,6 +453,18 @@
           "version": "0.1.1",
           "url": "archives/env-0.1.1.tgz",
           "sha256": "fc755f335699e6b27a5a0f8324e0a63da35655ac723f98cf643b4def1ce3f1ac",
+          "provides": [
+            "env"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/env-0.2.0.tgz",
+          "sha256": "560f63d06a58c8bc482a7e71a445046511fbc3d0335d2ba8b214a349c2c58956",
           "provides": [
             "env"
           ],
@@ -502,7 +538,7 @@
       "name": "Flavors",
       "description": "Dart-level app flavors, entry points, and launch configurations.",
       "category": "flavor",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -521,6 +557,18 @@
           "version": "0.1.1",
           "url": "archives/flavors-0.1.1.tgz",
           "sha256": "6a637605919d0f8212427c6ec3851f36c984b473da50520f1cef334e6bc5b19a",
+          "provides": [
+            "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/flavors-0.2.0.tgz",
+          "sha256": "14a69ee9b85b2face339d87d270cb0ae06768e0ee02572fe6c23b65c043e9bbf",
           "provides": [
             "flavor"
           ],
@@ -570,7 +618,7 @@
       "name": "GoRouter",
       "description": "Declarative routing with route slots, guards, and deep link mapping.",
       "category": "navigation",
-      "latest": "0.2.1",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -613,6 +661,18 @@
           "version": "0.2.1",
           "url": "archives/go_router-0.2.1.tgz",
           "sha256": "7767015adb9e82c137948d95ae4b9983ef43721584ddb1e6938210db57be57cd",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/go_router-0.3.0.tgz",
+          "sha256": "a0148962e3b03bb5daa4cb16995be89208be75ac43bcfc9df1e9024217ca9d62",
           "provides": [
             "navigation"
           ],
@@ -706,7 +766,7 @@
       "name": "Image picker",
       "description": "Camera and gallery image picking with validation and upload handoff.",
       "category": "media",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -732,6 +792,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/image_picker-0.2.0.tgz",
+          "sha256": "d13411ffd239f663508214b153e73c5496360c103b9fafc1a6521d7c4d717ab6",
+          "provides": [
+            "media"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -740,7 +812,7 @@
       "name": "Localization",
       "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
       "category": "l10n",
-      "latest": "0.1.5",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -814,6 +886,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/l10n-0.2.0.tgz",
+          "sha256": "5f9d938b0f23bdf6ad58973f8ab3fd2c0b014d5ac32e2b09bc6402aae28da323",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -856,7 +940,7 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -875,6 +959,18 @@
           "version": "0.1.1",
           "url": "archives/logger-0.1.1.tgz",
           "sha256": "ae4126200e873f3feb238711dc819d2c759457e0ed85a79fe63fae262a7fdc43",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/logger-0.2.0.tgz",
+          "sha256": "2badafac2825752005ac4b8b52db123b6c1129fab34bff995b4921667e0d38db",
           "provides": [
             "logger"
           ],
@@ -960,7 +1056,7 @@
       "name": "Permission",
       "description": "Typed permission checks and requests with rationale flow.",
       "category": "platform",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -979,6 +1075,18 @@
           "version": "0.1.1",
           "url": "archives/permission-0.1.1.tgz",
           "sha256": "91d275d374a299018f0b6ca488ae63f378629b7c3918277327aba7afae977fee",
+          "provides": [
+            "permission"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/permission-0.2.0.tgz",
+          "sha256": "ee152e0411327160da2289796f4bae11580a523872b26b8062a2c046fe673ca3",
           "provides": [
             "permission"
           ],
@@ -1052,7 +1160,7 @@
       "name": "Riverpod state management",
       "description": "State management with Riverpod providers and Notifier.",
       "category": "state",
-      "latest": "0.1.2",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -1083,6 +1191,18 @@
           "version": "0.1.2",
           "url": "archives/riverpod-0.1.2.tgz",
           "sha256": "a0a8cab375e3e2e2b832c40df57f44493b2c75cfd5a9d9b3618cc4a35ca556de",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/riverpod-0.2.0.tgz",
+          "sha256": "53de5993271e147e242dcbcf1e2e99f79453ec407a86bbf4008621ecabf88784",
           "provides": [
             "state_riverpod"
           ],
@@ -1166,7 +1286,7 @@
       "name": "Social login",
       "description": "Google and Apple credential sign-in for a social auth backend.",
       "category": "social",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -1188,6 +1308,21 @@
           "version": "0.1.1",
           "url": "archives/social_login-0.1.1.tgz",
           "sha256": "71668362df843fd54c73e0fae291c78f2f3b3e0f2fd989ab3ed52ab71f2dc66f",
+          "requires": [
+            "social_auth"
+          ],
+          "provides": [
+            "social_login"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/social_login-0.2.0.tgz",
+          "sha256": "ec9521dabea2c947cfdee7db1a0eff8fd13ed12034b8d25a04f89a34240aa3af",
           "requires": [
             "social_auth"
           ],
@@ -1310,7 +1445,7 @@
       "name": "Theme",
       "description": "Brand color, typography, design tokens, and light or dark mode for Kiln apps.",
       "category": "theme",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -1329,6 +1464,18 @@
           "version": "0.1.1",
           "url": "archives/theme-0.1.1.tgz",
           "sha256": "84dda6be348f36e58d7e7c370623e99ff95b0355e19a01ca65c5fe95c5977eed",
+          "provides": [
+            "theme"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/theme-0.2.0.tgz",
+          "sha256": "c456a133d4998bad03aeb82a32a543c68ce53db40b6edac0afe6eb1c15dfe704",
           "provides": [
             "theme"
           ],

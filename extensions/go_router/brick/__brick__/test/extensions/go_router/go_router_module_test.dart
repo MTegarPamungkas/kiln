@@ -61,21 +61,13 @@ void main() {
   test('honours an application supplied config', () {
     TestWidgetsFlutterBinding.ensureInitialized();
     final registry = GetItRegistry();
-    const config = AppRouterConfig(includeSampleShell: false);
+    const config = AppRouterConfig(debugLogDiagnostics: true);
     registry.registerSingleton<AppRouterConfig>(config);
 
     GoRouterModule().register(registry);
 
     expect(registry.read<AppRouterConfig>(), same(config));
-    expect(
-      registry
-          .read<AppRouter>()
-          .router
-          .configuration
-          .routes
-          .whereType<ShellRoute>(),
-      isEmpty,
-    );
+    expect(registry.read<AppRouter>().config, same(config));
   });
 
   testWidgets('connects deep links during ready', (tester) async {
@@ -86,21 +78,28 @@ void main() {
         initialStatus: SessionStatus.authenticated,
       ),
     );
+    registry
+        .read<SlotRegistry>()
+        .open<AppRoute>(SlotNames.routerRoutes)
+        .add(
+          AppRoute(
+            path: AppRoutes.home,
+            name: AppRoutes.homeName,
+            builder: (BuildContext context) => const SizedBox.shrink(),
+          ),
+        );
     final module = GoRouterModule();
-    registry.registerSingleton<AppRouterConfig>(
-      const AppRouterConfig(includeSampleShell: true),
-    );
     module.register(registry);
     module.ready(registry);
 
     final router = registry.read<RouterConfig<Object>>() as GoRouter;
     await pumpRouter(tester, router);
-    deepLinks.emit(Uri.parse('https://example.com/explore'));
+    deepLinks.emit(Uri.parse('https://example.com/'));
     await tester.pumpAndSettle();
 
     expect(
       router.routerDelegate.currentConfiguration.uri.path,
-      AppRoutes.explore,
+      AppRoutes.home,
     );
 
     await tester.pumpWidget(const SizedBox.shrink());

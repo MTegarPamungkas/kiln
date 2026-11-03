@@ -16,8 +16,6 @@ void main() {
         'lib/extensions/riverpod/riverpod_module.dart',
         'lib/core/riverpod/kiln_providers.dart',
         'lib/core/riverpod/session_notifier.dart',
-        'lib/features/counter/counter_provider.dart',
-        'lib/features/counter/counter_page.dart',
       ]),
     );
     final module = files.firstWhere(

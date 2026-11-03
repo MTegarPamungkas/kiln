@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `ImageSourceSheet` and `AvatarPicker`. Applications call `MediaPicker` and build their own picker UI.
+
 ## 0.1.1
 
 - Add `MediaPickerSupport` with per-source platform/device checks.

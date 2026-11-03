@@ -23,7 +23,6 @@ void main() {
         'lib/extensions/env/env_validator.dart',
         'lib/extensions/env/env_x.dart',
         'lib/extensions/env/env_describe.dart',
-        'lib/extensions/env/widgets/env_debug_page.dart',
         'test/extensions/env/env_x_test.dart',
       ]),
     );

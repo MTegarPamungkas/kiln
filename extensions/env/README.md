@@ -8,7 +8,7 @@ Typed build-time configuration from `--dart-define`.
   `Failure(configuration)`.
 - `EnvX` provides `uri`, `duration`, `boolValue`, and `enumValue` readers.
 - `EnvDescribe` redacts secret values for logs.
-- `EnvDebugPage` only appears in non-production flavors.
+- Applications can render their own debug view from `Env` and `EnvDescribe`.
 
 The keys available today are `api_base_url`, `api_key`, `feature_flags`, and
 `enable_debug_tools`. See [docs/env.md](docs/env.md) for adding keys.

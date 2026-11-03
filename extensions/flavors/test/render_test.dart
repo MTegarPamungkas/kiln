@@ -18,7 +18,6 @@ void main() {
         'lib/main_production.dart',
         'lib/extensions/flavors/app_flavors.dart',
         'lib/extensions/flavors/flavors_module.dart',
-        'lib/extensions/flavors/flavor_banner.dart',
         'lib/extensions/flavors/release_guard.dart',
         'lib/extensions/flavors/flavor_x.dart',
         'test/extensions/flavors/launch_config_test.dart',

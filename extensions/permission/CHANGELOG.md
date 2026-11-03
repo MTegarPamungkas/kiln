@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `PermissionGate` and the permission dialogs. Applications request permissions through `Permissions` and render their own rationale UI.
+
 ## 0.1.1
 
 - Add `PermissionSupport` and report platform/device support through

@@ -23,8 +23,6 @@ void main() {
         'lib/extensions/image_picker/lost_data_recovery.dart',
         'lib/extensions/image_picker/picked_image_x.dart',
         'lib/extensions/image_picker/picked_image_upload_adapter.dart',
-        'lib/extensions/image_picker/widgets/image_source_sheet.dart',
-        'lib/extensions/image_picker/widgets/avatar_picker.dart',
         'test/extensions/image_picker/media_picker_contract_test.dart',
       ]),
     );

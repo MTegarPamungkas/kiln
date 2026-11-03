@@ -22,11 +22,18 @@ final apiUrl = flavor.valueFor<String>(
 );
 ```
 
-## Banner
+## Flavor indicator
 
-`FlavorBanner` shows a DEV or STG ribbon in the top-left corner. Production
-shows no ribbon. The module adds the banner through the `app.wrappers` slot,
-so `app_shell.dart` does not need to be edited.
+The extension exposes the active `AppFlavor` as data; it does not add a banner.
+Applications that want an indicator wrap their shell themselves:
+
+```dart
+Banner(
+  location: BannerLocation.topStart,
+  message: flavor == AppFlavor.production ? '' : flavor.label,
+  child: app,
+)
+```
 
 ## Release guard
 

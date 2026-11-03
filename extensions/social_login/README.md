@@ -9,7 +9,7 @@ installed `SocialAuth` backend.
 - `SocialAvailability` filters providers by platform.
 - `SocialSignOutListener` signs out the Google session when `AuthRepository`
   calls signOut.
-- `SocialLoginButtons` and `SocialLoginPanel` are ready to use.
+- Applications render their own provider buttons and call `SocialLogin`.
 
 Google setup: [docs/google-setup.md](docs/google-setup.md). Apple setup:
 [docs/apple-setup.md](docs/apple-setup.md).

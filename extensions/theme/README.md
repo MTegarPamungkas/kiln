@@ -13,7 +13,7 @@ tokens, semantic colors, and light or dark mode control.
 - `AppSpacing`, `AppRadius`, and `SemanticColors` are available as
   `ThemeExtension`s; quick access through `context.spacing`, `context.radii`, and
   `context.semantic`.
-- `ThemeModeSwitcher` shows the System, Light, and Dark options.
+- The application renders its own appearance controls and calls the controller.
 
 ## Install
 
@@ -39,7 +39,16 @@ final primary = context.colors.primary;
 ```
 
 ```dart
-ThemeModeSwitcher(controller: registry.read<ThemeModeController>())
+SegmentedButton<ThemeMode>(
+  segments: const <ButtonSegment<ThemeMode>>[
+    ButtonSegment(value: ThemeMode.system, label: Text('System')),
+    ButtonSegment(value: ThemeMode.light, label: Text('Light')),
+    ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+  ],
+  selected: <ThemeMode>{registry.read<ThemeModeController>().mode},
+  onSelectionChanged: (Set<ThemeMode> selection) =>
+      registry.read<ThemeModeController>().setMode(selection.first),
+)
 ```
 
 Full documentation is in [docs/theme.md](docs/theme.md),

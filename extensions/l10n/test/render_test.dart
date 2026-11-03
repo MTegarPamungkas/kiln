@@ -27,7 +27,6 @@ void main() {
         'lib/extensions/l10n/localized_core_copy.dart',
         'lib/extensions/l10n/locale_formatters.dart',
         'lib/extensions/l10n/failure_messages.dart',
-        'lib/extensions/l10n/widgets/language_switcher.dart',
         'test/extensions/l10n/l10n_test.dart',
         'test/extensions/l10n/l10n_module_test.dart',
         'test/extensions/l10n/l10n_config_test.dart',
@@ -36,7 +35,6 @@ void main() {
         'test/extensions/l10n/locale_store_test.dart',
         'test/extensions/l10n/locale_formatters_test.dart',
         'test/extensions/l10n/failure_messages_test.dart',
-        'test/extensions/l10n/language_switcher_test.dart',
         'test/extensions/l10n/l10n_coverage_test.dart',
       ]),
     );

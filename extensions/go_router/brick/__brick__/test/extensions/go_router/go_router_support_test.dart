@@ -9,7 +9,6 @@ void main() {
       config: AppRouterConfig(
         initialLocation: '/home',
         enableAuthRedirect: true,
-        includeSampleShell: true,
       ),
       routeCount: 4,
     );
@@ -20,7 +19,6 @@ void main() {
     expect(info.details['initial_location'], '/home');
     expect(info.details['routes'], 4);
     expect(info.details['auth_redirect'], isTrue);
-    expect(info.details['sample_shell'], isTrue);
   });
 
   test('rejects an initial location without a leading slash', () {

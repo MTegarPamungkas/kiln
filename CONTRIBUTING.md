@@ -36,6 +36,8 @@ dart run tool/bundle.dart --check
 - Never edit files owned by the user. `remove` deletes only files whose hash
   still matches.
 - Extensions never import another extension; use slots.
+- Extensions expose data, contracts, and wiring only. Screens, widgets, dialogs,
+  and copy belong to the application.
 - Code comments are in English; UI text follows the product language.
 
 ## Dependencies

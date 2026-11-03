@@ -39,5 +39,5 @@ scale, the `NavigationBar` height, and component padding.
   `context.semantic`.
 - `AppThemeConfig` is still registered by `ThemeModule`; do not register a second
   `AppThemeConfig`.
-- `ThemeModeSwitcher` and `ThemeModeController` do not depend on prompt values,
+- `ThemeModeController` does not depend on prompt values,
   so rebranding does not change the mode behavior.

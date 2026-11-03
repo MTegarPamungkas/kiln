@@ -17,8 +17,6 @@ void main() {
         'lib/core/bloc/base_cubit.dart',
         'lib/core/bloc/async_cubit.dart',
         'lib/core/bloc/session_cubit.dart',
-        'lib/features/counter/counter_cubit.dart',
-        'lib/features/counter/counter_page.dart',
       ]),
     );
     final module = files.firstWhere(

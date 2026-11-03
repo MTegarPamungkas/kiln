@@ -68,8 +68,8 @@ appRouter.router.routerDelegate.currentConfiguration.uri.path
 
 ## Limitations
 
-- Only links already known to the router are displayed; the rest go to
-  `NotFoundPage`.
+- Only links already known to the router are displayed; the rest go to the
+  application `errorBuilder`.
 - Path parameters must be declared on `AppRoute.path`, for example
   `/orders/:id`.
 - Deep links do not bypass guards; redirects still apply, including to

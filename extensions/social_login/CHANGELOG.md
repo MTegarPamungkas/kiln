@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `SocialLoginButtons` and `SocialLoginPanel`. Applications call `SocialLogin` and render their own sign-in buttons.
+
 ## 0.1.1
 
 - Add `SocialLoginSupport` with per-provider platform/configuration support.

@@ -11,6 +11,8 @@ The foundation phase runs end-to-end:
 
 - `kiln create` generates a minimal application root from the `app_basic`
   brick; `--template app` adds the starter page and demo shell.
+- Extensions never render UI. They expose typed data, contracts, and wiring;
+  the application owns screens, widgets, navigation structure, and copy.
 - Every extension reports runtime platform/device/config support through
   `SupportRegistry`. Unsupported extensions return typed information and do not
   block startup. See

@@ -12,27 +12,16 @@ import 'package:{{app_name}}/extensions/go_router/sign_in_page_builder.dart';
 import 'test_support.dart';
 
 void main() {
-  testWidgets('builds the shell from the initial location', (tester) async {
-    final registry = createTestRegistry(
-      sessionController: SessionController(
-        initialStatus: SessionStatus.authenticated,
-      ),
-    );
-    final appRouter = AppRouter(
-      registry: registry,
-      config: const AppRouterConfig(includeSampleShell: true),
-    );
+  testWidgets('builds the router from application routes', (tester) async {
+    final registry = _registry(signedIn: true);
+    _addRoute(registry, AppRoutes.home, 'home', const Text('Beranda'));
+
+    final appRouter = AppRouter(registry: registry);
 
     expect(appRouter.router, isA<GoRouter>());
     await pumpRouter(tester, appRouter.router);
 
-    expect(find.byKey(const Key('home-tab')), findsOneWidget);
-    final routes = appRouter.router.configuration.routes;
-    expect(routes.whereType<ShellRoute>(), isNotEmpty);
-    expect(
-      routes.whereType<GoRoute>().map((GoRoute route) => route.path),
-      contains(AppRoutes.signIn),
-    );
+    expect(find.text('Beranda'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await appRouter.dispose();
@@ -41,22 +30,9 @@ void main() {
   testWidgets('includes routes contributed through router.routes', (
     tester,
   ) async {
-    final registry = createTestRegistry(
-      sessionController: SessionController(
-        initialStatus: SessionStatus.authenticated,
-      ),
-    );
-    registry
-        .read<SlotRegistry>()
-        .open<AppRoute>(SlotNames.routerRoutes)
-        .add(
-          AppRoute(
-            path: '/orders/:id',
-            name: 'order',
-            builder: (BuildContext context) =>
-                const Scaffold(body: Text('Detail pesanan')),
-          ),
-        );
+    final registry = _registry(signedIn: true);
+    _addRoute(registry, '/orders/:id', 'order', const Text('Detail pesanan'));
+
     final appRouter = AppRouter(registry: registry);
 
     expect(
@@ -81,20 +57,16 @@ void main() {
   });
 
   testWidgets('honours the configured initial location', (tester) async {
-    final registry = createTestRegistry(
-      sessionController: SessionController(
-        initialStatus: SessionStatus.authenticated,
-      ),
+    final registry = _registry(signedIn: true);
+    _addRoute(registry, '/explore', 'explore', const Text('Jelajah'));
+    final appRouter = AppRouter(
+      registry: registry,
+      config: const AppRouterConfig(initialLocation: '/explore'),
     );
-    const config = AppRouterConfig(
-      initialLocation: AppRoutes.explore,
-      includeSampleShell: true,
-    );
-    final appRouter = AppRouter(registry: registry, config: config);
 
     await pumpRouter(tester, appRouter.router);
 
-    expect(find.byKey(const Key('explore-tab')), findsOneWidget);
+    expect(find.text('Jelajah'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await appRouter.dispose();
@@ -106,25 +78,25 @@ void main() {
     final session = SessionController(
       initialStatus: SessionStatus.unauthenticated,
     );
-    final registry = createTestRegistry(sessionController: session);
+    final registry = _registry(session: session);
+    _addRoute(registry, AppRoutes.home, AppRoutes.homeName, const Text('Home'));
+    registry.registerSingleton<SignInPageBuilder>(const _CustomSignInBuilder());
+
     final appRouter = AppRouter(
       registry: registry,
-      config: const AppRouterConfig(
-        includeSampleShell: true,
-        enableAuthRedirect: true,
-      ),
+      config: const AppRouterConfig(enableAuthRedirect: true),
     );
 
     await pumpRouter(tester, appRouter.router);
-    expect(find.byKey(const Key('sign-in-page')), findsOneWidget);
+    expect(find.byKey(const Key('custom-sign-in')), findsOneWidget);
 
     session.setSession(const AuthSession(userId: 'user-1'));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('home-tab')), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
 
     session.markUnauthenticated();
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('sign-in-page')), findsOneWidget);
+    expect(find.byKey(const Key('custom-sign-in')), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await appRouter.dispose();
@@ -137,23 +109,20 @@ void main() {
       initialLink: Uri.parse('https://example.com/explore'),
     );
     final notifications = FakeNotifications();
-    final registry = createTestRegistry(
+    final registry = _registry(
+      signedIn: true,
       deepLinks: deepLinks,
       notifications: notifications,
-      sessionController: SessionController(
-        initialStatus: SessionStatus.authenticated,
-      ),
     );
-    final appRouter = AppRouter(
-      registry: registry,
-      config: const AppRouterConfig(includeSampleShell: true),
-    );
+    _addRoute(registry, '/explore', 'explore', const Text('Jelajah'));
+    _addRoute(registry, AppRoutes.home, AppRoutes.homeName, const Text('Home'));
+    final appRouter = AppRouter(registry: registry);
 
     appRouter.start();
     await pumpRouter(tester, appRouter.router);
     expect(
       appRouter.router.routerDelegate.currentConfiguration.uri.path,
-      AppRoutes.explore,
+      '/explore',
     );
 
     notifications.emitTap('{"route":"/"}');
@@ -167,14 +136,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       appRouter.router.routerDelegate.currentConfiguration.uri.path,
-      AppRoutes.explore,
-    );
-
-    deepLinks.emit(Uri.parse('mailto:halo@example.com'));
-    await tester.pumpAndSettle();
-    expect(
-      appRouter.router.routerDelegate.currentConfiguration.uri.path,
-      AppRoutes.explore,
+      '/explore',
     );
 
     expect(deepLinks.disposed, isFalse);
@@ -182,109 +144,85 @@ void main() {
     await appRouter.dispose();
   });
 
-  testWidgets('renders the registered sign-in page builder', (tester) async {
-    final registry = createTestRegistry(
-      sessionController: SessionController(
-        initialStatus: SessionStatus.unauthenticated,
+  testWidgets('throws when auth redirect has no sign-in page', (tester) async {
+    final registry = _registry(signedIn: false);
+
+    expect(
+      () => AppRouter(
+        registry: registry,
+        config: const AppRouterConfig(enableAuthRedirect: true),
       ),
+      throwsStateError,
     );
-    registry.registerSingleton<SignInPageBuilder>(const _CustomSignInBuilder());
-    final appRouter = AppRouter(
-      registry: registry,
-      config: const AppRouterConfig(enableAuthRedirect: true),
-    );
-
-    await pumpRouter(tester, appRouter.router);
-
-    expect(find.byKey(const Key('custom-sign-in')), findsOneWidget);
-    expect(find.byKey(const Key('sign-in-page')), findsNothing);
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    await appRouter.dispose();
   });
 
-  testWidgets('defaults to application-owned routing', (tester) async {
-    final registry = createTestRegistry(
-      sessionController: SessionController(
-        initialStatus: SessionStatus.unauthenticated,
-      ),
-    );
-    registry
-        .read<SlotRegistry>()
-        .open<AppRoute>(SlotNames.routerRoutes)
-        .add(
-          AppRoute(
-            path: AppRoutes.home,
-            name: AppRoutes.homeName,
-            builder: (BuildContext context) =>
-                const Scaffold(body: Text('Halaman aplikasi')),
-          ),
-        );
+  testWidgets('omits the sign-in route without a builder', (tester) async {
+    final registry = _registry(signedIn: true);
+    _addRoute(registry, AppRoutes.home, AppRoutes.homeName, const Text('Home'));
+
     final appRouter = AppRouter(registry: registry);
 
     expect(
-      appRouter.router.configuration.routes.whereType<ShellRoute>(),
-      isEmpty,
+      appRouter.router.configuration.routes.whereType<GoRoute>().map(
+        (GoRoute route) => route.path,
+      ),
+      isNot(contains(AppRoutes.signIn)),
     );
-
-    await pumpRouter(tester, appRouter.router);
-    expect(find.text('Halaman aplikasi'), findsOneWidget);
-    expect(find.byKey(const Key('sign-in-page')), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await appRouter.dispose();
   });
 
-  testWidgets('omits the sample shell when it is disabled', (tester) async {
-    final registry = createTestRegistry(
-      sessionController: SessionController(
-        initialStatus: SessionStatus.authenticated,
+  testWidgets('uses the application supplied error page', (tester) async {
+    final registry = _registry(signedIn: true);
+    final appRouter = AppRouter(
+      registry: registry,
+      config: AppRouterConfig(
+        initialLocation: '/tidak-ada',
+        errorBuilder: (BuildContext context, GoRouterState state) =>
+            const Scaffold(body: Text('Tidak ditemukan', key: Key('app-error'))),
       ),
     );
-    registry
-        .read<SlotRegistry>()
-        .open<AppRoute>(SlotNames.routerRoutes)
-        .add(
-          AppRoute(
-            path: AppRoutes.home,
-            name: AppRoutes.homeName,
-            builder: (BuildContext context) =>
-                const Scaffold(body: Text('Beranda aplikasi')),
-          ),
-        );
-    final appRouter = AppRouter(
-      registry: registry,
-      config: const AppRouterConfig(includeSampleShell: false),
-    );
-
-    expect(
-      appRouter.router.configuration.routes.whereType<ShellRoute>(),
-      isEmpty,
-    );
 
     await pumpRouter(tester, appRouter.router);
-    expect(find.text('Beranda aplikasi'), findsOneWidget);
+
+    expect(find.byKey(const Key('app-error')), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await appRouter.dispose();
   });
+}
 
-  testWidgets('shows the not found page for an unknown location', (
-    tester,
-  ) async {
-    final registry = GetItRegistry();
-    final appRouter = AppRouter(
-      registry: registry,
-      config: const AppRouterConfig(initialLocation: '/tidak-ada'),
-    );
+Registry _registry({
+  SessionController? session,
+  bool signedIn = false,
+  FakeDeepLinks? deepLinks,
+  FakeNotifications? notifications,
+}) {
+  return createTestRegistry(
+    sessionController:
+        session ??
+        SessionController(
+          initialStatus: signedIn
+              ? SessionStatus.authenticated
+              : SessionStatus.unauthenticated,
+        ),
+    deepLinks: deepLinks,
+    notifications: notifications,
+  );
+}
 
-    await pumpRouter(tester, appRouter.router);
-
-    expect(find.byKey(const Key('not-found-page')), findsOneWidget);
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    await appRouter.dispose();
-  });
+void _addRoute(Registry registry, String path, String name, Widget child) {
+  registry
+      .read<SlotRegistry>()
+      .open<AppRoute>(SlotNames.routerRoutes)
+      .add(
+        AppRoute(
+          path: path,
+          name: name,
+          builder: (BuildContext context) => Scaffold(body: child),
+        ),
+      );
 }
 
 final class _CustomSignInBuilder implements SignInPageBuilder {

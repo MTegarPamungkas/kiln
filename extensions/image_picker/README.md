@@ -15,7 +15,7 @@ An implementation of `MediaPicker` from `kiln_core` on top of the
   destroyed.
 - `PickedImageUploadAdapter` turns `PickedImage` into `FileUpload` for
   `FileStorage`; the adapter is only registered when that contract exists.
-- `ImageSourceSheet` and `AvatarPicker` are ready to use in the UI.
+- Applications choose camera or gallery in their own UI and call `MediaPicker`.
 
 Platform limits and native notes are in
 [docs/platform-notes.md](docs/platform-notes.md). The upload flow is in

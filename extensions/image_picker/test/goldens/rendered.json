@@ -13,8 +13,6 @@
     "lib/extensions/image_picker/mime_sniffer.dart": "e176e4a44eb818881ca98e291109a96110230b2f80f37150f96d8f3639443d99",
     "lib/extensions/image_picker/picked_image_upload_adapter.dart": "7cd48c1031504e49e1eaf22a310c19394c46e33188144bcc9ce935e8126d83dc",
     "lib/extensions/image_picker/picked_image_x.dart": "50730decf91fcd7defae2427a397b8e6b923d1d239e2df1237c6c425b8e2050d",
-    "lib/extensions/image_picker/widgets/avatar_picker.dart": "df90cd20ef3551d2c0644454ee0d5f6e1efe4b918fa8ac5dfb7dcf03186b2233",
-    "lib/extensions/image_picker/widgets/image_source_sheet.dart": "8166753ba6f93630aafe468e8669db04943d4364e6bbc31f379a50ec504af3ad",
     "test/extensions/image_picker/camera_permission_precheck_test.dart": "f5438c012dffe54449984b0dfc1ff605b7673a18f5aa83235ca91c55fa4aa4bc",
     "test/extensions/image_picker/device_media_picker_test.dart": "e601fdf949b4d7208b8ebc45b21a3cd5f052e16b946adb987c01fe8fc9a7b669",
     "test/extensions/image_picker/image_picker_module_test.dart": "037666472c0714c7996a8868d507d5bca91d4555349f7229cbae210e540aa461",
@@ -27,7 +25,6 @@
     "test/extensions/image_picker/mime_sniffer_test.dart": "4957db098b164cc209c87a1583e46e5756e0d4512b0bdbe3db37a1c18c966607",
     "test/extensions/image_picker/picked_image_upload_adapter_test.dart": "925261b5791881fbdf7b44ef32544ed11afa875eee0ea24ba5d641e97c647a74",
     "test/extensions/image_picker/picked_image_x_test.dart": "5db5e4b743001949f617f72467ab487339f420de9e6469c6d4f8bc03efc4f52d",
-    "test/extensions/image_picker/test_support.dart": "25c24f0be7d9bab5228b115f39d7044bf90b29c1d9b522b7c3d6f352cf4e8edc",
-    "test/extensions/image_picker/widgets_test.dart": "376d5e19a7a12b053eca88b8890c529808fa6f176a6f2e2603c7afb484b6d18d"
+    "test/extensions/image_picker/test_support.dart": "25c24f0be7d9bab5228b115f39d7044bf90b29c1d9b522b7c3d6f352cf4e8edc"
   }
 }

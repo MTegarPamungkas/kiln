@@ -10,14 +10,12 @@ import 'auth_redirect.dart';
 import 'deep_link_route_mapper.dart';
 import 'navigation_observer.dart';
 import 'notification_route_mapper.dart';
-import 'not_found_page.dart';
 import 'route_guard.dart';
 import 'route_slot.dart';
 import 'route_transitions.dart';
 import 'router_config.dart';
 import 'session_refresh_listenable.dart';
 import 'sign_in_page_builder.dart';
-import 'shell_scaffold.dart';
 
 /// Owns the application [GoRouter] and its optional integrations.
 ///
@@ -47,6 +45,12 @@ final class AppRouter {
         const <AppRoute>[];
 
     final signInBuilder = registry.readOrNull<SignInPageBuilder>();
+    if (config.enableAuthRedirect && session != null && signInBuilder == null) {
+      throw StateError(
+        'AppRouterConfig.enableAuthRedirect requires the application to '
+        'register a SignInPageBuilder.',
+      );
+    }
 
     final routeGuards = <RouteGuard>[
       if (config.enableAuthRedirect && session != null) const AuthRedirect(),
@@ -70,22 +74,20 @@ final class AppRouter {
                 ),
               );
             },
-      errorBuilder:
-          config.errorBuilder ??
-          (BuildContext context, GoRouterState state) => const NotFoundPage(),
+      errorBuilder: config.errorBuilder,
       routes: <RouteBase>[
-        if (config.includeSampleShell) buildShellRoute(),
-        GoRoute(
-          path: AppRoutes.signIn,
-          name: AppRoutes.signInName,
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            return buildRoutePage(
-              state: state,
-              platform: Theme.of(context).platform,
-              child: signInBuilder?.build(context) ?? const _SignInPage(),
-            );
-          },
-        ),
+        if (signInBuilder != null)
+          GoRoute(
+            path: AppRoutes.signIn,
+            name: AppRoutes.signInName,
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              return buildRoutePage(
+                state: state,
+                platform: Theme.of(context).platform,
+                child: signInBuilder.build(context),
+              );
+            },
+          ),
         ...RouteSlot.toGoRoutes(slotRoutes),
       ],
     );
@@ -162,42 +164,5 @@ final class AppRouter {
       return;
     }
     router.go(location);
-  }
-}
-
-class _SignInPage extends StatelessWidget {
-  const _SignInPage();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      key: const Key('sign-in-page'),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.lock_outline_rounded,
-                size: 56,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 20),
-              Text('Masuk', style: theme.textTheme.headlineMedium),
-              const SizedBox(height: 8),
-              Text(
-                'Silakan masuk untuk melanjutkan.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

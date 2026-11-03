@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `LanguageSwitcher`. The extension exposes the locale controller and supported locales; applications render their own language picker.
+
 ## 0.1.5
 
 - Add `L10nSupport` with locale, fallback, and preference-storage details.

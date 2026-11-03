@@ -16,7 +16,6 @@ Brick contents:
 - `provider_overrides.dart` — Registry overrides for tests.
 - `async_value_x.dart` — concise failure/data access.
 - `session_notifier.dart` — wraps `SessionController`.
-- counter feature example.
 
 ## Runtime support
 

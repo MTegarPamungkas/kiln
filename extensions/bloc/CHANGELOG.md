@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed the counter demo cubit and page. The extension keeps the Bloc observer, session cubit, and provider wiring.
+
 ## 0.1.3
 
 - Add `BlocSupport` with observer and app-wrapper details.

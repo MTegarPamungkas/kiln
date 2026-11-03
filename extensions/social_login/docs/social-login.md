@@ -20,15 +20,19 @@ if (credential != null) {
 - Apple is available natively on iOS and macOS. Android and the web require an
   `apple_service_id` and an `apple_redirect_uri` registered with Apple.
 
-The UI panel only shows providers that are active, supported by the platform,
-and already configured:
+The application renders its own buttons, showing only providers that are
+active, supported by the platform, and configured:
 
 ```dart
-SocialLoginPanel(
-  login: registry.read<SocialLogin>(),
-  availability: registry.read<SocialAvailability>(),
-  config: registry.read<SocialLoginConfig>(),
-)
+final login = registry.read<SocialLogin>();
+final availability = registry.read<SocialAvailability>();
+
+for (final provider in availability.providers) {
+  FilledButton(
+    onPressed: () => login.signIn(provider),
+    child: Text(provider.label),
+  );
+}
 ```
 
 ## Nonce

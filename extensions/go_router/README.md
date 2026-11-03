@@ -14,12 +14,11 @@ fills the `RouterConfig<Object>` seam read by `app_shell.dart`, so
   notification payloads into route locations.
 - `NavigationObserver` logs navigation to `AppLogger` and sends screens to
   `Analytics` when the contract is available.
-- `NotFoundPage`, `ShellScaffold`, and `route_transitions.dart` provide optional
-  starter UI. The sample shell is off by default.
-- `SignInPageBuilder` replaces the built-in sign-in page while keeping the auth
-  guard.
-- `AppRouterConfig.includeSampleShell` adds the starter `/` and `/explore`
-  routes when an app explicitly wants the demo shell.
+- `route_transitions.dart` supplies page transitions as data; screens stay in
+  the application.
+- `SignInPageBuilder` supplies the application sign-in page. Enabling the auth
+  redirect requires it.
+- `AppRouterConfig.errorBuilder` supplies the application not found page.
 
 ## Install
 
@@ -60,21 +59,23 @@ Do not require the `navigation` capability from a module that contributes
 routes: required capabilities are registered first, so the router would be
 built before those routes exist.
 
-## Replacing the sign-in page and starter shell
+## Sign-in page and errors
 
 Register `SignInPageBuilder` to render the app's login screen on `/sign-in` and
-turn on the guard explicitly, because auth policy is app-owned:
+enable the guard explicitly, because auth policy and UI are app-owned:
 
 ```dart
 registry.registerSingleton<SignInPageBuilder>(const AppSignInPage());
 registry.registerSingleton<AppRouterConfig>(
-  const AppRouterConfig(enableAuthRedirect: true),
+  const AppRouterConfig(
+    enableAuthRedirect: true,
+    errorBuilder: (context, state) => const AppErrorPage(),
+  ),
 );
 ```
 
-`includeSampleShell` defaults to `false`. Set it to `true` only when you want
-the starter two-tab demo; otherwise contribute the app's own `/` route through
-the slot.
+The extension ships no sign-in page, shell, or not found page. Without a
+`SignInPageBuilder`, `enableAuthRedirect` throws during router creation.
 
 ## Navigating from a widget
 

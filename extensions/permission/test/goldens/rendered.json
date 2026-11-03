@@ -12,8 +12,6 @@
     "lib/extensions/permission/permission_resume_observer.dart": "9da133f73bc828eb152ee3b760f64111ca5e5b2ff91b2612b5285f9aaff0708b",
     "lib/extensions/permission/permission_status_cache.dart": "26180d34d859dfe13cf42c6a5780565bf1199d0b40cd710105f632254bc1f25a",
     "lib/extensions/permission/permission_support.dart": "a220efdb6ff7c81440a95ca6db05c30b3fc5889ccb13968dece9866628aa522d",
-    "lib/extensions/permission/widgets/permission_dialogs.dart": "3878fdb61e15db3faf86dde5ee9ad99f308dc32e8b2c99f734e70db48d9138bf",
-    "lib/extensions/permission/widgets/permission_gate.dart": "0e9b288064d6abfdfbd9bf9241cde245ca96c6337d06e077b3c4f8e992a9f358",
     "test/extensions/permission/device_permissions_test.dart": "e9540f28d7fea88193c8e76523ffe1ca51c2d50e1d41bbc8a3b04e6f32ca0e3c",
     "test/extensions/permission/permission_flow_test.dart": "ac5f9930ea5b293ec7988d5c9d71b9a2676e17388e3d656d42227d7d15c5354f",
     "test/extensions/permission/permission_group_test.dart": "f448a56cb63987c8913677dac076b1f553f78d74bcf1f844c49ca8c9f94a6003",
@@ -23,7 +21,6 @@
     "test/extensions/permission/permission_status_cache_test.dart": "624f58541e26f2d21ababb50026c2af4c231af01ebfee7a324893ac8abbb32cb",
     "test/extensions/permission/permission_support_test.dart": "ad729c7d0cf909c8eade88a4b5ac1053ca8da12a216cec60b17de36eed06f2a3",
     "test/extensions/permission/permissions_contract_test.dart": "fc6e70442b06d6064ec9e4b3a186f56c709bb0129df1844501665f8aaf4a0260",
-    "test/extensions/permission/test_support.dart": "fd650e40dd729a4e1fa1d8a32dd1d0335895b76f0e9210b2ec9972194d5f43a1",
-    "test/extensions/permission/widgets_test.dart": "44bda3d4f27a1a21e2fae7fb99ca7392a4de14eb4ef3ca7e185fbbc07c4fd676"
+    "test/extensions/permission/test_support.dart": "fd650e40dd729a4e1fa1d8a32dd1d0335895b76f0e9210b2ec9972194d5f43a1"
   }
 }

@@ -33,10 +33,19 @@ If the `storage` extension is installed, `ThemeModeStore` writes the
 `theme.mode` key through `Storage`. Without storage, persistence is skipped and
 mode switching still works while the app process is running.
 
-`ThemeModeSwitcher` is ready to be placed on a settings page:
+The application renders its own appearance control. For example:
 
 ```dart
-ThemeModeSwitcher(controller: controller)
+SegmentedButton<ThemeMode>(
+  segments: const <ButtonSegment<ThemeMode>>[
+    ButtonSegment(value: ThemeMode.system, label: Text('System')),
+    ButtonSegment(value: ThemeMode.light, label: Text('Light')),
+    ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+  ],
+  selected: <ThemeMode>{controller.mode},
+  onSelectionChanged: (Set<ThemeMode> selection) =>
+      controller.setMode(selection.first),
+)
 ```
 
 ## High contrast

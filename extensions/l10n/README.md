@@ -8,7 +8,7 @@ Localization extension for Kiln with ARB file translation sources and
   `LocaleController`, the generated delegates, and `FailureMessages`.
 - `LocaleController` stores the locale choice; `null` means follow the device
   locale. The choice is persisted through `Storage` when the `storage` extension is installed.
-- `LanguageSwitcher` displays the languages from `L10nConfig.supportedLocales`.
+- The application renders its own language picker from `L10nConfig.supportedLocales`.
 - `LocaleFormatters` provides date, number, and currency formats.
 
 ## Install
@@ -35,12 +35,12 @@ Text(l10n.helloName('Ana'));
 Text(l10n.itemsCount(3));
 ```
 
-Changing the language from the UI:
+Changing the language from an application-owned control:
 
 ```dart
 final controller = registry.read<LocaleController>();
 
-LanguageSwitcher(controller: controller);
+await controller.setLocale(const Locale('id'));
 ```
 
 Failure messages are applied automatically when `FailurePresenter.fromRegistry` is used:

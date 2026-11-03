@@ -8,7 +8,7 @@ Monitors network status and provides `offline_guard` for HTTP.
   not trigger excessive changes.
 - `ReconnectTrigger` runs pending actions when back online.
 - `OfflineGuardMiddleware` (priority 5) stops requests while offline.
-- `OfflineBanner` and `NetworkStatusBuilder` are ready to use in the UI.
+- Applications observe `NetworkMonitor` and render their own connectivity UI.
 - `ReachabilityProbe` optionally uses `HttpClient` to check the server.
 
 ## Runtime support

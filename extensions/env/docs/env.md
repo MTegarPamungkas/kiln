@@ -46,5 +46,5 @@ once, so the application does not fail one at a time.
 
 ## Debug
 
-`EnvDebugPage` shows the active keys and masks secret values. This page is
-automatically hidden in the production flavor.
+Applications can render their own debug view from `Env` and `EnvDescribe`;
+`EnvDescribe` returns masked values for secret keys.

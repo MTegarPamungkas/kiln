@@ -22,8 +22,6 @@ void main() {
         'lib/extensions/social_login/google_credential_gateway.dart',
         'lib/extensions/social_login/apple_credential_gateway.dart',
         'lib/extensions/social_login/social_sign_out_listener.dart',
-        'lib/extensions/social_login/widgets/social_login_buttons.dart',
-        'lib/extensions/social_login/widgets/social_login_panel.dart',
         'test/extensions/social_login/social_auth_contract_test.dart',
       ]),
     );

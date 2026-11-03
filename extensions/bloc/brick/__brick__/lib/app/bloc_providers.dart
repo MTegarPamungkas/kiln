@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/app/app_wrappers.dart';
 import 'package:{{app_name}}/core/bloc/session_cubit.dart';
-import 'package:{{app_name}}/features/counter/counter_cubit.dart';
 
 /// Wraps the application with the global Bloc providers.
 AppWrapper buildBlocAppWrapper(Registry registry) {
@@ -11,7 +10,6 @@ AppWrapper buildBlocAppWrapper(Registry registry) {
       BlocProvider<SessionCubit>(
         create: (_) => SessionCubit(registry.read<SessionController>()),
       ),
-      BlocProvider<CounterCubit>(create: (_) => CounterCubit()),
     ],
     child: child,
   );

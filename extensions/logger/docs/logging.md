@@ -56,7 +56,8 @@ as warnings, 5xx and network errors as errors, and errors are still rethrown.
 
 ## Debug and export
 
-`DebugLogPage` shows the contents of `MemoryLogSink` in non-production flavors.
+Applications render their own log viewer from `MemoryLogSink`; the extension
+does not ship a page.
 
 ```dart
 final exporter = LogExporter(

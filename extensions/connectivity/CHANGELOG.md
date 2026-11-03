@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Removed `OfflineBanner` and `NetworkStatusBuilder`. Applications observe `NetworkMonitor` and render their own connectivity UI.
+
 ## 0.1.1
 
 - Add `ConnectivitySupport` and report platform/plugin availability through

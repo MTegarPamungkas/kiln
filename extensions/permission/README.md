@@ -9,8 +9,8 @@ An implementation of `Permissions` from `kiln_core` on top of
 - `PermissionFlow` runs status, rationale, request, and directions to settings
   for permanently denied permissions.
 - `PermissionGroup` requests several permissions at once.
-- `PermissionGate`, `PermissionRationaleDialog`, and `OpenSettingsDialog` are
-  available for the UI.
+- Applications show rationale and settings prompts in their own UI; the
+  extension returns status and flow results.
 
 Native notes: Android manifest entries and the iOS Info.plist must be adjusted
 to match the selected kind. `permission_handler` does not add native entries

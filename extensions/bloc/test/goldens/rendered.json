@@ -1,7 +1,7 @@
 {
   "extension": "bloc",
   "files": {
-    "lib/app/bloc_providers.dart": "f94b09f32cfc92a4ccb04ea05697f9b3be6d6bf5d352778514dbc9c9643a9d12",
+    "lib/app/bloc_providers.dart": "97a898c3894c8f132760f27b32a79138e91cdff1c06dd23e47a083dabd67c7b1",
     "lib/core/bloc/app_bloc_observer.dart": "e1c04b4e80afbb525e4abadcee6b5b9abe330660e2df003242dfb702b6553b7e",
     "lib/core/bloc/async_cubit.dart": "3118c80691024362bb8bc86a4806c847c218f990d3f6a89f4a078a6174aecc30",
     "lib/core/bloc/async_state.dart": "7a44915cb23c7a3371ca8e3e2b2a4a6f914bd45997e6d2ec1f41d5e21bf12c68",
@@ -10,17 +10,13 @@
     "lib/core/bloc/session_cubit.dart": "2db04acbe1f15aa34d4ef37c0e9157500ba55be4186881e93c26c59faf0f5bea",
     "lib/extensions/bloc/bloc_module.dart": "7c9ab17700d37a39f7e3237ce1f0ab992a5ac035fbe906098fec282fe514bf77",
     "lib/extensions/bloc/bloc_support.dart": "ff9bc20485db9fc7e343d638413519d9caeae394b1b31f4b28aa7b8c91055374",
-    "lib/features/counter/counter_cubit.dart": "b376d0f662e83ef8eeba8bba95c5a312656dd4b34734be5719d1cb61371c58a6",
-    "lib/features/counter/counter_page.dart": "08727c5b318cebc2bd4a05e089a0f52ec8e535479cff99bf5d234b890f34e79e",
     "test/extensions/bloc/bloc_bootstrap_test.dart": "5f5f519f04912e2192bb3a483c0130a2004baa885191f2ee944f50d7273eb66c",
     "test/extensions/bloc/bloc_module_test.dart": "1734232a24e945437bc00c1e41c0525f2670f1e571eb4b4b14ad2159d0fc95b0",
-    "test/extensions/bloc/core/bloc/app_bloc_observer_test.dart": "9f61572552ce47bc64ef61689099a96044e69217bc6e611531dca117e7f6fe89",
+    "test/extensions/bloc/core/bloc/app_bloc_observer_test.dart": "d31288fae0dc1dc43fbe1bb7f140ccc8289dc02d840bb1b824dc0b33dcb008f1",
     "test/extensions/bloc/core/bloc/async_cubit_test.dart": "78bfe109279cef6371a34e3bf31e7bb4f90d5b627ef14fa08628b1a9531bd7c0",
     "test/extensions/bloc/core/bloc/async_state_test.dart": "d59e9770b0bd8d533e60d0eb95c1ea6d26278d1b5e1eae2e95e49bf01f775dd1",
     "test/extensions/bloc/core/bloc/base_cubit_test.dart": "421f6dbb2722b0d0eae84aaac181a7e84dd6b2f06ba3258672fa5bbd9a4f4673",
     "test/extensions/bloc/core/bloc/bloc_transformers_test.dart": "a8e8203a359136e0540d0fb7fd4332fa543a45699216d037901c3658c6a87140",
-    "test/extensions/bloc/core/bloc/session_cubit_test.dart": "c267a1723f761bf987e43f499cb4c2e467e27b926f69840f7033799f46b20399",
-    "test/extensions/bloc/counter_cubit_test.dart": "ba40cacd0a3952d7f8cb437fde72c9366fe4a791c842f17cc29c67583c2f764a",
-    "test/extensions/bloc/counter_page_test.dart": "4c264b0d6276fe6daf5199d50e0bb10b48d9e962a5ebd72efadf531f126719cf"
+    "test/extensions/bloc/core/bloc/session_cubit_test.dart": "c267a1723f761bf987e43f499cb4c2e467e27b926f69840f7033799f46b20399"
   }
 }
