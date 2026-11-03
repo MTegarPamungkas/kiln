@@ -1,6 +1,6 @@
 id: local_db
 name: Local database
-version: 0.1.0
+version: 0.1.1
 description: Offline-first document database backed by Sembast.
 category: database
 tier: official

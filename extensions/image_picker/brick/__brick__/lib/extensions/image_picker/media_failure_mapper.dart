@@ -6,6 +6,12 @@ Failure mapMediaError(Object error, {StackTrace? stackTrace}) {
   if (error is Failure) {
     return error;
   }
+  if (error is MissingPluginException || error is UnsupportedError) {
+    return const SupportInfo.unsupported(
+      SupportState.unsupportedPlatform,
+      message: 'Image picking is not supported on this platform.',
+    ).toFailure();
+  }
   if (error is PlatformException) {
     final code = error.code.toLowerCase();
     final message = error.message?.toLowerCase() ?? '';

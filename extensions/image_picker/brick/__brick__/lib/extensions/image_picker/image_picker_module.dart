@@ -5,6 +5,7 @@ import 'device_media_picker.dart';
 import 'image_picker_gateway.dart';
 import 'lost_data_recovery.dart';
 import 'media_picker_config.dart';
+import 'media_picker_support.dart';
 import 'picked_image_upload_adapter.dart';
 
 /// Registers MediaPicker and the optional upload adapter.
@@ -27,9 +28,11 @@ final class ImagePickerModule extends KilnModule {
   void register(Registry registry) {
     const config = MediaPickerConfig.defaults;
     final gateway = SdkImagePickerGateway();
+    final support = MediaPickerSupport.current();
     final picker = DeviceMediaPicker(
       gateway: gateway,
       config: config,
+      support: support,
       permissionPrecheck: CameraPermissionPrecheck(
         permissions: registry.readOrNull<Permissions>(),
       ),
@@ -41,6 +44,7 @@ final class ImagePickerModule extends KilnModule {
 
     registry
       ..registerSingleton<MediaPickerConfig>(config)
+      ..registerSingleton<MediaPickerSupport>(support)
       ..registerSingleton<MediaPicker>(picker)
       ..registerSingleton<LostDataRecovery>(recovery);
 
@@ -50,5 +54,10 @@ final class ImagePickerModule extends KilnModule {
         PickedImageUploadAdapter(storage: storage),
       );
     }
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<MediaPickerSupport>().overall;
   }
 }

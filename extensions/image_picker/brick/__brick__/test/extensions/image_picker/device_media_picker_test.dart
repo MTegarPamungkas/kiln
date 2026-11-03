@@ -6,6 +6,7 @@ import 'package:kiln_testing/kiln_testing.dart';
 import 'package:{{app_name}}/extensions/image_picker/camera_permission_precheck.dart';
 import 'package:{{app_name}}/extensions/image_picker/device_media_picker.dart';
 import 'package:{{app_name}}/extensions/image_picker/media_picker_config.dart';
+import 'package:{{app_name}}/extensions/image_picker/media_picker_support.dart';
 
 import 'test_support.dart';
 
@@ -40,6 +41,7 @@ void main() {
     final gateway = FakeImagePickerGateway()..file = _jpegFile();
     final picker = DeviceMediaPicker(
       gateway: gateway,
+      support: const MediaPickerSupport(platform: TargetPlatform.android),
       permissionPrecheck: CameraPermissionPrecheck(permissions: permissions),
     );
 
@@ -58,7 +60,10 @@ void main() {
   test('maps plugin failures', () async {
     final gateway = FakeImagePickerGateway()
       ..failure = PlatformException(code: 'camera_access_denied');
-    final picker = DeviceMediaPicker(gateway: gateway);
+    final picker = DeviceMediaPicker(
+      gateway: gateway,
+      support: const MediaPickerSupport(platform: TargetPlatform.android),
+    );
 
     await expectLater(
       picker.pickImage(source: MediaSource.camera),
@@ -89,11 +94,7 @@ void main() {
       throwsA(
         isA<Failure>()
             .having((failure) => failure.code, 'code', FailureCode.mediaInvalid)
-            .having(
-              (failure) => failure.kind,
-              'kind',
-              FailureKind.validation,
-            ),
+            .having((failure) => failure.kind, 'kind', FailureKind.validation),
       ),
     );
   });

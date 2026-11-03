@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T13:56:43.010916Z",
+  "generated_at": "2026-11-03T14:22:58.212696Z",
   "extensions": [
     {
       "id": "analytics",
@@ -482,13 +482,25 @@
       "name": "Image picker",
       "description": "Camera and gallery image picking with validation and upload handoff.",
       "category": "media",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/image_picker-0.1.0.tgz",
           "sha256": "cedcfb4b43d0b2250b4b4e1a2889fc0786ffbe25152f44f8597d6f2309b33a18",
+          "provides": [
+            "media"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/image_picker-0.1.1.tgz",
+          "sha256": "d9eb0849d6e9322e224fd8917ed5b1eb70365eaf89d160bc8f2646b2ba7aa535",
           "provides": [
             "media"
           ],
@@ -574,13 +586,25 @@
       "name": "Local database",
       "description": "Offline-first document database backed by Sembast.",
       "category": "database",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/local_db-0.1.0.tgz",
           "sha256": "691c8f7c7204c92c87f6d43f6ce2a84acb76deeb61742616a420de26cd8769da",
+          "provides": [
+            "local_db"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/local_db-0.1.1.tgz",
+          "sha256": "6ec6d4806f5076962add1e1595f5dcfeb311d10903145e15f80540dc72893bb8",
           "provides": [
             "local_db"
           ],
@@ -798,13 +822,25 @@
       "name": "Secure storage",
       "description": "Keychain and Keystore storage for secrets and tokens.",
       "category": "storage",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/secure_storage-0.1.0.tgz",
           "sha256": "141a53c7de95f9be5d5f8cd71425a431d9fc5b0ee0ce21db90f82fcde8ed1cbd",
+          "provides": [
+            "secure_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/secure_storage-0.1.1.tgz",
+          "sha256": "fb5ebd2aafb0265e56bd3b88b1574bacecfe96147d81660924420441a1ae0a5a",
           "provides": [
             "secure_storage"
           ],

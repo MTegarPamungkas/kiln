@@ -8,6 +8,7 @@ final class FakeSecureStorageGateway implements SecureStorageGateway {
 
   final Map<String, String> values;
   bool failReads = false;
+  Object? readAllError;
 
   @override
   Future<void> clear() async {
@@ -28,8 +29,13 @@ final class FakeSecureStorageGateway implements SecureStorageGateway {
   }
 
   @override
-  Future<Map<String, String>> readAll() async =>
-      Map<String, String>.unmodifiable(values);
+  Future<Map<String, String>> readAll() async {
+    final error = readAllError;
+    if (error != null) {
+      throw error;
+    }
+    return Map<String, String>.unmodifiable(values);
+  }
 
   @override
   Future<void> write(String key, String value) async {

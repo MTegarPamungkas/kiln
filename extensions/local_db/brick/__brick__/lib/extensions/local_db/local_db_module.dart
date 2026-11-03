@@ -2,6 +2,7 @@ import 'package:kiln_core/kiln_core.dart';
 
 import 'database_encryption.dart';
 import 'local_database_opener.dart';
+import 'local_database_support.dart';
 import 'local_db_config.dart';
 import 'sembast_local_database.dart';
 
@@ -19,8 +20,10 @@ final class LocalDbModule extends KilnModule {
   void register(Registry registry) {
     const config = LocalDbConfig.defaults;
     const encryption = DatabaseEncryption();
+    final support = LocalDatabaseSupport(config: config);
     registry
       ..registerSingleton<LocalDbConfig>(config)
+      ..registerSingleton<LocalDatabaseSupport>(support)
       ..registerSingleton<LocalDatabase>(
         SembastLocalDatabase(
           opener: () async {
@@ -33,5 +36,10 @@ final class LocalDbModule extends KilnModule {
           },
         ),
       );
+  }
+
+  @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<LocalDatabaseSupport>().check();
   }
 }

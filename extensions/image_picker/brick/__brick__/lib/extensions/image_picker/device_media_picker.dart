@@ -6,6 +6,7 @@ import 'image_picker_gateway.dart';
 import 'image_validator.dart';
 import 'media_failure_mapper.dart';
 import 'media_picker_config.dart';
+import 'media_picker_support.dart';
 import 'mime_sniffer.dart';
 
 /// [MediaPicker] on top of an ImagePickerGateway.
@@ -15,11 +16,14 @@ final class DeviceMediaPicker implements MediaPicker {
     this.config = MediaPickerConfig.defaults,
     ImageValidator? validator,
     this.permissionPrecheck,
-  }) : validator = validator ?? ImageValidator(config: config);
+    MediaPickerSupport? support,
+  }) : validator = validator ?? ImageValidator(config: config),
+       support = support ?? MediaPickerSupport.current();
 
   final ImagePickerGateway gateway;
   final ImageValidator validator;
   final CameraPermissionPrecheck? permissionPrecheck;
+  final MediaPickerSupport support;
   final MediaPickerConfig config;
 
   @override
@@ -29,6 +33,10 @@ final class DeviceMediaPicker implements MediaPicker {
     int? maxHeight,
     int? imageQuality,
   }) async {
+    final supportInfo = support.forSource(source);
+    if (!supportInfo.isSupported) {
+      throw supportInfo.toFailure();
+    }
     try {
       await permissionPrecheck?.ensure(source);
       final file = await gateway.pickImage(
