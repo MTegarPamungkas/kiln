@@ -1,6 +1,6 @@
 id: riverpod
 name: Riverpod state management
-version: 0.1.1
+version: 0.1.2
 description: State management with Riverpod providers and Notifier.
 category: state
 tier: official

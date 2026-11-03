@@ -8,6 +8,7 @@ import 'package:{{app_name}}/core/l10n/core_copy.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'failure_messages.dart';
 import 'l10n_config.dart';
+import 'l10n_support.dart';
 import 'locale_controller.dart';
 import 'locale_formatters.dart';
 import 'locale_store.dart';
@@ -40,6 +41,9 @@ final class L10nModule extends KilnModule {
 
     registry
       ..registerSingleton<L10nConfig>(config)
+      ..registerSingleton<L10nSupport>(
+        L10nSupport(config: config, persisted: store != null),
+      )
       ..registerSingleton<LocaleController>(controller)
       ..registerSingleton<FailureMessages>(messages)
       ..registerSingleton<CoreCopy>(const LocalizedCoreCopy())
@@ -55,6 +59,11 @@ final class L10nModule extends KilnModule {
     if (store != null) {
       registry.registerSingleton<LocaleStore>(store);
     }
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<L10nSupport>().info;
   }
 
   @override

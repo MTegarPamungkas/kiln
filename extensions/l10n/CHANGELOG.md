@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+- Add `L10nSupport` with locale, fallback, and preference-storage details.
+
 ## 0.1.4
 
 - Map `support.unsupported_platform` and `support.unsupported_device` to a

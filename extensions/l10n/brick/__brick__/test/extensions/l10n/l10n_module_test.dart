@@ -10,6 +10,7 @@ import 'package:{{app_name}}/core/l10n/core_copy.dart';
 import 'package:{{app_name}}/extensions/l10n/failure_messages.dart';
 import 'package:{{app_name}}/extensions/l10n/l10n_config.dart';
 import 'package:{{app_name}}/extensions/l10n/l10n_module.dart';
+import 'package:{{app_name}}/extensions/l10n/l10n_support.dart';
 import 'package:{{app_name}}/extensions/l10n/locale_controller.dart';
 import 'package:{{app_name}}/extensions/l10n/locale_store.dart';
 import 'package:{{app_name}}/extensions/l10n/localized_core_copy.dart';
@@ -32,6 +33,7 @@ void main() {
     expect(app.localeListenable, same(controller.localeListenable));
     expect(app.delegates, contains(AppLocalizations.delegate));
     expect(registry.read<FailureMessages>(), isA<L10nFailureMessages>());
+    expect(registry.read<L10nSupport>(), isA<L10nSupport>());
     expect(registry.read<CoreCopy>(), isA<LocalizedCoreCopy>());
   });
 

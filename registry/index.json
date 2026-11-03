@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T15:42:21.286762Z",
+  "generated_at": "2026-11-03T15:51:23.036656Z",
   "extensions": [
     {
       "id": "analytics",
@@ -672,7 +672,7 @@
       "name": "Localization",
       "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
       "category": "l10n",
-      "latest": "0.1.4",
+      "latest": "0.1.5",
       "tier": "official",
       "versions": [
         {
@@ -727,6 +727,18 @@
           "version": "0.1.4",
           "url": "archives/l10n-0.1.4.tgz",
           "sha256": "04cd920a70e1563648ab05d658488863c42e90df2ede9671b7246ce88f4fe347",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.5",
+          "url": "archives/l10n-0.1.5.tgz",
+          "sha256": "ab9d8f03e2353ad0d38088f96e90f9e8677d3fc851d277c964fd9a200e4bb327",
           "provides": [
             "l10n"
           ],
@@ -972,7 +984,7 @@
       "name": "Riverpod state management",
       "description": "State management with Riverpod providers and Notifier.",
       "category": "state",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -991,6 +1003,18 @@
           "version": "0.1.1",
           "url": "archives/riverpod-0.1.1.tgz",
           "sha256": "09ce3c235c5ce159f674ee6bb0f2497d231c5fbddca465f5f4c4bc7c982d67a0",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/riverpod-0.1.2.tgz",
+          "sha256": "cffa3559395f262879d1b631f6f7051151b2456861f4cd0244d52117e1f1f0f7",
           "provides": [
             "state_riverpod"
           ],
