@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T13:23:43.281784Z",
+  "generated_at": "2026-11-03T13:56:43.010916Z",
   "extensions": [
     {
       "id": "analytics",
@@ -67,7 +67,7 @@
       "name": "Biometric",
       "description": "Biometric authentication, app lock, and protected storage.",
       "category": "security",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -110,6 +110,18 @@
           "version": "0.1.3",
           "url": "archives/biometric-0.1.3.tgz",
           "sha256": "5b2ce808668d713c5d0938830080be229fa33b2c2e50502167ff3ccdce8563e5",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/biometric-0.1.4.tgz",
+          "sha256": "bd32f0e19c8401631393e7f6ffa7d5d05788bbb71a39ccf683738491df7bf36f",
           "provides": [
             "biometric"
           ],
@@ -492,7 +504,7 @@
       "name": "Localization",
       "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
       "category": "l10n",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -535,6 +547,18 @@
           "version": "0.1.3",
           "url": "archives/l10n-0.1.3.tgz",
           "sha256": "9da9bbedcdd56ea7b64339dfaed7c73dc95d7ec5c028396f36ec4bc2ac86d7e4",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/l10n-0.1.4.tgz",
+          "sha256": "04cd920a70e1563648ab05d658488863c42e90df2ede9671b7246ce88f4fe347",
           "provides": [
             "l10n"
           ],
@@ -594,7 +618,7 @@
       "name": "Notifications",
       "description": "Local notifications with channels, scheduling, and tap routing.",
       "category": "notifications",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -644,6 +668,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/notifications-0.1.4.tgz",
+          "sha256": "842583eb71d24f5cdce1ad214b2912a9ce71e6783cb744a3251e1f48cb2c63a2",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -652,13 +688,25 @@
       "name": "Permission",
       "description": "Typed permission checks and requests with rationale flow.",
       "category": "platform",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/permission-0.1.0.tgz",
           "sha256": "6a2354e4e11bd5246375375bd66ce29897170cb10d69c5b0937b0311e5ffd467",
+          "provides": [
+            "permission"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/permission-0.1.1.tgz",
+          "sha256": "9e73125a9ed46fbc066cfe86371ed9575c3f7a5d4dd58e2c32f21839fdeb1dc1",
           "provides": [
             "permission"
           ],

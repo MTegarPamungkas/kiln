@@ -1,6 +1,6 @@
 id: permission
 name: Permission
-version: 0.1.0
+version: 0.1.1
 description: Typed permission checks and requests with rationale flow.
 category: platform
 tier: official
@@ -39,6 +39,132 @@ platforms:
   - web
   - windows
   - linux
+android:
+  compile_sdk: 37
+conditional:
+  - when:
+      kinds: camera
+    android:
+      permissions:
+        - android.permission.CAMERA
+    ios:
+      plist:
+        NSCameraUsageDescription: Take photos for your content.
+      podfile_permissions:
+        - PERMISSION_CAMERA
+    macos:
+      entitlements:
+        com.apple.security.device.camera: true
+  - when:
+      kinds: microphone
+    android:
+      permissions:
+        - android.permission.RECORD_AUDIO
+    ios:
+      plist:
+        NSMicrophoneUsageDescription: Record audio for your content.
+      podfile_permissions:
+        - PERMISSION_MICROPHONE
+    macos:
+      entitlements:
+        com.apple.security.device.audio-input: true
+  - when:
+      kinds: photos
+    android:
+      permissions:
+        - android.permission.READ_MEDIA_IMAGES
+    ios:
+      plist:
+        NSPhotoLibraryUsageDescription: Choose photos from your library.
+        NSPhotoLibraryAddUsageDescription: Save photos to your library.
+      podfile_permissions:
+        - PERMISSION_PHOTOS
+    macos:
+      entitlements:
+        com.apple.security.assets.pictures.read-write: true
+  - when:
+      kinds: notifications
+    android:
+      permissions:
+        - android.permission.POST_NOTIFICATIONS
+  - when:
+      kinds: location
+    android:
+      permissions:
+        - android.permission.ACCESS_COARSE_LOCATION
+        - android.permission.ACCESS_FINE_LOCATION
+    ios:
+      plist:
+        NSLocationWhenInUseUsageDescription: Show nearby content while you use the app.
+      podfile_permissions:
+        - PERMISSION_LOCATION
+    macos:
+      entitlements:
+        com.apple.security.personal-information.location: true
+  - when:
+      kinds: locationAlways
+    android:
+      permissions:
+        - android.permission.ACCESS_COARSE_LOCATION
+        - android.permission.ACCESS_FINE_LOCATION
+        - android.permission.ACCESS_BACKGROUND_LOCATION
+    ios:
+      plist:
+        NSLocationAlwaysAndWhenInUseUsageDescription: Remember places in the background.
+        NSLocationWhenInUseUsageDescription: Show nearby content while you use the app.
+      podfile_permissions:
+        - PERMISSION_LOCATION
+  - when:
+      kinds: contacts
+    android:
+      permissions:
+        - android.permission.READ_CONTACTS
+        - android.permission.WRITE_CONTACTS
+    ios:
+      plist:
+        NSContactsUsageDescription: Find friends from your contacts.
+      podfile_permissions:
+        - PERMISSION_CONTACTS
+    macos:
+      entitlements:
+        com.apple.security.personal-information.addressbook: true
+  - when:
+      kinds: calendar
+    android:
+      permissions:
+        - android.permission.READ_CALENDAR
+        - android.permission.WRITE_CALENDAR
+    ios:
+      plist:
+        NSCalendarsUsageDescription: Read your calendar for reminders.
+        NSCalendarsFullAccessUsageDescription: Read and write reminders.
+      podfile_permissions:
+        - PERMISSION_EVENTS
+        - PERMISSION_EVENTS_FULL_ACCESS
+    macos:
+      entitlements:
+        com.apple.security.personal-information.calendars: true
+  - when:
+      kinds: bluetooth
+    android:
+      permissions:
+        - android.permission.BLUETOOTH_SCAN
+        - android.permission.BLUETOOTH_CONNECT
+    ios:
+      plist:
+        NSBluetoothAlwaysUsageDescription: Connect to nearby devices.
+        NSBluetoothPeripheralUsageDescription: Connect to nearby devices.
+      podfile_permissions:
+        - PERMISSION_BLUETOOTH
+    macos:
+      entitlements:
+        com.apple.security.device.bluetooth: true
+  - when:
+      kinds: storage
+    android:
+      permissions:
+        - android.permission.READ_EXTERNAL_STORAGE
+        - android.permission.WRITE_EXTERNAL_STORAGE
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

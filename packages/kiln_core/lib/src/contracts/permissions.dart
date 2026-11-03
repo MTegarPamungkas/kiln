@@ -19,6 +19,9 @@ enum PermissionStatus {
   denied,
   permanentlyDenied,
   restricted,
+
+  /// The permission does not exist on this platform or device.
+  unsupported,
 }
 
 extension PermissionStatusX on PermissionStatus {
@@ -26,6 +29,8 @@ extension PermissionStatusX on PermissionStatus {
       this == PermissionStatus.granted || this == PermissionStatus.limited;
 
   bool get isPermanent => this == PermissionStatus.permanentlyDenied;
+
+  bool get isUnsupported => this == PermissionStatus.unsupported;
 }
 
 /// Checks and requests platform permissions.

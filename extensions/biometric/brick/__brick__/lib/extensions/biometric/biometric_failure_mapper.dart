@@ -33,10 +33,16 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
       cause: error,
       stackTrace: stackTrace,
     ),
-    LocalAuthExceptionCode.noBiometricHardware ||
+    LocalAuthExceptionCode.noBiometricHardware => Failure(
+      code: FailureCode.unsupportedDevice,
+      message: 'This device has no biometric hardware.',
+      kind: FailureKind.unsupported,
+      cause: error,
+      stackTrace: stackTrace,
+    ),
     LocalAuthExceptionCode.biometricHardwareTemporarilyUnavailable => Failure(
       code: FailureCode.unavailable,
-      message: 'Perangkat tidak mendukung biometrik.',
+      message: 'Biometric hardware is temporarily unavailable.',
       kind: FailureKind.unavailable,
       cause: error,
       stackTrace: stackTrace,

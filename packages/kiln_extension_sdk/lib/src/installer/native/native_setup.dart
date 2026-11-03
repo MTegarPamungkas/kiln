@@ -114,6 +114,10 @@ final class NativeSetup {
       if (minSdk != null) {
         patches.add(AndroidGradleMinSdkPatch(minSdk));
       }
+      final compileSdk = android.compileSdk;
+      if (compileSdk != null) {
+        patches.add(AndroidGradleCompileSdkPatch(compileSdk));
+      }
     }
 
     final iosDir = Directory(p.join(projectRoot.path, 'ios'));

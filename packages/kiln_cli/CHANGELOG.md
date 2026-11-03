@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.4
+
+- `kiln create` defaults to the minimal template; `--template app` restores
+  the starter page.
+- `kiln upgrade` keeps installed extensions resolvable while validating the
+  candidate, so a failed upgrade no longer leaves other extensions unknown.
+- Bundle `kiln_core` 0.1.2 and the support-aware biometric, permission,
+  notifications, and l10n extensions.
+
 ## 0.1.3
 
 - `kiln doctor` warns when an extension is disabled on some project platforms

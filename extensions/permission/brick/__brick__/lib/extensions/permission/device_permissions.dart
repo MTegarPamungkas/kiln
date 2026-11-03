@@ -4,6 +4,7 @@ import 'permission_flow.dart';
 import 'permission_gateway.dart';
 import 'permission_kind_guard.dart';
 import 'permission_status_cache.dart';
+import 'permission_support.dart';
 
 /// [Permissions] implementation backed by a PermissionGateway.
 final class DevicePermissions implements Permissions {
@@ -12,16 +13,22 @@ final class DevicePermissions implements Permissions {
     required this.flow,
     required this.cache,
     required this.guard,
+    required this.support,
   });
 
   final PermissionGateway gateway;
   final PermissionFlow flow;
   final PermissionStatusCache cache;
   final PermissionKindGuard guard;
+  final PermissionSupport support;
 
   @override
   Future<PermissionStatus> status(PermissionKind kind) async {
     guard.ensure(kind);
+    final info = await support.forKind(kind);
+    if (!info.isSupported) {
+      return PermissionStatus.unsupported;
+    }
     final cached = cache.get(kind);
     if (cached != null) {
       return cached;
@@ -34,6 +41,10 @@ final class DevicePermissions implements Permissions {
   @override
   Future<PermissionStatus> request(PermissionKind kind) async {
     guard.ensure(kind);
+    final info = await support.forKind(kind);
+    if (!info.isSupported) {
+      return PermissionStatus.unsupported;
+    }
     final status = await gateway.request(kind);
     cache.set(kind, status);
     return status;

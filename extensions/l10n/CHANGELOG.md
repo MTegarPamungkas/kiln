@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Map `support.unsupported_platform` and `support.unsupported_device` to a
+  dedicated localized message.
+
 ## 0.1.3
 
 - Failure messages now follow the platform locale when the app has no explicit

@@ -5,6 +5,7 @@ import 'package:{{app_name}}/extensions/permission/permission_flow.dart';
 import 'package:{{app_name}}/extensions/permission/permission_group.dart';
 import 'package:{{app_name}}/extensions/permission/permission_kind_guard.dart';
 import 'package:{{app_name}}/extensions/permission/permission_status_cache.dart';
+import 'package:{{app_name}}/extensions/permission/permission_support.dart';
 
 import 'test_support.dart';
 
@@ -24,13 +25,14 @@ void main() {
       gateway: gateway,
       guard: const PermissionKindGuard(config),
       cache: cache,
+      support: PermissionSupport(config: config, gateway: gateway),
     );
     final group = PermissionGroup(flow);
 
-    final results = await group.ensureAll(
-      const [PermissionKind.camera, PermissionKind.microphone],
-      requestIfDenied: false,
-    );
+    final results = await group.ensureAll(const [
+      PermissionKind.camera,
+      PermissionKind.microphone,
+    ], requestIfDenied: false);
 
     expect(results[PermissionKind.camera], PermissionStatus.granted);
     expect(results[PermissionKind.microphone], PermissionStatus.denied);

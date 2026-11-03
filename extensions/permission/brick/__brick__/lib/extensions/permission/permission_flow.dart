@@ -3,6 +3,7 @@ import 'package:kiln_core/kiln_core.dart';
 import 'permission_gateway.dart';
 import 'permission_kind_guard.dart';
 import 'permission_status_cache.dart';
+import 'permission_support.dart';
 
 typedef RationaleHandler = Future<bool> Function(PermissionKind kind);
 
@@ -12,12 +13,14 @@ final class PermissionFlow {
     required this.gateway,
     required this.guard,
     required this.cache,
+    required this.support,
     this.rationale,
   });
 
   final PermissionGateway gateway;
   final PermissionKindGuard guard;
   final PermissionStatusCache cache;
+  final PermissionSupport support;
   final RationaleHandler? rationale;
 
   Future<PermissionStatus> ensure(
@@ -25,6 +28,10 @@ final class PermissionFlow {
     bool requestIfDenied = true,
   }) async {
     guard.ensure(kind);
+    final info = await support.forKind(kind);
+    if (!info.isSupported) {
+      return PermissionStatus.unsupported;
+    }
     final cached = cache.get(kind);
     if (cached != null && cached.isGranted) {
       return cached;

@@ -98,6 +98,89 @@ final class AndroidGradleMinSdkPatch implements Patch {
   }
 }
 
+/// Raises the Android compileSdk when a plugin requires a newer API level.
+final class AndroidGradleCompileSdkPatch implements Patch {
+  const AndroidGradleCompileSdkPatch(this.compileSdk);
+
+  final int compileSdk;
+
+  @override
+  String get id => 'android.compile_sdk';
+
+  @override
+  String get description => 'Set Android compileSdk to at least $compileSdk';
+
+  @override
+  void apply(ProjectFiles files) {
+    final path = _gradleFile(files);
+    if (path == null) {
+      return;
+    }
+    var content = files.read(path);
+    if (content == null || content.contains('// kiln:compile_sdk')) {
+      return;
+    }
+
+    final kotlin = RegExp(r'compileSdk\s*=\s*([^\n]+)');
+    final groovy = RegExp(r'compileSdkVersion\s+([^\n]+)');
+    final match = kotlin.firstMatch(content) ?? groovy.firstMatch(content);
+    if (match == null) {
+      final android = RegExp(r'android\s*\{').firstMatch(content);
+      if (android == null) {
+        return;
+      }
+      final line = path.endsWith('.gradle')
+          ? '\n    compileSdkVersion $compileSdk // kiln:compile_sdk'
+          : '\n    compileSdk = $compileSdk // kiln:compile_sdk';
+      files.write(path, content.replaceRange(android.end, android.end, line));
+      return;
+    }
+    final original = match.group(1)!.trim();
+    final current = int.tryParse(original);
+    if (current != null && current >= compileSdk) {
+      return;
+    }
+    final replacement = content
+        .substring(match.start, match.end)
+        .replaceFirst(
+          match.group(1)!,
+          '$compileSdk // kiln:compile_sdk from $original',
+        );
+    files.write(
+      path,
+      content.replaceRange(match.start, match.end, replacement),
+    );
+  }
+
+  @override
+  void revert(ProjectFiles files) {
+    final path = _gradleFile(files);
+    if (path == null) {
+      return;
+    }
+    final content = files.read(path);
+    if (content == null) {
+      return;
+    }
+    final isGroovy = path.endsWith('.gradle');
+    final marker = RegExp(
+      r'[ \t]*compileSdk(?:Version)?\s*(?:=\s*)?\d+\s*// kiln:compile_sdk(?: from ([^\n]+))?[ \t]*\n?',
+    );
+    files.write(
+      path,
+      content.replaceAllMapped(marker, (match) {
+        final original = match.group(1)?.trim();
+        if (original == null) {
+          return '';
+        }
+        return isGroovy
+            ? 'compileSdkVersion $original\n'
+            : 'compileSdk = $original\n';
+      }),
+    );
+  }
+}
+
 /// Switches MainActivity to FlutterFragmentActivity.
 final class AndroidActivityPatch implements Patch {
   const AndroidActivityPatch(this.activity);

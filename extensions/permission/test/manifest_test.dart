@@ -14,5 +14,12 @@ void main() {
     expect(manifest.exclusive, isTrue);
     expect(manifest.provides, ['permission']);
     expect(manifest.prompts.single.name, 'kinds');
+    expect(manifest.platformSetup.android.compileSdk, 37);
+    expect(manifest.platformSetup.conditionals, isNotEmpty);
+    final camera = manifest.platformSetup.conditionals.firstWhere(
+      (conditional) => conditional.when['kinds'] == 'camera',
+    );
+    expect(camera.android.permissions, contains('android.permission.CAMERA'));
+    expect(camera.ios.podfilePermissions, contains('PERMISSION_CAMERA'));
   });
 }

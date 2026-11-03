@@ -9,9 +9,8 @@ void main() {
     const messages = L10nFailureMessages();
 
     test('has a friendly Indonesian message for every known code', () {
-      final fallback = lookupAppLocalizations(
-        const Locale('id'),
-      ).failureUnexpected;
+      final fallback = lookupAppLocalizations(const Locale('id'))
+          .failureUnexpected;
       for (final code in FailureCode.known) {
         final text = messages.messageFor(
           Failure(code: code, message: 'raw technical message'),
@@ -33,7 +32,10 @@ void main() {
         ),
       );
 
-      expect(text, lookupAppLocalizations(const Locale('id')).failureUnexpected);
+      expect(
+        text,
+        lookupAppLocalizations(const Locale('id')).failureUnexpected,
+      );
     });
 
     test('returns English copy when the locale resolver says en', () {
@@ -44,12 +46,13 @@ void main() {
         const Failure(code: FailureCode.networkOffline, message: 'offline'),
       );
 
-      expect(text, lookupAppLocalizations(const Locale('en')).failureNetworkOffline);
       expect(
         text,
-        isNot(
-          lookupAppLocalizations(const Locale('id')).failureNetworkOffline,
-        ),
+        lookupAppLocalizations(const Locale('en')).failureNetworkOffline,
+      );
+      expect(
+        text,
+        isNot(lookupAppLocalizations(const Locale('id')).failureNetworkOffline),
       );
     });
 
@@ -71,6 +74,31 @@ void main() {
       expect(
         live.messageFor(failure),
         lookupAppLocalizations(const Locale('en')).failureStorage,
+      );
+    });
+
+    test('maps unsupported support states', () {
+      final english = L10nFailureMessages(
+        resolveLocale: () => const Locale('en'),
+      );
+
+      expect(
+        english.messageFor(
+          const Failure(
+            code: FailureCode.unsupportedDevice,
+            message: 'No sensor',
+          ),
+        ),
+        lookupAppLocalizations(const Locale('en')).failureUnsupported,
+      );
+      expect(
+        english.messageFor(
+          const Failure(
+            code: FailureCode.unsupportedPlatform,
+            message: 'No web support',
+          ),
+        ),
+        lookupAppLocalizations(const Locale('en')).failureUnsupported,
       );
     });
 

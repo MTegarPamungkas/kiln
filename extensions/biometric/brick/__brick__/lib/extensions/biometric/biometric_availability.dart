@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:kiln_core/kiln_core.dart';
 
 /// Biometric capabilities of the device.
 enum BiometricAvailability {
@@ -6,6 +7,25 @@ enum BiometricAvailability {
   notEnrolled,
   noHardware,
   unsupportedPlatform,
+}
+
+extension BiometricAvailabilitySupport on BiometricAvailability {
+  /// Converts the probe into the shared support contract.
+  SupportInfo get supportInfo => switch (this) {
+    BiometricAvailability.available => const SupportInfo.supported(),
+    BiometricAvailability.notEnrolled => const SupportInfo.unsupported(
+      SupportState.permissionDenied,
+      message: 'Biometrics are not enrolled on this device.',
+    ),
+    BiometricAvailability.noHardware => const SupportInfo.unsupported(
+      SupportState.unsupportedDevice,
+      message: 'This device has no biometric hardware.',
+    ),
+    BiometricAvailability.unsupportedPlatform => const SupportInfo.unsupported(
+      SupportState.unsupportedPlatform,
+      message: 'Biometrics are not supported on this platform.',
+    ),
+  };
 }
 
 /// A biometric method reported by the platform.

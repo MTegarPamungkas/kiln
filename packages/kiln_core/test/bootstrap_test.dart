@@ -10,6 +10,8 @@ final class _TrackedModule extends KilnModule {
     this.requires = const <String>{},
     this.platforms = const <String>{},
     this.readyAction,
+    this.supportInfo,
+    this.supportAction,
     this.events,
   });
 
@@ -22,11 +24,22 @@ final class _TrackedModule extends KilnModule {
   @override
   final Set<String> platforms;
   final FutureOr<void> Function()? readyAction;
+  final SupportInfo? supportInfo;
+  final FutureOr<SupportInfo> Function()? supportAction;
   final List<String>? events;
 
   @override
   void register(Registry registry) {
     events?.add('register:$id');
+  }
+
+  @override
+  FutureOr<SupportInfo> support(Registry registry) {
+    final action = supportAction;
+    if (action != null) {
+      return action();
+    }
+    return supportInfo ?? const SupportInfo.supported();
   }
 
   @override
@@ -61,6 +74,67 @@ void main() {
       );
 
       expect(events, ['register:android', 'ready:android']);
+      final support = await KilnBootstrap.run(
+        modules: [
+          _TrackedModule('web-only', platforms: const {'web'}),
+          _TrackedModule('android', platforms: const {'android'}),
+        ],
+        platform: 'android',
+      );
+      expect(
+        support.read<SupportRegistry>()['web-only']?.state,
+        SupportState.unsupportedPlatform,
+      );
+    });
+
+    test('skips ready and records device support info', () async {
+      final events = <String>[];
+      final registry = await KilnBootstrap.run(
+        modules: [
+          _TrackedModule(
+            'sensor',
+            supportInfo: const SupportInfo.unsupported(
+              SupportState.unsupportedDevice,
+              message: 'No sensor on this device.',
+            ),
+            events: events,
+          ),
+        ],
+      );
+
+      expect(events, ['register:sensor']);
+      final info = registry.read<SupportRegistry>()['sensor'];
+      expect(info?.state, SupportState.unsupportedDevice);
+      expect(info?.message, 'No sensor on this device.');
+      expect(info?.isDeviceUnsupported, isTrue);
+    });
+
+    test('records a failed support probe and keeps bootstrapping', () async {
+      final events = <String>[];
+      final registry = await KilnBootstrap.run(
+        modules: [
+          _TrackedModule(
+            'probe',
+            supportAction: () => throw StateError('probe failed'),
+            events: events,
+          ),
+        ],
+      );
+
+      expect(events, ['register:probe']);
+      final info = registry.read<SupportRegistry>()['probe'];
+      expect(info?.state, SupportState.unavailable);
+      expect(info?.message, contains('probe failed'));
+    });
+
+    test('records supported modules before calling ready', () async {
+      final events = <String>[];
+      final registry = await KilnBootstrap.run(
+        modules: [_TrackedModule('ok', events: events)],
+      );
+
+      expect(events, ['register:ok', 'ready:ok']);
+      expect(registry.read<SupportRegistry>()['ok']?.isSupported, isTrue);
     });
 
     test('runs modules in dependency order', () async {

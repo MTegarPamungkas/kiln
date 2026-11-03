@@ -59,4 +59,9 @@ final class BiometricModule extends KilnModule {
       );
     }
   }
+
+  @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<Biometric>().support();
+  }
 }

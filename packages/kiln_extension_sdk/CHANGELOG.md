@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3
+
+- Add `android.compile_sdk` native setup with a patch that only raises the
+  project value and can be reverted.
+- Conditional native setup can match one value inside a multi-select answer,
+  so permission kinds can add their own Android/iOS/macOS declarations.
+
 ## 0.1.2
 
 - Warn when `kiln remove --force` deletes a file that was edited or has no

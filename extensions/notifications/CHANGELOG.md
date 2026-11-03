@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Add `NotificationSupport` and report plugin/device support through
+  `SupportRegistry` instead of silently ignoring initialization errors.
+- Record an `unavailable` support state when the plugin cannot start.
+
 ## 0.1.3
 
 - Declare `SCHEDULE_EXACT_ALARM` through conditional native setup when the

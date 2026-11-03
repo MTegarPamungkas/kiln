@@ -77,6 +77,39 @@ reports `biometric is disabled on web` as a warning, and the app keeps working
 on the supported platforms. It only fails when the extension and the project
 share no platform at all.
 
+### Device support
+
+Platform support is only the first check. Probe the device in `support()` and
+return `SupportInfo` instead of letting initialization fail:
+
+```dart
+@override
+Future<SupportInfo> support(Registry registry) async {
+  final probe = await registry.read<MySensor>().probe();
+  return probe.isAvailable
+      ? const SupportInfo.supported()
+      : const SupportInfo.unsupported(
+          SupportState.unsupportedDevice,
+          message: 'This device has no sensor.',
+        );
+}
+```
+
+When `support()` is not supported, bootstrap skips `ready()` and records the
+result in `SupportRegistry`. Application code can read it without wiring:
+
+```dart
+final info = registry.read<SupportRegistry>()['my_extension'];
+if (info?.isSupported ?? false) {
+  // use the feature
+}
+```
+
+Calls that still run while unsupported should throw
+`SupportInfo.toFailure()` (or return a native unavailable status such as
+`PermissionStatus.unsupported`) so the app receives explanatory information
+instead of a crash.
+
 ## 4. Rules
 
 - An extension does not import other extensions.

@@ -33,6 +33,7 @@ export 'src/runtime/module_graph.dart';
 export 'src/runtime/platform/platform.dart';
 export 'src/runtime/registry.dart';
 export 'src/runtime/slot.dart';
+export 'src/runtime/support.dart';
 export 'src/session/session.dart';
 export 'src/session/session_controller.dart';
 export 'src/session/token_provider.dart';

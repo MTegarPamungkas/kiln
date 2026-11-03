@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'registry.dart';
+import 'support.dart';
 
 /// A unit of application wiring.
 ///
@@ -28,6 +29,15 @@ abstract class KilnModule {
       platforms.isEmpty || platforms.contains(platform);
 
   void register(Registry registry);
+
+  /// Probes platform and device support after [register].
+  ///
+  /// The result is recorded in `SupportRegistry`. When it is not supported,
+  /// bootstrap skips [ready] so a missing sensor, plugin, or desktop service
+  /// cannot block application startup. Modules should keep their contracts
+  /// registered and return a typed support failure from calls that still run.
+  FutureOr<SupportInfo> support(Registry registry) =>
+      const SupportInfo.supported();
 
   FutureOr<void> ready(Registry registry) {}
 

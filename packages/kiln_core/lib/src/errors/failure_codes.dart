@@ -93,6 +93,10 @@ final class FailureCode {
 
   static const cancelled = FailureCode('cancelled');
   static const unavailable = FailureCode('unavailable');
+  static const unsupportedPlatform = FailureCode(
+    'support.unsupported_platform',
+  );
+  static const unsupportedDevice = FailureCode('support.unsupported_device');
   static const unexpected = FailureCode('unexpected');
 
   /// Every code that ships with `kiln_core`.
@@ -147,6 +151,8 @@ final class FailureCode {
     sessionExpired,
     cancelled,
     unavailable,
+    unsupportedPlatform,
+    unsupportedDevice,
     unexpected,
   ];
 

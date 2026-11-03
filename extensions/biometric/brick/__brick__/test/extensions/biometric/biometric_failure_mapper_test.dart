@@ -31,7 +31,7 @@ void main() {
     );
 
     expect(notEnrolled.code, FailureCode.permissionDenied);
-    expect(noHardware.code, FailureCode.unavailable);
+    expect(noHardware.code, FailureCode.unsupportedDevice);
   });
 
   test('keeps a Failure and wraps platform errors', () {

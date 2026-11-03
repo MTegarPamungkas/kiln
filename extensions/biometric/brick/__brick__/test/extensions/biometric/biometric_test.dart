@@ -43,7 +43,7 @@ void main() {
         isA<Failure>().having(
           (failure) => failure.code,
           'code',
-          FailureCode.unavailable,
+          FailureCode.unsupportedPlatform,
         ),
       ),
     );

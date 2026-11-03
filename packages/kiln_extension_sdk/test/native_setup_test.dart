@@ -25,6 +25,7 @@ void main() {
               ),
             ],
             minSdk: 24,
+            compileSdk: 37,
           ),
           ios: IosSetup(
             plist: {'NSFaceIDUsageDescription': 'Unlock'},
@@ -57,6 +58,7 @@ void main() {
           'android.url_scheme.kiln',
           'android.receiver.com.example.BootReceiver',
           'android.min_sdk',
+          'android.compile_sdk',
           'ios.plist.NSFaceIDUsageDescription',
           'ios.podfile_permission.camera',
           'macos.entitlements.com.apple.security.network.client',

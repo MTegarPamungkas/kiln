@@ -5,6 +5,7 @@ import 'package:{{app_name}}/extensions/permission/permission_flow.dart';
 import 'package:{{app_name}}/extensions/permission/permission_gateway.dart';
 import 'package:{{app_name}}/extensions/permission/permission_kind_guard.dart';
 import 'package:{{app_name}}/extensions/permission/permission_status_cache.dart';
+import 'package:{{app_name}}/extensions/permission/permission_support.dart';
 
 final class FakePermissionGateway implements PermissionGateway {
   FakePermissionGateway({Map<PermissionKind, PermissionStatus>? statuses})
@@ -14,6 +15,7 @@ final class FakePermissionGateway implements PermissionGateway {
   PermissionStatus requestResult = PermissionStatus.granted;
   bool openSettingsResult = true;
   int openSettingsCalls = 0;
+  Object? statusError;
 
   @override
   Future<bool> openSettings() async {
@@ -29,6 +31,10 @@ final class FakePermissionGateway implements PermissionGateway {
 
   @override
   Future<PermissionStatus> status(PermissionKind kind) async {
+    final error = statusError;
+    if (error != null) {
+      throw error;
+    }
     return statuses[kind] ?? PermissionStatus.denied;
   }
 
@@ -58,10 +64,12 @@ DevicePermissions createDevicePermissions({
   final effectiveGateway = gateway ?? FakePermissionGateway();
   final cache = PermissionStatusCache();
   final guard = PermissionKindGuard(config);
+  final support = PermissionSupport(config: config, gateway: effectiveGateway);
   final flow = PermissionFlow(
     gateway: effectiveGateway,
     guard: guard,
     cache: cache,
+    support: support,
     rationale: rationale,
   );
   return DevicePermissions(
@@ -69,5 +77,6 @@ DevicePermissions createDevicePermissions({
     flow: flow,
     cache: cache,
     guard: guard,
+    support: support,
   );
 }

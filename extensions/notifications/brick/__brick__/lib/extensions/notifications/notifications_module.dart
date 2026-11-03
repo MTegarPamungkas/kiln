@@ -3,6 +3,7 @@ import 'package:kiln_core/kiln_core.dart';
 import 'device_notifications.dart';
 import 'notification_channels.dart';
 import 'notification_permission_flow.dart';
+import 'notification_support.dart';
 import 'notification_tap_hub.dart';
 import 'notifications_config.dart';
 import 'plugin_notification_gateway.dart';
@@ -38,6 +39,7 @@ final class NotificationsModule extends KilnModule {
     final tapHub = NotificationTapHub(
       foreground: gateway.taps.map((tap) => tap.payload),
     );
+    final support = NotificationSupport(gateway: gateway);
     final notifications = DeviceNotifications(
       gateway: gateway,
       tapHub: tapHub,
@@ -49,7 +51,13 @@ final class NotificationsModule extends KilnModule {
       ..registerSingleton<NotificationsConfig>(config)
       ..registerSingleton<NotificationChannels>(channels)
       ..registerSingleton<TimezoneResolver>(timezones)
+      ..registerSingleton<NotificationSupport>(support)
       ..registerSingleton<Notifications>(notifications);
+  }
+
+  @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<NotificationSupport>().check();
   }
 
   @override
@@ -61,8 +69,15 @@ final class NotificationsModule extends KilnModule {
     }
     try {
       await registry.read<Notifications>().initialize();
-    } on Object {
-      // Notifications are optional on platforms that cannot show them.
+    } on Object catch (error) {
+      registry.read<SupportRegistry>().record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Local notifications could not start: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
     }
   }
 }

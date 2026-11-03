@@ -19,8 +19,10 @@ void main() {
       contains('android.permission.POST_NOTIFICATIONS'),
     );
     expect(
-      manifest.manualSteps.map((step) => step.id),
-      contains('notifications_android_receivers'),
+      manifest.platformSetup.android.receivers.map((receiver) => receiver.name),
+      contains(
+        'com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver',
+      ),
     );
   });
 }

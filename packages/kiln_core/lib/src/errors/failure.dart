@@ -18,6 +18,7 @@ enum FailureKind {
   session,
   cancelled,
   unavailable,
+  unsupported,
   unknown,
 }
 

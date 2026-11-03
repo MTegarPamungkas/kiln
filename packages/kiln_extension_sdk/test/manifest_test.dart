@@ -123,6 +123,39 @@ conditional:
       ]);
     });
 
+    test('conditional setup matches one value inside a multi answer', () {
+      final manifest = ExtensionManifest.parse('''
+id: kinds
+name: Kinds
+version: 1.0.0
+description: Multi value condition
+category: tooling
+prompts:
+  - name: kinds
+    type: multi
+    options: [camera, microphone]
+conditional:
+  - when:
+      kinds: camera
+    android:
+      permissions: [android.permission.CAMERA]
+''');
+
+      final conditional = manifest.platformSetup.conditionals.single;
+      expect(
+        conditional.matches(<String, Object?>{
+          'kinds': <String>['camera', 'microphone'],
+        }),
+        isTrue,
+      );
+      expect(
+        conditional.matches(<String, Object?>{
+          'kinds': <String>['microphone'],
+        }),
+        isFalse,
+      );
+    });
+
     test('parses an exclusive state management extension', () {
       final bloc = manifestFixtureByName('bloc');
 

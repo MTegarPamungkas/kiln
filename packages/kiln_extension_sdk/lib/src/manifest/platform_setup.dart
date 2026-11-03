@@ -45,6 +45,7 @@ final class AndroidSetup {
     this.allowBackup,
     this.activity,
     this.minSdk,
+    this.compileSdk,
   });
 
   final List<String> permissions;
@@ -55,6 +56,7 @@ final class AndroidSetup {
   final bool? allowBackup;
   final String? activity;
   final int? minSdk;
+  final int? compileSdk;
 
   bool get isEmpty =>
       permissions.isEmpty &&
@@ -63,7 +65,8 @@ final class AndroidSetup {
       receivers.isEmpty &&
       allowBackup == null &&
       activity == null &&
-      minSdk == null;
+      minSdk == null &&
+      compileSdk == null;
 
   static AndroidSetup fromMap(Map<String, Object?> map) {
     final appLinks = _asMap(map['app_links']);
@@ -76,6 +79,7 @@ final class AndroidSetup {
       allowBackup: map['allow_backup'] as bool?,
       activity: map['activity'] as String?,
       minSdk: _asInt(map['min_sdk']),
+      compileSdk: _asInt(map['compile_sdk']),
     );
   }
 
@@ -96,6 +100,7 @@ final class AndroidSetup {
       if (allowBackup != null) 'allow_backup': allowBackup,
       if (activity != null) 'activity': activity,
       if (minSdk != null) 'min_sdk': minSdk,
+      if (compileSdk != null) 'compile_sdk': compileSdk,
     };
   }
 }
@@ -268,7 +273,7 @@ bool _matchesAnswer(Object? expected, Object? actual) {
     return true;
   }
   if (actual is Iterable) {
-    return false;
+    return actual.any((item) => _matchesAnswer(expected, item));
   }
   return '$actual' == '$expected';
 }

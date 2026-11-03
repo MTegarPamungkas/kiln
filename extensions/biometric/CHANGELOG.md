@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Report device support through the shared `SupportRegistry`.
+- Return `support.unsupported_platform` and `support.unsupported_device`
+  failures instead of a generic `unavailable` code.
+
 ## 0.1.3
 
 - The app lock now checks device biometric availability at runtime. Devices

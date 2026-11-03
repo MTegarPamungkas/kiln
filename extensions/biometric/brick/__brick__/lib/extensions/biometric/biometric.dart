@@ -35,6 +35,8 @@ final class Biometric {
     );
   }
 
+  Future<SupportInfo> support() async => (await availability()).supportInfo;
+
   Future<List<BiometricMethod>> availableBiometrics() {
     return gateway.availableBiometrics();
   }
@@ -43,20 +45,9 @@ final class Biometric {
   Future<bool> authenticate({String? reason}) async {
     try {
       final availability = await this.availability();
-      if (availability == BiometricAvailability.unsupportedPlatform ||
-          availability == BiometricAvailability.noHardware) {
-        throw const Failure(
-          code: FailureCode.unavailable,
-          message: 'Biometrik tidak tersedia di perangkat ini.',
-          kind: FailureKind.unavailable,
-        );
-      }
-      if (availability == BiometricAvailability.notEnrolled) {
-        throw const Failure(
-          code: FailureCode.permissionDenied,
-          message: 'Biometrik belum terdaftar di perangkat.',
-          kind: FailureKind.permission,
-        );
+      final support = availability.supportInfo;
+      if (!support.isSupported) {
+        throw support.toFailure();
       }
       return await gateway.authenticate(
         reason: reason ?? config.reason,

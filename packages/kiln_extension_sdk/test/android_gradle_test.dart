@@ -47,6 +47,40 @@ void main() {
       );
     });
 
+    test('raises compileSdk and restores the original expression', () {
+      const patch = AndroidGradleCompileSdkPatch(37);
+
+      patch.apply(files);
+      var content = files.read('android/app/build.gradle.kts')!;
+      expect(
+        content,
+        contains(
+          'compileSdk = 37 // kiln:compile_sdk from flutter.compileSdkVersion',
+        ),
+      );
+
+      patch.revert(files);
+      content = files.read('android/app/build.gradle.kts')!;
+      expect(content, contains('compileSdk = flutter.compileSdkVersion'));
+      expect(content, isNot(contains('kiln:compile_sdk')));
+    });
+
+    test('never lowers an existing newer compileSdk', () {
+      final path = 'android/app/build.gradle.kts';
+      final content = files
+          .read(path)!
+          .replaceFirst(
+            'compileSdk = flutter.compileSdkVersion',
+            'compileSdk = 38',
+          );
+      files.write(path, content);
+
+      const AndroidGradleCompileSdkPatch(37).apply(files);
+
+      expect(files.read(path), contains('compileSdk = 38'));
+      expect(files.read(path), isNot(contains('kiln:compile_sdk')));
+    });
+
     test('switches MainActivity to FlutterFragmentActivity and back', () {
       const patch = AndroidActivityPatch('FlutterFragmentActivity');
 

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/biometric/biometric_availability.dart';
 
 void main() {
@@ -58,6 +59,22 @@ void main() {
         hasMethods: true,
       ),
       BiometricAvailability.unsupportedPlatform,
+    );
+  });
+
+  test('maps availability to the shared support contract', () {
+    expect(BiometricAvailability.available.supportInfo.isSupported, isTrue);
+    expect(
+      BiometricAvailability.noHardware.supportInfo.state,
+      SupportState.unsupportedDevice,
+    );
+    expect(
+      BiometricAvailability.notEnrolled.supportInfo.state,
+      SupportState.permissionDenied,
+    );
+    expect(
+      BiometricAvailability.unsupportedPlatform.supportInfo.state,
+      SupportState.unsupportedPlatform,
     );
   });
 }

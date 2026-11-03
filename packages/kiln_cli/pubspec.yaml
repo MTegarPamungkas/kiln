@@ -1,6 +1,6 @@
 name: kiln_cli
 description: The Kiln command line interface.
-version: 0.1.3
+version: 0.1.4
 publish_to: none
 
 environment:

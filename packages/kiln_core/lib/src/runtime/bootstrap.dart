@@ -10,6 +10,7 @@ import 'module_graph.dart';
 import 'platform/platform.dart';
 import 'registry.dart';
 import 'slot.dart';
+import 'support.dart';
 
 typedef BootstrapErrorHandler = void Function(
   Object error,
@@ -21,6 +22,7 @@ abstract final class KilnBootstrap {
   static Future<Registry> run({
     required List<KilnModule> modules,
     Duration timeout = const Duration(seconds: 30),
+    Duration supportTimeout = const Duration(seconds: 5),
     Clock? clock,
     BootstrapErrorHandler? onError,
     void Function(KilnModule module)? onModuleReady,
@@ -32,6 +34,8 @@ abstract final class KilnBootstrap {
     final session = SessionController();
     final consent = ConsentController();
     final lifecycle = LifecycleController();
+    final support = SupportRegistry();
+    final activePlatform = platform ?? currentPlatform;
 
     registry.registerSingleton<SlotRegistry>(slots);
     registry.registerSingleton<SessionController>(session);
@@ -39,12 +43,27 @@ abstract final class KilnBootstrap {
     registry.registerSingleton<LifecycleController>(lifecycle);
     registry.registerSingleton<Lifecycle>(lifecycle);
     registry.registerSingleton<Clock>(clock ?? const SystemClock());
+    registry.registerSingleton<SupportRegistry>(support);
+
+    for (final module in modules) {
+      if (!module.supportsPlatform(activePlatform)) {
+        support.record(
+          module.id,
+          SupportInfo.unsupported(
+            SupportState.unsupportedPlatform,
+            message: '${module.id} is not supported on $activePlatform.',
+            details: <String, Object?>{
+              'platform': activePlatform,
+              'supported_platforms': module.platforms.toList(growable: false),
+            },
+          ),
+        );
+      }
+    }
 
     final ordered = ModuleGraph(
       modules
-          .where(
-            (module) => module.supportsPlatform(platform ?? currentPlatform),
-          )
+          .where((module) => module.supportsPlatform(activePlatform))
           .toList(growable: false),
     ).resolve(availableCapabilities: capabilities);
     final registered = <KilnModule>[];
@@ -53,7 +72,12 @@ abstract final class KilnBootstrap {
       for (final module in ordered) {
         module.register(registry);
         registered.add(module);
-        await Future<void>.sync(() => module.ready(registry)).timeout(timeout);
+        final info = await _probeSupport(module, registry, supportTimeout);
+        support.record(module.id, info);
+        if (info.isSupported) {
+          await Future<void>.sync(() => module.ready(registry))
+              .timeout(timeout);
+        }
         onModuleReady?.call(module);
       }
       await lifecycle.onReady();
@@ -70,10 +94,34 @@ abstract final class KilnBootstrap {
       await session.dispose();
       await consent.dispose();
       await slots.dispose();
+      await support.dispose();
       if (onError != null) {
         onError(error, stackTrace);
       }
       rethrow;
+    }
+  }
+
+  static Future<SupportInfo> _probeSupport(
+    KilnModule module,
+    Registry registry,
+    Duration timeout,
+  ) async {
+    try {
+      return await Future<SupportInfo>.sync(() => module.support(registry))
+          .timeout(timeout);
+    } on TimeoutException {
+      return SupportInfo.unsupported(
+        SupportState.unavailable,
+        message: '${module.id} support probe timed out.',
+        details: <String, Object?>{'timeout_ms': timeout.inMilliseconds},
+      );
+    } on Object catch (error) {
+      return SupportInfo.unsupported(
+        SupportState.unavailable,
+        message: '${module.id} support probe failed: $error',
+        details: <String, Object?>{'error': '$error'},
+      );
     }
   }
 }

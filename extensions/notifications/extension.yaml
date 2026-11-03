@@ -1,6 +1,6 @@
 id: notifications
 name: Notifications
-version: 0.1.3
+version: 0.1.4
 description: Local notifications with channels, scheduling, and tap routing.
 category: notifications
 tier: official

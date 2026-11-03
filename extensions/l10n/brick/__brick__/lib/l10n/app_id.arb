@@ -55,5 +55,6 @@
   "failureSession": "Sesi berakhir. Silakan masuk kembali.",
   "failureCancelled": "Tindakan dibatalkan.",
   "failureUnavailable": "Fitur ini belum tersedia.",
+  "failureUnsupported": "Fitur ini tidak didukung di perangkat ini.",
   "failureUnexpected": "Terjadi kesalahan tak terduga. Coba lagi."
 }
