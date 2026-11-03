@@ -16,7 +16,7 @@ This catalog is generated from extension manifests by
 | `env` | Environment | 0.1.1 | config | official | `env` |
 | `firebase` | Firebase | 0.2.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `flavors` | Flavors | 0.1.1 | flavor | official | `flavor` |
-| `geolocation` | Geolocation | 0.1.0 | location | official | `location` |
+| `geolocation` | Geolocation | 0.1.1 | location | official | `location` |
 | `go_router` | GoRouter | 0.2.1 | navigation | official | `navigation` |
 | `http_cache` | HTTP cache | 0.1.1 | network | official | `http_cache` |
 | `http_retry` | HTTP retry | 0.1.1 | network | official |  |
@@ -29,7 +29,7 @@ This catalog is generated from extension manifests by
 | `rest_auth` | REST auth | 0.1.2 | auth | official | `auth` |
 | `riverpod` | Riverpod state management | 0.1.2 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.1 | storage | official | `secure_storage` |
-| `share` | Share | 0.1.0 | share | official | `share` |
+| `share` | Share | 0.1.1 | share | official | `share` |
 | `social_login` | Social login | 0.1.1 | social | official | `social_login` |
 | `storage` | Key-value storage | 0.1.1 | storage | official | `storage` |
 | `supabase` | Supabase | 0.1.3 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
