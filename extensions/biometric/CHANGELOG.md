@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0
+
+- The extension no longer registers a lock screen wrapper in `app.wrappers`.
+  Applications own the lock UI, its copy, and its styling; the extension keeps
+  `AppLock`, `BiometricGate`, availability, and protected storage.
+- Removed the generated `AppLockScope` widget and its test. Add your own lock
+  screen and forward the pause/resume events to `AppLock`.
+
 ## 0.1.4
 
 - Report device support through the shared `SupportRegistry`.

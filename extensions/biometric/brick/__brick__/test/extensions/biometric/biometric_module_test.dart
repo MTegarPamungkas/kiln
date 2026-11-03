@@ -10,7 +10,7 @@ import 'package:{{app_name}}/extensions/biometric/biometric_module.dart';
 import 'package:{{app_name}}/extensions/biometric/biometric_protected_storage.dart';
 
 void main() {
-  test('module registers biometrics, the lock, and the app wrapper', () {
+  test('module registers biometrics and the lock without injecting UI', () {
     final registry = GetItRegistry()
       ..registerSingleton<SlotRegistry>(SlotRegistry())
       ..registerSingleton<SecureStorage>(InMemorySecureStorage());
@@ -27,11 +27,8 @@ void main() {
       isA<BiometricProtectedStorage>(),
     );
     expect(
-      registry
-          .read<SlotRegistry>()
-          .open<AppWrapper>(SlotNames.appWrappers)
-          .items,
-      hasLength(1),
+      registry.read<SlotRegistry>().has(SlotNames.appWrappers),
+      isFalse,
     );
   });
 

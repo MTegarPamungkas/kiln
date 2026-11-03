@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T18:05:47.483308Z",
+  "generated_at": "2026-11-03T18:48:52.669962Z",
   "extensions": [
     {
       "id": "analytics",
@@ -91,9 +91,9 @@
     {
       "id": "biometric",
       "name": "Biometric",
-      "description": "Biometric authentication, app lock, and protected storage.",
+      "description": "Biometric authentication, app lock state, and protected storage.",
       "category": "security",
-      "latest": "0.1.4",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -148,6 +148,18 @@
           "version": "0.1.4",
           "url": "archives/biometric-0.1.4.tgz",
           "sha256": "440b8819612e0dfecd704e310d919155c500740fceb8e1e1b1d74fadbb561b37",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/biometric-0.2.0.tgz",
+          "sha256": "ebaed4af19725c56f352659dcd8529e09c2799b725d0069a8cb7264a58fe581c",
           "provides": [
             "biometric"
           ],

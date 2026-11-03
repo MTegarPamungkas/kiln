@@ -8,8 +8,8 @@ Local biometrics, app lock, and protected secret storage.
   unsupportedPlatform.
 - `BiometricGate` runs an action after authentication and stores the grace
   period using `Clock`.
-- `AppLock` locks the app after a pause exceeds the limit;
-  `AppLockScope` covers the screen and provides an unlock button.
+- `AppLock` locks the app after a pause exceeds the limit. The extension exposes
+  the lock state only; the application renders its own lock screen.
 - `BiometricProtectedStorage` requests authentication before `read`.
 
 App lock guide: [docs/app-lock.md](docs/app-lock.md). Platform requirements:

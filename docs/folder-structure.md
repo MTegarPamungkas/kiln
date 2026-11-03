@@ -1297,8 +1297,7 @@ extensions/biometric/
       │  ├─ biometric_gateway.dart  # wraps LocalAuthentication so it can be faked: interface and SdkBiometricGateway
       │  ├─ biometric_availability.dart  # reports availability status: available, notEnrolled, noHardware, unsupportedPlatform
       │  ├─ biometric_gate.dart  # guards an action through guard(action): authenticate first, grace period using Clock
-      │  ├─ app_lock.dart  # locks when onPause lasts longer than the limit, unlocks through biometrics
-      │  ├─ app_lock_scope.dart  # screen cover widget while locked, contributes: app.wrappers
+      │  ├─ app_lock.dart  # locks when onPause lasts longer than the limit, unlocks through biometrics; the app renders its own lock screen
       │  └─ biometric_protected_storage.dart  # SecureStorage implementation that requires authentication before read (readOrNull)
       └─ test/extensions/biometric/  # tests for the biometric extension code in the generated app
          ├─ biometric_test.dart  # tests the Biometric facade: canAuthenticate, availableBiometrics, and authenticate
@@ -1308,7 +1307,6 @@ extensions/biometric/
          ├─ biometric_availability_test.dart  # tests determination of the available, notEnrolled, noHardware, and unsupportedPlatform statuses
          ├─ biometric_gate_test.dart  # tests the guard: authenticate first and the grace period using a fake Clock
          ├─ app_lock_test.dart  # tests that the lock engages after onPause exceeds the limit
-         ├─ app_lock_scope_test.dart  # tests that the screen is covered while locked and opens after authentication
          └─ biometric_protected_storage_test.dart  # tests that read requires authentication first
 ```
 
@@ -2058,7 +2056,7 @@ the last response.
 | `registry` | built into the SDK | `KilnModule` | every extension that has a `*_module.dart` |
 | `http.interceptors` | `dio` | `HttpMiddleware` from `kiln_core` | `connectivity` offline_guard (5), `rest_auth` auth_middleware (10), `http_retry` (20), `http_cache` (30), `logger` http_log (90), `crash_report` http_breadcrumb (95) |
 | `router.routes` | `go_router` | neutral `AppRoute` from `app_basic` | no built-in contributors yet; open to community extensions |
-| `app.wrappers` | built into `app_basic` | `AppWrapper` from `app_basic` | `flavors` FlavorBanner, `biometric` AppLockScope |
+| `app.wrappers` | built into `app_basic` | `AppWrapper` from `app_basic` | `flavors` FlavorBanner |
 
 The order in `http.interceptors` is chosen for the following reasons:
 

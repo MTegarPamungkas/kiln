@@ -1,17 +1,16 @@
-import 'package:flutter/widgets.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 import 'app_lock.dart';
-import 'app_lock_scope.dart';
 import 'biometric.dart';
 import 'biometric_config.dart';
 import 'biometric_gate.dart';
 import 'biometric_gateway.dart';
 import 'biometric_protected_storage.dart';
 
-typedef AppWrapper = Widget Function(BuildContext context, Widget child);
-
 /// Registers Biometric, the app lock, and their seams.
+///
+/// The extension owns the lock state but not its presentation. The application
+/// renders its own lock screen from [AppLock] and drives the lifecycle events.
 final class BiometricModule extends KilnModule {
   const BiometricModule();
 
@@ -43,14 +42,6 @@ final class BiometricModule extends KilnModule {
       ..registerSingleton<Biometric>(biometric)
       ..registerSingleton<BiometricGate>(gate)
       ..registerSingleton<AppLock>(appLock);
-
-    final slots = registry.readOrNull<SlotRegistry>();
-    slots
-        ?.open<AppWrapper>(SlotNames.appWrappers)
-        .add(
-          (context, child) => AppLockScope(appLock: appLock, child: child),
-          owner: 'biometric',
-        );
 
     final storage = registry.readOrNull<SecureStorage>();
     if (storage != null) {

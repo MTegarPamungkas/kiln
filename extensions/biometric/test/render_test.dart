@@ -20,10 +20,13 @@ void main() {
         'lib/extensions/biometric/biometric_availability.dart',
         'lib/extensions/biometric/biometric_gate.dart',
         'lib/extensions/biometric/app_lock.dart',
-        'lib/extensions/biometric/app_lock_scope.dart',
         'lib/extensions/biometric/biometric_protected_storage.dart',
         'test/extensions/biometric/biometric_module_test.dart',
       ]),
+    );
+    expect(
+      files.map((file) => file.relativePath),
+      isNot(contains('lib/extensions/biometric/app_lock_scope.dart')),
     );
     final config = files.firstWhere(
       (file) => file.relativePath.endsWith('biometric_config.dart'),

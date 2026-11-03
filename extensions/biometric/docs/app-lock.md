@@ -1,29 +1,82 @@
 # App lock
 
 `AppLock` locks the application when the user leaves it for longer than
-`grace_seconds`.
+`grace_seconds`. The extension owns the lock state; the application owns the
+lock screen, its copy, and its styling.
 
 The flow:
 
-1. `AppLockScope` receives the `paused` lifecycle event and records the time.
-2. On `resumed`, the elapsed time is compared with the grace period.
-3. If it exceeds the limit, a lock overlay appears covering the whole
-   application.
-4. The unlock button requests biometrics through `BiometricGate`.
-5. If authentication succeeds, the overlay disappears; if it fails, the overlay
+1. The application forwards the `paused` lifecycle event to `AppLock`.
+2. On `resumed`, `AppLock` compares the elapsed time with the grace period.
+3. When the limit is exceeded, `AppLock.locked` becomes true.
+4. The application shows its own lock screen while `locked` is true.
+5. Its unlock action calls `AppLock.unlock()`, which authenticates through
+   `BiometricGate`.
+6. If authentication succeeds, `locked` becomes false; if it fails, the screen
    stays.
 
 ```dart
-AppLockScope(
-  appLock: registry.read<AppLock>(),
-  child: const MyApp(),
+class MyLockGate extends StatefulWidget {
+  const MyLockGate({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  State<MyLockGate> createState() => _MyLockGateState();
+}
+
+class _MyLockGateState extends State<MyLockGate>
+    with WidgetsBindingObserver {
+  late final AppLock _lock;
+
+  @override
+  void initState() {
+    super.initState();
+    _lock = RegistryScope.read<AppLock>(context);
+    WidgetsBinding.instance.addObserver(this);
+    unawaited(_lock.initialize());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+        _lock.onPause();
+      case AppLifecycleState.resumed:
+        unawaited(_lock.onResume());
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _lock.locked,
+      builder: (context, locked, child) {
+        return locked ? const MyLockScreen() : child!;
+      },
+      child: widget.child,
+    );
+  }
+}
+```
+
+Place the gate inside `MaterialApp.builder` so the lock screen inherits the
+application theme and localizations:
+
+```dart
+MaterialApp.router(
+  builder: (context, child) => MyLockGate(child: child ?? const SizedBox()),
+  routerConfig: router,
 )
 ```
 
-The biometric module adds this wrapper to the `app.wrappers` slot, so a generated
-application does not need to edit `app_shell.dart`. The wrapper runs outside
-`MaterialApp`; the overlay uses its own `Directionality` and `Material` so it
-stays valid.
+The gate must call `AppLock.initialize()`. It disables the lock automatically
+when the device has no usable biometrics, so `unlock()` never blocks a device
+without hardware.
 
 ## Grace period
 
