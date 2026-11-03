@@ -7,6 +7,7 @@ import 'social_availability.dart';
 import 'social_credentials.dart';
 import 'social_login.dart';
 import 'social_login_config.dart';
+import 'social_login_support.dart';
 import 'social_sign_out_listener.dart';
 
 /// Registers SocialLogin and its provider gateways.
@@ -26,6 +27,10 @@ final class SocialLoginModule extends KilnModule {
   void register(Registry registry) {
     const config = SocialLoginConfig.defaults;
     final availability = SocialAvailability.current();
+    final support = SocialLoginSupport(
+      config: config,
+      availability: availability,
+    );
     final google = SdkGoogleCredentialGateway();
     const apple = SdkAppleCredentialGateway();
     final login = DefaultSocialLogin(
@@ -42,6 +47,7 @@ final class SocialLoginModule extends KilnModule {
     registry
       ..registerSingleton<SocialLoginConfig>(config)
       ..registerSingleton<SocialAvailability>(availability)
+      ..registerSingleton<SocialLoginSupport>(support)
       ..registerSingleton<GoogleCredentialGateway>(google)
       ..registerSingleton<AppleCredentialGateway>(apple)
       ..registerSingleton<SocialLogin>(login);
@@ -52,6 +58,11 @@ final class SocialLoginModule extends KilnModule {
         SocialSignOutListener(auth: auth, google: google),
       );
     }
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<SocialLoginSupport>().overall;
   }
 
   @override

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T14:22:58.212696Z",
+  "generated_at": "2026-11-03T14:35:51.752036Z",
   "extensions": [
     {
       "id": "analytics",
@@ -183,13 +183,25 @@
       "name": "Connectivity",
       "description": "Network status monitoring and an offline guard middleware.",
       "category": "connectivity",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/connectivity-0.1.0.tgz",
           "sha256": "9f86246c8ee1ce8d5c025b9d813f6e5641720b0b0c128a7889a24da3ad22d748",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/connectivity-0.1.1.tgz",
+          "sha256": "7c05591d8d41caa7514af8f7a0727bb0234ece294edba6199e0567be24b2d65d",
           "provides": [
             "connectivity"
           ],
@@ -205,7 +217,7 @@
       "name": "Deep links",
       "description": "Incoming deep links with allowlisting, normalization, and deduplication.",
       "category": "deep_link",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -224,6 +236,18 @@
           "version": "0.1.1",
           "url": "archives/deep_link-0.1.1.tgz",
           "sha256": "31e2a86bb60b635f372281307684a6d8313d8d69489da88dfa6db63d7fe09df2",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/deep_link-0.1.2.tgz",
+          "sha256": "8d7dbfd2b92cd4e9832eacd4439877d290448d507959aa59dc3f81d5c91e1f29",
           "provides": [
             "deep_links"
           ],
@@ -856,13 +880,28 @@
       "name": "Social login",
       "description": "Google and Apple credential sign-in for a social auth backend.",
       "category": "social",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/social_login-0.1.0.tgz",
           "sha256": "27a06c9ceaf33580690b796587aeddd7b929b98b4517b34dcdad45eb55eb00a5",
+          "requires": [
+            "social_auth"
+          ],
+          "provides": [
+            "social_login"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/social_login-0.1.1.tgz",
+          "sha256": "e7ebea030decdaed580ee557bd839fbac65de5e3b44e132c03ee705dd72fc0d8",
           "requires": [
             "social_auth"
           ],

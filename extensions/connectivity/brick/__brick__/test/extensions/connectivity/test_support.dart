@@ -9,11 +9,18 @@ final class FakeConnectivityGateway implements ConnectivityGateway {
   FakeConnectivityGateway({this.current = NetworkStatus.unknown});
 
   NetworkStatus current;
+  Object? checkError;
   final StreamController<NetworkStatus> controller =
       StreamController<NetworkStatus>.broadcast(sync: true);
 
   @override
-  Future<NetworkStatus> check() async => current;
+  Future<NetworkStatus> check() async {
+    final error = checkError;
+    if (error != null) {
+      throw error;
+    }
+    return current;
+  }
 
   @override
   Stream<NetworkStatus> get changes => controller.stream;
@@ -29,8 +36,6 @@ final class FakeConnectivityGateway implements ConnectivityGateway {
 DeviceNetworkMonitor createTestMonitor(FakeConnectivityGateway gateway) {
   return DeviceNetworkMonitor(
     gateway: gateway,
-    config: const ConnectivityConfig(
-      debounceWindow: Duration.zero,
-    ),
+    config: const ConnectivityConfig(debounceWindow: Duration.zero),
   );
 }

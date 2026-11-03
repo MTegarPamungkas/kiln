@@ -4,6 +4,7 @@ import 'social_availability.dart';
 import 'social_credentials.dart';
 import 'social_login_config.dart';
 import 'social_login_failure_mapper.dart';
+import 'social_login_support.dart';
 
 /// [SocialLogin] backed by Google and Apple credential gateways.
 final class DefaultSocialLogin implements SocialLogin {
@@ -19,6 +20,13 @@ final class DefaultSocialLogin implements SocialLogin {
 
   @override
   Future<SocialCredential?> signIn(SocialProvider provider) async {
+    final support = SocialLoginSupport(
+      config: config,
+      availability: availability,
+    ).forProvider(provider);
+    if (support.isPlatformUnsupported) {
+      throw support.toFailure();
+    }
     if (!config.isReady(provider, availability)) {
       throw Failure(
         code: FailureCode.authProviderDisabled,

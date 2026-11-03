@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+- Add `SocialLoginSupport` with per-provider platform/configuration support.
+- Report support through `SupportRegistry` and return
+  `support.unsupported_platform` instead of `authProviderDisabled` on
+  unsupported platforms.
+
 ## 0.1.0
 
 - Initial Google and Apple credential login, nonce generation, availability,

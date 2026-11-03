@@ -37,12 +37,14 @@ final class DeviceNetworkMonitor implements NetworkMonitor {
     if (_started) {
       return;
     }
-    _started = true;
-    _status = await gateway.check();
-    _changes.add(_status);
-    _subscription = gateway.changes.listen((status) {
+    final status = await gateway.check();
+    final subscription = gateway.changes.listen((status) {
       _stabilizer.add(status, _emit);
     });
+    _subscription = subscription;
+    _started = true;
+    _status = status;
+    _changes.add(status);
   }
 
   void _emit(NetworkStatus status) {

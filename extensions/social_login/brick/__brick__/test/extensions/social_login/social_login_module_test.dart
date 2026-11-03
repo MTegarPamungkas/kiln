@@ -7,6 +7,7 @@ import 'package:{{app_name}}/extensions/social_login/social_availability.dart';
 import 'package:{{app_name}}/extensions/social_login/social_login.dart';
 import 'package:{{app_name}}/extensions/social_login/social_login_config.dart';
 import 'package:{{app_name}}/extensions/social_login/social_login_module.dart';
+import 'package:{{app_name}}/extensions/social_login/social_login_support.dart';
 import 'package:{{app_name}}/extensions/social_login/social_sign_out_listener.dart';
 
 void main() {
@@ -18,6 +19,7 @@ void main() {
     expect(registry.read<SocialLogin>(), isA<DefaultSocialLogin>());
     expect(registry.read<SocialLoginConfig>(), isA<SocialLoginConfig>());
     expect(registry.read<SocialAvailability>(), isA<SocialAvailability>());
+    expect(registry.read<SocialLoginSupport>(), isA<SocialLoginSupport>());
     expect(
       registry.read<GoogleCredentialGateway>(),
       isA<GoogleCredentialGateway>(),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/social_login/nonce_generator.dart';
@@ -70,6 +71,23 @@ void main() {
           (failure) => failure.code,
           'code',
           FailureCode.authProviderDisabled,
+        ),
+      ),
+    );
+  });
+
+  test('reports unsupported platforms before provider configuration', () async {
+    final login = _login(
+      availability: const SocialAvailability(platform: TargetPlatform.windows),
+    );
+
+    await expectLater(
+      login.signIn(SocialProvider.google),
+      throwsA(
+        isA<Failure>().having(
+          (failure) => failure.code,
+          'code',
+          FailureCode.unsupportedPlatform,
         ),
       ),
     );

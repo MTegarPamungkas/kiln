@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:kiln_core/kiln_core.dart';
 
 import 'deep_link_config.dart';
@@ -44,6 +45,8 @@ final class DeviceDeepLinks implements DeepLinks {
   bool _started = false;
   bool _disposed = false;
   bool _replayed = false;
+  bool _initialProbed = false;
+  SupportInfo? _support;
 
   /// The last platform error; rejected links are dropped silently.
   Failure? lastFailure;
@@ -57,13 +60,58 @@ final class DeviceDeepLinks implements DeepLinks {
   @override
   Stream<Uri> get links => _links.stream;
 
+  /// Probes the platform and captures the launch link once.
+  ///
+  /// Called by the module before `ready`; [start] reuses the captured link so
+  /// the platform is asked only once.
+  Future<SupportInfo> probeSupport() async {
+    final cached = _support;
+    if (cached != null) {
+      return cached;
+    }
+    _initialProbed = true;
+    try {
+      final initial = await gateway.initialLink();
+      if (initial != null && !_disposed) {
+        _initialLink = _accept(initial);
+      }
+      _support = const SupportInfo.supported();
+    } on MissingPluginException catch (error) {
+      lastFailure = mapDeepLinkError(error);
+      _support = SupportInfo.unsupported(
+        SupportState.unsupportedPlatform,
+        message: 'Deep links are not implemented on this platform.',
+        details: <String, Object?>{'error': '$error'},
+      );
+    } on UnsupportedError catch (error) {
+      lastFailure = mapDeepLinkError(error);
+      _support = SupportInfo.unsupported(
+        SupportState.unsupportedPlatform,
+        message: 'Deep links are not implemented on this platform.',
+        details: <String, Object?>{'error': '$error'},
+      );
+    } on Object catch (error, stackTrace) {
+      lastFailure = mapDeepLinkError(error, stackTrace: stackTrace);
+      _support = SupportInfo.unsupported(
+        SupportState.unavailable,
+        message: 'Deep links could not start: $error',
+        details: <String, Object?>{'error': '$error'},
+      );
+    }
+    return _support!;
+  }
+
   /// Subscribes to the gateway and captures the launch link.
   Future<void> start() async {
     if (_started || _disposed) {
       return;
     }
-    _started = true;
     _subscription = gateway.links.listen(_handleLink, onError: _handleError);
+    _started = true;
+    if (_initialProbed) {
+      return;
+    }
+    _initialProbed = true;
     try {
       final initial = await gateway.initialLink();
       if (initial == null || _disposed) {

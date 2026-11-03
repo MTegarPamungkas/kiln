@@ -31,6 +31,15 @@ final class DeepLinkModule extends KilnModule {
   }
 
   @override
+  Future<SupportInfo> support(Registry registry) async {
+    final links = registry.read<DeepLinks>();
+    if (links is DeviceDeepLinks) {
+      return links.probeSupport();
+    }
+    return const SupportInfo.supported();
+  }
+
+  @override
   Future<void> ready(Registry registry) async {
     final links = registry.read<DeepLinks>();
     if (links is! DeviceDeepLinks) {
@@ -38,8 +47,15 @@ final class DeepLinkModule extends KilnModule {
     }
     try {
       await links.start();
-    } on Object {
-      // Links stay unavailable when the platform cannot deliver them.
+    } on Object catch (error) {
+      registry.read<SupportRegistry>().record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Deep links could not start: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
     }
   }
 }
