@@ -12,3 +12,10 @@ Typed build-time configuration from `--dart-define`.
 
 The keys available today are `api_base_url`, `api_key`, `feature_flags`, and
 `enable_debug_tools`. See [docs/env.md](docs/env.md) for adding keys.
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

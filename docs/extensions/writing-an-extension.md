@@ -95,8 +95,14 @@ Future<SupportInfo> support(Registry registry) async {
 }
 ```
 
+`support()` runs after `register()` and before `ready()`, with a timeout. Keep
+the probe cheap and never prompt for permission or open UI from it. Probe
+failures are recorded as `unavailable`; they do not stop bootstrap.
+
 When `support()` is not supported, bootstrap skips `ready()` and records the
-result in `SupportRegistry`. Application code can read it without wiring:
+result in `SupportRegistry`. Keep the contracts registered so callers receive a
+typed failure rather than a missing-service error. Application code can read
+the report without wiring:
 
 ```dart
 final info = registry.read<SupportRegistry>()['my_extension'];
@@ -110,12 +116,17 @@ Calls that still run while unsupported should throw
 `PermissionStatus.unsupported`) so the app receives explanatory information
 instead of a crash.
 
+The full state list, coverage table, and application examples are in
+[support-and-devices.md](support-and-devices.md).
+
 ## 4. Rules
 
 - An extension does not import other extensions.
 - Depend on capabilities, not ids.
 - Provide a gateway for plugins that are hard to test.
 - Map package errors to `Failure` with a stable `FailureCode`.
+- Report runtime platform/device readiness from `support()`; never require the
+  app to check hardware or a plugin manually.
 - Native patches must be idempotent and have stable ids.
 - Do not edit files owned by another extension or `extensions.g.dart`.
 - Secret prompts are not written to `kiln.yaml`.

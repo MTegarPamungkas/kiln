@@ -88,11 +88,13 @@ kiln/
 │  │     │  │  ├─ app_shell.dart             # builds MaterialApp (theme, locale, router from the Registry when present), applies the app.wrappers slot
 │  │     │  │  ├─ error_screen.dart          # screen shown when bootstrap fails
 │  │     │  │  ├─ app_wrappers.dart          # built-in app.wrappers slot, type AppWrapper = Widget Function(BuildContext, Widget)
-│  │     │  │  └─ app_route.dart             # neutral AppRoute (path, name, builder) for the router.routes slot, without importing go_router
+│  │     │  │  ├─ app_route.dart             # neutral AppRoute (path, name, builder) for the router.routes slot, without importing go_router
+│  │     │  │  └─ app_home.dart              # starter template only: AppHome seam for the starter page
+│  │     │  ├─ features/home/home_page.dart  # minimal template starting page owned by the application
 │  │     │  └─ core/                         # core app components: l10n, theme, and error handling
 │  │     │     ├─ l10n/                      # built-in app localization and the l10n extension integration point
 │  │     │     │  ├─ app_localizations_config.dart  # typed configuration: AppLocalizationsConfig, the l10n extension integration point
-│  │     │     │  └─ app_strings.dart        # built-in app UI strings when no AppLocalizationsConfig is in the Registry
+│  │     │     │  └─ core_copy.dart          # CoreCopy seam filled by the l10n extension; no hardcoded UI strings
 │  │     │     ├─ theme/                     # built-in app theme and the theme extension integration point
 │  │     │     │  ├─ app_theme_config.dart   # typed configuration: AppThemeConfig, the theme extension integration point
 │  │     │     │  └─ app_theme.dart          # built-in app theme when no AppThemeConfig is in the Registry
@@ -218,13 +220,14 @@ packages/kiln_core/
 │     │  ├─ failure.dart                          # Failure class, the uniform error model for all contracts
 │     │  ├─ failure_codes.dart                    # FailureCode class: stable codes, e.g. network.timeout and auth.invalid_credentials
 │     │  └─ result.dart                           # Result<T> type holding Ok or Err(Failure)
-│     ├─ runtime/                                 # module runtime: Registry, init order, Lifecycle, bootstrap, and Slot
+│     ├─ runtime/                                 # module runtime: Registry, init order, Lifecycle, bootstrap, SupportRegistry, and Slot
 │     │  ├─ registry.dart                         # Registry contract for registering and resolving services
 │     │  ├─ get_it_registry.dart                  # get_it-based Registry implementation
-│     │  ├─ kiln_module.dart                      # KilnModule contract: a unit that registers services with the Registry on init
+│     │  ├─ kiln_module.dart                      # KilnModule contract: register services and report runtime support
 │     │  ├─ module_graph.dart                     # computes init order from requires and detects cycles
 │     │  ├─ lifecycle.dart                        # Lifecycle contract: onReady, onPause, onResume, and dispose
-│     │  ├─ bootstrap.dart                        # KilnBootstrap.run: async init with timeout and error handler
+│     │  ├─ bootstrap.dart                        # KilnBootstrap.run: async init, support probing, timeout, and error handler
+│     │  ├─ support.dart                          # SupportInfo, SupportState, and SupportRegistry for platform/device readiness
 │     │  └─ slot.dart                             # OrderedSlot<T> for http.interceptors and router.routes
 │     ├─ session/                                 # login session state: session model, controller, and token provider
 │     │  ├─ session.dart                          # AuthSession model with userId and expiresAt
@@ -507,6 +510,11 @@ packages/kiln_cli/
   range.
 - Extensions with a new version or a migration that has not been run.
 - Leftover journal entries from an operation interrupted halfway.
+
+`kiln doctor` does not check runtime device support. That is reported by
+`KilnModule.support()` inside the running app and recorded in
+`SupportRegistry`; see
+[extensions/support-and-devices.md](extensions/support-and-devices.md).
 ## kiln_store, kiln_testing, kiln_lints
 
 Three packages that close the trust and quality gaps: the store downloads

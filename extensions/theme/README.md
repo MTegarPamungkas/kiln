@@ -45,3 +45,10 @@ ThemeModeSwitcher(controller: registry.read<ThemeModeController>())
 Full documentation is in [docs/theme.md](docs/theme.md),
 [docs/design-tokens.md](docs/design-tokens.md), and
 [docs/rebranding.md](docs/rebranding.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

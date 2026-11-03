@@ -17,3 +17,10 @@ Brick contents:
 - `async_value_x.dart` — concise failure/data access.
 - `session_notifier.dart` — wraps `SessionController`.
 - counter feature example.
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

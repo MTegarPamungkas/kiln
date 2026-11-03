@@ -5,32 +5,32 @@ This catalog is generated from extension manifests by
 
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
-| `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.1.1 | auth | official | `auth`, `remote_database`, `file_storage` |
-| `biometric` | Biometric | 0.1.1 | security | official | `biometric` |
-| `bloc` | Bloc state management | 0.1.2 | state | official | `state_bloc` |
-| `connectivity` | Connectivity | 0.1.0 | connectivity | official | `connectivity` |
-| `deep_link` | Deep links | 0.1.1 | deep_link | official | `deep_links` |
-| `dio` | Dio HTTP client | 0.2.3 | network | official | `http_client`, `http_pipeline` |
-| `env` | Environment | 0.1.0 | config | official | `env` |
-| `firebase` | Firebase | 0.2.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
-| `flavors` | Flavors | 0.1.0 | flavor | official | `flavor` |
-| `go_router` | GoRouter | 0.1.0 | navigation | official | `navigation` |
-| `http_cache` | HTTP cache | 0.1.0 | network | official | `http_cache` |
-| `http_retry` | HTTP retry | 0.1.0 | network | official |  |
-| `image_picker` | Image picker | 0.1.0 | media | official | `media` |
-| `l10n` | Localization | 0.1.2 | l10n | official | `l10n` |
-| `local_db` | Local database | 0.1.0 | database | official | `local_db` |
-| `logger` | Logger | 0.1.0 | logging | official | `logger` |
-| `notifications` | Notifications | 0.1.3 | notifications | official | `notifications` |
-| `permission` | Permission | 0.1.0 | platform | official | `permission` |
-| `rest_auth` | REST auth | 0.1.1 | auth | official | `auth` |
-| `riverpod` | Riverpod state management | 0.1.1 | state | official | `state_riverpod` |
-| `secure_storage` | Secure storage | 0.1.0 | storage | official | `secure_storage` |
-| `social_login` | Social login | 0.1.0 | social | official | `social_login` |
-| `storage` | Key-value storage | 0.1.0 | storage | official | `storage` |
-| `supabase` | Supabase | 0.1.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
-| `theme` | Theme | 0.1.0 | theme | official | `theme` |
+| `analytics` | Analytics | 0.1.1 | analytics | official | `analytics` |
+| `appwrite` | Appwrite | 0.1.2 | auth | official | `auth`, `remote_database`, `file_storage` |
+| `biometric` | Biometric | 0.1.4 | security | official | `biometric` |
+| `bloc` | Bloc state management | 0.1.3 | state | official | `state_bloc` |
+| `connectivity` | Connectivity | 0.1.1 | connectivity | official | `connectivity` |
+| `deep_link` | Deep links | 0.1.2 | deep_link | official | `deep_links` |
+| `dio` | Dio HTTP client | 0.2.4 | network | official | `http_client`, `http_pipeline` |
+| `env` | Environment | 0.1.1 | config | official | `env` |
+| `firebase` | Firebase | 0.2.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
+| `flavors` | Flavors | 0.1.1 | flavor | official | `flavor` |
+| `go_router` | GoRouter | 0.2.1 | navigation | official | `navigation` |
+| `http_cache` | HTTP cache | 0.1.1 | network | official | `http_cache` |
+| `http_retry` | HTTP retry | 0.1.1 | network | official |  |
+| `image_picker` | Image picker | 0.1.1 | media | official | `media` |
+| `l10n` | Localization | 0.1.5 | l10n | official | `l10n` |
+| `local_db` | Local database | 0.1.1 | database | official | `local_db` |
+| `logger` | Logger | 0.1.1 | logging | official | `logger` |
+| `notifications` | Notifications | 0.1.4 | notifications | official | `notifications` |
+| `permission` | Permission | 0.1.1 | platform | official | `permission` |
+| `rest_auth` | REST auth | 0.1.2 | auth | official | `auth` |
+| `riverpod` | Riverpod state management | 0.1.2 | state | official | `state_riverpod` |
+| `secure_storage` | Secure storage | 0.1.1 | storage | official | `secure_storage` |
+| `social_login` | Social login | 0.1.1 | social | official | `social_login` |
+| `storage` | Key-value storage | 0.1.1 | storage | official | `storage` |
+| `supabase` | Supabase | 0.1.2 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
+| `theme` | Theme | 0.1.1 | theme | official | `theme` |
 
 ## analytics
 

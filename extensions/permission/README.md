@@ -15,3 +15,10 @@ An implementation of `Permissions` from `kiln_core` on top of
 Native notes: Android manifest entries and the iOS Info.plist must be adjusted
 to match the selected kind. `permission_handler` does not add native entries
 automatically.
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

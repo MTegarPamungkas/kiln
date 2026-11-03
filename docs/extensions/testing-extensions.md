@@ -24,7 +24,21 @@ Files in the extension's `test/` folder:
 `ExtensionTestHarness` provides `loadManifest`, `validateManifest`, `bundle`,
 and `render`.
 
-## 3. Contract suite
+## 3. Support tests
+
+Extensions that expose `SupportInfo` keep a `*_support_test.dart` file in the
+brick tests. Cover:
+
+- `supported` for a valid configuration,
+- the relevant `unsupportedPlatform`, `unsupportedDevice`, `permissionDenied`,
+  `notConfigured`, or `unavailable` state,
+- `SupportInfo.toFailure()` code mapping,
+- probe caching when the probe is expensive.
+
+Bootstrap tests in `kiln_core` cover the lifecycle rule: unsupported modules
+skip `ready()`, while probe failures are recorded without stopping the app.
+
+## 4. Contract suite
 
 `kiln_testing` provides suites for HttpClient, Storage, SecureStorage,
 AuthRepository, AccountManagement, SocialAuth, LocalDatabase, RemoteDatabase,

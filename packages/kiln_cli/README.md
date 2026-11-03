@@ -4,6 +4,7 @@ The Kiln command line interface.
 
 ```bash
 kiln create my_app --with dio --answer base_url=https://api.example.com
+kiln create starter_app --template app
 kiln add dio
 kiln doctor
 kiln remove dio --yes

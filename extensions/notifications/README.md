@@ -19,3 +19,10 @@ After install, the Android receivers for scheduling have already been added
 automatically through `android.receivers`. If `exact_alarms` is selected,
 complete the exact alarm permission step in
 [docs/troubleshooting-delivery.md](docs/troubleshooting-delivery.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

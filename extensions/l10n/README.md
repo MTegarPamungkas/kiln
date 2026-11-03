@@ -53,3 +53,10 @@ showSnackBar(SnackBar(content: Text(presenter.present(failure))));
 Details are in [docs/l10n.md](docs/l10n.md),
 [docs/adding-a-language.md](docs/adding-a-language.md), and
 [docs/formatting.md](docs/formatting.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

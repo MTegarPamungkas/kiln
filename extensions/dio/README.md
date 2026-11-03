@@ -32,3 +32,10 @@ flutter run --dart-define=KILN_API_KEY=secret
 
 Use `api_key_query=key` instead of a header when the API expects the key in the
 query string. `api_key_prefix` supports values such as `Bearer `.
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

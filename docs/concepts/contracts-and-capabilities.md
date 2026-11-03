@@ -29,3 +29,8 @@ final client = RegistryScope.read<HttpClient>(context);
 
 Concrete implementations such as `DioClient` are not imported by the
 application.
+
+Capabilities decide whether a provider is installed. They do not promise that
+the current device can use it. Runtime readiness is reported separately by
+`KilnModule.support()` and exposed through `SupportRegistry`; see
+[../extensions/support-and-devices.md](../extensions/support-and-devices.md).

@@ -71,3 +71,10 @@ call `Firebase.initializeApp` before `KilnBootstrap.run`.
 
 Other documentation: [setup](docs/firebase-setup.md),
 [emulator](docs/emulators.md), [security rules](docs/security-rules.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

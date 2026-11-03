@@ -11,8 +11,8 @@
 | `kiln list` | Installed/available extensions |
 | `kiln info <extension>` | Full manifest of a single extension |
 | `kiln graph` | Requires graph, `text`/`mermaid` format |
-| `kiln doctor` | Check hashes, codegen, journal, dependencies, platform |
-| `kiln upgrade` | Upgrade extensions from the registry (or plan from the catalog) |
+| `kiln doctor` | Check hashes, codegen, journal, dependencies, and manifest/platform compatibility |
+| `kiln upgrade` | Upgrade extensions from the registry; validates the candidate against installed extensions |
 | `kiln rollback` | Undo the last/interrupted transaction |
 | `kiln config` | Registry, mirror, offline mode |
 | `kiln cache` | Inspect/clear the cache |
@@ -28,6 +28,13 @@
 - `--yes` for non-interactive mode.
 - `--dry-run` on `add`/`remove`/`repair`.
 - `--answer name=value` on `add`/`create`/`repair`.
+
+## Runtime support
+
+`kiln doctor` only sees manifests and the project. Device-level support (camera,
+biometrics, keyrings, plugin initialization, backend configuration) is probed at
+runtime by `KilnModule.support()` and exposed through `SupportRegistry`. See
+[../extensions/support-and-devices.md](../extensions/support-and-devices.md).
 - `--force` on `remove` to delete files that were already edited, and on
   `repair` to overwrite ARB files.
 - `--core-path` on `create` to use a local workspace.

@@ -14,3 +14,10 @@ Local biometrics, app lock, and protected secret storage.
 
 App lock guide: [docs/app-lock.md](docs/app-lock.md). Platform requirements:
 [docs/platform-requirements.md](docs/platform-requirements.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

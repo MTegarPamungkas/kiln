@@ -11,6 +11,10 @@ The foundation phase runs end-to-end:
 
 - `kiln create` generates a minimal application root from the `app_basic`
   brick; `--template app` adds the starter page and demo shell.
+- Every extension reports runtime platform/device/config support through
+  `SupportRegistry`. Unsupported extensions return typed information and do not
+  block startup. See
+  [docs/extensions/support-and-devices.md](docs/extensions/support-and-devices.md).
 - `kiln add dio` installs an extension transactionally, including Android
   patches, pubspec dependencies, lockfile, and `extensions.g.dart`.
 - `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`, `cache`,
@@ -64,7 +68,7 @@ See [getting-started.md](docs/getting-started.md) and
 
 | Package | Purpose |
 | --- | --- |
-| `kiln_core` | Contracts, failures, registry runtime, sessions, privacy |
+| `kiln_core` | Contracts, failures, registry runtime, support probes, sessions, privacy |
 | `kiln_extension_sdk` | Manifest, resolver, renderer, installer, migrations |
 | `kiln_cli` | The `kiln` command line interface |
 | `kiln_store` | Registry client, checksum verification, publishing |

@@ -13,3 +13,10 @@ installed `SocialAuth` backend.
 
 Google setup: [docs/google-setup.md](docs/google-setup.md). Apple setup:
 [docs/apple-setup.md](docs/apple-setup.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

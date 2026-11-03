@@ -45,6 +45,7 @@ android:
     path_prefixes: [/profile]
   allow_backup: false
   min_sdk: 24
+  compile_sdk: 37
   receivers:
     - name: com.example.BootReceiver
       exported: false
@@ -92,8 +93,19 @@ compatibility:
 - Native patches are applied only when the platform folder exists in the
   project.
 - `conditional` applies a native block only when all prompt answers in `when`
-  match; lists are compared element by element.
+  match; lists are compared element by element. A scalar expected value matches
+  when a multi-select answer contains it, so `kinds: camera` can add the camera
+  native setup.
+- `android.compile_sdk` raises the project value only when it is lower; the
+  patch is recorded and reverted with the extension.
 - `manual_steps` are tracked by `kiln doctor`.
+
+## Runtime support
+
+`platforms` is a build-time filter. Device and service readiness is not declared
+in the manifest; the module reports it from `KilnModule.support()` and
+`KilnBootstrap` records the result in `SupportRegistry`. See
+[extensions/support-and-devices.md](extensions/support-and-devices.md).
 
 ## Validation
 

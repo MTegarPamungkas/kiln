@@ -8,7 +8,7 @@ through extensions. A generated application only knows the contracts in
 
 | Package | Responsibility |
 | --- | --- |
-| `kiln_core` | Contracts, `Failure`, `Result`, Registry, bootstrap, slots, session, privacy |
+| `kiln_core` | Contracts, `Failure`, `Result`, Registry, bootstrap, support probes, slots, session, privacy |
 | `kiln_extension_sdk` | Manifest, resolver, Mason renderer, transactional installer, migrations |
 | `kiln_cli` | `kiln` commands, prompts, reports, extension bundles |
 | `kiln_testing` | Fakes per contract, contract suite, widget harness |
@@ -20,14 +20,26 @@ through extensions. A generated application only knows the contracts in
 1. `main.dart` runs `KilnBootstrap.run(modules: kilnModules())`.
 2. Bootstrap assembles modules from the `requires`/`provides` capabilities.
 3. Each module registers its services with the `Registry`.
-4. `KilnApp` exposes the Registry through `RegistryScope`.
-5. `AppShell` reads the `AppThemeConfig`, `AppLocalizationsConfig`, and
+4. Bootstrap calls `KilnModule.support(registry)` and records the result in
+   `SupportRegistry`. Modules that are not supported skip `ready()`.
+5. `KilnApp` exposes the Registry through `RegistryScope`.
+6. `AppShell` reads the `AppThemeConfig`, `AppLocalizationsConfig`, and
    `RouterConfig` seams, plus the `app.wrappers` slot.
-6. Features read contracts (`RegistryScope.read<HttpClient>()`), not
+7. Features read contracts (`RegistryScope.read<HttpClient>()`), not
    implementations.
 
 There is no static facade or global registry. Every service access goes through
 the Registry that is passed explicitly.
+
+## Support model
+
+Manifest `platforms` decides whether a module is loaded. Runtime support decides
+whether it can be used on the current device and configuration. Extensions
+return `SupportInfo` from `support()`; the application reads
+`SupportRegistry` when it needs to show information or choose a fallback.
+Support probes must be cheap and must not prompt the user. Unsupported calls
+return typed failures instead of crashing startup. See
+[extensions/support-and-devices.md](extensions/support-and-devices.md).
 
 ## Extension model
 

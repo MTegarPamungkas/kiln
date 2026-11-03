@@ -57,3 +57,10 @@ final stored = await storage.upload(
 Query mapping, document permissions, and behavior differences are covered in
 [docs/collections-and-permissions.md](docs/collections-and-permissions.md) and
 [docs/backend-swap-notes.md](docs/backend-swap-notes.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

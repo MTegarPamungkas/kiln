@@ -16,3 +16,10 @@ An implementation of `Analytics` from `kiln_core` on top of PostHog.
 Install this extension together with the analytics module in the app's module
 list, then read [docs/analytics.md](docs/analytics.md) for configuration and
 usage.
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

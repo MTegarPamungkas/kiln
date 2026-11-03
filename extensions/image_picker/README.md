@@ -20,3 +20,10 @@ An implementation of `MediaPicker` from `kiln_core` on top of the
 Platform limits and native notes are in
 [docs/platform-notes.md](docs/platform-notes.md). The upload flow is in
 [docs/upload-flow.md](docs/upload-flow.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

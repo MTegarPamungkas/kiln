@@ -87,3 +87,10 @@ context.pop();
 The full guide is in [docs/navigation.md](docs/navigation.md),
 [docs/route-guards.md](docs/route-guards.md), and
 [docs/deep-links-and-routing.md](docs/deep-links-and-routing.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

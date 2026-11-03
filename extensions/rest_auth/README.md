@@ -16,3 +16,10 @@
 
 The server JSON shape is in [docs/server-contract.md](docs/server-contract.md),
 the refresh flow is in [docs/token-refresh.md](docs/token-refresh.md).
+
+## Runtime support
+
+This extension reports platform and device readiness through `SupportRegistry`.
+Unsupported calls return typed information instead of blocking startup. See
+[support and devices](../../docs/extensions/support-and-devices.md) for the
+probe and possible states.

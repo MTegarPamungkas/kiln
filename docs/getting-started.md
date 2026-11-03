@@ -77,8 +77,9 @@ kiln remove dio --yes
 my_app/
 ├─ lib/
 │  ├─ main.dart
-│  ├─ app/            # KilnApp, RegistryScope, AppShell, error screen
-│  ├─ core/           # theme, l10n, global error handler
+│  ├─ app/            # KilnApp, RegistryScope, AppShell seams, error screen
+│  ├─ features/home/  # application-owned starting page (minimal template)
+│  ├─ core/           # theme, l10n seams, global error handler
 │  ├─ extensions/     # extension code + extensions.g.dart
 │  └─ ...
 ├─ test/
@@ -87,8 +88,34 @@ my_app/
 └─ .kiln/             # journal and backups, ignored by Git
 ```
 
+The starter template (`--template app`) also includes `app_home.dart` and the
+starter page. The minimal template passes its own `HomePage` to `KilnApp`.
+
 `lib/extensions/extensions.g.dart` is the only application file owned by Kiln.
 Do not edit it by hand; `kiln doctor --fix` keeps it in sync.
+
+## Runtime support
+
+Bootstrap probes every installed extension after registration. Results are
+available without app-side platform checks:
+
+```dart
+final support = registry.read<SupportRegistry>();
+
+final biometric = support['biometric'];
+if (biometric?.isSupported ?? false) {
+  // show the biometric action
+} else {
+  // show biometric?.message and fall back
+}
+```
+
+Unsupported extensions are reported as `unsupportedPlatform`,
+`unsupportedDevice`, `permissionDenied`, `notConfigured`, or `unavailable`.
+Their `ready()` hook is skipped, and calls return typed failures such as
+`support.unsupported_device` or `PermissionStatus.unsupported`. The full
+coverage table is in
+[extensions/support-and-devices.md](extensions/support-and-devices.md).
 
 ## Writing an extension
 
@@ -104,7 +131,7 @@ and [extension-manifest.md](extension-manifest.md).
 
 ## Bundled catalog
 
-Phase 2 currently provides:
+The bundled catalog provides:
 
 - `bloc` and `riverpod` for state management (exclusive).
 - `dio` for the HTTP client and pipeline.
