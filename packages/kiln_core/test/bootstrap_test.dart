@@ -8,6 +8,7 @@ final class _TrackedModule extends KilnModule {
     this.id, {
     this.provides = const <String>{},
     this.requires = const <String>{},
+    this.platforms = const <String>{},
     this.readyAction,
     this.events,
   });
@@ -18,6 +19,8 @@ final class _TrackedModule extends KilnModule {
   final Set<String> provides;
   @override
   final Set<String> requires;
+  @override
+  final Set<String> platforms;
   final FutureOr<void> Function()? readyAction;
   final List<String>? events;
 
@@ -43,6 +46,23 @@ final class _TrackedModule extends KilnModule {
 
 void main() {
   group('KilnBootstrap', () {
+    test('skips modules that do not support the current platform', () async {
+      final events = <String>[];
+      await KilnBootstrap.run(
+        modules: [
+          _TrackedModule('web-only', platforms: const {'web'}, events: events),
+          _TrackedModule(
+            'android',
+            platforms: const {'android'},
+            events: events,
+          ),
+        ],
+        platform: 'android',
+      );
+
+      expect(events, ['register:android', 'ready:android']);
+    });
+
     test('runs modules in dependency order', () async {
       final events = <String>[];
       final registry = await KilnBootstrap.run(

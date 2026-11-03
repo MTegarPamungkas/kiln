@@ -52,6 +52,31 @@ void main() {
     expect(harness.gateway.authCalls, 1);
   });
 
+  test('disables itself when the device has no biometrics', () async {
+    final harness = _build();
+    harness.gateway.supported = false;
+
+    await harness.lock.initialize();
+    harness.lock.lock();
+    harness.lock.onPause(harness.clock.now());
+    await harness.lock.onResume(
+      harness.clock.now().add(const Duration(minutes: 5)),
+    );
+
+    expect(harness.lock.enabled.value, isFalse);
+    expect(harness.lock.isLocked, isFalse);
+    expect(await harness.lock.unlock(), isTrue);
+    expect(harness.gateway.authCalls, 0);
+  });
+
+  test('stays enabled when biometrics are available', () async {
+    final harness = _build();
+
+    await harness.lock.initialize();
+
+    expect(harness.lock.enabled.value, isTrue);
+  });
+
   test('stays locked when authentication fails', () async {
     final harness = _build();
     harness.gateway.result = false;

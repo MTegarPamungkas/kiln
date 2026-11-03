@@ -19,6 +19,9 @@ final class BiometricModule extends KilnModule {
   String get id => 'biometric';
 
   @override
+  Set<String> get platforms => const <String>{'android', 'ios', 'macos'};
+
+  @override
   Set<String> get provides => const <String>{'biometric'};
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
@@ -54,12 +56,26 @@ void main() {
     expect(app.locale, isNull);
     expect(app.currentLocale, const Locale('en'));
     expect(
-      registry
-          .read<FailureMessages>()
-          .messageFor(
-            const Failure(code: FailureCode.networkOffline, message: 'off'),
-          ),
+      registry.read<FailureMessages>().messageFor(
+        const Failure(code: FailureCode.networkOffline, message: 'off'),
+      ),
       lookupAppLocalizations(const Locale('en')).failureNetworkOffline,
+    );
+  });
+
+  test('failure messages follow the platform locale by default', () {
+    final registry = GetItRegistry();
+    const L10nModule().register(registry);
+
+    final expected = lookupAppLocalizations(
+      L10nConfig.defaults.resolve(PlatformDispatcher.instance.locale),
+    );
+
+    expect(
+      registry.read<FailureMessages>().messageFor(
+        const Failure(code: FailureCode.networkOffline, message: 'off'),
+      ),
+      expected.failureNetworkOffline,
     );
   });
 

@@ -34,13 +34,15 @@ void main() {
     final registry = GetItRegistry();
     final slots = SlotRegistry();
     registry.registerSingleton<SlotRegistry>(slots);
-    slots.open<AppRoute>(SlotNames.routerRoutes).add(
-      AppRoute(
-        path: '/settings',
-        name: 'settings',
-        builder: (BuildContext context) => const SizedBox.shrink(),
-      ),
-    );
+    slots
+        .open<AppRoute>(SlotNames.routerRoutes)
+        .add(
+          AppRoute(
+            path: '/settings',
+            name: 'settings',
+            builder: (BuildContext context) => const SizedBox.shrink(),
+          ),
+        );
 
     GoRouterModule().register(registry);
 
@@ -52,6 +54,26 @@ void main() {
         .whereType<GoRoute>()
         .map((GoRoute route) => route.path);
     expect(routes, contains('/settings'));
+  });
+
+  test('honours an application supplied config', () {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    final registry = GetItRegistry();
+    const config = AppRouterConfig(includeSampleShell: false);
+    registry.registerSingleton<AppRouterConfig>(config);
+
+    GoRouterModule().register(registry);
+
+    expect(registry.read<AppRouterConfig>(), same(config));
+    expect(
+      registry
+          .read<AppRouter>()
+          .router
+          .configuration
+          .routes
+          .whereType<ShellRoute>(),
+      isEmpty,
+    );
   });
 
   testWidgets('connects deep links during ready', (tester) async {

@@ -30,6 +30,7 @@ void main() {
         'lib/extensions/go_router/not_found_page.dart',
         'lib/extensions/go_router/shell_scaffold.dart',
         'lib/extensions/go_router/route_transitions.dart',
+        'lib/extensions/go_router/sign_in_page_builder.dart',
         'test/extensions/go_router/app_router_test.dart',
         'test/extensions/go_router/go_router_module_test.dart',
         'test/extensions/go_router/app_routes_test.dart',

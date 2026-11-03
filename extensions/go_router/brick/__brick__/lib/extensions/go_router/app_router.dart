@@ -16,6 +16,7 @@ import 'route_slot.dart';
 import 'route_transitions.dart';
 import 'router_config.dart';
 import 'session_refresh_listenable.dart';
+import 'sign_in_page_builder.dart';
 import 'shell_scaffold.dart';
 
 /// Owns the application [GoRouter] and its optional integrations.
@@ -45,6 +46,8 @@ final class AppRouter {
             ?.items ??
         const <AppRoute>[];
 
+    final signInBuilder = registry.readOrNull<SignInPageBuilder>();
+
     final routeGuards = <RouteGuard>[
       if (session != null) const AuthRedirect(),
       ...guards,
@@ -54,10 +57,7 @@ final class AppRouter {
       initialLocation: config.initialLocation,
       debugLogDiagnostics: config.debugLogDiagnostics,
       refreshListenable: refreshListenable,
-      observers: <NavigatorObserver>[
-        navigationObserver,
-        ...config.observers,
-      ],
+      observers: <NavigatorObserver>[navigationObserver, ...config.observers],
       redirect: routeGuards.isEmpty
           ? null
           : (BuildContext context, GoRouterState state) {
@@ -74,7 +74,7 @@ final class AppRouter {
           config.errorBuilder ??
           (BuildContext context, GoRouterState state) => const NotFoundPage(),
       routes: <RouteBase>[
-        buildShellRoute(),
+        if (config.includeSampleShell) buildShellRoute(),
         GoRoute(
           path: AppRoutes.signIn,
           name: AppRoutes.signInName,
@@ -82,7 +82,7 @@ final class AppRouter {
             return buildRoutePage(
               state: state,
               platform: Theme.of(context).platform,
-              child: const _SignInPage(),
+              child: signInBuilder?.build(context) ?? const _SignInPage(),
             );
           },
         ),

@@ -54,6 +54,29 @@ Contracts used by the application are defined in `kiln_core`. Do not create a
 static facade or a global registry. Application code reads services through
 `RegistryScope`/`Registry`.
 
+## Platform support
+
+Declare the platforms an extension can run on in `extension.yaml`:
+
+```yaml
+platforms:
+  - android
+  - ios
+  - macos
+```
+
+Mirror the list on the module so `KilnBootstrap` skips it on other targets:
+
+```dart
+@override
+Set<String> get platforms => const {'android', 'ios', 'macos'};
+```
+
+A project can still list more platforms (for example web). `kiln doctor`
+reports `biometric is disabled on web` as a warning, and the app keeps working
+on the supported platforms. It only fails when the extension and the project
+share no platform at all.
+
 ## 4. Rules
 
 - An extension does not import other extensions.

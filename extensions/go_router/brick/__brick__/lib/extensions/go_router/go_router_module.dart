@@ -34,12 +34,15 @@ final class GoRouterModule extends KilnModule {
     }
     slots.open<AppRoute>(SlotNames.routerRoutes);
 
-    const config = AppRouterConfig();
+    final config =
+        registry.readOrNull<AppRouterConfig>() ?? const AppRouterConfig();
     final appRouter = AppRouter(registry: registry, config: config);
     _appRouter = appRouter;
 
+    if (registry.readOrNull<AppRouterConfig>() == null) {
+      registry.registerSingleton<AppRouterConfig>(config);
+    }
     registry
-      ..registerSingleton<AppRouterConfig>(config)
       ..registerSingleton<AppRouter>(appRouter)
       ..registerSingleton<RouterConfig<Object>>(appRouter.router);
   }

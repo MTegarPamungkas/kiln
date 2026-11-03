@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T08:32:38.006742Z",
+  "generated_at": "2026-11-03T13:00:47.978956Z",
   "extensions": [
     {
       "id": "analytics",
@@ -13,7 +13,7 @@
         {
           "version": "0.1.0",
           "url": "archives/analytics-0.1.0.tgz",
-          "sha256": "a9cf01051a2fd996968ebc0ed1a3344f9b4389e3bf4abe95950a4bab661dc1c9",
+          "sha256": "43e33d42db3c4e22d9f5cee7d95aa840e0d154fa819c8d9de72a3a1b3be832d7",
           "provides": [
             "analytics"
           ],
@@ -49,7 +49,7 @@
         {
           "version": "0.1.1",
           "url": "archives/appwrite-0.1.1.tgz",
-          "sha256": "f69c6f89c6fc34707bca28a88210ab9b63b823b7359b05ce4a4143a0fbf30989",
+          "sha256": "f9011865e193b04a53403632a723a3417cf3bee984fa29caad5f74aa25ce4255",
           "provides": [
             "auth",
             "remote_database",
@@ -67,7 +67,7 @@
       "name": "Biometric",
       "description": "Biometric authentication, app lock, and protected storage.",
       "category": "security",
-      "latest": "0.1.1",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -86,6 +86,30 @@
           "version": "0.1.1",
           "url": "archives/biometric-0.1.1.tgz",
           "sha256": "ea1f9ebbae0d45e1ac0b49ad94ae39e2aa0cd8b0d678bb940506532946bd9c80",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/biometric-0.1.2.tgz",
+          "sha256": "249dd0527f6d0a040fafd179a85e45b18ac5969e8c4ca1ce497bfe4f5dabe3a4",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/biometric-0.1.3.tgz",
+          "sha256": "5b2ce808668d713c5d0938830080be229fa33b2c2e50502167ff3ccdce8563e5",
           "provides": [
             "biometric"
           ],
@@ -131,7 +155,7 @@
         {
           "version": "0.1.2",
           "url": "archives/bloc-0.1.2.tgz",
-          "sha256": "61a6825537a1a5fb333d1ee6736145f3acc618d61200a057534c8111bd215692",
+          "sha256": "8139ee632a431074eab2ce6c58c5548b3243ab76fc9901bdf8255e985e73bd02",
           "provides": [
             "state_bloc"
           ],
@@ -153,7 +177,7 @@
         {
           "version": "0.1.0",
           "url": "archives/connectivity-0.1.0.tgz",
-          "sha256": "37d0ceb737f8d75d074cde9dafdbb5dbc35cba1305f86f6accb59cbc5a83a8db",
+          "sha256": "9f86246c8ee1ce8d5c025b9d813f6e5641720b0b0c128a7889a24da3ad22d748",
           "provides": [
             "connectivity"
           ],
@@ -187,7 +211,7 @@
         {
           "version": "0.1.1",
           "url": "archives/deep_link-0.1.1.tgz",
-          "sha256": "cde7d50ce85813d71507a174192050e0299663651db62a20d0599e5089d053d6",
+          "sha256": "31e2a86bb60b635f372281307684a6d8313d8d69489da88dfa6db63d7fe09df2",
           "provides": [
             "deep_links"
           ],
@@ -271,7 +295,7 @@
         {
           "version": "0.1.0",
           "url": "archives/env-0.1.0.tgz",
-          "sha256": "1803e6f4867adb9fc01221d92294e1c8986d5591323e44e824ae220d09d4f52b",
+          "sha256": "5ff6598ef15910905b20c513b0788633001689bd4eaef3da5e3599905e01a7ca",
           "provides": [
             "env"
           ],
@@ -309,7 +333,7 @@
         {
           "version": "0.2.0",
           "url": "archives/firebase-0.2.0.tgz",
-          "sha256": "07cc0746170244834c7d162d3e58dd0cced0d87ac2a8adf354465b5e1886df42",
+          "sha256": "366e25f3ba4f28f86f4b956d704f841c9ef653b8b2bf4977d5d9ce5a854819b3",
           "provides": [
             "auth",
             "social_auth",
@@ -335,7 +359,7 @@
         {
           "version": "0.1.0",
           "url": "archives/flavors-0.1.0.tgz",
-          "sha256": "c219771b3812671b8b095516bab018b37c58b2e06d8956a53b0c48a41f61c245",
+          "sha256": "b0ae02396bcd931dec8967812997d13a1f6b88db839b118584504153839733d1",
           "provides": [
             "flavor"
           ],
@@ -351,13 +375,25 @@
       "name": "GoRouter",
       "description": "Declarative routing with route slots, guards, and deep link mapping.",
       "category": "navigation",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/go_router-0.1.0.tgz",
-          "sha256": "ee4138017080c3e6441ce776530c2925187236653742dc651463a36c86d88a41",
+          "sha256": "fe57190a58a820a0b5311ada1fda50d4f16165469c7adaf4f39b7f3368f95d6b",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/go_router-0.1.1.tgz",
+          "sha256": "d8b2f5eee1c47f4a015b4a0ae301511d92230811b3126bdb924207e611f7c01f",
           "provides": [
             "navigation"
           ],
@@ -379,7 +415,7 @@
         {
           "version": "0.1.0",
           "url": "archives/http_cache-0.1.0.tgz",
-          "sha256": "9784071602f4581cb540ce8ca4beb16f88d15170c2334b19359b34247d8b5195",
+          "sha256": "058b01d16e0f27bc88772e0e2fb7e4f7e1144adcbd2f95ff3685fef883162f43",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -405,7 +441,7 @@
         {
           "version": "0.1.0",
           "url": "archives/http_retry-0.1.0.tgz",
-          "sha256": "31555709742cfde804fcf85156127012dbadc5e20e70c7d47452bed4ad8eec70",
+          "sha256": "bc3cc2000c4462c8356b2993dfe840bc4e10d87bef8634a81630b3dc3d835d90",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -428,7 +464,7 @@
         {
           "version": "0.1.0",
           "url": "archives/image_picker-0.1.0.tgz",
-          "sha256": "cacaf64cb121f6ab421df0c0f68ebd1d09ffd63e99d833e078bc5b2b44ab1d8d",
+          "sha256": "cedcfb4b43d0b2250b4b4e1a2889fc0786ffbe25152f44f8597d6f2309b33a18",
           "provides": [
             "media"
           ],
@@ -444,7 +480,7 @@
       "name": "Localization",
       "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
       "category": "l10n",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -474,7 +510,19 @@
         {
           "version": "0.1.2",
           "url": "archives/l10n-0.1.2.tgz",
-          "sha256": "1aeec5eb76f54ff991c824940d44b32443f4c659f2f9e7cb19b8c4d12201bc20",
+          "sha256": "167141842c8c9d56eaee790a277d3035d517dc179794864f97d2a82f3e46ce2f",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/l10n-0.1.3.tgz",
+          "sha256": "9da9bbedcdd56ea7b64339dfaed7c73dc95d7ec5c028396f36ec4bc2ac86d7e4",
           "provides": [
             "l10n"
           ],
@@ -496,7 +544,7 @@
         {
           "version": "0.1.0",
           "url": "archives/local_db-0.1.0.tgz",
-          "sha256": "a788fc4f64e8d87520dadb69a590644aa3d826a23f081c94d5c95c6e337b93c1",
+          "sha256": "691c8f7c7204c92c87f6d43f6ce2a84acb76deeb61742616a420de26cd8769da",
           "provides": [
             "local_db"
           ],
@@ -518,7 +566,7 @@
         {
           "version": "0.1.0",
           "url": "archives/logger-0.1.0.tgz",
-          "sha256": "8bc4e70c882772aabee8f8a6da78b28f21534de55c2d2c18b042e5dd0efbe75a",
+          "sha256": "3f6d4b076c22220f63b59814102f35ccbcb4ce75c146b63c287f07f90c2b7ba7",
           "provides": [
             "logger"
           ],
@@ -576,7 +624,7 @@
         {
           "version": "0.1.3",
           "url": "archives/notifications-0.1.3.tgz",
-          "sha256": "db969bc2f90009c37dbe94e6f4954501ccdb1cef1c6de1389b15f669e8ef324d",
+          "sha256": "d5c7928399dfb3ce0d7ca38df5b540606ea4239218a9658ba4cb37e9665aa725",
           "provides": [
             "notifications"
           ],
@@ -598,7 +646,7 @@
         {
           "version": "0.1.0",
           "url": "archives/permission-0.1.0.tgz",
-          "sha256": "17b156a689b7bee26b7d7761707baad7d14f9b653388a34ac63e00e555ad899e",
+          "sha256": "6a2354e4e11bd5246375375bd66ce29897170cb10d69c5b0937b0311e5ffd467",
           "provides": [
             "permission"
           ],
@@ -636,7 +684,7 @@
         {
           "version": "0.1.1",
           "url": "archives/rest_auth-0.1.1.tgz",
-          "sha256": "2d51ce6cceea2e6f4d0e101ed6b34e3e4cb07e82a643a603f652516fe6d0f434",
+          "sha256": "f5e685457ff51da5eed648bf7558b9d8c553c70f3b5ec2b392903e44623dd1c7",
           "requires": [
             "http_client",
             "secure_storage"
@@ -674,7 +722,7 @@
         {
           "version": "0.1.1",
           "url": "archives/riverpod-0.1.1.tgz",
-          "sha256": "a84e41d6fb70bc3f5b34d8b964898a875b567efe36bfe96965b8fc3aeaf1e056",
+          "sha256": "09ce3c235c5ce159f674ee6bb0f2497d231c5fbddca465f5f4c4bc7c982d67a0",
           "provides": [
             "state_riverpod"
           ],
@@ -696,7 +744,7 @@
         {
           "version": "0.1.0",
           "url": "archives/secure_storage-0.1.0.tgz",
-          "sha256": "2a5c7254c137e0a994b1a29d760eeb8beea2dca7984a7f5a82d5b0bb4cd9441a",
+          "sha256": "141a53c7de95f9be5d5f8cd71425a431d9fc5b0ee0ce21db90f82fcde8ed1cbd",
           "provides": [
             "secure_storage"
           ],
@@ -718,7 +766,7 @@
         {
           "version": "0.1.0",
           "url": "archives/social_login-0.1.0.tgz",
-          "sha256": "0a09ced5c3335e2421a28f3cb6c26eb23283be9c1904a48ff98706ac8a205435",
+          "sha256": "27a06c9ceaf33580690b796587aeddd7b929b98b4517b34dcdad45eb55eb00a5",
           "requires": [
             "social_auth"
           ],
@@ -743,7 +791,7 @@
         {
           "version": "0.1.0",
           "url": "archives/storage-0.1.0.tgz",
-          "sha256": "77845bf84f4a7b5af15cd9f4f0ccd84d57a4eb3a0dfead9c5f4fde0dc2da404d",
+          "sha256": "58fd6a9af05dac24e7017b0534a75bca78779e2470840ece4aeda4d3b2e979a7",
           "provides": [
             "storage"
           ],
@@ -780,7 +828,7 @@
         {
           "version": "0.1.1",
           "url": "archives/supabase-0.1.1.tgz",
-          "sha256": "f202c0f05cc5a6a2f653844b0fb0ee669ad860b570e2f2dd89e096ed8ae17ccb",
+          "sha256": "a114cfcdc8886f0e89b0f1d9220d00954009512b1827ad8e54c6e697e584aa9c",
           "provides": [
             "auth",
             "social_auth",
@@ -805,7 +853,7 @@
         {
           "version": "0.1.0",
           "url": "archives/theme-0.1.0.tgz",
-          "sha256": "a1cfbf071e839950b22bf6bed42e7fb6a1f4326f7f500681d149d63807df9301",
+          "sha256": "b96b966ac120cb453a5b90a2ba0a397a8024e449a0959362646d26d172d02275",
           "provides": [
             "theme"
           ],

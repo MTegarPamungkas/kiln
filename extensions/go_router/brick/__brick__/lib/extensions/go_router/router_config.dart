@@ -10,10 +10,18 @@ final class AppRouterConfig {
     this.debugLogDiagnostics = false,
     this.errorBuilder,
     this.observers = const <NavigatorObserver>[],
+    this.includeSampleShell = true,
   });
 
   /// Location shown when the platform does not provide one.
   final String initialLocation;
+
+  /// Whether the sample two-tab shell is added to the router.
+  ///
+  /// Applications that contribute their own shell or tabs through the
+  /// `router.routes` slot set this to `false` so the sample `/` and `/explore`
+  /// routes do not claim their paths.
+  final bool includeSampleShell;
 
   /// Prints go_router diagnostics for every navigation decision.
   ///

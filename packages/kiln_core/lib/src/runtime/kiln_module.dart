@@ -17,6 +17,16 @@ abstract class KilnModule {
 
   Set<String> get optionalRequires => const <String>{};
 
+  /// Platforms this module supports. Empty means every platform.
+  ///
+  /// `KilnBootstrap` skips a module when the current platform is not listed,
+  /// so a plugin that has no web implementation can stay installed while the
+  /// web build simply does not register it.
+  Set<String> get platforms => const <String>{};
+
+  bool supportsPlatform(String platform) =>
+      platforms.isEmpty || platforms.contains(platform);
+
   void register(Registry registry);
 
   FutureOr<void> ready(Registry registry) {}

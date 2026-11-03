@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3
+
+- The app lock now checks device biometric availability at runtime. Devices
+  without biometrics keep the app unlocked automatically.
+
+## 0.1.2
+
+- Declare supported platforms so `KilnBootstrap` skips biometric on web and
+  other unsupported targets instead of blocking the whole project.
+
 ## 0.1.1
 
 - Configuration test now renders the prompt answers instead of hardcoded

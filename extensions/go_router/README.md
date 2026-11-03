@@ -16,6 +16,10 @@ fills the `RouterConfig<Object>` seam read by `app_shell.dart`, so
   `Analytics` when the contract is available.
 - `NotFoundPage`, `ShellScaffold`, and `route_transitions.dart` provide starter
   UI that the app can replace.
+- `SignInPageBuilder` replaces the built-in sign-in page while keeping the auth
+  guard.
+- `AppRouterConfig.includeSampleShell` removes the starter `/` and `/explore`
+  routes so the application can own those paths.
 
 ## Install
 
@@ -43,9 +47,30 @@ slots.open<AppRoute>(SlotNames.routerRoutes).add(
 );
 ```
 
-Routes must be contributed before `GoRouterModule.register` runs.
-Modules that provide routes can declare the `navigation` capability
-as a dependency so that the order is correct.
+Routes must be contributed before `GoRouterModule.register` builds the router.
+List the application module before the generated modules:
+
+```dart
+KilnBootstrap.run(
+  modules: <KilnModule>[const AppModule(), ...kilnModules()],
+);
+```
+
+Do not require the `navigation` capability from a module that contributes
+routes: required capabilities are registered first, so the router would be
+built before those routes exist.
+
+## Replacing the sign-in page and starter shell
+
+Register `SignInPageBuilder` to keep `AuthRedirect` but render the app's login
+screen on `/sign-in`:
+
+```dart
+registry.registerSingleton<SignInPageBuilder>(const AppSignInPage());
+```
+
+Register `AppRouterConfig(includeSampleShell: false)` to drop the starter
+two-tab shell, then contribute the app's own `/` route through the slot.
 
 ## Navigating from a widget
 

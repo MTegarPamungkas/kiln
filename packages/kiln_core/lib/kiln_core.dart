@@ -30,6 +30,7 @@ export 'src/runtime/get_it_registry.dart';
 export 'src/runtime/kiln_module.dart';
 export 'src/runtime/lifecycle.dart';
 export 'src/runtime/module_graph.dart';
+export 'src/runtime/platform/platform.dart';
 export 'src/runtime/registry.dart';
 export 'src/runtime/slot.dart';
 export 'src/session/session.dart';

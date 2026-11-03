@@ -7,6 +7,7 @@ import 'get_it_registry.dart';
 import 'kiln_module.dart';
 import 'lifecycle.dart';
 import 'module_graph.dart';
+import 'platform/platform.dart';
 import 'registry.dart';
 import 'slot.dart';
 
@@ -24,6 +25,7 @@ abstract final class KilnBootstrap {
     BootstrapErrorHandler? onError,
     void Function(KilnModule module)? onModuleReady,
     Set<String> capabilities = const <String>{},
+    String? platform,
   }) async {
     final registry = GetItRegistry();
     final slots = SlotRegistry();
@@ -38,8 +40,13 @@ abstract final class KilnBootstrap {
     registry.registerSingleton<Lifecycle>(lifecycle);
     registry.registerSingleton<Clock>(clock ?? const SystemClock());
 
-    final ordered = ModuleGraph(modules)
-        .resolve(availableCapabilities: capabilities);
+    final ordered = ModuleGraph(
+      modules
+          .where(
+            (module) => module.supportsPlatform(platform ?? currentPlatform),
+          )
+          .toList(growable: false),
+    ).resolve(availableCapabilities: capabilities);
     final registered = <KilnModule>[];
 
     try {

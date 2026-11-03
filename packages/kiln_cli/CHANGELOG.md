@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- `kiln doctor` warns when an extension is disabled on some project platforms
+  instead of failing the whole project.
+
 ## 0.1.2
 
 - Beautify `kiln store search/info` with an aligned table, installed/update

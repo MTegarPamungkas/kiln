@@ -181,14 +181,22 @@ final class DoctorCommand extends KilnCommand {
         }
       }
 
+      final extensionPlatforms = manifest.platformSetup.platforms;
+      final supportedOnAny =
+          extensionPlatforms.isEmpty ||
+          project.platforms.any(extensionPlatforms.contains);
       for (final platform in project.platforms) {
         if (!manifest.platformSetup.supports(platform)) {
           checks.add(
             DoctorCheck(
               id: 'platform.$id.$platform',
-              status: DoctorStatus.fail,
-              message: '$id does not support platform $platform',
-              suggestion: 'Remove that platform from kiln.yaml',
+              status: supportedOnAny ? DoctorStatus.warn : DoctorStatus.fail,
+              message: supportedOnAny
+                  ? '$id is disabled on $platform'
+                  : '$id does not support any project platform',
+              suggestion: supportedOnAny
+                  ? 'The module is skipped on $platform; other platforms keep working.'
+                  : 'Remove $id or add one of: ${extensionPlatforms.join(', ')}',
             ),
           );
         }

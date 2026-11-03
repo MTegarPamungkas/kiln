@@ -32,6 +32,8 @@ final class _AppLockScopeState extends State<AppLockScope>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     widget.appLock.locked.addListener(_onLockChanged);
+    widget.appLock.enabled.addListener(_onLockChanged);
+    unawaited(widget.appLock.initialize());
   }
 
   @override
@@ -57,6 +59,7 @@ final class _AppLockScopeState extends State<AppLockScope>
   @override
   void dispose() {
     widget.appLock.locked.removeListener(_onLockChanged);
+    widget.appLock.enabled.removeListener(_onLockChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+- Failure messages now follow the platform locale when the app has no explicit
+  locale choice, matching `MaterialApp` locale resolution instead of always
+  using the fallback locale.
+
 ## 0.1.2
 
 - Installed automatically by `kiln create`; the app shell now requires

@@ -29,7 +29,10 @@ void main() {
         captured.out.join('\n'),
         matches(RegExp(r'kiln \d+\.\d+\.\d+')),
       );
-      expect(captured.out.join('\n'), contains('kiln_core 0.1.0'));
+      expect(
+        captured.out.join('\n'),
+        matches(RegExp(r'kiln_core \d+\.\d+\.\d+')),
+      );
     });
 
     test('version --json is machine readable', () async {

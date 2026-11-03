@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/core/error/failure_presenter.dart';
 import 'package:{{app_name}}/core/l10n/app_localizations_config.dart';
@@ -32,7 +34,8 @@ final class L10nModule extends KilnModule {
     final controller = LocaleController(config: config, store: store);
     final messages = L10nFailureMessages(
       config: config,
-      resolveLocale: () => controller.locale,
+      resolveLocale: () =>
+          controller.locale ?? PlatformDispatcher.instance.locale,
     );
 
     registry
