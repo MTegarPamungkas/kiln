@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T12:30:30.230665Z",
+  "generated_at": "2026-11-04T13:43:03.112181Z",
   "extensions": [
     {
       "id": "analytics",
@@ -541,7 +541,7 @@
       "name": "Firebase",
       "description": "Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.",
       "category": "auth",
-      "latest": "0.2.1",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -580,6 +580,22 @@
           "version": "0.2.1",
           "url": "archives/firebase-0.2.1.tgz",
           "sha256": "be7003e6f30b82a927afc07bab056853a10aa6fc93c989ebbaea43378860ae5e",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/firebase-0.3.0.tgz",
+          "sha256": "d87488691936151925726a391923ec1196335845f46dc667b0e9225e56b5e04e",
           "provides": [
             "auth",
             "social_auth",
@@ -1252,7 +1268,7 @@
       "name": "REST auth",
       "description": "Email and password authentication against a REST API.",
       "category": "auth",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -1291,6 +1307,22 @@
           "version": "0.1.2",
           "url": "archives/rest_auth-0.1.2.tgz",
           "sha256": "0885c985b99777e608229e41d5fa832ed808a596bd342e592867e1611f67ffb4",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/rest_auth-0.1.3.tgz",
+          "sha256": "72376ded96f2e689f32e48d7d481e0adc187b7acfce7e93eaac09448d7f4c322",
           "requires": [
             "http_client",
             "secure_storage"
@@ -1460,7 +1492,7 @@
       "name": "Social login",
       "description": "Google and Apple credential sign-in for a social auth backend.",
       "category": "social",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -1497,6 +1529,21 @@
           "version": "0.2.0",
           "url": "archives/social_login-0.2.0.tgz",
           "sha256": "4449f25383c7c0945e2a5ff2fd0213616bdca1e717a6c24f009d6f3296bf2cd2",
+          "requires": [
+            "social_auth"
+          ],
+          "provides": [
+            "social_login"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/social_login-0.3.0.tgz",
+          "sha256": "335f41ee7621f3a5086181c67ef09d651f2375397df7ea22934d037e65edc1c1",
           "requires": [
             "social_auth"
           ],

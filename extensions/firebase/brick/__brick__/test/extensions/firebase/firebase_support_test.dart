@@ -42,7 +42,7 @@ void main() {
       initializer: _FakeInitializer(
         error: const Failure(
           code: FailureCode.configurationMissing,
-          message: 'FirebaseOptions belum diberikan.',
+          message: 'FirebaseOptions was not provided.',
           kind: FailureKind.configuration,
         ),
       ),

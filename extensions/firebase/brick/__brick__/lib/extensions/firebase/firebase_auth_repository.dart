@@ -86,7 +86,7 @@ final class FirebaseAuthRepository implements AuthRepository {
     if (session == null) {
       throw const Failure(
         code: FailureCode.authUnauthorized,
-        message: 'Firebase tidak mengembalikan sesi pengguna.',
+        message: 'Firebase did not return a user session.',
         kind: FailureKind.authentication,
       );
     }

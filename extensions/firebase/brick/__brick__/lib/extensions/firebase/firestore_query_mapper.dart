@@ -15,10 +15,10 @@ final class FirestoreQueryMapper {
   FirestoreQuery map(RemoteQuery query) {
     final limit = query.limit;
     if (limit != null && limit <= 0) {
-      throw _invalid('limit harus lebih besar dari 0.');
+      throw _invalid('limit must be greater than 0.');
     }
     if (query.offset < 0) {
-      throw _invalid('offset tidak boleh negatif.');
+      throw _invalid('offset cannot be negative.');
     }
 
     final filters = <FirestoreFilter>[];
@@ -39,7 +39,7 @@ final class FirestoreQueryMapper {
   FirestoreFilter _mapFilter(RemoteFilter filter) {
     final field = filter.field.trim();
     if (field.isEmpty) {
-      throw _invalid('Field filter tidak boleh kosong.');
+      throw _invalid('The filter field cannot be empty.');
     }
     final value = filter.value;
     switch (filter.operator) {
@@ -108,10 +108,10 @@ final class FirestoreQueryMapper {
     for (final order in orders) {
       final field = order.field.trim();
       if (field.isEmpty) {
-        throw _invalid('Field orderBy tidak boleh kosong.');
+        throw _invalid('The orderBy field cannot be empty.');
       }
       if (!fields.add(field)) {
-        throw _invalid('Field "$field" diurutkan lebih dari sekali.');
+        throw _invalid('Field "$field" is sorted more than once.');
       }
       mapped.add(
         FirestoreOrder(
@@ -129,8 +129,8 @@ final class FirestoreQueryMapper {
   ) {
     if (orders.length > 1) {
       throw _unsupported(
-        'Mengurutkan lebih dari satu field membutuhkan indeks komposit '
-        'Firestore. Tambahkan indeks tersebut lalu gunakan query native.',
+        'Sorting by more than one field requires a Firestore '
+        'composite index. Add that index, or use a native query.',
       );
     }
 
@@ -140,16 +140,16 @@ final class FirestoreQueryMapper {
     };
     if (rangeFields.length > 1) {
       throw _unsupported(
-        'Filter rentang pada beberapa field membutuhkan indeks komposit '
-        'Firestore.',
+        'Range filters on multiple fields require a Firestore '
+        'composite index.',
       );
     }
     if (rangeFields.isNotEmpty &&
         orders.isNotEmpty &&
         rangeFields.first != orders.first.field) {
       throw _unsupported(
-        'Filter rentang dan orderBy pada field berbeda membutuhkan indeks '
-        'komposit Firestore.',
+        'A range filter and orderBy on different fields require a '
+        'composite Firestore index.',
       );
     }
 
@@ -161,8 +161,8 @@ final class FirestoreQueryMapper {
     );
     if (disjunctions.length > 1) {
       throw _unsupported(
-        'Firestore hanya mengizinkan satu filter in, not-in, atau '
-        'array-contains per query.',
+        'Firestore allows only one in, not-in, or '
+        'array-contains filter per query.',
       );
     }
   }
@@ -188,7 +188,7 @@ final class FirestoreQueryMapper {
   static Object _requiredValue(RemoteFilter filter) {
     final value = filter.value;
     if (value == null) {
-      throw _invalid('Filter ${filter.operator.name} membutuhkan nilai.');
+      throw _invalid('The ${filter.operator.name} filter needs a value.');
     }
     return value;
   }
@@ -197,23 +197,23 @@ final class FirestoreQueryMapper {
     final value = filter.value;
     if (value is! Iterable) {
       throw _invalid(
-        'Filter ${filter.operator.name} membutuhkan daftar nilai.',
+        'The ${filter.operator.name} filter needs a list of values.',
       );
     }
     final values = <Object?>[];
     for (final item in value) {
       if (item == null) {
-        throw _invalid('Daftar nilai filter tidak boleh berisi null.');
+        throw _invalid('The filter value list cannot contain null.');
       }
       values.add(item);
     }
     if (values.isEmpty) {
-      throw _invalid('Daftar nilai filter tidak boleh kosong.');
+      throw _invalid('The filter value list cannot be empty.');
     }
     if (values.length > _maxDisjunctionValues) {
       throw _invalid(
-        'Filter ${filter.operator.name} maksimal '
-        '$_maxDisjunctionValues nilai.',
+        'The ${filter.operator.name} filter allows at most '
+        '$_maxDisjunctionValues values.',
       );
     }
     return List<Object?>.unmodifiable(values);

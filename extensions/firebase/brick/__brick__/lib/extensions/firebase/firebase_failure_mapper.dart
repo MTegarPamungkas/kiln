@@ -23,7 +23,7 @@ Failure mapFirebaseError(Object error, [StackTrace? stackTrace]) {
   if (error is TimeoutException) {
     return Failure(
       code: FailureCode.networkTimeout,
-      message: 'Permintaan ke Firebase melewati batas waktu.',
+      message: 'The request to Firebase timed out.',
       kind: FailureKind.network,
       cause: error,
       stackTrace: stackTrace,
@@ -65,7 +65,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'email-already-in-use':
       return _failure(
         FailureCode.authInvalidCredentials,
-        'Email atau kata sandi tidak cocok.',
+        'The email or password does not match.',
         FailureKind.authentication,
         error,
         stackTrace,
@@ -73,7 +73,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'email-not-verified':
       return _failure(
         FailureCode.authEmailNotVerified,
-        'Verifikasi email terlebih dahulu sebelum masuk.',
+        'Verify your email before signing in.',
         FailureKind.authentication,
         error,
         stackTrace,
@@ -81,7 +81,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'too-many-requests':
       return _failure(
         FailureCode.unavailable,
-        'Terlalu banyak percobaan. Coba lagi beberapa saat lagi.',
+        'Too many attempts. Try again in a while.',
         FailureKind.unavailable,
         error,
         stackTrace,
@@ -91,7 +91,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'user-disabled':
       return _failure(
         FailureCode.authUnauthorized,
-        'Akun ini tidak diizinkan mengakses layanan.',
+        'This account is not allowed to access the service.',
         FailureKind.authorization,
         error,
         stackTrace,
@@ -100,7 +100,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'user-token-expired':
       return _failure(
         FailureCode.authSessionExpired,
-        'Sesi berakhir. Masuk kembali untuk melanjutkan.',
+        'The session expired. Sign in again to continue.',
         FailureKind.session,
         error,
         stackTrace,
@@ -109,7 +109,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'unavailable':
       return _failure(
         FailureCode.networkUnreachable,
-        'Tidak dapat menghubungi Firebase Auth.',
+        'Could not reach Firebase Auth.',
         FailureKind.network,
         error,
         stackTrace,
@@ -118,7 +118,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'deadline-exceeded':
       return _failure(
         FailureCode.networkTimeout,
-        'Permintaan Firebase Auth melewati batas waktu.',
+        'The Firebase Auth request timed out.',
         FailureKind.network,
         error,
         stackTrace,
@@ -127,7 +127,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'operation-not-allowed':
       return _failure(
         FailureCode.authProviderDisabled,
-        'Metode masuk ini belum diaktifkan di Firebase Console.',
+        'This sign-in method is not enabled in the Firebase Console.',
         FailureKind.authentication,
         error,
         stackTrace,
@@ -138,7 +138,7 @@ Failure _mapAuth(FirebaseException error, String code, StackTrace? stackTrace) {
     case 'canceled':
       return _failure(
         FailureCode.authCancelled,
-        'Proses masuk dibatalkan.',
+        'Sign-in was cancelled.',
         FailureKind.cancelled,
         error,
         stackTrace,
@@ -162,7 +162,7 @@ Failure _mapFirestore(
     case 'not-found':
       return _failure(
         FailureCode.remoteDatabaseNotFound,
-        'Dokumen tidak ditemukan.',
+        'The document was not found.',
         FailureKind.database,
         error,
         stackTrace,
@@ -171,7 +171,7 @@ Failure _mapFirestore(
     case 'aborted':
       return _failure(
         FailureCode.remoteDatabaseConflict,
-        'Dokumen sudah berubah. Muat ulang lalu coba lagi.',
+        'The document changed. Reload and try again.',
         FailureKind.database,
         error,
         stackTrace,
@@ -181,7 +181,7 @@ Failure _mapFirestore(
     case 'unauthenticated':
       return _failure(
         FailureCode.authUnauthorized,
-        'Aturan keamanan Firestore menolak permintaan ini.',
+        'Firestore security rules rejected this request.',
         FailureKind.authorization,
         error,
         stackTrace,
@@ -189,7 +189,7 @@ Failure _mapFirestore(
     case 'unavailable':
       return _failure(
         FailureCode.remoteDatabaseUnavailable,
-        'Firestore sedang tidak tersedia.',
+        'Firestore is currently unavailable.',
         FailureKind.network,
         error,
         stackTrace,
@@ -198,7 +198,7 @@ Failure _mapFirestore(
     case 'deadline-exceeded':
       return _failure(
         FailureCode.networkTimeout,
-        'Permintaan Firestore melewati batas waktu.',
+        'The Firestore request timed out.',
         FailureKind.network,
         error,
         stackTrace,
@@ -207,7 +207,7 @@ Failure _mapFirestore(
     case 'failed-precondition':
       return _failure(
         FailureCode.remoteDatabaseQueryFailed,
-        'Query ditolak Firestore. Periksa indeks komposit yang diminta.',
+        'Firestore rejected the query. Check the required composite index.',
         FailureKind.validation,
         error,
         stackTrace,
@@ -215,7 +215,7 @@ Failure _mapFirestore(
     case 'invalid-argument':
       return _failure(
         FailureCode.validationInvalidInput,
-        'Query Firestore tidak valid.',
+        'The Firestore query is not valid.',
         FailureKind.validation,
         error,
         stackTrace,
@@ -223,7 +223,7 @@ Failure _mapFirestore(
     case 'resource-exhausted':
       return _failure(
         FailureCode.remoteDatabaseUnavailable,
-        'Kuota Firestore habis. Coba lagi nanti.',
+        'Firestore quota exhausted. Try again later.',
         FailureKind.unavailable,
         error,
         stackTrace,
@@ -248,7 +248,7 @@ Failure _mapStorage(
     case 'object-not-found':
       return _failure(
         FailureCode.fileNotFound,
-        'Berkas tidak ditemukan di Cloud Storage.',
+        'The file was not found in Cloud Storage.',
         FailureKind.file,
         error,
         stackTrace,
@@ -258,7 +258,7 @@ Failure _mapStorage(
     case 'permission-denied':
       return _failure(
         FailureCode.authUnauthorized,
-        'Aturan keamanan Storage menolak permintaan ini.',
+        'Storage security rules rejected this request.',
         FailureKind.authorization,
         error,
         stackTrace,
@@ -266,7 +266,7 @@ Failure _mapStorage(
     case 'retry-limit-exceeded':
       return _failure(
         FailureCode.fileUploadFailed,
-        'Unggahan gagal setelah beberapa percobaan.',
+        'The upload failed after several attempts.',
         FailureKind.file,
         error,
         stackTrace,
@@ -276,7 +276,7 @@ Failure _mapStorage(
     case 'cancelled':
       return _failure(
         FailureCode.cancelled,
-        'Operasi penyimpanan dibatalkan.',
+        'The storage operation was cancelled.',
         FailureKind.cancelled,
         error,
         stackTrace,
@@ -284,7 +284,7 @@ Failure _mapStorage(
     case 'quota-exceeded':
       return _failure(
         FailureCode.storageWriteFailed,
-        'Kuota Cloud Storage habis.',
+        'Cloud Storage quota exhausted.',
         FailureKind.storage,
         error,
         stackTrace,
@@ -292,7 +292,7 @@ Failure _mapStorage(
     case 'invalid-argument':
       return _failure(
         FailureCode.validationInvalidInput,
-        'Path atau metadata berkas tidak valid.',
+        'The file path or metadata is not valid.',
         FailureKind.validation,
         error,
         stackTrace,
@@ -301,7 +301,7 @@ Failure _mapStorage(
     case 'network-request-failed':
       return _failure(
         FailureCode.networkUnreachable,
-        'Tidak dapat menghubungi Cloud Storage.',
+        'Could not reach Cloud Storage.',
         FailureKind.network,
         error,
         stackTrace,
@@ -321,7 +321,7 @@ Failure _mapCore(FirebaseException error, String code, StackTrace? stackTrace) {
   if (code == 'network-request-failed') {
     return _failure(
       FailureCode.networkUnreachable,
-      'Tidak dapat menghubungi Firebase.',
+      'Could not reach Firebase.',
       FailureKind.network,
       error,
       stackTrace,

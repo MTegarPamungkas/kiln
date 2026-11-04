@@ -461,7 +461,7 @@ final class InMemoryFirebaseStorageGateway implements FirebaseStorageGateway {
     if (bytes == null) {
       throw const Failure(
         code: FailureCode.fileNotFound,
-        message: 'Berkas tidak ditemukan.',
+        message: 'The file was not found.',
         kind: FailureKind.file,
       );
     }
@@ -475,7 +475,7 @@ final class InMemoryFirebaseStorageGateway implements FirebaseStorageGateway {
     if (!files.containsKey(path)) {
       throw const Failure(
         code: FailureCode.fileNotFound,
-        message: 'Berkas tidak ditemukan.',
+        message: 'The file was not found.',
         kind: FailureKind.file,
       );
     }
@@ -488,7 +488,7 @@ final class InMemoryFirebaseStorageGateway implements FirebaseStorageGateway {
     if (files.remove(path) == null) {
       throw const Failure(
         code: FailureCode.fileNotFound,
-        message: 'Berkas tidak ditemukan.',
+        message: 'The file was not found.',
         kind: FailureKind.file,
       );
     }

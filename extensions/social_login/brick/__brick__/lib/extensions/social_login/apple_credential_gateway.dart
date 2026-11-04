@@ -41,7 +41,7 @@ final class SdkAppleCredentialGateway implements AppleCredentialGateway {
       if (idToken == null || idToken.isEmpty) {
         throw const Failure(
           code: FailureCode.authProviderDisabled,
-          message: 'Apple tidak mengembalikan identity token.',
+          message: 'Apple did not return an identity token.',
           kind: FailureKind.authentication,
         );
       }

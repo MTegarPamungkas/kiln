@@ -38,7 +38,7 @@ final class FirebaseFileStorage implements FileStorage {
         error,
         stackTrace,
         code: FailureCode.fileUploadFailed,
-        message: 'Berkas gagal diunggah ke Cloud Storage.',
+        message: 'Failed to upload the file to Cloud Storage.',
       );
     }
   }
@@ -62,7 +62,7 @@ final class FirebaseFileStorage implements FileStorage {
         error,
         stackTrace,
         code: FailureCode.fileDownloadFailed,
-        message: 'Berkas gagal diunduh dari Cloud Storage.',
+        message: 'Failed to download the file from Cloud Storage.',
       );
     }
   }
@@ -79,7 +79,7 @@ final class FirebaseFileStorage implements FileStorage {
         error,
         stackTrace,
         code: FailureCode.fileNotFound,
-        message: 'Berkas tidak ditemukan di Cloud Storage.',
+        message: 'The file was not found in Cloud Storage.',
       );
     }
   }
@@ -94,7 +94,7 @@ final class FirebaseFileStorage implements FileStorage {
         error,
         stackTrace,
         code: FailureCode.fileDeleteFailed,
-        message: 'Berkas gagal dihapus dari Cloud Storage.',
+        message: 'Failed to delete the file from Cloud Storage.',
       );
     }
   }
@@ -122,7 +122,7 @@ final class FirebaseFileStorage implements FileStorage {
     if (path.trim().isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Path berkas tidak boleh kosong.',
+        message: 'The file path cannot be empty.',
         kind: FailureKind.validation,
       );
     }

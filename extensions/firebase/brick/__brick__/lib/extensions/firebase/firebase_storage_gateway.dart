@@ -83,7 +83,7 @@ final class SdkFirebaseStorageGateway implements FirebaseStorageGateway {
       throw FirebaseException(
         plugin: 'firebase_storage',
         code: 'object-not-found',
-        message: 'Berkas $path tidak ditemukan.',
+        message: 'The file $path was not found.',
       );
     }
     onProgress?.call(1);

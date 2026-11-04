@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Add `gate_social_login.dart` so the native `SocialLogin` service
+  (`socialLoginSignIn`, `socialLoginSignOut`) is reachable through the `Gate`.
+- Rewrite the credential and failure messages in English.
+
 ## 0.2.0
 
 - Removed `SocialLoginButtons` and `SocialLoginPanel`. Applications call `SocialLogin` and render their own sign-in buttons.

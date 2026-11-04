@@ -30,7 +30,7 @@ final class DefaultSocialLogin implements SocialLogin {
     if (!config.isReady(provider, availability)) {
       throw Failure(
         code: FailureCode.authProviderDisabled,
-        message: 'Masuk dengan ${_label(provider)} tidak tersedia.',
+        message: 'Sign-in with ${_label(provider)} is unavailable.',
         kind: FailureKind.authentication,
       );
     }

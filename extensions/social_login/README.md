@@ -17,8 +17,13 @@ Google setup: [docs/google-setup.md](docs/google-setup.md). Apple setup:
 ## Gate
 
 ```dart
+// Backend OAuth path (uses the installed SocialAuth, e.g. Supabase):
 final credential = await gate.socialSignIn(SocialProvider.google); // Result<SocialCredential?>
 await gate.socialSignOut();
+
+// Native SDK path (uses SocialLogin from this extension):
+final native = await gate.socialLoginSignIn(SocialProvider.google); // Result<SocialCredential?>
+await gate.socialLoginSignOut();
 ```
 
 ## Runtime support

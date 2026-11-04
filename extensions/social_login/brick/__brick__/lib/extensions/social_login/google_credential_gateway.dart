@@ -39,7 +39,7 @@ final class SdkGoogleCredentialGateway implements GoogleCredentialGateway {
       if (idToken == null || idToken.isEmpty) {
         throw const Failure(
           code: FailureCode.authProviderDisabled,
-          message: 'Google tidak mengembalikan id token.',
+          message: 'Google did not return an id token.',
           kind: FailureKind.authentication,
         );
       }

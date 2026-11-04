@@ -133,7 +133,7 @@ final class RestAuth implements AuthRepository {
     if (user == null) {
       throw const Failure(
         code: FailureCode.unexpected,
-        message: 'Respons profil pengguna tidak valid.',
+        message: 'The user profile response is not valid.',
         kind: FailureKind.authentication,
       );
     }
@@ -142,7 +142,7 @@ final class RestAuth implements AuthRepository {
     if (session == null) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Profil pengguna tidak memuat id.',
+        message: 'The user profile did not include an id.',
         kind: FailureKind.authentication,
       );
     }
@@ -165,7 +165,7 @@ final class RestAuth implements AuthRepository {
     if (path.isEmpty) {
       throw const Failure(
         code: FailureCode.configurationMissing,
-        message: 'Endpoint REST belum dikonfigurasi.',
+        message: 'The REST endpoint is not configured.',
         kind: FailureKind.configuration,
       );
     }
@@ -198,7 +198,7 @@ final class RestAuth implements AuthRepository {
     if (body == null) {
       throw const Failure(
         code: FailureCode.unexpected,
-        message: 'Respons autentikasi tidak valid.',
+        message: 'The authentication response is not valid.',
         kind: FailureKind.authentication,
       );
     }
@@ -228,7 +228,7 @@ final class RestAuth implements AuthRepository {
     if (session == null) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Respons autentikasi tidak memuat id pengguna.',
+        message: 'The authentication response did not include a user id.',
         kind: FailureKind.authentication,
       );
     }
@@ -300,7 +300,7 @@ final class RestAuth implements AuthRepository {
     if (body == null) {
       throw const Failure(
         code: FailureCode.unexpected,
-        message: 'Respons refresh tidak valid.',
+        message: 'The refresh response is not valid.',
         kind: FailureKind.authentication,
       );
     }

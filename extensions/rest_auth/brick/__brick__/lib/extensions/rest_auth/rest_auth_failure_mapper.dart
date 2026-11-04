@@ -7,7 +7,7 @@ Failure mapRestResponse(HttpResponse response) {
   if (status == 401) {
     return Failure(
       code: FailureCode.authSessionExpired,
-      message: message ?? 'Sesi berakhir. Silakan masuk kembali.',
+      message: message ?? 'The session expired. Please sign in again.',
       kind: FailureKind.authentication,
       details: <String, Object?>{'status': status},
     );
@@ -15,7 +15,7 @@ Failure mapRestResponse(HttpResponse response) {
   if (status == 400 || status == 422) {
     return Failure(
       code: FailureCode.validationInvalidInput,
-      message: message ?? 'Data yang dikirim tidak valid.',
+      message: message ?? 'The submitted data is not valid.',
       kind: FailureKind.validation,
       details: <String, Object?>{'status': status},
     );
@@ -23,7 +23,7 @@ Failure mapRestResponse(HttpResponse response) {
   if (status == 409) {
     return Failure(
       code: FailureCode.validationInvalidInput,
-      message: message ?? 'Data sudah dipakai.',
+      message: message ?? 'The data has already been used.',
       kind: FailureKind.validation,
       details: <String, Object?>{'status': status},
     );
@@ -31,7 +31,7 @@ Failure mapRestResponse(HttpResponse response) {
   if (status == 403 || status == 404 || status == 429 || status >= 500) {
     final fallback = switch (status) {
       403 => 'Akses ditolak.',
-      404 => 'Endpoint tidak ditemukan.',
+      404 => 'The endpoint was not found.',
       _ => 'Server sedang sibuk.',
     };
     return mapHttpStatusToFailure(
@@ -42,7 +42,7 @@ Failure mapRestResponse(HttpResponse response) {
   }
   return Failure(
     code: FailureCode.unexpected,
-    message: message ?? 'Permintaan gagal (status $status).',
+    message: message ?? 'The request failed (status $status).',
     kind: FailureKind.unknown,
     details: <String, Object?>{'status': status},
   );
@@ -53,7 +53,7 @@ Failure mapCredentialResponse(HttpResponse response) {
   if (response.statusCode == 401) {
     return Failure(
       code: FailureCode.authInvalidCredentials,
-      message: _message(response.data) ?? 'Email atau kata sandi salah.',
+      message: _message(response.data) ?? 'The email or password is incorrect.',
       kind: FailureKind.authentication,
       details: <String, Object?>{'status': response.statusCode},
     );

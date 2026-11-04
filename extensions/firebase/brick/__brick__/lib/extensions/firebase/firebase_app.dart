@@ -35,8 +35,8 @@ final class FirebaseBootstrap implements FirebaseAppInitializer {
       throw Failure(
         code: FailureCode.configurationMissing,
         message:
-            'FirebaseOptions belum diberikan ke FirebaseModule. Jalankan '
-            'flutterfire configure lalu teruskan '
+            'FirebaseOptions was not provided to FirebaseModule. Run '
+            'flutterfire configure and pass '
             'DefaultFirebaseOptions.currentPlatform.',
         kind: FailureKind.configuration,
         details: <String, Object?>{
@@ -51,7 +51,7 @@ final class FirebaseBootstrap implements FirebaseAppInitializer {
     } catch (error, stackTrace) {
       throw Failure(
         code: FailureCode.configurationInvalid,
-        message: 'Firebase gagal diinisialisasi dengan options yang diberikan.',
+        message: 'Firebase failed to initialize with the provided options.',
         kind: FailureKind.configuration,
         cause: error,
         stackTrace: stackTrace,

@@ -1,6 +1,6 @@
 id: firebase
 name: Firebase
-version: 0.2.1
+version: 0.3.0
 description: Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.
 category: auth
 tier: official
@@ -18,15 +18,15 @@ dependencies:
 prompts:
   - name: options_source
     type: enum
-    label: Sumber FirebaseOptions
-    description: generated memakai lib/firebase_options.dart dari FlutterFire CLI, explicit memakai FirebaseOptions yang diberikan ke FirebaseModule.
+    label: FirebaseOptions source
+    description: Use "generated" to read lib/firebase_options.dart produced by the FlutterFire CLI, or "explicit" to pass a FirebaseOptions instance to FirebaseModule.
     default: generated
     options:
       - generated
       - explicit
   - name: firebase_options_path
     type: string
-    label: Lokasi firebase_options.dart
+    label: firebase_options.dart location
     default: lib/firebase_options.dart
   - name: emulator_host
     type: string
@@ -34,7 +34,7 @@ prompts:
     default: localhost
   - name: use_emulator_in_development
     type: bool
-    label: Pakai emulator pada flavor development
+    label: Use the emulator in the development flavor
     default: true
 platforms:
   - android
@@ -44,11 +44,11 @@ platforms:
   - windows
 manual_steps:
   - id: firebase_flutterfire_configure
-    description: Jalankan flutterfire configure agar lib/firebase_options.dart dan konfigurasi native Firebase tersedia sebelum aplikasi dijalankan.
+    description: Run flutterfire configure so lib/firebase_options.dart and the native Firebase configuration exist before the app runs.
   - id: firebase_social_sign_in
-    description: Aktifkan provider Google dan Apple di Firebase Console, lalu tambahkan SHA fingerprint Android dan URL scheme terbalik iOS sesuai docs/firebase-setup.md.
+    description: Enable the Google and Apple providers in the Firebase Console, then add the Android SHA fingerprint and the iOS reversed URL scheme as described in docs/firebase-setup.md.
   - id: firebase_emulator_start
-    description: Jalankan firebase emulators:start di root proyek bila flavor development memakai emulator.
+    description: Run firebase emulators:start in the project root when the development flavor uses the emulator.
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

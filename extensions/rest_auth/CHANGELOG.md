@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Rewrite the REST auth failure, response, and endpoint messages in English.
+
 ## 0.1.2
 
 - Validate the REST auth base URL and endpoint paths through

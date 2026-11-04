@@ -19,20 +19,20 @@ void _checkFlutterFireCli(HookContext context) {
     ], runInShell: Platform.isWindows);
     if (result.exitCode != 0) {
       context.logger.warn(
-        'flutterfire CLI tidak merespons. Jalankan langkah manual '
-        'firebase_flutterfire_configure sebelum build.',
+        'The flutterfire CLI did not respond. Run the manual step '
+        'firebase_flutterfire_configure before building.',
       );
     }
   } on ProcessException {
     context.logger.warn(
-      'flutterfire CLI tidak ditemukan. Pasang dengan '
-      '`dart pub global activate flutterfire_cli`, lalu jalankan '
+      'The flutterfire CLI was not found. Install it with '
+      '`dart pub global activate flutterfire_cli`, then run '
       '`flutterfire configure`.',
     );
   } on Object {
     context.logger.warn(
-      'Pemeriksaan flutterfire CLI dilewati. Selesaikan langkah manual '
-      'firebase_flutterfire_configure sebelum build.',
+      'The flutterfire CLI check was skipped. Complete the manual step '
+      'firebase_flutterfire_configure before building.',
     );
   }
 }
@@ -49,14 +49,14 @@ void _checkFirebaseOptions(HookContext context) {
         : rawPath;
     if (!File(path).existsSync()) {
       context.logger.warn(
-        '$path belum ada. Jalankan `flutterfire configure` agar '
-        'FirebaseOptions untuk semua platform dihasilkan.',
+        '$path does not exist yet. Run `flutterfire configure` so '
+        'FirebaseOptions is generated for every platform.',
       );
     }
   } on Object {
     context.logger.warn(
-      'Pemeriksaan firebase_options.dart dilewati. Pastikan file tersebut '
-      'ada sebelum build.',
+      'The firebase_options.dart check was skipped. Make sure the file '
+      'exists before building.',
     );
   }
 }

@@ -224,7 +224,7 @@ final class SdkFirebaseAuthGateway implements FirebaseAuthGateway {
   static Failure _missingUser() {
     return const Failure(
       code: FailureCode.authUnauthorized,
-      message: 'Tidak ada pengguna Firebase yang sedang masuk.',
+      message: 'No Firebase user is currently signed in.',
       kind: FailureKind.authentication,
     );
   }

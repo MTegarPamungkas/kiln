@@ -22,7 +22,9 @@ void main() {
         'lib/extensions/social_login/google_credential_gateway.dart',
         'lib/extensions/social_login/apple_credential_gateway.dart',
         'lib/extensions/social_login/social_sign_out_listener.dart',
+        'lib/extensions/social_login/gate_social_login.dart',
         'test/extensions/social_login/social_auth_contract_test.dart',
+        'test/extensions/social_login/gate_social_login_test.dart',
       ]),
     );
   });

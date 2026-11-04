@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0
+
+- Normalized every user-facing string to English: failure messages in
+  `mapFirebaseError`, the auth/Firestore/storage contract implementations, the
+  `extension.yaml` prompt labels and manual steps, and the `pre_gen` FlutterFire
+  warning hook.
+- Failure wording now describes the actionable cause (composite index, quota,
+  session expiry) so callers can surface it directly.
+
 ## 0.2.1
 
 - Add `FirebaseSupport` and initialize Firebase during bootstrap.

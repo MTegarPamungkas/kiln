@@ -14,7 +14,7 @@ Failure mapSocialLoginError(Object error, {StackTrace? stackTrace}) {
         message.contains('cancel')) {
       return Failure(
         code: FailureCode.authCancelled,
-        message: 'Masuk dibatalkan.',
+        message: 'Sign-in was cancelled.',
         kind: FailureKind.cancelled,
         cause: error,
         stackTrace: stackTrace,
@@ -23,7 +23,7 @@ Failure mapSocialLoginError(Object error, {StackTrace? stackTrace}) {
     if (code.contains('network') || message.contains('network')) {
       return Failure(
         code: FailureCode.networkUnreachable,
-        message: 'Jaringan tidak tersedia.',
+        message: 'The network is unavailable.',
         kind: FailureKind.network,
         cause: error,
         stackTrace: stackTrace,
@@ -32,7 +32,7 @@ Failure mapSocialLoginError(Object error, {StackTrace? stackTrace}) {
     }
     return Failure(
       code: FailureCode.authProviderDisabled,
-      message: error.message ?? 'Masuk dengan penyedia ini gagal.',
+      message: error.message ?? 'Sign-in with this provider failed.',
       kind: FailureKind.authentication,
       cause: error,
       stackTrace: stackTrace,
@@ -42,7 +42,7 @@ Failure mapSocialLoginError(Object error, {StackTrace? stackTrace}) {
   if (text.contains('cancel')) {
     return Failure(
       code: FailureCode.authCancelled,
-      message: 'Masuk dibatalkan.',
+      message: 'Sign-in was cancelled.',
       kind: FailureKind.cancelled,
       cause: error,
       stackTrace: stackTrace,

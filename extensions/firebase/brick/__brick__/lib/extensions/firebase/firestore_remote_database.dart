@@ -122,7 +122,7 @@ final class FirestoreRemoteDatabase implements RemoteDatabase {
   Failure _notFound(String collection, String id) {
     return Failure(
       code: FailureCode.remoteDatabaseNotFound,
-      message: 'Dokumen $collection/$id tidak ditemukan.',
+      message: 'The document $collection/$id was not found.',
       kind: FailureKind.database,
     );
   }
@@ -132,7 +132,7 @@ final class FirestoreRemoteDatabase implements RemoteDatabase {
     if (failure.code == FailureCode.unexpected) {
       return Failure(
         code: FailureCode.remoteDatabaseUnavailable,
-        message: 'Dokumen gagal dibuat di Firestore.',
+        message: 'Failed to create the document in Firestore.',
         kind: FailureKind.database,
         cause: error,
         stackTrace: stackTrace,
@@ -145,7 +145,7 @@ final class FirestoreRemoteDatabase implements RemoteDatabase {
     if (collection.trim().isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Nama collection tidak boleh kosong.',
+        message: 'The collection name cannot be empty.',
         kind: FailureKind.validation,
       );
     }
@@ -156,7 +156,7 @@ final class FirestoreRemoteDatabase implements RemoteDatabase {
     if (id.trim().isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Id dokumen tidak boleh kosong.',
+        message: 'The document id cannot be empty.',
         kind: FailureKind.validation,
       );
     }
