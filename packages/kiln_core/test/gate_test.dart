@@ -290,6 +290,59 @@ final class _Location implements LocationProvider {
   }
 }
 
+final class _Notifications implements Notifications {
+  final List<int> cancelled = <int>[];
+  int cancelAllCalls = 0;
+  NotificationMessage? shown;
+  Failure? failure;
+
+  @override
+  Future<void> initialize() async => _throwIfFailed();
+
+  @override
+  Future<bool> requestPermission() async {
+    _throwIfFailed();
+    return true;
+  }
+
+  @override
+  Future<void> show(NotificationMessage message) async {
+    _throwIfFailed();
+    shown = message;
+  }
+
+  @override
+  Future<void> schedule(NotificationMessage message, DateTime when) async {
+    _throwIfFailed();
+    shown = message;
+  }
+
+  @override
+  Future<void> cancel(int id) async {
+    _throwIfFailed();
+    cancelled.add(id);
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    _throwIfFailed();
+    cancelAllCalls++;
+  }
+
+  @override
+  Stream<NotificationTap> get taps => const Stream<NotificationTap>.empty();
+
+  @override
+  Future<void> dispose() async {}
+
+  void _throwIfFailed() {
+    final programmedFailure = failure;
+    if (programmedFailure != null) {
+      throw programmedFailure;
+    }
+  }
+}
+
 void main() {
   group('Gate', () {
     late GetItRegistry registry;
@@ -620,6 +673,49 @@ void main() {
       expect(
         (await gate.currentLocation()).failureOrNull?.code,
         FailureCode.unavailable,
+      );
+    });
+  });
+
+  group('Gate notification verbs', () {
+    late GetItRegistry registry;
+    late _Notifications notifications;
+
+    setUp(() {
+      registry = GetItRegistry();
+      notifications = _Notifications();
+      registry.registerSingleton<Notifications>(notifications);
+    });
+
+    test('show and cancel delegate through the gate', () async {
+      final gate = Gate(registry);
+      const message = NotificationMessage(id: 7, title: 'Hi', body: 'There');
+
+      expect((await gate.showNotification(message)).isOk, isTrue);
+      expect(notifications.shown, same(message));
+
+      expect((await gate.cancelNotification(7)).isOk, isTrue);
+      expect(notifications.cancelled, <int>[7]);
+    });
+
+    test('cancelAllNotifications clears the store', () async {
+      final gate = Gate(registry);
+
+      expect((await gate.cancelAllNotifications()).isOk, isTrue);
+      expect(notifications.cancelAllCalls, 1);
+    });
+
+    test('notification verbs surface failures as Err', () async {
+      notifications.failure = const Failure(
+        code: FailureCode.notificationsUnavailable,
+        message: 'down',
+        kind: FailureKind.notification,
+      );
+      final gate = Gate(registry);
+
+      expect(
+        (await gate.cancelAllNotifications()).failureOrNull?.code,
+        FailureCode.notificationsUnavailable,
       );
     });
   });

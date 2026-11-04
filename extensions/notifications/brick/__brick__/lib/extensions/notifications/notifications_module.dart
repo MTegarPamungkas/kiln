@@ -7,6 +7,7 @@ import 'notification_support.dart';
 import 'notification_tap_hub.dart';
 import 'notifications_config.dart';
 import 'plugin_notification_gateway.dart';
+import 'reminder_scheduler.dart';
 import 'timezone_resolver.dart';
 
 /// Registers Notifications, its channels, and the timezone resolver.
@@ -52,7 +53,10 @@ final class NotificationsModule extends KilnModule {
       ..registerSingleton<NotificationChannels>(channels)
       ..registerSingleton<TimezoneResolver>(timezones)
       ..registerSingleton<NotificationSupport>(support)
-      ..registerSingleton<Notifications>(notifications);
+      ..registerSingleton<Notifications>(notifications)
+      ..registerSingleton<ReminderScheduler>(
+        ReminderScheduler(notifications: notifications),
+      );
   }
 
   @override

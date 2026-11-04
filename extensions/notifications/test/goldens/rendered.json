@@ -12,7 +12,7 @@
     "lib/extensions/notifications/notification_support.dart": "6b847671df70210bad29baf14d6be871de0e8b426c48e03f972fa6a61965299a",
     "lib/extensions/notifications/notification_tap_hub.dart": "368e163b031f41ad742dab3b5833ecb7e5b80a34f4f8af5c3cc8fdec0fc182e1",
     "lib/extensions/notifications/notifications_config.dart": "863876d958d006a01dbdc55958ba874fbef9d1f580000fef295e4c2c52fe7b5e",
-    "lib/extensions/notifications/notifications_module.dart": "5484f506026c80d8d82f9c5c0477edb4873791290c8dea59dac681c2c03d5ee7",
+    "lib/extensions/notifications/notifications_module.dart": "54d9ffaff034083ed4eaaa8bc23f3e39dccdc4b96c35f3575c5483d9fdf58e14",
     "lib/extensions/notifications/plugin_notification_gateway.dart": "7fba975651c7ecd1e4eb6843d642123ddbe7dbc889e9f09364c2d992417ec95b",
     "lib/extensions/notifications/reminder_scheduler.dart": "b62187d60d5c853f8e6cf708a41ff048dbb6b129251b9b732468ff1d08249c06",
     "lib/extensions/notifications/timezone_resolver.dart": "6341c505cd5016accfbd7ef0bafb30684a6f490ff1585d608df7858c4de45bdb",
@@ -26,7 +26,7 @@
     "test/extensions/notifications/notification_tap_hub_test.dart": "b2b88441bdd0659029144b29fe213df75124f5ef836a9e8034bcfd0c5fc8bff7",
     "test/extensions/notifications/notifications_config_test.dart": "be305a104f83fe690745e220d8b568ddd6b427381fe1abfaa3e2eea9558e6f5e",
     "test/extensions/notifications/notifications_contract_test.dart": "db6ea8ce44aa0c22a3b2b53613cb711dfb41f69138f83fa4310e59b4c08f08d8",
-    "test/extensions/notifications/notifications_module_test.dart": "bb9d29e1d71772951700faad1c1626a6e0dd78c19931669cdabad7be0bce15fd",
+    "test/extensions/notifications/notifications_module_test.dart": "596669ff63b4223fc5dafd88b06032e10d41a2e21877c9cce91dac41f000a491",
     "test/extensions/notifications/reminder_scheduler_test.dart": "89270d0e5774e3265dd46a0eff026b28be865e26e529fd6072c49d445cea919b",
     "test/extensions/notifications/test_support.dart": "9d6f0439d7479f405caa55a010475d659c3df901c18902bdebc2116c36908ef7",
     "test/extensions/notifications/timezone_resolver_test.dart": "0c2182e594623e8bad7427c4b6be76c185f16359932050da177eef0a1f38b033"

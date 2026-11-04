@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+- Add the `cancelAllNotifications` gate verb for the `cancelAll` contract method.
+- Register `ReminderScheduler` as a shared singleton so keyed reminders keep
+  consistent state across the app.
+
 ## 0.1.4
 
 - Add `NotificationSupport` and report plugin/device support through

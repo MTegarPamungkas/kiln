@@ -27,7 +27,11 @@ final granted = await gate.requestNotificationPermission(); // Result<bool>
 await gate.showNotification(NotificationMessage(id: 1, title: 'Hi', body: 'New'));
 await gate.scheduleNotification(message, when);
 await gate.cancelNotification(1);
+await gate.cancelAllNotifications(); // Result<void>
 ```
+
+`ReminderScheduler` is registered as a shared singleton, so the app reads it with
+`registry.read<ReminderScheduler>()` to (re)schedule idempotent reminders by key.
 
 ## Runtime support
 

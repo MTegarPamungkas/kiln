@@ -1,6 +1,6 @@
 id: calendar
 name: Calendar
-version: 0.1.0
+version: 0.1.1
 description: Add events to the device calendar through the native calendar UI.
 category: calendar
 tier: official
@@ -14,8 +14,8 @@ platforms:
   - ios
 ios:
   plist:
-    NSCalendarsUsageDescription: Add trip reminders to your calendar.
-    NSCalendarsFullAccessUsageDescription: Add trip reminders to your calendar.
+    NSCalendarsUsageDescription: Add events to your calendar.
+    NSCalendarsFullAccessUsageDescription: Add events to your calendar.
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/share/device_share_service.dart';
+import 'package:{{app_name}}/extensions/share/sdk_share_gateway.dart';
 import 'package:{{app_name}}/extensions/share/share_gateway.dart';
 import 'package:{{app_name}}/extensions/share/share_module.dart';
 import 'package:{{app_name}}/extensions/share/share_support.dart';
@@ -47,5 +48,18 @@ void main() {
 
   test('reports supported', () {
     expect(const ShareSupport().info.isSupported, isTrue);
+  });
+
+  test('gateway rejects empty content before calling the plugin', () async {
+    await expectLater(
+      const SdkShareGateway().share(const ShareContent()),
+      throwsA(
+        isA<Failure>().having(
+          (failure) => failure.code,
+          'code',
+          FailureCode.validationInvalidInput,
+        ),
+      ),
+    );
   });
 }

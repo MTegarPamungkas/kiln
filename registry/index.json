@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T11:13:07.947240Z",
+  "generated_at": "2026-11-04T11:52:24.525850Z",
   "extensions": [
     {
       "id": "analytics",
@@ -245,13 +245,25 @@
       "name": "Calendar",
       "description": "Add events to the device calendar through the native calendar UI.",
       "category": "calendar",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/calendar-0.1.0.tgz",
           "sha256": "f0483af63f28e2f0baec686721091fa1ce916f5ce02d36ab7583952dd481d3d8",
+          "provides": [
+            "calendar"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/calendar-0.1.1.tgz",
+          "sha256": "dd42b6dad424d199c5e353336758b6f473f61f1d992600670b59b02d138e5df7",
           "provides": [
             "calendar"
           ],
@@ -1100,7 +1112,7 @@
       "name": "Notifications",
       "description": "Local notifications with channels, scheduling, and tap routing.",
       "category": "notifications",
-      "latest": "0.1.4",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -1155,6 +1167,18 @@
           "version": "0.1.4",
           "url": "archives/notifications-0.1.4.tgz",
           "sha256": "41a7eea9ccdb6c0c57b04d9724f794671c43594e5b258881a34f14c8930324e8",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/notifications-0.2.0.tgz",
+          "sha256": "02be9c1cd6e1e6a8e840e98f2adcf501be5f973b45b8da5aaf8d6483cf8d354e",
           "provides": [
             "notifications"
           ],
@@ -1390,7 +1414,7 @@
       "name": "Share",
       "description": "Native share sheet for text, links, and files.",
       "category": "share",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -1409,6 +1433,18 @@
           "version": "0.1.1",
           "url": "archives/share-0.1.1.tgz",
           "sha256": "30e385ff5aa8ed87b6434f3fca8ecbd89a27bb3ad2595483dd5e2cb843e18662",
+          "provides": [
+            "share"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/share-0.1.2.tgz",
+          "sha256": "8f0bb1a74bab432b39f50fd9e240c46774740007f2f8e02ae2faa46ab67c4215",
           "provides": [
             "share"
           ],

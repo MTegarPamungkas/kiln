@@ -5,6 +5,7 @@ import 'package:{{app_name}}/extensions/notifications/notification_channels.dart
 import 'package:{{app_name}}/extensions/notifications/notification_support.dart';
 import 'package:{{app_name}}/extensions/notifications/notifications_config.dart';
 import 'package:{{app_name}}/extensions/notifications/notifications_module.dart';
+import 'package:{{app_name}}/extensions/notifications/reminder_scheduler.dart';
 import 'package:{{app_name}}/extensions/notifications/timezone_resolver.dart';
 
 void main() {
@@ -18,5 +19,6 @@ void main() {
     expect(registry.read<NotificationChannels>().specs, isNotEmpty);
     expect(registry.read<TimezoneResolver>(), isA<TimezoneResolver>());
     expect(registry.read<NotificationSupport>(), isA<NotificationSupport>());
+    expect(registry.read<ReminderScheduler>(), isA<ReminderScheduler>());
   });
 }

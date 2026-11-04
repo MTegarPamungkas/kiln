@@ -378,6 +378,9 @@ final class Gate {
   Future<Result<void>> cancelNotification(int id) =>
       call<void>(() => notifications.cancel(id));
 
+  Future<Result<void>> cancelAllNotifications() =>
+      call<void>(notifications.cancelAll);
+
   // Secure storage
   Future<Result<String?>> readSecure(String key) =>
       call(() => secureStorage.read(key));
