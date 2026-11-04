@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Add `gate.supportedLocales` so a language picker can list the shipped
+  locales through the Gate instead of reading `L10nConfig` from the registry.
+  Updated the README and language-picker guide to use the new verb.
+
 ## 0.2.0
 
 - Removed `LanguageSwitcher`. The extension exposes the locale controller and supported locales; applications render their own language picker.

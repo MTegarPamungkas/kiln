@@ -8,7 +8,7 @@ Localization extension for Kiln with ARB file translation sources and
   `LocaleController`, the generated delegates, and `FailureMessages`.
 - `LocaleController` stores the locale choice; `null` means follow the device
   locale. The choice is persisted through `Storage` when the `storage` extension is installed.
-- The application renders its own language picker from `L10nConfig.supportedLocales`.
+- The application renders its own language picker from `gate.supportedLocales`.
 - `LocaleFormatters` provides date, number, and currency formats.
 
 ## Install
@@ -60,6 +60,7 @@ Details are in [docs/l10n.md](docs/l10n.md),
 import 'package:my_app/extensions/l10n/gate_l10n.dart';
 
 final current = gate.locale;                  // Locale?
+final options = gate.supportedLocales;        // List<Locale>
 await gate.setLocale(const Locale('id'));     // Result<void>
 await gate.followSystemLocale();              // Result<void>
 ```

@@ -1,6 +1,6 @@
 id: l10n
 name: Localization
-version: 0.2.0
+version: 0.3.0
 description: ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.
 category: l10n
 tier: official

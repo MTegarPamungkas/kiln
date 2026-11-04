@@ -13,6 +13,9 @@ extension GateL10nX on Gate {
 
   Locale? get locale => localeController.locale;
 
+  /// Locales the application ships with, for building a language picker.
+  List<Locale> get supportedLocales => localeController.config.supportedLocales;
+
   Future<Result<void>> setLocale(Locale? locale) =>
       call<void>(() => localeController.setLocale(locale));
 

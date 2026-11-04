@@ -19,6 +19,7 @@ void main() {
       );
     final gate = Gate(registry);
 
+    expect(gate.supportedLocales, [Locale('id'), Locale('en')]);
     expect(gate.locale, isNull);
 
     final result = await gate.setLocale(Locale('id'));
