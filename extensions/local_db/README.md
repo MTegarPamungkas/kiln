@@ -14,6 +14,13 @@ Features:
 - schema migrations,
 - optional AES-GCM encryption with keys from SecureStorage.
 
+## Gate
+
+```dart
+final record = await gate.localGet('notes', '1');   // Result<Map<String, Object?>?>
+await gate.localPut('notes', '1', {'title': 'Hi'}); // Result<void>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

@@ -20,6 +20,15 @@ automatically through `android.receivers`. If `exact_alarms` is selected,
 complete the exact alarm permission step in
 [docs/troubleshooting-delivery.md](docs/troubleshooting-delivery.md).
 
+## Gate
+
+```dart
+final granted = await gate.requestNotificationPermission(); // Result<bool>
+await gate.showNotification(NotificationMessage(id: 1, title: 'Hi', body: 'New'));
+await gate.scheduleNotification(message, when);
+await gate.cancelNotification(1);
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

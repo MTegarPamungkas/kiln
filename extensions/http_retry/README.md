@@ -18,6 +18,11 @@ Features:
 kiln add http_retry
 ```
 
+## Gate
+
+Retry runs as `HttpPipeline` middleware automatically; there are no
+request/response verbs to call.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

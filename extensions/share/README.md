@@ -11,6 +11,14 @@ Native share sheet for text, links, and files.
 kiln add share
 ```
 
+## Gate
+
+```dart
+final outcome = await gate.shareContent(
+  ShareContent(text: 'Check this out', subject: 'Kiln'),
+); // Result<ShareOutcome>
+```
+
 ## Runtime support
 
 This extension reports readiness through `SupportRegistry`. The share sheet is

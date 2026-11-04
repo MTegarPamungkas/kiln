@@ -54,6 +54,16 @@ Details are in [docs/l10n.md](docs/l10n.md),
 [docs/adding-a-language.md](docs/adding-a-language.md), and
 [docs/formatting.md](docs/formatting.md).
 
+## Gate
+
+```dart
+import 'package:my_app/extensions/l10n/gate_l10n.dart';
+
+final current = gate.locale;                  // Locale?
+await gate.setLocale(const Locale('id'));     // Result<void>
+await gate.followSystemLocale();              // Result<void>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

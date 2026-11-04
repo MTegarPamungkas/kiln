@@ -89,6 +89,15 @@ The full guide is in [docs/navigation.md](docs/navigation.md),
 [docs/route-guards.md](docs/route-guards.md), and
 [docs/deep-links-and-routing.md](docs/deep-links-and-routing.md).
 
+## Gate
+
+Navigation is fire-and-forget; read the router and drive it from app UI:
+
+```dart
+final router = registry.read<AppRouter>();
+router.go('/home');
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

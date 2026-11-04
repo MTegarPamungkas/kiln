@@ -58,6 +58,16 @@ Further documentation:
 - [Row level security](docs/row-level-security.md)
 - [Email confirmation and redirect](docs/email-confirmation-and-redirects.md)
 
+## Gate
+
+```dart
+final session = await gate.signIn(email: email, password: password);
+final doc = await gate.remoteRead('users', id);
+final file = await gate.uploadFile(upload);
+```
+
+Every call returns a `Result`; the app owns the UI.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

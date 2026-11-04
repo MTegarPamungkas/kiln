@@ -7,7 +7,7 @@
     "lib/extensions/rest_auth/rest_account_management.dart": "824f5f2ed0cacb196cd23704c2c548d1971f5f6b3c504ac3a9051b759d1b5a02",
     "lib/extensions/rest_auth/rest_auth.dart": "ed7746b5effc54e6e855592b9983797ceef3ab12c89239023fc197f12bcc2454",
     "lib/extensions/rest_auth/rest_auth_config.dart": "1b33d2be69aa2fe70944bb6552dd9bf939fbed254bd63e5400a71065ca1c10df",
-    "lib/extensions/rest_auth/rest_auth_failure_mapper.dart": "77b7e411b0966d2455af03d6fd693fe294e8b6a58cdb41e7c7bacc36296531c0",
+    "lib/extensions/rest_auth/rest_auth_failure_mapper.dart": "a59f4c7f1648e458fbe491abf5c8f3cf978f92bb62e54682a9bec3387d7bc249",
     "lib/extensions/rest_auth/rest_auth_module.dart": "07dd8fa2f17b25e12f1afc840c0362122ccdfbf56a4e15c2138353bf7a3b3ad8",
     "lib/extensions/rest_auth/rest_auth_support.dart": "ba44d7d60d5e8332ac2534b11684cb26fa00d4a4da0928f685b816dcb112f3e6",
     "lib/extensions/rest_auth/rest_session_bridge.dart": "099135b0de3534cb60311780f517622ea72365a19106952b1fcc365de8ea18ab",

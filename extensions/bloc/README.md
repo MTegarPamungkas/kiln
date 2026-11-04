@@ -15,6 +15,12 @@ the Cubit/Bloc foundation used by features:
 kiln add bloc
 ```
 
+## Gate
+
+State management has no request/response verbs. The extension wires
+`BlocSupport` and the session bridge into the registry; feature code drives
+cubits directly and owns the UI.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

@@ -11,6 +11,15 @@ Monitors network status and provides `offline_guard` for HTTP.
 - Applications observe `NetworkMonitor` and render their own connectivity UI.
 - `ReachabilityProbe` optionally uses `HttpClient` to check the server.
 
+## Gate
+
+```dart
+final status = gate.network.status;      // NetworkStatus
+gate.network.changes.listen(print);      // Stream<NetworkStatus>
+```
+
+Synchronous access through the facade; the app renders connectivity UI itself.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

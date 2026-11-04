@@ -17,6 +17,11 @@ Brick contents:
 - `async_value_x.dart` — concise failure/data access.
 - `session_notifier.dart` — wraps `SessionController`.
 
+## Gate
+
+State management has no request/response verbs. The extension registers
+`RiverpodSupport`; providers live in feature code, which owns the UI.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

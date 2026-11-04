@@ -15,6 +15,11 @@ HTTP response cache middleware for `HttpPipeline`.
 kiln add http_cache
 ```
 
+## Gate
+
+Caching runs as `HttpPipeline` middleware automatically; there are no
+request/response verbs to call.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

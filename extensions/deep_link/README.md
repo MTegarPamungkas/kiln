@@ -91,6 +91,13 @@ Further guides:
 - [docs/universal-links.md](docs/universal-links.md)
 - [docs/testing-links.md](docs/testing-links.md)
 
+## Gate
+
+```dart
+final initial = gate.deepLinks.initialLink;   // Uri?
+gate.deepLinks.links.listen((uri) { ... });   // Stream<Uri>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

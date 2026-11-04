@@ -109,6 +109,14 @@ void main() {
     create: () => FakeRemoteDatabase(),
     description: 'FakeRemoteDatabase',
   );
+  paginatedRemoteDatabaseContract(
+    create: () => FakeRemoteDatabase(),
+    description: 'FakeRemoteDatabase',
+  );
+  batchRemoteDatabaseContract(
+    create: () => FakeRemoteDatabase(),
+    description: 'FakeRemoteDatabase',
+  );
   fileStorageContract(
     create: () => FakeFileStorage(),
     description: 'FakeFileStorage',
@@ -187,6 +195,7 @@ void main() {
       expect(registry.read<SlotRegistry>(), isA<SlotRegistry>());
       expect(registry.read<LifecycleController>(), isA<LifecycleController>());
       expect(registry.read<Lifecycle>(), isA<Lifecycle>());
+      expect(registry.read<Gate>(), isA<Gate>());
     });
 
     test('accepts an override without replacing the rest', () {

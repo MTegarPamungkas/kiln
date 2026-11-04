@@ -14,6 +14,13 @@ installed `SocialAuth` backend.
 Google setup: [docs/google-setup.md](docs/google-setup.md). Apple setup:
 [docs/apple-setup.md](docs/apple-setup.md).
 
+## Gate
+
+```dart
+final credential = await gate.socialSignIn(SocialProvider.google); // Result<SocialCredential?>
+await gate.socialSignOut();
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

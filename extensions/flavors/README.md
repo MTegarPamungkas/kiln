@@ -13,6 +13,13 @@ Dart flavor values, per-flavor entry points, and VS Code launch configuration.
 Flavors here are Dart values, not native Android/iOS product flavors.
 See [docs/native-flavors-not-included.md](docs/native-flavors-not-included.md).
 
+## Gate
+
+```dart
+final flavor = gate.flavor;          // AppFlavor
+final isProduction = flavor.isProduction;
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

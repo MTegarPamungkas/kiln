@@ -67,6 +67,63 @@ The foundation phase runs end-to-end:
 See [getting-started.md](docs/getting-started.md) and
 [roadmap.md](docs/roadmap.md).
 
+## Gate
+
+Every capability is reachable through one facade that returns a `Result`:
+the SDK sends back success or failure plus information and never owns UI.
+Build it from the registry after bootstrap:
+
+```dart
+final gate = Gate(registry);
+```
+
+One call, one result. The `permission` extension is a plain request — the app
+decides what UI to show:
+
+```dart
+final result = await gate.requestPermission(PermissionKind.camera);
+result.fold(
+  ok: (status) => print('Granted: $status'),
+  err: (failure) => print('${failure.code}: ${failure.details}'),
+);
+```
+
+`Err.failure.details` carries the information the SDK sends back (status code,
+server message, operation name). The same shape covers the whole SDK:
+
+```dart
+final session = await gate.signIn(email: email, password: password);
+final doc = await gate.remoteRead('users', userId);
+final image = await gate.pickImage(source: MediaSource.gallery);
+await gate.captureEvent('checkout_started', properties: {'cart': 3});
+```
+
+On/off capabilities follow the same rule: the SDK toggles state, the app
+renders it. These verbs come from each extension's `gate_<id>.dart` file:
+
+```dart
+import 'package:my_app/extensions/biometric/gate_biometric.dart';
+import 'package:my_app/extensions/theme/gate_theme.dart';
+import 'package:my_app/extensions/l10n/gate_l10n.dart';
+
+final unlock = await gate.biometricUnlock();          // Result<bool>
+final theme = await gate.setThemeMode(ThemeMode.dark); // Result<void>
+final locale = await gate.setLocale(const Locale('id')); // Result<void>
+```
+
+Read any contract generically, or wrap a call yourself when a typed verb is
+missing:
+
+```dart
+if (gate.has<Biometric>()) {
+  final biometric = gate.use<Biometric>();
+  final ok = await gate.call(biometric.authenticate);
+}
+```
+
+`kiln_testing` registers a `Gate` automatically, so widget tests drive the
+same facade through `registry.read<Gate>()`.
+
 ## Packages
 
 | Package | Purpose |

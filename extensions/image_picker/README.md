@@ -21,6 +21,13 @@ Platform limits and native notes are in
 [docs/platform-notes.md](docs/platform-notes.md). The upload flow is in
 [docs/upload-flow.md](docs/upload-flow.md).
 
+## Gate
+
+```dart
+final image = await gate.pickImage(source: MediaSource.gallery); // Result<PickedImage?>
+final photo = await gate.pickImage(source: MediaSource.camera, maxWidth: 1080);
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

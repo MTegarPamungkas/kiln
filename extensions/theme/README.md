@@ -55,6 +55,15 @@ Full documentation is in [docs/theme.md](docs/theme.md),
 [docs/design-tokens.md](docs/design-tokens.md), and
 [docs/rebranding.md](docs/rebranding.md).
 
+## Gate
+
+```dart
+import 'package:my_app/extensions/theme/gate_theme.dart';
+
+final mode = gate.themeMode;                  // ThemeMode
+await gate.setThemeMode(ThemeMode.dark);      // Result<void>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

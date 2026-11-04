@@ -36,31 +36,10 @@ final class FakeHttpClient implements HttpClient {
     return response;
   }
 
-  Failure _failureFor(int statusCode) {
-    if (statusCode == 404) {
-      return Failure(
-        code: FailureCode.unavailable,
-        message: 'Fake response returned 404',
-        kind: FailureKind.unavailable,
-        details: <String, Object?>{'statusCode': statusCode},
-      );
-    }
-    if (statusCode == 429 || statusCode >= 500) {
-      return Failure(
-        code: FailureCode.networkServer,
-        message: 'Fake response returned $statusCode',
-        kind: FailureKind.network,
-        details: <String, Object?>{'statusCode': statusCode},
-        isRetryable: true,
-      );
-    }
-    return Failure(
-      code: FailureCode.validationInvalidInput,
-      message: 'Fake response returned $statusCode',
-      kind: FailureKind.validation,
-      details: <String, Object?>{'statusCode': statusCode},
-    );
-  }
+  Failure _failureFor(int statusCode) => mapHttpStatusToFailure(
+    statusCode,
+    message: 'Fake response returned $statusCode',
+  );
 
   @override
   Future<HttpResponse> get(

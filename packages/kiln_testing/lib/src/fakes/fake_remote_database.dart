@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:kiln_core/kiln_core.dart';
 
 /// [RemoteDatabase] backed by nested maps, with programmable failures.
-final class FakeRemoteDatabase implements RemoteDatabase {
+final class FakeRemoteDatabase
+    implements RemoteDatabase, PaginatedRemoteDatabase, BatchRemoteDatabase {
   final Map<String, Map<String, Map<String, Object?>>> _data =
       <String, Map<String, Map<String, Object?>>>{};
   final StreamController<String> _changes = StreamController<String>.broadcast(
@@ -50,6 +51,63 @@ final class FakeRemoteDatabase implements RemoteDatabase {
     RemoteQuery? query,
   }) async {
     await _maybeFail();
+    final documents = _matching(collection, query);
+    final offset = query?.offset ?? 0;
+    final sliced = documents.skip(offset);
+    final limit = query?.limit;
+    return (limit == null ? sliced : sliced.take(limit)).toList();
+  }
+
+  @override
+  Future<RemotePage<Map<String, Object?>>> queryPage(
+    String collection, {
+    RemoteQuery? query,
+  }) async {
+    await _maybeFail();
+    final documents = _matching(collection, query);
+    final offset = query?.offset ?? 0;
+    final limit = query?.limit ?? 20;
+    final items = documents.skip(offset).take(limit).toList();
+    final hasMore = documents.length > offset + items.length;
+    return RemotePage<Map<String, Object?>>(
+      items: items,
+      nextOffset: hasMore ? offset + items.length : null,
+      totalCount: documents.length,
+    );
+  }
+
+  @override
+  Future<void> writeBatch(String collection, List<RemoteWrite> writes) async {
+    await _maybeFail();
+    for (final write in writes) {
+      switch (write.kind) {
+        case RemoteWriteKind.insert:
+          await create(collection, write.data);
+        case RemoteWriteKind.update:
+          final id = write.id;
+          if (id == null) {
+            throw const Failure(
+              code: FailureCode.validationInvalidInput,
+              message: 'update requires an id',
+              kind: FailureKind.validation,
+            );
+          }
+          await update(collection, id, write.data);
+        case RemoteWriteKind.delete:
+          final id = write.id;
+          if (id == null) {
+            throw const Failure(
+              code: FailureCode.validationInvalidInput,
+              message: 'delete requires an id',
+              kind: FailureKind.validation,
+            );
+          }
+          await delete(collection, id);
+      }
+    }
+  }
+
+  List<Map<String, Object?>> _matching(String collection, RemoteQuery? query) {
     var documents = <Map<String, Object?>>[
       for (final document in _collection(collection).values)
         Map<String, Object?>.of(document),
@@ -76,11 +134,7 @@ final class FakeRemoteDatabase implements RemoteDatabase {
         return 0;
       });
     }
-
-    final offset = query?.offset ?? 0;
-    final sliced = documents.skip(offset);
-    final limit = query?.limit;
-    return (limit == null ? sliced : sliced.take(limit)).toList();
+    return documents;
   }
 
   bool _matches(Map<String, Object?> document, RemoteFilter filter) {

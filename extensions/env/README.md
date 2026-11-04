@@ -13,6 +13,13 @@ Typed build-time configuration from `--dart-define`.
 The keys available today are `api_base_url`, `api_key`, `feature_flags`, and
 `enable_debug_tools`. See [docs/env.md](docs/env.md) for adding keys.
 
+## Gate
+
+```dart
+final apiKey = gate.env.read('API_KEY');  // String?
+final all = gate.env.values;              // Map<String, String>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

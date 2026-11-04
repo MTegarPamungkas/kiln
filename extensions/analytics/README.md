@@ -17,6 +17,17 @@ Install this extension together with the analytics module in the app's module
 list, then read [docs/analytics.md](docs/analytics.md) for configuration and
 usage.
 
+## Gate
+
+```dart
+await gate.captureEvent('signup_started', properties: {'plan': 'pro'});
+await gate.identifyUser(userId, traits: {'plan': 'pro'});
+await gate.resetAnalytics();
+```
+
+Each call returns a `Result`; the app owns the UI and receives success or
+failure plus information.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

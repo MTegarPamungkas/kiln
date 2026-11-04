@@ -58,6 +58,17 @@ Query mapping, document permissions, and behavior differences are covered in
 [docs/collections-and-permissions.md](docs/collections-and-permissions.md) and
 [docs/backend-swap-notes.md](docs/backend-swap-notes.md).
 
+## Gate
+
+```dart
+final session = await gate.signIn(email: email, password: password);
+final doc = await gate.remoteCreate('users', {'name': 'Ana'});
+final file = await gate.uploadFile(upload);
+await gate.sendPasswordReset(email);
+```
+
+Every call returns a `Result`; the app owns the UI.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

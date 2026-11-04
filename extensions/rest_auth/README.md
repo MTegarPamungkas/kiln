@@ -17,6 +17,14 @@
 The server JSON shape is in [docs/server-contract.md](docs/server-contract.md),
 the refresh flow is in [docs/token-refresh.md](docs/token-refresh.md).
 
+## Gate
+
+```dart
+final session = await gate.signIn(email: email, password: password); // Result<AuthSession>
+await gate.signOut();
+await gate.sendPasswordReset(email);
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

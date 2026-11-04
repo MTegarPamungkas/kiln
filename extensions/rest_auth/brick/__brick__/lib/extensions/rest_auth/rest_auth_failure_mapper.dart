@@ -4,14 +4,6 @@ import 'package:kiln_core/kiln_core.dart';
 Failure mapRestResponse(HttpResponse response) {
   final message = _message(response.data);
   final status = response.statusCode;
-  if (status == 400 || status == 422) {
-    return Failure(
-      code: FailureCode.validationInvalidInput,
-      message: message ?? 'Data yang dikirim tidak valid.',
-      kind: FailureKind.validation,
-      details: <String, Object?>{'status': status},
-    );
-  }
   if (status == 401) {
     return Failure(
       code: FailureCode.authSessionExpired,
@@ -20,19 +12,11 @@ Failure mapRestResponse(HttpResponse response) {
       details: <String, Object?>{'status': status},
     );
   }
-  if (status == 403) {
+  if (status == 400 || status == 422) {
     return Failure(
-      code: FailureCode.authUnauthorized,
-      message: message ?? 'Akses ditolak.',
-      kind: FailureKind.authorization,
-      details: <String, Object?>{'status': status},
-    );
-  }
-  if (status == 404) {
-    return Failure(
-      code: FailureCode.unavailable,
-      message: message ?? 'Endpoint tidak ditemukan.',
-      kind: FailureKind.unavailable,
+      code: FailureCode.validationInvalidInput,
+      message: message ?? 'Data yang dikirim tidak valid.',
+      kind: FailureKind.validation,
       details: <String, Object?>{'status': status},
     );
   }
@@ -44,12 +28,15 @@ Failure mapRestResponse(HttpResponse response) {
       details: <String, Object?>{'status': status},
     );
   }
-  if (status == 429 || status >= 500) {
-    return Failure(
-      code: FailureCode.networkServer,
-      message: message ?? 'Server sedang sibuk.',
-      kind: FailureKind.network,
-      isRetryable: true,
+  if (status == 403 || status == 404 || status == 429 || status >= 500) {
+    final fallback = switch (status) {
+      403 => 'Akses ditolak.',
+      404 => 'Endpoint tidak ditemukan.',
+      _ => 'Server sedang sibuk.',
+    };
+    return mapHttpStatusToFailure(
+      status,
+      message: message ?? fallback,
       details: <String, Object?>{'status': status},
     );
   }

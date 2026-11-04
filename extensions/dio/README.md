@@ -33,6 +33,13 @@ flutter run --dart-define=KILN_API_KEY=secret
 Use `api_key_query=key` instead of a header when the API expects the key in the
 query string. `api_key_prefix` supports values such as `Bearer `.
 
+## Gate
+
+```dart
+final response = await gate.http.get(Uri.parse('https://api.example.com/users'));
+final created = await gate.http.post(uri, body: {'name': 'Ana'});
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

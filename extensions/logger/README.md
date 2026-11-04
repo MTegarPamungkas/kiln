@@ -25,6 +25,15 @@ Read [docs/logging.md](docs/logging.md) for usage guidance,
 [docs/what-not-to-log.md](docs/what-not-to-log.md) for the list of data that must
 not be logged.
 
+## Gate
+
+```dart
+gate.logger.info('User signed in', data: {'id': userId});
+gate.logger.error('Upload failed', error: err);
+```
+
+Synchronous access through the facade.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

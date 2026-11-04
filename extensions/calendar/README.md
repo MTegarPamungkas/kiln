@@ -12,6 +12,14 @@ Add events to the device calendar through the native calendar UI.
 kiln add calendar
 ```
 
+## Gate
+
+```dart
+final added = await gate.addCalendarEvent(
+  CalendarEvent(title: 'Meeting', startsAt: start, endsAt: end),
+); // Result<bool>
+```
+
 ## Runtime support
 
 This extension reports readiness through `SupportRegistry`. The platform

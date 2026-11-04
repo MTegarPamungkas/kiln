@@ -95,6 +95,7 @@ Registry createTestRegistry({
   registry.registerSingleton<ConsentController>(consent);
   registry.registerSingleton<LifecycleController>(lifecycle);
   registry.registerSingleton<Lifecycle>(lifecycle);
+  registry.registerSingleton<Gate>(Gate(registry));
 
   return registry;
 }

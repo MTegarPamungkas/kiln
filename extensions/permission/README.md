@@ -16,6 +16,20 @@ Native notes: Android manifest entries and the iOS Info.plist must be adjusted
 to match the selected kind. `permission_handler` does not add native entries
 automatically.
 
+## Gate
+
+```dart
+final status = await gate.permissionStatus(PermissionKind.camera);
+final result = await gate.requestPermission(PermissionKind.camera); // Result<PermissionStatus>
+result.fold(
+  ok: (status) => print('Granted: $status'),
+  err: (failure) => print('${failure.code}: ${failure.details}'),
+);
+```
+
+The SDK returns status and flow results; the app shows rationale and settings
+prompts in its own UI.
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

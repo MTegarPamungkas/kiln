@@ -14,6 +14,14 @@ Brick contents:
 - `NamespacedStorage` for other owners such as `http_cache`,
 - `StorageMigrator` for key schema versions.
 
+## Gate
+
+```dart
+final value = await gate.readValue('theme');   // Result<String?>
+await gate.writeValue('theme', 'dark');        // Result<void>
+await gate.deleteValue('theme');               // Result<void>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

@@ -14,6 +14,14 @@ Brick contents:
 This extension sets `android.allow_backup=false` so that encrypted data is not
 carried over by backups across installations.
 
+## Gate
+
+```dart
+final token = await gate.readSecure('access_token');   // Result<String?>
+await gate.writeSecure('access_token', token);        // Result<void>
+await gate.deleteSecure('access_token');              // Result<void>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

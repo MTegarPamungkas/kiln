@@ -13,6 +13,12 @@ Device location behind the `LocationProvider` contract.
 kiln add geolocation
 ```
 
+## Gate
+
+```dart
+final position = await gate.currentLocation(); // Result<GeoPosition>
+```
+
 ## Runtime support
 
 This extension reports platform and device readiness through `SupportRegistry`.

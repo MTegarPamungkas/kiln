@@ -68,75 +68,15 @@ Failure mapDioException(DioException error) {
 Failure _mapResponse(DioException error, int statusCode) {
   final serverMessage = _serverMessage(error.response?.data);
   final retryAfter = _retryAfter(error.response?.headers);
-  final details = <String, Object?>{'statusCode': statusCode};
-  if (serverMessage != null) {
-    details['serverMessage'] = serverMessage;
-  }
-  if (retryAfter != null) {
-    details['retryAfterSeconds'] = retryAfter;
-  }
-
-  if (statusCode == 401 || statusCode == 403) {
-    return Failure(
-      code: FailureCode.authUnauthorized,
-      message: serverMessage ?? 'The request was not authorized',
-      kind: FailureKind.authorization,
-      cause: error,
-      stackTrace: error.stackTrace,
-      details: details,
-    );
-  }
-  if (statusCode == 404) {
-    return Failure(
-      code: FailureCode.unavailable,
-      message: serverMessage ?? 'The requested resource was not found',
-      kind: FailureKind.unavailable,
-      cause: error,
-      stackTrace: error.stackTrace,
-      details: details,
-    );
-  }
-  if (statusCode == 408) {
-    return Failure(
-      code: FailureCode.networkTimeout,
-      message: serverMessage ?? 'The request timed out',
-      kind: FailureKind.network,
-      cause: error,
-      stackTrace: error.stackTrace,
-      details: details,
-      isRetryable: true,
-    );
-  }
-  if (statusCode == 429) {
-    return Failure(
-      code: FailureCode.networkServer,
-      message: serverMessage ?? 'The server is rate limiting requests',
-      kind: FailureKind.network,
-      cause: error,
-      stackTrace: error.stackTrace,
-      details: details,
-      isRetryable: true,
-    );
-  }
-  if (statusCode >= 500) {
-    return Failure(
-      code: FailureCode.networkServer,
-      message: serverMessage ?? 'The server could not complete the request',
-      kind: FailureKind.network,
-      cause: error,
-      stackTrace: error.stackTrace,
-      details: details,
-      isRetryable: true,
-    );
-  }
-  return Failure(
-    code: FailureCode.validationInvalidInput,
-    message:
-        serverMessage ?? 'The request was rejected with status $statusCode',
-    kind: FailureKind.validation,
+  return mapHttpStatusToFailure(
+    statusCode,
+    message: serverMessage,
     cause: error,
     stackTrace: error.stackTrace,
-    details: details,
+    details: <String, Object?>{
+      if (serverMessage != null) 'serverMessage': serverMessage,
+      if (retryAfter != null) 'retryAfterSeconds': retryAfter,
+    },
   );
 }
 

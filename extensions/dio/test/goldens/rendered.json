@@ -4,7 +4,7 @@
     "lib/extensions/dio/cancellation.dart": "31e26a39d97bef14ecd43c7d4499ea27a1565def69e964286d1556897ab78022",
     "lib/extensions/dio/dio_client.dart": "f5a5e3f15870dedcf3913d547e711ea2eb18f9fd83164090d225420156cfd2b4",
     "lib/extensions/dio/dio_config.dart": "a09bd6adc79f01c3fd0b795c1679bfd62f259024fc2f5c6d7296e485d496b93c",
-    "lib/extensions/dio/dio_failure_mapper.dart": "55c6dc2348085f57e7491e9646d663b9f0774827dc32412407d2807b58bb62e5",
+    "lib/extensions/dio/dio_failure_mapper.dart": "3a0ce3fd3c211e8f16952005f814f970c3311a7f8ac358bf852ebda63aa00291",
     "lib/extensions/dio/dio_module.dart": "e1c6539db6866f357868d673d60437ba6c844fd708f55a4d050ec854101496df",
     "lib/extensions/dio/dio_support.dart": "e46c2dbc86ded5e840287395e72d04452f8482fd351563e059bd5a99bc0e871c",
     "lib/extensions/dio/dio_test_adapter.dart": "c1dd03a9722d094f7d2503c9489e3e4ea499dc5ad55fd372ba172677c14aeaae",

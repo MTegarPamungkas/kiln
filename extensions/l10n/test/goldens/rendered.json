@@ -3,6 +3,7 @@
   "files": {
     "l10n.yaml": "dcb2415bce40aa6113d0938282fd5e810d834fa8f0b80c0197db4b8c20ae8f12",
     "lib/extensions/l10n/failure_messages.dart": "42e53c72e013800a76d363ce572378b5c112e6beba52c61a15d6acf0ee701256",
+    "lib/extensions/l10n/gate_l10n.dart": "97c5d80848a96570284ab9b851fba6b20474a4c4267820f0c32ef98620759563",
     "lib/extensions/l10n/l10n_config.dart": "617c9290592cdec133e9fb2ae92f8ae7b514db2ca83344420a2cacf295ba2f45",
     "lib/extensions/l10n/l10n_module.dart": "915d30879e21245c8bb221ef1927d2a682e38357db9b62d309719a77c70aa897",
     "lib/extensions/l10n/l10n_support.dart": "8db13854d7288fd5ee5ea8adbfa102f71a18e26d3740044d78370d9fb8daae0a",
@@ -14,6 +15,7 @@
     "lib/l10n/app_en.arb": "ff06984798c0ad45e62b70cabefd1a459a5417462213966780a7f84ab51a8899",
     "lib/l10n/app_id.arb": "1b945a212317913371275e0bda6b2589e76009e45350dad2c8d3901c85172548",
     "test/extensions/l10n/failure_messages_test.dart": "dbbf6afe67e4dac89bb4db92bb7e98f31a13b162f507c6bd452f2307241d00a7",
+    "test/extensions/l10n/gate_l10n_test.dart": "d0ba8a1756e19bf39a84e7ed1160277a1c012125f5e8081d6135360c6cba5e0c",
     "test/extensions/l10n/l10n_config_test.dart": "0a42c81f3090d9f9293b683fc0bab9067f5bda1d9deb86e4467ce6dadd60126a",
     "test/extensions/l10n/l10n_coverage_test.dart": "6284c7848176ab5233e446e6b3e846d18701d4dcb2d06a7ae0bdebe8bde72e0a",
     "test/extensions/l10n/l10n_module_test.dart": "7d0bef3d2b340c54a11e06b2184ca9a2a1579d05c1792996b9e503e9529f2e35",
