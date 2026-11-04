@@ -121,7 +121,7 @@ final class Prompter {
       final answer = text(question, defaultValue: defaultValue?.toString());
       final value = int.tryParse(answer ?? '');
       if (value == null) {
-        _write('Masukkan angka yang valid.\n');
+        _write('Enter a valid number.\n');
         continue;
       }
       if (min != null && value < min) {

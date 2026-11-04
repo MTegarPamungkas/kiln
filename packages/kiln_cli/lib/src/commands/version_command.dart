@@ -37,7 +37,7 @@ final class VersionCommand extends KilnCommand {
       logger.info('kiln $kilnVersion');
       logger.info('kiln_core $kilnCoreVersion');
       if (latest != null) {
-        logger.info('Versi baru tersedia: $latest');
+        logger.info('A new version is available: $latest');
       }
     }
     return ExitCodes.success;

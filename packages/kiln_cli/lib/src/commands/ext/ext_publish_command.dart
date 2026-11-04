@@ -106,7 +106,7 @@ final class ExtPublishCommand extends KilnCommand {
       });
     } else {
       logger.success(
-        'Publish ${result.id} ${result.version} ke ${result.archivePath}',
+        'Publish ${result.id} ${result.version} to ${result.archivePath}',
       );
       logger.info('Index: ${result.indexPath}');
     }

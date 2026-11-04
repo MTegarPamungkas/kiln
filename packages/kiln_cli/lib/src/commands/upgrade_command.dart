@@ -93,7 +93,7 @@ final class UpgradeCommand extends KilnCommand {
       return ExitCodes.success;
     }
     if (argResults!['dry-run'] == true) {
-      logger.info('Upgrade tersedia:');
+      logger.info('Upgrades available:');
       for (final candidate in candidates) {
         logger.info(
           '  ${candidate.id} ${candidate.from} -> ${candidate.version.version}',
@@ -258,7 +258,7 @@ final class UpgradeCommand extends KilnCommand {
       logger.info('All extensions are already at the latest catalog version.');
       return ExitCodes.success;
     }
-    logger.info('Upgrade tersedia:');
+    logger.info('Upgrades available:');
     for (final candidate in candidates) {
       logger.info('  ${candidate.id} ${candidate.from} -> ${candidate.to}');
     }

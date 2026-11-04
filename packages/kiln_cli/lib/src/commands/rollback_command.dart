@@ -48,7 +48,7 @@ final class RollbackCommand extends KilnCommand {
     logger.success(
       interrupted != null
           ? 'Interrupted operation rolled back.'
-          : 'Operasi terakhir dibatalkan.',
+          : 'Last operation rolled back.',
     );
     return ExitCodes.success;
   }

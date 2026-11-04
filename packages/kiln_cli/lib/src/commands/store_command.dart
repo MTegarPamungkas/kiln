@@ -348,7 +348,7 @@ final class StoreCommand extends KilnCommand {
           !prompter
               .withAssumeYes(argResults!['yes'] == true)
               .confirm(decision.reason, defaultValue: false)) {
-        logger.info('Instalasi dibatalkan.');
+        logger.info('Installation cancelled.');
         return ExitCodes.success;
       }
       if (runHooks && argResults!['yes'] != true && !prompter.interactive) {

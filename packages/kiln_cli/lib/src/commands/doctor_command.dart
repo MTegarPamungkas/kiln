@@ -240,7 +240,7 @@ final class DoctorCommand extends KilnCommand {
       if (failCount == 0) {
         logger.success('Project is healthy');
       } else {
-        logger.error('$failCount masalah perlu diperbaiki');
+        logger.error('$failCount issues need to be fixed');
       }
     }
     return failCount == 0 ? ExitCodes.success : ExitCodes.project;

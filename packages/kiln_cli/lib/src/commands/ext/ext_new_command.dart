@@ -41,7 +41,7 @@ final class ExtNewCommand extends KilnCommand {
     }
     final id = rest.first;
     if (!RegExp(r'^[a-z][a-z0-9]*(_[a-z0-9]+)*$').hasMatch(id)) {
-      usageException('Id extension harus snake_case.');
+      usageException('The extension id must be snake_case.');
     }
     final name = argResults!['name'] as String? ?? id;
     final output = Directory(

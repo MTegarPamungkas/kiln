@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5
+
+- Normalize CLI output to English: the `info` command labels (`Category`,
+  `required`/`optional`), and prompts, errors, and success messages across
+  `create`, `add`, `doctor`, `rollback`, `store`, `upgrade`, `version`,
+  `ext new`, `ext publish`, the answer prompter, and command helpers. No test
+  asserted on the previous strings.
+
 ## 0.1.4
 
 - `kiln create` defaults to the minimal template; `--template app` restores

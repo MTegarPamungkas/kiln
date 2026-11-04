@@ -47,7 +47,7 @@ final class InfoCommand extends KilnCommand {
 
     logger.info('${manifest.name} (${manifest.id}) ${manifest.version}');
     logger.info(manifest.description);
-    logger.info('Kategori: ${manifest.category} · tier: ${manifest.tier.name}');
+    logger.info('Category: ${manifest.category} · tier: ${manifest.tier.name}');
     if (manifest.provides.isNotEmpty) {
       logger.info('Provides: ${manifest.provides.join(', ')}');
     }
@@ -67,7 +67,7 @@ final class InfoCommand extends KilnCommand {
     if (manifest.prompts.isNotEmpty) {
       logger.info('Prompts:');
       for (final prompt in manifest.prompts) {
-        final required = prompt.required ? 'wajib' : 'opsional';
+        final required = prompt.required ? 'required' : 'optional';
         logger.info(
           '  ${prompt.name} (${prompt.type.name}, $required)'
           '${prompt.defaultValue == null ? '' : ' default=${prompt.defaultValue}'}',

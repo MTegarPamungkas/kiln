@@ -59,10 +59,10 @@ final class CreateCommand extends KilnCommand {
     final rest = argResults!.rest;
     final name = rest.isEmpty ? null : rest.first;
     if (name == null) {
-      usageException('Nama aplikasi wajib diisi.');
+      usageException('The application name is required.');
     }
     if (!RegExp(r'^[a-z][a-z0-9_]*$').hasMatch(name)) {
-      usageException('Nama aplikasi harus snake_case, misalnya my_app.');
+      usageException('The application name must be snake_case, for example my_app.');
     }
 
     final state = argResults!['state'] as String;

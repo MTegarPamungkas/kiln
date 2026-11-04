@@ -100,7 +100,7 @@ final class AddCommand extends KilnCommand {
     }
 
     if (result.hasConflicts) {
-      logger.error('Perubahan dibatalkan karena ada konflik file.');
+      logger.error('Changes were reverted because of a file conflict.');
       return ExitCodes.conflict;
     }
 

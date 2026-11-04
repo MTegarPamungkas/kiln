@@ -22,7 +22,7 @@ Map<String, String> parseAnswerOptions(List<String> rawAnswers) {
     final index = raw.indexOf('=');
     if (index <= 0) {
       throw KilnException(
-        'Format --answer harus nama=nilai, diterima "$raw"',
+        'The --answer format must be name=value, got "$raw"',
         code: 'prompt.invalid',
       );
     }
@@ -67,7 +67,7 @@ Map<String, Object?> answerForExtension(
     }
     if (!prompter.interactive) {
       throw KilnException(
-        '${extension.id}: prompt "${prompt.name}" wajib diisi',
+        '${extension.id}: prompt "${prompt.name}" is required',
         code: 'prompt.required',
         suggestion: 'Add --answer ${prompt.name}=<value>',
       );
