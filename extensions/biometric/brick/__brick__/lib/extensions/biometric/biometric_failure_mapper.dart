@@ -10,7 +10,7 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
     return Failure.from(
       error,
       code: FailureCode.unavailable,
-      message: 'Biometrik tidak tersedia.',
+      message: 'Biometrics are not available.',
       kind: FailureKind.unavailable,
       stackTrace: stackTrace,
     );
@@ -20,7 +20,7 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
     LocalAuthExceptionCode.systemCanceled ||
     LocalAuthExceptionCode.timeout => Failure(
       code: FailureCode.cancelled,
-      message: 'Autentikasi dibatalkan.',
+      message: 'Authentication was cancelled.',
       kind: FailureKind.cancelled,
       cause: error,
       stackTrace: stackTrace,
@@ -28,7 +28,7 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
     LocalAuthExceptionCode.noCredentialsSet ||
     LocalAuthExceptionCode.noBiometricsEnrolled => Failure(
       code: FailureCode.permissionDenied,
-      message: 'Biometrik belum terdaftar di perangkat.',
+      message: 'No biometrics are enrolled on this device.',
       kind: FailureKind.permission,
       cause: error,
       stackTrace: stackTrace,
@@ -50,7 +50,7 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
     LocalAuthExceptionCode.biometricLockout ||
     LocalAuthExceptionCode.temporaryLockout => Failure(
       code: FailureCode.permissionPermanentlyDenied,
-      message: 'Biometrik terkunci. Coba lagi nanti atau pakai kode perangkat.',
+      message: 'Biometrics are locked. Try again later or use the device passcode.',
       kind: FailureKind.permission,
       cause: error,
       stackTrace: stackTrace,
@@ -58,7 +58,7 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
     LocalAuthExceptionCode.authInProgress ||
     LocalAuthExceptionCode.uiUnavailable => Failure(
       code: FailureCode.unavailable,
-      message: 'Autentikasi tidak bisa dimulai sekarang.',
+      message: 'Authentication cannot start right now.',
       kind: FailureKind.unavailable,
       cause: error,
       stackTrace: stackTrace,
@@ -66,7 +66,7 @@ Failure mapBiometricError(Object error, {StackTrace? stackTrace}) {
     ),
     _ => Failure(
       code: FailureCode.unexpected,
-      message: error.description ?? 'Autentikasi biometrik gagal.',
+      message: error.description ?? 'Biometric authentication failed.',
       kind: FailureKind.unknown,
       cause: error,
       stackTrace: stackTrace,

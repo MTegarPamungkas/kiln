@@ -1,7 +1,7 @@
 /// Biometric settings from the install prompts.
 final class BiometricConfig {
   const BiometricConfig({
-    this.reason = 'Buka aplikasi dengan biometrik',
+    this.reason = 'Unlock the app with biometrics',
     this.gracePeriod = const Duration(seconds: 30),
     this.biometricOnly = true,
   });

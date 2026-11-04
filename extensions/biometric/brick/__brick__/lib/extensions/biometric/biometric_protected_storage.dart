@@ -18,7 +18,7 @@ final class BiometricProtectedStorage implements SecureStorage {
     if (!authenticated) {
       throw const Failure(
         code: FailureCode.permissionDenied,
-        message: 'Autentikasi biometrik diperlukan untuk membaca data.',
+        message: 'Biometric authentication is required to read data.',
         kind: FailureKind.permission,
       );
     }

@@ -30,7 +30,7 @@ final class BiometricGate {
     if (!authenticated) {
       throw const Failure(
         code: FailureCode.permissionDenied,
-        message: 'Autentikasi biometrik diperlukan.',
+        message: 'Biometric authentication is required.',
         kind: FailureKind.permission,
       );
     }

@@ -18,7 +18,7 @@ void main() {
         vars: const <String, dynamic>{
           'id': 'biometric',
           'app_name': 'bio_analyze',
-          'reason': 'Buka aplikasi dengan biometrik',
+          'reason': 'Unlock the app with biometrics',
           'grace_seconds': 30,
           'biometric_only': true,
         },

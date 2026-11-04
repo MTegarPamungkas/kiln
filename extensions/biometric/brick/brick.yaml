@@ -15,7 +15,7 @@ vars:
   reason:
     type: string
     description: Authentication prompt
-    default: Buka aplikasi dengan biometrik
+    default: Unlock the app with biometrics
   grace_seconds:
     type: number
     description: Grace period in seconds

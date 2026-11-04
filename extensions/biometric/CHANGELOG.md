@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Normalized every user-facing string to English: the `mapBiometricError`
+  messages, `BiometricGate` and `BiometricProtectedStorage` failures, the
+  default authentication `reason`, the `extension.yaml` prompt default and
+  `NSFaceIDUsageDescription`, and the brick variable default. Applications can
+  still localize the prompt by passing their own `reason`.
+
 ## 0.2.0
 
 - The extension no longer registers a lock screen wrapper in `app.wrappers`.

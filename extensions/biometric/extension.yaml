@@ -1,6 +1,6 @@
 id: biometric
 name: Biometric
-version: 0.2.0
+version: 0.3.0
 description: Biometric authentication, app lock state, and protected storage.
 category: security
 tier: official
@@ -13,7 +13,7 @@ prompts:
   - name: reason
     type: string
     label: Prompt shown during authentication
-    default: Buka aplikasi dengan biometrik
+    default: Unlock the app with biometrics
   - name: grace_seconds
     type: int
     label: Grace period in seconds
@@ -34,7 +34,7 @@ android:
   activity: FlutterFragmentActivity
 ios:
   plist:
-    NSFaceIDUsageDescription: Gunakan Face ID untuk membuka aplikasi.
+    NSFaceIDUsageDescription: Use Face ID to unlock the app.
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

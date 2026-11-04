@@ -22,7 +22,7 @@ void main() {
 
     expect(await biometric.authenticate(), isTrue);
     expect(gateway.authCalls, 1);
-    expect(gateway.lastReason, 'Buka aplikasi dengan biometrik');
+    expect(gateway.lastReason, 'Unlock the app with biometrics');
     expect(gateway.lastBiometricOnly, isTrue);
   });
 
