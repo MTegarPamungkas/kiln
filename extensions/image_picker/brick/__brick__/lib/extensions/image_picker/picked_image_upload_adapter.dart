@@ -19,7 +19,7 @@ final class PickedImageUploadAdapter {
     if (bytes == null) {
       throw const Failure(
         code: FailureCode.mediaInvalid,
-        message: 'Byte gambar tidak tersedia untuk diunggah.',
+        message: 'Image bytes are not available for upload.',
         kind: FailureKind.validation,
       );
     }

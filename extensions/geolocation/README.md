@@ -16,7 +16,11 @@ kiln add geolocation
 ## Gate
 
 ```dart
-final position = await gate.currentLocation(); // Result<GeoPosition>
+final position = await gate.currentLocation();        // Result<GeoPosition>
+final enabled = await gate.locationServiceEnabled();  // Result<bool>
+
+// Streaming is not a Result verb; read the contract directly:
+gate.location.updates(distanceFilterMeters: 10).listen((p) => ...);
 ```
 
 ## Runtime support

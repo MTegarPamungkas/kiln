@@ -1,6 +1,6 @@
 id: geolocation
 name: Geolocation
-version: 0.1.1
+version: 0.2.0
 description: Device location with permission-aware reads and streaming updates.
 category: location
 tier: official
@@ -23,7 +23,7 @@ android:
     - android.permission.ACCESS_FINE_LOCATION
 ios:
   plist:
-    NSLocationWhenInUseUsageDescription: Jejak uses your location to remember where a trip happened.
+    NSLocationWhenInUseUsageDescription: This app needs your location to show nearby content.
 macos:
   entitlements:
     com.apple.security.personal-information.location: true

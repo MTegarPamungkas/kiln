@@ -252,6 +252,44 @@ final class _HttpCache implements HttpCache {
   }
 }
 
+final class _Location implements LocationProvider {
+  bool serviceEnabled = true;
+  GeoPosition? position;
+  Failure? failure;
+
+  @override
+  Future<bool> isServiceEnabled() async {
+    _throwIfFailed();
+    return serviceEnabled;
+  }
+
+  @override
+  Future<GeoPosition> current({
+    LocationAccuracy accuracy = LocationAccuracy.high,
+  }) async {
+    _throwIfFailed();
+    return position ??
+        GeoPosition(
+          latitude: 1,
+          longitude: 2,
+          timestamp: DateTime.utc(2026),
+        );
+  }
+
+  @override
+  Stream<GeoPosition> updates({
+    LocationAccuracy accuracy = LocationAccuracy.high,
+    int distanceFilterMeters = 0,
+  }) => const Stream<GeoPosition>.empty();
+
+  void _throwIfFailed() {
+    final programmedFailure = failure;
+    if (programmedFailure != null) {
+      throw programmedFailure;
+    }
+  }
+}
+
 void main() {
   group('Gate', () {
     late GetItRegistry registry;
@@ -541,6 +579,48 @@ void main() {
 
       expect((await gate.clearCache()).isOk, isTrue);
       expect(cache.clears, 1);
+    });
+  });
+
+  group('Gate location verbs', () {
+    late GetItRegistry registry;
+    late _Location location;
+
+    setUp(() {
+      registry = GetItRegistry();
+      location = _Location();
+      registry.registerSingleton<LocationProvider>(location);
+    });
+
+    test('currentLocation returns a position', () async {
+      final gate = Gate(registry);
+
+      final result = await gate.currentLocation();
+
+      expect(result.valueOrNull?.latitude, 1);
+    });
+
+    test('locationServiceEnabled reports the service state', () async {
+      final gate = Gate(registry);
+
+      expect((await gate.locationServiceEnabled()).valueOrNull, isTrue);
+
+      location.serviceEnabled = false;
+      expect((await gate.locationServiceEnabled()).valueOrNull, isFalse);
+    });
+
+    test('location verbs surface failures as Err', () async {
+      location.failure = const Failure(
+        code: FailureCode.unavailable,
+        message: 'no fix',
+        kind: FailureKind.unavailable,
+      );
+      final gate = Gate(registry);
+
+      expect(
+        (await gate.currentLocation()).failureOrNull?.code,
+        FailureCode.unavailable,
+      );
     });
   });
 }

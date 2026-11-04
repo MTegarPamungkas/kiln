@@ -14,14 +14,14 @@ extension PickedImageX on PickedImage {
     if (data == null) {
       throw const Failure(
         code: FailureCode.mediaInvalid,
-        message: 'Gambar membutuhkan byte untuk ditampilkan.',
+        message: 'An image needs bytes to be displayed.',
         kind: FailureKind.media,
       );
     }
     return MemoryImage(Uint8List.fromList(data));
   }
 
-  /// Human readable size, for example "1,2 MB".
+  /// Human readable size, for example "1.2 MB".
   String? get readableSize {
     final size = sizeBytes ?? bytes?.length;
     if (size == null) {
@@ -44,8 +44,7 @@ extension PickedImageX on PickedImage {
 
 String _format(double value) {
   final rounded = (value * 10).round() / 10;
-  final text = rounded == rounded.truncateToDouble()
+  return rounded == rounded.truncateToDouble()
       ? rounded.toStringAsFixed(0)
       : rounded.toStringAsFixed(1);
-  return text.replaceAll('.', ',');
 }

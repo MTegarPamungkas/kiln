@@ -11,8 +11,8 @@ void main() {
     const unknown = PickedImage(path: '/a', name: 'a');
 
     expect(bytes.readableSize, '900 B');
-    expect(kilobytes.readableSize, '1,5 KB');
-    expect(megabytes.readableSize, '1,1 MB');
+    expect(kilobytes.readableSize, '1.5 KB');
+    expect(megabytes.readableSize, '1.1 MB');
     expect(unknown.readableSize, isNull);
   });
 

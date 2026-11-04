@@ -1,5 +1,6 @@
 import 'package:kiln_core/kiln_core.dart';
 
+import 'permission_failure_mapper.dart';
 import 'permission_flow.dart';
 import 'permission_gateway.dart';
 import 'permission_kind_guard.dart';
@@ -23,7 +24,7 @@ final class DevicePermissions implements Permissions {
   final PermissionSupport support;
 
   @override
-  Future<PermissionStatus> status(PermissionKind kind) async {
+  Future<PermissionStatus> status(PermissionKind kind) => _guard(() async {
     guard.ensure(kind);
     final info = await support.forKind(kind);
     if (!info.isSupported) {
@@ -36,10 +37,10 @@ final class DevicePermissions implements Permissions {
     final status = await gateway.status(kind);
     cache.set(kind, status);
     return status;
-  }
+  });
 
   @override
-  Future<PermissionStatus> request(PermissionKind kind) async {
+  Future<PermissionStatus> request(PermissionKind kind) => _guard(() async {
     guard.ensure(kind);
     final info = await support.forKind(kind);
     if (!info.isSupported) {
@@ -48,16 +49,28 @@ final class DevicePermissions implements Permissions {
     final status = await gateway.request(kind);
     cache.set(kind, status);
     return status;
-  }
+  });
 
   @override
   Future<PermissionStatus> ensure(
     PermissionKind kind, {
     bool requestIfDenied = true,
-  }) {
-    return flow.ensure(kind, requestIfDenied: requestIfDenied);
-  }
+  }) => _guard(
+    () => flow.ensure(kind, requestIfDenied: requestIfDenied),
+  );
 
   @override
-  Future<bool> openSettings() => gateway.openSettings();
+  Future<bool> openSettings() => _guard(gateway.openSettings);
+
+  /// Runs [action], mapping unexpected platform errors to a permission
+  /// [Failure]. Existing [Failure]s, such as the kind guard, pass through.
+  Future<T> _guard<T>(Future<T> Function() action) async {
+    try {
+      return await action();
+    } on Failure {
+      rethrow;
+    } catch (error, stackTrace) {
+      throw mapPermissionError(error, stackTrace: stackTrace);
+    }
+  }
 }

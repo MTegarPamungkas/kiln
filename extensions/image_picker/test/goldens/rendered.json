@@ -5,14 +5,14 @@
     "lib/extensions/image_picker/device_media_picker.dart": "dfd6554b28005f3bd6fce9f89fb9c60c6162d1d285d0fd13538e2b6c20b3eba3",
     "lib/extensions/image_picker/image_picker_gateway.dart": "a79ec6815d314026b417f1224f2daf760425789fa5411e4851124ef56c82cceb",
     "lib/extensions/image_picker/image_picker_module.dart": "5d62dbf771789b2d3d8d10f2b2e8e5623236f59c185c5b35904dc4d06e47b49d",
-    "lib/extensions/image_picker/image_validator.dart": "1e8f1a4557cbab93d5566a2283c65666c7e4b3303b9668829d482231624142ab",
+    "lib/extensions/image_picker/image_validator.dart": "b5f2067beea8e7c14a871413ee5ba67c81d0d1ac23deae218ac427f3b40e3736",
     "lib/extensions/image_picker/lost_data_recovery.dart": "4d60f02863c0088caecf3d8dc04adc723596f96103bca3e76a5e877f16cb1eb7",
-    "lib/extensions/image_picker/media_failure_mapper.dart": "78c3bec8f3641dc01b3283d7e0d1a6dca6f209c9f29cd81d48518684870c0e67",
+    "lib/extensions/image_picker/media_failure_mapper.dart": "91ed4bc7e35ecea4d05725f95e74dd801a7207fa14ce816517126e593caf1c2b",
     "lib/extensions/image_picker/media_picker_config.dart": "672350e45e06e92977cd8383791ac6ab8be558d1c1f77b1bdb353df96037ecae",
     "lib/extensions/image_picker/media_picker_support.dart": "fbbc8299ca32309866cb6926a3f60e51c5ebf615b2e5ae97b9317f88cfd68af9",
     "lib/extensions/image_picker/mime_sniffer.dart": "e176e4a44eb818881ca98e291109a96110230b2f80f37150f96d8f3639443d99",
-    "lib/extensions/image_picker/picked_image_upload_adapter.dart": "7cd48c1031504e49e1eaf22a310c19394c46e33188144bcc9ce935e8126d83dc",
-    "lib/extensions/image_picker/picked_image_x.dart": "50730decf91fcd7defae2427a397b8e6b923d1d239e2df1237c6c425b8e2050d",
+    "lib/extensions/image_picker/picked_image_upload_adapter.dart": "d8fa32ded2cc1ecf17cb9533fb0ae7679df2a7fce37d59349f47076525369628",
+    "lib/extensions/image_picker/picked_image_x.dart": "a495ddca74661ae17a640b10b2ac4ed685eb303582fdd02f9d864325736b00a0",
     "test/extensions/image_picker/camera_permission_precheck_test.dart": "f5438c012dffe54449984b0dfc1ff605b7673a18f5aa83235ca91c55fa4aa4bc",
     "test/extensions/image_picker/device_media_picker_test.dart": "e601fdf949b4d7208b8ebc45b21a3cd5f052e16b946adb987c01fe8fc9a7b669",
     "test/extensions/image_picker/image_picker_module_test.dart": "037666472c0714c7996a8868d507d5bca91d4555349f7229cbae210e540aa461",
@@ -24,7 +24,7 @@
     "test/extensions/image_picker/media_picker_support_test.dart": "2769afcdfe7b87ced38142b227039af5e9a2e6987200c2ad62eecbecb5b7ee34",
     "test/extensions/image_picker/mime_sniffer_test.dart": "4957db098b164cc209c87a1583e46e5756e0d4512b0bdbe3db37a1c18c966607",
     "test/extensions/image_picker/picked_image_upload_adapter_test.dart": "925261b5791881fbdf7b44ef32544ed11afa875eee0ea24ba5d641e97c647a74",
-    "test/extensions/image_picker/picked_image_x_test.dart": "5db5e4b743001949f617f72467ab487339f420de9e6469c6d4f8bc03efc4f52d",
+    "test/extensions/image_picker/picked_image_x_test.dart": "1e48d41bbe711381ce618655ed09f2bed3101ad32257c94c7eb069f15a832d4e",
     "test/extensions/image_picker/test_support.dart": "25c24f0be7d9bab5228b115f39d7044bf90b29c1d9b522b7c3d6f352cf4e8edc"
   }
 }

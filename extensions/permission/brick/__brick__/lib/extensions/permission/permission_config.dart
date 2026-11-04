@@ -1,13 +1,11 @@
 import 'package:kiln_core/kiln_core.dart';
 
 /// Runtime permission settings from the install prompts.
+///
+/// Only the kinds selected at install time are active. Rationale and settings
+/// copy belong to the application; the SDK returns statuses and flow results.
 final class PermissionConfig {
-  const PermissionConfig({
-    required this.activeKinds,
-    this.rationaleTitle = 'Izin diperlukan',
-    this.rationaleMessage =
-        'Aplikasi membutuhkan izin ini untuk melanjutkan.',
-  });
+  const PermissionConfig({required this.activeKinds});
 
   static const defaults = PermissionConfig(
     activeKinds: <PermissionKind>{
@@ -18,6 +16,4 @@ final class PermissionConfig {
   );
 
   final Set<PermissionKind> activeKinds;
-  final String rationaleTitle;
-  final String rationaleMessage;
 }

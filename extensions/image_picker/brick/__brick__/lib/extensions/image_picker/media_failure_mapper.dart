@@ -20,7 +20,7 @@ Failure mapMediaError(Object error, {StackTrace? stackTrace}) {
         message.contains('permission')) {
       return Failure(
         code: FailureCode.mediaPermissionDenied,
-        message: error.message ?? 'Izin kamera atau galeri ditolak.',
+        message: error.message ?? 'Camera or gallery permission was denied.',
         kind: FailureKind.permission,
         cause: error,
         stackTrace: stackTrace,
@@ -29,7 +29,7 @@ Failure mapMediaError(Object error, {StackTrace? stackTrace}) {
     if (code.contains('cancel') || message.contains('cancel')) {
       return Failure(
         code: FailureCode.mediaCancelled,
-        message: 'Pemilihan gambar dibatalkan.',
+        message: 'Image selection was cancelled.',
         kind: FailureKind.cancelled,
         cause: error,
         stackTrace: stackTrace,
@@ -40,7 +40,7 @@ Failure mapMediaError(Object error, {StackTrace? stackTrace}) {
   if (message.contains('cancelled') || message.contains('canceled')) {
     return Failure(
       code: FailureCode.mediaCancelled,
-      message: 'Pemilihan gambar dibatalkan.',
+      message: 'Image selection was cancelled.',
       kind: FailureKind.cancelled,
       cause: error,
       stackTrace: stackTrace,

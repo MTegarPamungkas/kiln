@@ -4,6 +4,7 @@ import 'device_permissions.dart';
 import 'permission_config.dart';
 import 'permission_flow.dart';
 import 'permission_gateway.dart';
+import 'permission_group.dart';
 import 'permission_kind_guard.dart';
 import 'permission_resume_observer.dart';
 import 'permission_status_cache.dart';
@@ -43,6 +44,8 @@ final class PermissionModule extends KilnModule {
     registry
       ..registerSingleton<PermissionConfig>(config)
       ..registerSingleton<PermissionSupport>(support)
+      ..registerSingleton<PermissionFlow>(flow)
+      ..registerSingleton<PermissionGroup>(PermissionGroup(flow))
       ..registerSingleton<Permissions>(permissions);
 
     registry.readOrNull<LifecycleController>()?.attach(

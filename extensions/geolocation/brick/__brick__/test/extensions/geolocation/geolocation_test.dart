@@ -118,4 +118,26 @@ void main() {
       ),
     );
   });
+
+  test('isServiceEnabled reflects the gateway', () async {
+    final gateway = _FakeGateway()..serviceEnabled = false;
+    final provider = DeviceLocationProvider(gateway: gateway);
+
+    expect(await provider.isServiceEnabled(), isFalse);
+  });
+
+  test('updates streams positions once permission is ready', () async {
+    final gateway = _FakeGateway();
+    final provider = DeviceLocationProvider(gateway: gateway);
+    final received = <GeoPosition>[];
+    final subscription = provider.updates().listen(received.add);
+
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    gateway.controller.add(_position());
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+
+    expect(received, hasLength(1));
+    await subscription.cancel();
+    await gateway.controller.close();
+  });
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T10:57:18.604224Z",
+  "generated_at": "2026-11-04T11:13:07.947240Z",
   "extensions": [
     {
       "id": "analytics",
@@ -633,7 +633,7 @@
       "name": "Geolocation",
       "description": "Device location with permission-aware reads and streaming updates.",
       "category": "location",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -652,6 +652,18 @@
           "version": "0.1.1",
           "url": "archives/geolocation-0.1.1.tgz",
           "sha256": "d7dbb9f5e37dbcd99cae71b39240136be5c2d97ee107a15815521b1042ffb648",
+          "provides": [
+            "location"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/geolocation-0.2.0.tgz",
+          "sha256": "8b34e5d358a21af51a7a7acc0d704b7a344f61dca8738774fc028e028f7cd00c",
           "provides": [
             "location"
           ],
@@ -844,7 +856,7 @@
       "name": "Image picker",
       "description": "Camera and gallery image picking with validation and upload handoff.",
       "category": "media",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -875,6 +887,18 @@
           "version": "0.2.0",
           "url": "archives/image_picker-0.2.0.tgz",
           "sha256": "079e7668fdcd5c2636a4cef10ff837199f64e60d4518b3e90904025eb672c3a7",
+          "provides": [
+            "media"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/image_picker-0.3.0.tgz",
+          "sha256": "0486311de600e3b503cc9cb4210dcce68cc2a70a431d846ca298ebec0f94fc27",
           "provides": [
             "media"
           ],
@@ -1146,7 +1170,7 @@
       "name": "Permission",
       "description": "Typed permission checks and requests with rationale flow.",
       "category": "platform",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -1177,6 +1201,18 @@
           "version": "0.2.0",
           "url": "archives/permission-0.2.0.tgz",
           "sha256": "da16ab02461701741d88084ef5f58f14ea872b56629c9fe297656246361b8b89",
+          "provides": [
+            "permission"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/permission-0.3.0.tgz",
+          "sha256": "d00dc6b5b32258653c8b1818bd734c3a5f40f6e3e30a3cf389d65111368b6055",
           "provides": [
             "permission"
           ],

@@ -21,6 +21,10 @@ automatically.
 ```dart
 final status = await gate.permissionStatus(PermissionKind.camera);
 final result = await gate.requestPermission(PermissionKind.camera); // Result<PermissionStatus>
+final group = await gate.ensurePermissions(
+  [PermissionKind.camera, PermissionKind.microphone], // Result<Map<PermissionKind, PermissionStatus>>
+);
+final opened = await gate.openPermissionSettings();   // Result<bool>
 result.fold(
   ok: (status) => print('Granted: $status'),
   err: (failure) => print('${failure.code}: ${failure.details}'),

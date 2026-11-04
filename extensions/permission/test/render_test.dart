@@ -16,6 +16,8 @@ void main() {
         'lib/extensions/permission/permission_flow.dart',
         'lib/extensions/permission/permission_kind_guard.dart',
         'lib/extensions/permission/permission_resume_observer.dart',
+        'lib/extensions/permission/gate_permission.dart',
+        'test/extensions/permission/gate_permission_test.dart',
       ]),
     );
     final config = files.firstWhere(

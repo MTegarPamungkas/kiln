@@ -14,16 +14,16 @@ final class ImageValidator {
     final size = image.sizeBytes ?? image.bytes?.length;
     if (size != null && size > config.maxBytes) {
       throw _invalid(
-        'Ukuran gambar $size byte melebihi batas ${config.maxBytes} byte.',
+        'Image size $size bytes exceeds the ${config.maxBytes} byte limit.',
       );
     }
     final bytes = image.bytes;
     final mime = bytes != null ? MimeSniffer.detect(bytes) : image.mimeType;
     if (mime == null) {
-      throw _invalid('Tipe gambar tidak dikenali.');
+      throw _invalid('The image type could not be detected.');
     }
     if (!config.allowedTypes.contains(mime)) {
-      throw _invalid('Tipe $mime tidak diizinkan.');
+      throw _invalid('Type $mime is not allowed.');
     }
     return mime;
   }

@@ -425,4 +425,8 @@ final class Gate {
   Future<Result<GeoPosition>> currentLocation({
     LocationAccuracy accuracy = LocationAccuracy.high,
   }) => call(() => location.current(accuracy: accuracy));
+
+  /// Whether the platform location service is currently enabled.
+  Future<Result<bool>> locationServiceEnabled() =>
+      call(location.isServiceEnabled);
 }

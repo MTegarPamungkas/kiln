@@ -7,6 +7,6 @@
     "lib/extensions/geolocation/geolocator_gateway.dart": "c927fab9885b91bc34606ccb2801194c17664491799b01d075e5bf401d168f0c",
     "lib/extensions/geolocation/location_gateway.dart": "8b0efa9a32cbdd84fc2156b9a1e0e63e9b905446b748eda7f1cf9c2a03a8a76e",
     "test/extensions/geolocation/geolocation_module_test.dart": "8242c26deaa77e6646cb6c1f38a60b98eeb06311aac6ac3db8aecd5e94938fc6",
-    "test/extensions/geolocation/geolocation_test.dart": "744c3a78bcf6299a6ee65464adf7520bbcf62010cc85d46d962af37c1c6a27a8"
+    "test/extensions/geolocation/geolocation_test.dart": "85df0773c613f906002697df371902ab018e8a9eb2a0b4f2cf7a2f84ad613ab9"
   }
 }

@@ -1,6 +1,6 @@
 id: image_picker
 name: Image picker
-version: 0.2.0
+version: 0.3.0
 description: Camera and gallery image picking with validation and upload handoff.
 category: media
 tier: official
@@ -43,8 +43,8 @@ platforms:
   - linux
 ios:
   plist:
-    NSPhotoLibraryUsageDescription: Memilih foto untuk diunggah.
-    NSCameraUsageDescription: Mengambil foto untuk diunggah.
+    NSPhotoLibraryUsageDescription: Choose a photo to upload.
+    NSCameraUsageDescription: Take a photo to upload.
 macos:
   entitlements:
     com.apple.security.files.user-selected.read-only: true

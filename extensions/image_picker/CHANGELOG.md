@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Rewrite picker failure, cancellation, and validation messages in English.
+- Use a neutral `.` decimal separator in `PickedImageX.readableSize`.
+- Replace the Indonesian iOS usage descriptions with English defaults.
+
 ## 0.2.0
 
 - Removed `ImageSourceSheet` and `AvatarPicker`. Applications call `MediaPicker` and build their own picker UI.
