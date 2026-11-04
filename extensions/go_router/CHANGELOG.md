@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Replace the Indonesian test fixture strings (`/tidak-ada`, `Tidak ditemukan`)
+  with English equivalents so generated app tests are language-neutral.
+
 ## 0.3.0
 
 - Removed the bundled not found page, sample shell, and default sign-in page. The application supplies an error builder and sign-in page; enabling auth redirect now requires a `SignInPageBuilder`.

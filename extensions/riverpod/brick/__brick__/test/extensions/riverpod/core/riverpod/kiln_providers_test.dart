@@ -13,4 +13,11 @@ void main() {
     expect(container.read(kilnProvider<Storage>()), isA<InMemoryStorage>());
     expect(container.read(registryProvider), same(registry));
   });
+
+  test('kilnProvider returns a stable provider per type', () {
+    // Riverpod keys providers by object identity, so inline
+    // `ref.watch(kilnProvider<T>())` must reuse one instance per contract.
+    expect(kilnProvider<Storage>(), same(kilnProvider<Storage>()));
+    expect(kilnProvider<AppLogger>(), isNot(same(kilnProvider<Storage>())));
+  });
 }

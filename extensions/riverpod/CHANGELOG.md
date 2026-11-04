@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Cache `kilnProvider<T>()` by type so every call returns the same `Provider`
+  instance. Riverpod identifies providers by object identity, so the previously
+  fresh-per-call provider made inline `ref.watch(kilnProvider<Contract>())`
+  create a separate provider node each time; watchers of the same contract now
+  share one node. Covered by an identity test.
+
 ## 0.2.0
 
 - Removed the counter demo provider and page. The extension keeps the provider scope, observer, and registry bridge.

@@ -178,9 +178,9 @@ void main() {
     final appRouter = AppRouter(
       registry: registry,
       config: AppRouterConfig(
-        initialLocation: '/tidak-ada',
+        initialLocation: '/does-not-exist',
         errorBuilder: (BuildContext context, GoRouterState state) =>
-            const Scaffold(body: Text('Tidak ditemukan', key: Key('app-error'))),
+            const Scaffold(body: Text('Not found', key: Key('app-error'))),
       ),
     );
 

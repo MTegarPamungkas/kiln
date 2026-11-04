@@ -15,7 +15,7 @@
     "lib/extensions/go_router/router_config.dart": "db799a443ad48ad923bb34fa496c2c314d0078e5a92e1ae529eb09fd82b7dd1e",
     "lib/extensions/go_router/session_refresh_listenable.dart": "9ac897a6a82032217daf25b18d2d4016a2e0d3c0202af037748d6dc99c7a1503",
     "lib/extensions/go_router/sign_in_page_builder.dart": "6636f8e4e593ec3c193d12089a6c6e38cb0f0b09a33d5aba5e3e3d5b0590820e",
-    "test/extensions/go_router/app_router_test.dart": "f24e69db6a1c090864539e716a3fd861e493b8f7d1c9a85de006275808d57689",
+    "test/extensions/go_router/app_router_test.dart": "77c0f7ca370ca739f75beaed8663ff29ef6ae8687a9a50475302666d5272143f",
     "test/extensions/go_router/app_routes_test.dart": "1177dac6dd9aa3f8c436b5fe772697493431870ef92420d4e49851c43482ceae",
     "test/extensions/go_router/auth_redirect_test.dart": "cc3756b9e33e3a57653baf7f7e4b5fa7141f6a3a28fbda52fe7080326f5d384f",
     "test/extensions/go_router/deep_link_route_mapper_test.dart": "d8704619c7ae579476a511bc0bcd30bc1631db57e9b0dcfd6c6f45eb1be44de8",

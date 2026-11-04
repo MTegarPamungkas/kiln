@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T14:00:46.272863Z",
+  "generated_at": "2026-11-04T14:16:44.473870Z",
   "extensions": [
     {
       "id": "analytics",
@@ -707,7 +707,7 @@
       "name": "GoRouter",
       "description": "Declarative routing with route slots, guards, and deep link mapping.",
       "category": "navigation",
-      "latest": "0.3.0",
+      "latest": "0.3.1",
       "tier": "official",
       "versions": [
         {
@@ -762,6 +762,18 @@
           "version": "0.3.0",
           "url": "archives/go_router-0.3.0.tgz",
           "sha256": "272e18ca6553ded2f6be42520ad76599188faf38a716258ee1f8394b8352fd01",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.1",
+          "url": "archives/go_router-0.3.1.tgz",
+          "sha256": "5376194983652e09278fc30fb84432022782470e5babe1e8d5853bc2973e936a",
           "provides": [
             "navigation"
           ],
@@ -1354,7 +1366,7 @@
       "name": "Riverpod state management",
       "description": "State management with Riverpod providers and Notifier.",
       "category": "state",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -1397,6 +1409,18 @@
           "version": "0.2.0",
           "url": "archives/riverpod-0.2.0.tgz",
           "sha256": "871e9a0f2611f787c6e5d29a677054d8ca6740e7870224d05486063200e8781f",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/riverpod-0.3.0.tgz",
+          "sha256": "74e5f65cbdce108b8d370bca33e9961449cd2075d9fb10beca45504df99d211d",
           "provides": [
             "state_riverpod"
           ],
