@@ -16,9 +16,11 @@ Monitors network status and provides `offline_guard` for HTTP.
 ```dart
 final status = gate.network.status;      // NetworkStatus
 gate.network.changes.listen(print);      // Stream<NetworkStatus>
+final reachable = await gate.networkReachable(); // Result<bool> (needs probe_url)
 ```
 
 Synchronous access through the facade; the app renders connectivity UI itself.
+`networkReachable` probes the optional `probe_url` through the HTTP client.
 
 ## Runtime support
 

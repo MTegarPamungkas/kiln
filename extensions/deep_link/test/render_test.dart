@@ -25,6 +25,7 @@ void main() {
         'lib/extensions/deep_link/link_deduplicator.dart',
         'lib/extensions/deep_link/pending_link_buffer.dart',
         'lib/extensions/deep_link/app_link_builder.dart',
+        'lib/extensions/deep_link/gate_deep_link.dart',
         'test/extensions/deep_link/device_deep_links_test.dart',
         'test/extensions/deep_link/deep_link_module_test.dart',
         'test/extensions/deep_link/deep_link_config_test.dart',
@@ -35,6 +36,7 @@ void main() {
         'test/extensions/deep_link/pending_link_buffer_test.dart',
         'test/extensions/deep_link/app_link_builder_test.dart',
         'test/extensions/deep_link/deep_links_contract_test.dart',
+        'test/extensions/deep_link/gate_deep_link_test.dart',
       ]),
     );
 

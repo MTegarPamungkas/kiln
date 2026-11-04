@@ -96,6 +96,9 @@ Further guides:
 ```dart
 final initial = gate.deepLinks.initialLink;   // Uri?
 gate.deepLinks.links.listen((uri) { ... });   // Stream<Uri>
+
+final link = await gate.buildCustomLink('/profile/42');   // Result<Uri>
+final web = await gate.buildUniversalLink('/app/home');   // Result<Uri>
 ```
 
 ## Runtime support

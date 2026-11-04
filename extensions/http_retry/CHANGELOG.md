@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+- Wire an optional `RetryEvents` from the registry into the middleware so the
+  application can observe retry and give-up events without rebuilding it.
+
 ## 0.1.1
 
 - Validate retry attempts and delays and report the result through

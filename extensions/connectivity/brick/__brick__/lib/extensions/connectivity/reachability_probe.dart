@@ -4,14 +4,21 @@ import 'package:kiln_core/kiln_core.dart';
 final class ReachabilityProbe {
   const ReachabilityProbe();
 
-  Future<bool> probe(HttpClient? client, Uri uri) async {
+  Future<bool> probe(
+    HttpClient? client,
+    Uri uri, {
+    Duration? timeout,
+  }) async {
     if (client == null) {
       return true;
     }
     try {
-      final response = await client.send(
+      final future = client.send(
         HttpRequest(method: HttpMethod.head, uri: uri),
       );
+      final response = timeout == null
+          ? await future
+          : await future.timeout(timeout);
       return response.isSuccessful;
     } catch (_) {
       return false;

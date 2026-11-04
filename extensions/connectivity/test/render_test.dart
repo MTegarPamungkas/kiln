@@ -15,6 +15,8 @@ void main() {
         'lib/extensions/connectivity/connectivity_module.dart',
         'lib/extensions/connectivity/device_network_monitor.dart',
         'lib/extensions/connectivity/offline_guard_middleware.dart',
+        'lib/extensions/connectivity/gate_connectivity.dart',
+        'test/extensions/connectivity/gate_connectivity_test.dart',
       ]),
     );
     final config = files.firstWhere(

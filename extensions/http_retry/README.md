@@ -21,7 +21,17 @@ kiln add http_retry
 ## Gate
 
 Retry runs as `HttpPipeline` middleware automatically; there are no
-request/response verbs to call.
+request/response verbs to call. Register a `RetryEvents` before bootstrap to
+observe retries and give-ups:
+
+```dart
+registry.registerSingleton<RetryEvents>(
+  RetryEvents(
+    onRetry: (event) => logger.debug('retry #${event.attempt}'),
+    onGiveUp: (event) => logger.warning('gave up after #${event.attempt}'),
+  ),
+);
+```
 
 ## Runtime support
 

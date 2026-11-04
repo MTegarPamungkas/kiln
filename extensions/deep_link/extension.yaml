@@ -1,6 +1,6 @@
 id: deep_link
 name: Deep links
-version: 0.1.2
+version: 0.2.0
 description: Incoming deep links with allowlisting, normalization, and deduplication.
 category: deep_link
 tier: official

@@ -1,6 +1,6 @@
 id: connectivity
 name: Connectivity
-version: 0.2.0
+version: 0.3.0
 description: Network status monitoring and an offline guard middleware.
 category: connectivity
 tier: official

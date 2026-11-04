@@ -8,7 +8,7 @@ Failure mapDeepLinkError(Object error, {StackTrace? stackTrace}) {
   if (error is FormatException) {
     return Failure(
       code: FailureCode.deepLinkInvalid,
-      message: 'Tautan masuk tidak valid.',
+      message: 'The incoming link is invalid.',
       kind: FailureKind.deepLink,
       cause: error,
       stackTrace: stackTrace,
@@ -16,7 +16,7 @@ Failure mapDeepLinkError(Object error, {StackTrace? stackTrace}) {
   }
   return Failure(
     code: FailureCode.deepLinkUnavailable,
-    message: 'Tautan masuk tidak dapat dibaca dari platform.',
+    message: 'The incoming link could not be read from the platform.',
     kind: FailureKind.deepLink,
     cause: error,
     stackTrace: stackTrace,

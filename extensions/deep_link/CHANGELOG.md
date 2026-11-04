@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+- Add `gate_deep_link.dart` so outgoing link building (`buildCustomLink`,
+  `buildUniversalLink`) returns a `Result` instead of throwing.
+- Rewrite the deep link failure messages in English.
+
 ## 0.1.2
 
 - Probe the platform and capture the launch link during bootstrap through

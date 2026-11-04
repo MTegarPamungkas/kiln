@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T06:20:17.978401Z",
+  "generated_at": "2026-11-04T10:57:18.604224Z",
   "extensions": [
     {
       "id": "analytics",
@@ -267,7 +267,7 @@
       "name": "Connectivity",
       "description": "Network status monitoring and an offline guard middleware.",
       "category": "connectivity",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -305,6 +305,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/connectivity-0.3.0.tgz",
+          "sha256": "822e1234b40e881e5a5284e199bf6ee86c6e9cf9ec9529f0e4f23593701a8e3e",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -313,7 +325,7 @@
       "name": "Deep links",
       "description": "Incoming deep links with allowlisting, normalization, and deduplication.",
       "category": "deep_link",
-      "latest": "0.1.2",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -344,6 +356,18 @@
           "version": "0.1.2",
           "url": "archives/deep_link-0.1.2.tgz",
           "sha256": "a3fcef64b9898502e1e01746c382e10389dd0ed9325fc67a9d4f995c6bab373e",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/deep_link-0.2.0.tgz",
+          "sha256": "97dc61443b97182d8f87a81747e963ca67b9d876415152a3a377e5714f0cc787",
           "provides": [
             "deep_links"
           ],
@@ -771,7 +795,7 @@
       "name": "HTTP retry",
       "description": "Retries temporary HTTP failures with backoff and a retry budget.",
       "category": "network",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -791,6 +815,19 @@
           "version": "0.1.1",
           "url": "archives/http_retry-0.1.1.tgz",
           "sha256": "bcffcec953f06bb6ca6d3259180148dd1de9b9fd7fa6733c8eb25d803ab16ea6",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/http_retry-0.2.0.tgz",
+          "sha256": "d4867df7e22066168483cd0d8e479ae59dacea043cd1103587278414d99bcc17",
           "requires": [
             "http_client",
             "http_pipeline"

@@ -5,6 +5,7 @@ import 'connectivity_gateway.dart';
 import 'connectivity_support.dart';
 import 'device_network_monitor.dart';
 import 'offline_guard_middleware.dart';
+import 'reconnect_trigger.dart';
 
 /// Registers the NetworkMonitor and optional offline guard.
 final class ConnectivityModule extends KilnModule {
@@ -23,12 +24,18 @@ final class ConnectivityModule extends KilnModule {
   void register(Registry registry) {
     const config = ConnectivityConfig.defaults;
     final gateway = ConnectivityPlusGateway();
-    final monitor = DeviceNetworkMonitor(gateway: gateway, config: config);
+    final monitor = DeviceNetworkMonitor(
+      gateway: gateway,
+      config: config,
+      reconnectTrigger: registry.readOrNull<ReconnectTrigger>(),
+      client: registry.readOrNull<HttpClient>(),
+    );
     final support = ConnectivitySupport(gateway: gateway);
     registry
       ..registerSingleton<ConnectivityConfig>(config)
       ..registerSingleton<ConnectivitySupport>(support)
-      ..registerSingleton<NetworkMonitor>(monitor);
+      ..registerSingleton<NetworkMonitor>(monitor)
+      ..registerSingleton<DeviceNetworkMonitor>(monitor);
 
     final pipeline = registry.readOrNull<HttpPipeline>();
     if (pipeline != null) {
