@@ -23,7 +23,9 @@ void main() {
         'lib/extensions/env/env_validator.dart',
         'lib/extensions/env/env_x.dart',
         'lib/extensions/env/env_describe.dart',
+        'lib/extensions/env/gate_env.dart',
         'test/extensions/env/env_x_test.dart',
+        'test/extensions/env/gate_env_test.dart',
       ]),
     );
     final schema = files.firstWhere(

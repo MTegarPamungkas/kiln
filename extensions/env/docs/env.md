@@ -19,6 +19,21 @@ Or from a JSON file:
 flutter run --dart-define-from-file=env/development.json
 ```
 
+## Gate
+
+Typed reads and validation are also available as one-call `Result` verbs:
+
+```dart
+final baseUrl = await gate.envUri('api_base_url');     // Result<Uri?>
+final debug = await gate.envBool('enable_debug_tools'); // Result<bool?>
+final valid = await gate.validateEnv();                // Result<void>
+final summary = gate.describeEnv();                    // secrets masked
+```
+
+`EnvModule.ready` still runs the validator during bootstrap. Because
+`api_base_url` has no default value, bootstrap reports `notConfigured` until it
+is provided; the application starts anyway and can render its own message.
+
 ## Keys
 
 | Key | Type | Required | Secret |
@@ -29,7 +44,8 @@ flutter run --dart-define-from-file=env/development.json
 | `enable_debug_tools` | bool | no | no |
 
 Keys selected at install time go into `EnvSchema.defaults`. `BuildEnv` refuses to
-read keys that are not in the schema.
+read keys that are not in the schema. `enable_debug_tools` defaults to `false`
+when it is not provided.
 
 ## Adding a key
 

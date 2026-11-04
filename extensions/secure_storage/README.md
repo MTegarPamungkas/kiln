@@ -19,6 +19,8 @@ carried over by backups across installations.
 ```dart
 final token = await gate.readSecure('access_token');   // Result<String?>
 await gate.writeSecure('access_token', token);        // Result<void>
+final all = await gate.readAllSecure();               // Result<Map<String, String>>
+await gate.clearSecure();                             // Result<void>
 await gate.deleteSecure('access_token');              // Result<void>
 ```
 

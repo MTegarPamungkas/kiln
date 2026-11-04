@@ -31,6 +31,96 @@ final class _Permissions implements Permissions {
   }
 }
 
+final class _Storage implements Storage {
+  final Map<String, String> values = <String, String>{};
+  Failure? failure;
+
+  @override
+  Future<String?> read(String key) async {
+    _throwIfFailed();
+    return values[key];
+  }
+
+  @override
+  Future<void> write(String key, String value) async {
+    _throwIfFailed();
+    values[key] = value;
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    _throwIfFailed();
+    values.remove(key);
+  }
+
+  @override
+  Future<bool> containsKey(String key) async {
+    _throwIfFailed();
+    return values.containsKey(key);
+  }
+
+  @override
+  Future<Set<String>> keys() async {
+    _throwIfFailed();
+    return values.keys.toSet();
+  }
+
+  @override
+  Future<void> clear() async {
+    _throwIfFailed();
+    values.clear();
+  }
+
+  void _throwIfFailed() {
+    final programmedFailure = failure;
+    if (programmedFailure != null) {
+      throw programmedFailure;
+    }
+  }
+}
+
+final class _SecureStorage implements SecureStorage {
+  final Map<String, String> values = <String, String>{};
+  Failure? failure;
+
+  @override
+  Future<String?> read(String key) async {
+    _throwIfFailed();
+    return values[key];
+  }
+
+  @override
+  Future<void> write(String key, String value) async {
+    _throwIfFailed();
+    values[key] = value;
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    _throwIfFailed();
+    values.remove(key);
+  }
+
+  @override
+  Future<Map<String, String>> readAll() async {
+    _throwIfFailed();
+    return Map<String, String>.unmodifiable(values);
+  }
+
+  @override
+  Future<void> clear() async {
+    _throwIfFailed();
+    values.clear();
+  }
+
+  void _throwIfFailed() {
+    final programmedFailure = failure;
+    if (programmedFailure != null) {
+      throw programmedFailure;
+    }
+  }
+}
+
 void main() {
   group('Gate', () {
     late GetItRegistry registry;
@@ -133,6 +223,115 @@ void main() {
       expect(
         result.failureOrNull?.code,
         FailureCode.permissionPermanentlyDenied,
+      );
+    });
+  });
+
+  group('Gate storage verbs', () {
+    late GetItRegistry registry;
+    late _Storage storage;
+
+    setUp(() {
+      registry = GetItRegistry();
+      storage = _Storage();
+      registry.registerSingleton<Storage>(storage);
+    });
+
+    test('readValue and hasValue read through the gate', () async {
+      storage.values['theme'] = 'dark';
+      final gate = Gate(registry);
+
+      expect((await gate.readValue('theme')).valueOrNull, 'dark');
+      expect((await gate.hasValue('theme')).valueOrNull, isTrue);
+      expect((await gate.hasValue('missing')).valueOrNull, isFalse);
+    });
+
+    test('writeValue and deleteValue mutate through the gate', () async {
+      final gate = Gate(registry);
+
+      expect((await gate.writeValue('a', '1')).isOk, isTrue);
+      expect(storage.values['a'], '1');
+
+      expect((await gate.deleteValue('a')).isOk, isTrue);
+      expect(storage.values.containsKey('a'), isFalse);
+    });
+
+    test('storageKeys and clearValues expose the remaining contract', () async {
+      storage.values
+        ..['a'] = '1'
+        ..['b'] = '2';
+      final gate = Gate(registry);
+
+      expect((await gate.storageKeys()).valueOrNull, <String>{'a', 'b'});
+
+      await gate.clearValues();
+      expect(storage.values, isEmpty);
+    });
+
+    test('storage verbs surface failures as Err', () async {
+      storage.failure = const Failure(
+        code: FailureCode.storageReadFailed,
+        message: 'read',
+        kind: FailureKind.storage,
+      );
+      final gate = Gate(registry);
+
+      expect(
+        (await gate.readValue('x')).failureOrNull?.code,
+        FailureCode.storageReadFailed,
+      );
+    });
+  });
+
+  group('Gate secure storage verbs', () {
+    late GetItRegistry registry;
+    late _SecureStorage secureStorage;
+
+    setUp(() {
+      registry = GetItRegistry();
+      secureStorage = _SecureStorage();
+      registry.registerSingleton<SecureStorage>(secureStorage);
+    });
+
+    test('readSecure and readAllSecure read through the gate', () async {
+      secureStorage.values['token'] = 't';
+      final gate = Gate(registry);
+
+      expect((await gate.readSecure('token')).valueOrNull, 't');
+      expect((await gate.readAllSecure()).valueOrNull, <String, String>{
+        'token': 't',
+      });
+    });
+
+    test('writeSecure and deleteSecure mutate through the gate', () async {
+      final gate = Gate(registry);
+
+      expect((await gate.writeSecure('a', '1')).isOk, isTrue);
+      expect(secureStorage.values['a'], '1');
+
+      expect((await gate.deleteSecure('a')).isOk, isTrue);
+      expect(secureStorage.values.containsKey('a'), isFalse);
+    });
+
+    test('clearSecure clears the store', () async {
+      secureStorage.values['a'] = '1';
+      final gate = Gate(registry);
+
+      await gate.clearSecure();
+      expect(secureStorage.values, isEmpty);
+    });
+
+    test('secure storage verbs surface failures as Err', () async {
+      secureStorage.failure = const Failure(
+        code: FailureCode.secureStorageUnavailable,
+        message: 'unavailable',
+        kind: FailureKind.storage,
+      );
+      final gate = Gate(registry);
+
+      expect(
+        (await gate.readSecure('x')).failureOrNull?.code,
+        FailureCode.secureStorageUnavailable,
       );
     });
   });

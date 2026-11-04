@@ -1,6 +1,6 @@
 id: secure_storage
 name: Secure storage
-version: 0.1.1
+version: 0.2.0
 description: Keychain and Keystore storage for secrets and tokens.
 category: storage
 tier: official

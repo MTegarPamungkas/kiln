@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/storage/typed_key.dart';
 
 import 'test_support.dart';
@@ -23,6 +24,16 @@ void main() {
 
     await enabled.delete(storage);
     expect(await enabled.read(storage), isTrue);
+  });
+
+  test('maps a corrupt stored value to a storage Failure', () async {
+    final storage = createTestStorage();
+    await storage.write('enabled', 'not a json bool');
+
+    await expectLater(
+      enabled.read(storage),
+      throwsA(isA<Failure>()),
+    );
   });
 }
 

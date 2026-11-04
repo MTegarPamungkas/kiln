@@ -18,6 +18,11 @@ The keys available today are `api_base_url`, `api_key`, `feature_flags`, and
 ```dart
 final apiKey = gate.env.read('API_KEY');  // String?
 final all = gate.env.values;              // Map<String, String>
+
+final baseUrl = await gate.envUri('api_base_url');     // Result<Uri?>
+final debug = await gate.envBool('enable_debug_tools'); // Result<bool?>
+final valid = await gate.validateEnv();   // Result<void>
+final summary = gate.describeEnv();       // Map<String, String>, secrets masked
 ```
 
 ## Runtime support

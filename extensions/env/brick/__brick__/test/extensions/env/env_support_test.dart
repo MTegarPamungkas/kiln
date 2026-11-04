@@ -7,7 +7,10 @@ import 'package:{{app_name}}/extensions/env/env_support.dart';
 void main() {
   test('reports supported for a complete environment', () {
     final schema = EnvSchema.defaults;
-    final env = BuildEnv(schema: schema);
+    final env = BuildEnv(
+      schema: schema,
+      values: const <String, String>{'api_base_url': 'https://api.kiln.dev'},
+    );
     final support = EnvSupport(env: env, schema: schema);
 
     final info = support.info;

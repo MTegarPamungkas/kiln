@@ -30,5 +30,6 @@ void main() {
 
     expect(env.read(EnvKeys.apiBaseUrl), '');
     expect(env.containsKey(EnvKeys.apiBaseUrl), isFalse);
+    expect(env.values, isNot(contains(EnvKeys.apiBaseUrl)));
   });
 }

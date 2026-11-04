@@ -298,6 +298,11 @@ final class Gate {
   Future<Result<void>> deleteSecure(String key) =>
       call<void>(() => secureStorage.delete(key));
 
+  Future<Result<Map<String, String>>> readAllSecure() =>
+      call(secureStorage.readAll);
+
+  Future<Result<void>> clearSecure() => call<void>(secureStorage.clear);
+
   // Share & social auth
   Future<Result<ShareOutcome>> shareContent(
     ShareContent content, {
@@ -318,6 +323,13 @@ final class Gate {
 
   Future<Result<void>> deleteValue(String key) =>
       call<void>(() => storage.delete(key));
+
+  Future<Result<bool>> hasValue(String key) =>
+      call(() => storage.containsKey(key));
+
+  Future<Result<Set<String>>> storageKeys() => call(storage.keys);
+
+  Future<Result<void>> clearValues() => call<void>(storage.clear);
 
   // Location
   Future<Result<GeoPosition>> currentLocation({

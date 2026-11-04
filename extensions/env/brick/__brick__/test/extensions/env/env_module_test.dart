@@ -11,11 +11,25 @@ void main() {
     final registry = GetItRegistry();
 
     const EnvModule().register(registry);
-    const EnvModule().ready(registry);
 
     expect(registry.read<Env>(), isA<Env>());
     expect(registry.read<EnvSchema>().contains(EnvKeys.apiBaseUrl), isTrue);
     expect(registry.read<EnvValidator>(), isA<EnvValidator>());
     expect(registry.read<EnvSupport>(), isA<EnvSupport>());
+  });
+
+  test('module reports not configured until required keys are set', () {
+    final registry = GetItRegistry();
+
+    const EnvModule().register(registry);
+
+    expect(
+      registry.read<EnvSupport>().info.state,
+      SupportState.notConfigured,
+    );
+    expect(
+      () => const EnvModule().ready(registry),
+      throwsA(isA<Failure>()),
+    );
   });
 }

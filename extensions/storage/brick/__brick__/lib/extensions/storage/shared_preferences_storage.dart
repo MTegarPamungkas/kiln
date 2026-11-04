@@ -43,7 +43,11 @@ final class SharedPreferencesStorage implements Storage {
     try {
       await gateway.delete(_key(key));
     } catch (error, stackTrace) {
-      throw mapStorageError(error, stackTrace: stackTrace);
+      throw mapStorageError(
+        error,
+        stackTrace: stackTrace,
+        code: FailureCode.storageWriteFailed,
+      );
     }
   }
 

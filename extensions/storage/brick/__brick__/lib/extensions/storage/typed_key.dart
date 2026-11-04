@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:kiln_core/kiln_core.dart';
 
+import 'storage_failure_mapper.dart';
+
 /// A typed key stored as JSON.
 final class StorageKey<T> {
   const StorageKey({
@@ -21,7 +23,11 @@ final class StorageKey<T> {
     if (raw == null) {
       return defaultValue;
     }
-    return decode(jsonDecode(raw));
+    try {
+      return decode(jsonDecode(raw));
+    } catch (error, stackTrace) {
+      throw mapStorageError(error, stackTrace: stackTrace);
+    }
   }
 
   Future<void> write(Storage storage, T value) {

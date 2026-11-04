@@ -11,7 +11,7 @@ extension EnvX on Env {
     if (parsed == null || !parsed.hasScheme) {
       throw Failure(
         code: FailureCode.configurationInvalid,
-        message: 'Environment $key bukan URI absolut.',
+        message: 'Environment $key is not an absolute URI.',
         kind: FailureKind.configuration,
         details: <String, Object?>{'key': key, 'value': raw},
       );
@@ -28,7 +28,7 @@ extension EnvX on Env {
     if (value == null || value < 0) {
       throw Failure(
         code: FailureCode.configurationInvalid,
-        message: 'Environment $key harus berupa jumlah detik.',
+        message: 'Environment $key must be a whole number of seconds.',
         kind: FailureKind.configuration,
         details: <String, Object?>{'key': key, 'value': raw},
       );
@@ -49,7 +49,7 @@ extension EnvX on Env {
     }
     throw Failure(
       code: FailureCode.configurationInvalid,
-      message: 'Environment $key harus true atau false.',
+      message: 'Environment $key must be "true" or "false".',
       kind: FailureKind.configuration,
       details: <String, Object?>{'key': key, 'value': raw},
     );
@@ -65,7 +65,7 @@ extension EnvX on Env {
     if (value == null) {
       throw Failure(
         code: FailureCode.configurationInvalid,
-        message: 'Environment $key tidak dikenal: $raw.',
+        message: 'Environment $key has an unknown value: $raw.',
         kind: FailureKind.configuration,
         details: <String, Object?>{
           'key': key,

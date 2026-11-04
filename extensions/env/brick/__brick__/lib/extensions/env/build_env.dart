@@ -32,7 +32,8 @@ final class BuildEnv implements Env {
   Map<String, String> get values {
     return <String, String>{
       for (final key in schema.keys)
-        if (_values[key.name] != null) key.name: _values[key.name]!,
+        if (_values[key.name]?.isNotEmpty ?? false)
+          key.name: _values[key.name]!,
     };
   }
 }

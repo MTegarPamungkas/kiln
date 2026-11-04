@@ -36,4 +36,20 @@ void main() {
       ),
     );
   });
+
+  test('maps delete errors to a write failure', () async {
+    final gateway = FakeStorageGateway()..failDeletes = true;
+    final storage = createTestStorage(gateway: gateway);
+
+    await expectLater(
+      storage.delete('name'),
+      throwsA(
+        isA<Failure>().having(
+          (failure) => failure.code,
+          'code',
+          FailureCode.storageWriteFailed,
+        ),
+      ),
+    );
+  });
 }

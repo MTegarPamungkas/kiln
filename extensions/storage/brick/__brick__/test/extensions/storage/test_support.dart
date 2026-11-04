@@ -9,6 +9,7 @@ final class FakeStorageGateway implements StorageGateway {
   final Map<String, String> values;
   bool failReads = false;
   bool failWrites = false;
+  bool failDeletes = false;
   Object? keysError;
 
   @override
@@ -21,6 +22,9 @@ final class FakeStorageGateway implements StorageGateway {
 
   @override
   Future<void> delete(String key) async {
+    if (failDeletes) {
+      throw StateError('delete failed');
+    }
     values.remove(key);
   }
 

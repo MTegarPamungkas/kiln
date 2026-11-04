@@ -17,7 +17,7 @@ final class EnvValidator {
     }
     return Failure(
       code: FailureCode.configurationMissing,
-      message: 'Nilai environment wajib belum diisi: ${missing.join(', ')}.',
+      message: 'Missing required environment values: ${missing.join(', ')}.',
       kind: FailureKind.configuration,
       details: <String, Object?>{'missing': missing},
     );

@@ -19,6 +19,9 @@ Brick contents:
 ```dart
 final value = await gate.readValue('theme');   // Result<String?>
 await gate.writeValue('theme', 'dark');        // Result<void>
+final has = await gate.hasValue('theme');      // Result<bool>
+final keys = await gate.storageKeys();         // Result<Set<String>>
+await gate.clearValues();                      // Result<void>
 await gate.deleteValue('theme');               // Result<void>
 ```
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T19:49:38.998223Z",
+  "generated_at": "2026-11-04T05:53:16.470810Z",
   "extensions": [
     {
       "id": "analytics",
@@ -25,7 +25,7 @@
         {
           "version": "0.1.1",
           "url": "archives/analytics-0.1.1.tgz",
-          "sha256": "d9f6c93151652ca552f1a3d9177e73920380f48639095e01148605fa58b2a2cc",
+          "sha256": "59588bd7ecc2f5444de5c8ad438958c53e4e3ec4cb018ad00b103f4dadaef5c0",
           "provides": [
             "analytics"
           ],
@@ -75,7 +75,7 @@
         {
           "version": "0.1.2",
           "url": "archives/appwrite-0.1.2.tgz",
-          "sha256": "60aea071de29f2caaf1449234e273aa2bb5cfd4d8cfa30e94c88218de57691f2",
+          "sha256": "67c2de6f5a188979a4db5e6629d5e9dc791d1802aead41aa5007e31f0d3c7541",
           "provides": [
             "auth",
             "remote_database",
@@ -159,7 +159,7 @@
         {
           "version": "0.2.0",
           "url": "archives/biometric-0.2.0.tgz",
-          "sha256": "ebaed4af19725c56f352659dcd8529e09c2799b725d0069a8cb7264a58fe581c",
+          "sha256": "3b3da7e98cae31502cfeaabf1d06ce641d4df2447f6a4299303832e86c1cf45a",
           "provides": [
             "biometric"
           ],
@@ -229,7 +229,7 @@
         {
           "version": "0.2.0",
           "url": "archives/bloc-0.2.0.tgz",
-          "sha256": "b0667b376c7d9bf2947e03166d01fb30a1dfc752cea8d96b7c89d3fe736a49fc",
+          "sha256": "a3c7b6fc80bf1776a098f6e493f768c27719ed8736d7be992c80d1396b6fc581",
           "provides": [
             "state_bloc"
           ],
@@ -251,7 +251,7 @@
         {
           "version": "0.1.0",
           "url": "archives/calendar-0.1.0.tgz",
-          "sha256": "8adf8a7fd24b3dbaeab7f3f6eeec635984d2c078229abf893719d69ecffc2ba2",
+          "sha256": "f0483af63f28e2f0baec686721091fa1ce916f5ce02d36ab7583952dd481d3d8",
           "provides": [
             "calendar"
           ],
@@ -297,7 +297,7 @@
         {
           "version": "0.2.0",
           "url": "archives/connectivity-0.2.0.tgz",
-          "sha256": "a12ba63179acb28c235b4ec2fa9ee805d241845b6ac119391d5ca301df159368",
+          "sha256": "576ced5bebbb90d1a032e04ebec72458e7136b55a5a5ccccd8b46759610b7bbd",
           "provides": [
             "connectivity"
           ],
@@ -343,7 +343,7 @@
         {
           "version": "0.1.2",
           "url": "archives/deep_link-0.1.2.tgz",
-          "sha256": "c1850c89cd780eade0ef8d8cbd604ff4329db1ecf90038ead0cf795eb706210a",
+          "sha256": "a3fcef64b9898502e1e01746c382e10389dd0ed9325fc67a9d4f995c6bab373e",
           "provides": [
             "deep_links"
           ],
@@ -417,7 +417,7 @@
         {
           "version": "0.2.4",
           "url": "archives/dio-0.2.4.tgz",
-          "sha256": "d3a087183bcd3ebb51d36e4ace979309469b823aba5507d050d1463d188647fa",
+          "sha256": "10cf60b44b3736f90a0b2dabff0a19d1d1031e9d8347e9be14d46cf38b27bb44",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -434,7 +434,7 @@
       "name": "Environment",
       "description": "Typed build-time configuration from --dart-define values.",
       "category": "config",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -465,6 +465,18 @@
           "version": "0.2.0",
           "url": "archives/env-0.2.0.tgz",
           "sha256": "560f63d06a58c8bc482a7e71a445046511fbc3d0335d2ba8b214a349c2c58956",
+          "provides": [
+            "env"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/env-0.3.0.tgz",
+          "sha256": "3af7c7c67867043ffcaff61a822df8ebcd3f90bb51da694a21a4c98d2f61cdfc",
           "provides": [
             "env"
           ],
@@ -518,7 +530,7 @@
         {
           "version": "0.2.1",
           "url": "archives/firebase-0.2.1.tgz",
-          "sha256": "8744b77bdd181c16f817de144ae3540755cdac57e2667dcbd72bba286043c46b",
+          "sha256": "be7003e6f30b82a927afc07bab056853a10aa6fc93c989ebbaea43378860ae5e",
           "provides": [
             "auth",
             "social_auth",
@@ -568,7 +580,7 @@
         {
           "version": "0.2.0",
           "url": "archives/flavors-0.2.0.tgz",
-          "sha256": "b63325103ef3f8c74d6d898a71986a24df4af638ec184ce2b64047438f29abcf",
+          "sha256": "b941b8eec35e7d073c3831774cdbfa3cb1fafe849cb522a97872adf47a17943f",
           "provides": [
             "flavor"
           ],
@@ -602,7 +614,7 @@
         {
           "version": "0.1.1",
           "url": "archives/geolocation-0.1.1.tgz",
-          "sha256": "6d9e7a4eb91799fdf93d698c8ea0b0409678c931c9904c1c93d596a3880d90d8",
+          "sha256": "d7dbb9f5e37dbcd99cae71b39240136be5c2d97ee107a15815521b1042ffb648",
           "provides": [
             "location"
           ],
@@ -672,7 +684,7 @@
         {
           "version": "0.3.0",
           "url": "archives/go_router-0.3.0.tgz",
-          "sha256": "a0148962e3b03bb5daa4cb16995be89208be75ac43bcfc9df1e9024217ca9d62",
+          "sha256": "272e18ca6553ded2f6be42520ad76599188faf38a716258ee1f8394b8352fd01",
           "provides": [
             "navigation"
           ],
@@ -710,7 +722,7 @@
         {
           "version": "0.1.1",
           "url": "archives/http_cache-0.1.1.tgz",
-          "sha256": "2da03b9575bad8f7de6f8dc80d155a3370ea776a20ebcb425a7fb77c1c6e98b6",
+          "sha256": "33fe007c03fe93384e25c835d29f137989e045692ea75d3ca07527eae6b818f5",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -749,7 +761,7 @@
         {
           "version": "0.1.1",
           "url": "archives/http_retry-0.1.1.tgz",
-          "sha256": "855b18920ae5b22b25061b3b8b5a220f6b18b279297fad64efe549659218a80b",
+          "sha256": "bcffcec953f06bb6ca6d3259180148dd1de9b9fd7fa6733c8eb25d803ab16ea6",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -796,7 +808,7 @@
         {
           "version": "0.2.0",
           "url": "archives/image_picker-0.2.0.tgz",
-          "sha256": "d13411ffd239f663508214b153e73c5496360c103b9fafc1a6521d7c4d717ab6",
+          "sha256": "079e7668fdcd5c2636a4cef10ff837199f64e60d4518b3e90904025eb672c3a7",
           "provides": [
             "media"
           ],
@@ -890,7 +902,7 @@
         {
           "version": "0.2.0",
           "url": "archives/l10n-0.2.0.tgz",
-          "sha256": "5f9d938b0f23bdf6ad58973f8ab3fd2c0b014d5ac32e2b09bc6402aae28da323",
+          "sha256": "cfdcfe982b13311522c804fa8002ceb8a0fdd305475a5a9298e4f21911bff082",
           "provides": [
             "l10n"
           ],
@@ -924,7 +936,7 @@
         {
           "version": "0.1.1",
           "url": "archives/local_db-0.1.1.tgz",
-          "sha256": "75b0552858835f2f1835e56c1167edb95c10c61279e2930726b07495146a07ac",
+          "sha256": "ec72c49826f2055c62f64333b772ad3008f4f4759b9b2b9549b4ea6cb5e35b93",
           "provides": [
             "local_db"
           ],
@@ -970,7 +982,7 @@
         {
           "version": "0.2.0",
           "url": "archives/logger-0.2.0.tgz",
-          "sha256": "2badafac2825752005ac4b8b52db123b6c1129fab34bff995b4921667e0d38db",
+          "sha256": "0857b4e938bca17821d571d01a8b8c5e9a6386983f98e76d61b5d7417814a0f4",
           "provides": [
             "logger"
           ],
@@ -1040,7 +1052,7 @@
         {
           "version": "0.1.4",
           "url": "archives/notifications-0.1.4.tgz",
-          "sha256": "b80192e8b91e27bf4e128bdfbd677f379e33d98a7f96ebdaf42e6755141b16a7",
+          "sha256": "41a7eea9ccdb6c0c57b04d9724f794671c43594e5b258881a34f14c8930324e8",
           "provides": [
             "notifications"
           ],
@@ -1086,7 +1098,7 @@
         {
           "version": "0.2.0",
           "url": "archives/permission-0.2.0.tgz",
-          "sha256": "ee152e0411327160da2289796f4bae11580a523872b26b8062a2c046fe673ca3",
+          "sha256": "da16ab02461701741d88084ef5f58f14ea872b56629c9fe297656246361b8b89",
           "provides": [
             "permission"
           ],
@@ -1140,7 +1152,7 @@
         {
           "version": "0.1.2",
           "url": "archives/rest_auth-0.1.2.tgz",
-          "sha256": "480a6ea165ef6746730e11db2792f8e3b3274635659a19cc3923ce637408dee2",
+          "sha256": "0885c985b99777e608229e41d5fa832ed808a596bd342e592867e1611f67ffb4",
           "requires": [
             "http_client",
             "secure_storage"
@@ -1202,7 +1214,7 @@
         {
           "version": "0.2.0",
           "url": "archives/riverpod-0.2.0.tgz",
-          "sha256": "53de5993271e147e242dcbcf1e2e99f79453ec407a86bbf4008621ecabf88784",
+          "sha256": "871e9a0f2611f787c6e5d29a677054d8ca6740e7870224d05486063200e8781f",
           "provides": [
             "state_riverpod"
           ],
@@ -1218,7 +1230,7 @@
       "name": "Secure storage",
       "description": "Keychain and Keystore storage for secrets and tokens.",
       "category": "storage",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -1237,6 +1249,18 @@
           "version": "0.1.1",
           "url": "archives/secure_storage-0.1.1.tgz",
           "sha256": "e6d68827067a8788bf76c0b94a4c7e660058b2412633ad5e8c68eb58a1151d6c",
+          "provides": [
+            "secure_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/secure_storage-0.2.0.tgz",
+          "sha256": "d79c09958f86ea7cc6bada1862d71089de17ff85e9ce84961b5888848f038c70",
           "provides": [
             "secure_storage"
           ],
@@ -1270,7 +1294,7 @@
         {
           "version": "0.1.1",
           "url": "archives/share-0.1.1.tgz",
-          "sha256": "91688406374a3bd1f1d0abb5677df8c1a5f3183f87741fee6dccb607f93f8d81",
+          "sha256": "30e385ff5aa8ed87b6434f3fca8ecbd89a27bb3ad2595483dd5e2cb843e18662",
           "provides": [
             "share"
           ],
@@ -1322,7 +1346,7 @@
         {
           "version": "0.2.0",
           "url": "archives/social_login-0.2.0.tgz",
-          "sha256": "ec9521dabea2c947cfdee7db1a0eff8fd13ed12034b8d25a04f89a34240aa3af",
+          "sha256": "4449f25383c7c0945e2a5ff2fd0213616bdca1e717a6c24f009d6f3296bf2cd2",
           "requires": [
             "social_auth"
           ],
@@ -1341,7 +1365,7 @@
       "name": "Key-value storage",
       "description": "Persistent key-value storage backed by shared_preferences.",
       "category": "storage",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -1360,6 +1384,18 @@
           "version": "0.1.1",
           "url": "archives/storage-0.1.1.tgz",
           "sha256": "411d93b4c077ec0c3075a52edc262937dd9c7851475a8c18708da9f1602cb153",
+          "provides": [
+            "storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/storage-0.2.0.tgz",
+          "sha256": "37b8f28d59895381d5620795c502dee49f184d1f54bfaf2aed3b386e38066f69",
           "provides": [
             "storage"
           ],
@@ -1426,7 +1462,7 @@
         {
           "version": "0.1.3",
           "url": "archives/supabase-0.1.3.tgz",
-          "sha256": "a7867857707b8021f53ae7ce9b1d6df968499e3c92fe3595c2378e79425d0504",
+          "sha256": "82dc1200fdf987a63c3e8575e30d2ec52489b2009f4e592ae04e5344efd3f333",
           "provides": [
             "auth",
             "social_auth",
@@ -1475,7 +1511,7 @@
         {
           "version": "0.2.0",
           "url": "archives/theme-0.2.0.tgz",
-          "sha256": "c456a133d4998bad03aeb82a32a543c68ce53db40b6edac0afe6eb1c15dfe704",
+          "sha256": "c1b88d9724e1d9c0c23c0b2c78c9c1589272af48318078a735e98ef9188a4332",
           "provides": [
             "theme"
           ],
