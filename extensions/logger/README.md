@@ -2,7 +2,7 @@
 
 Implementation of `AppLogger` from `kiln_core`: leveled logging, composable
 sinks, personal data redaction, rotating log files, an in-memory buffer, crash
-breadcrumbs, and an in-memory buffer.
+breadcrumbs, and HTTP request logging.
 
 - `LoggerModule` registers `AppLogger`, `LoggerConfig`, `LogLevelController`,
   `MemoryLogSink`, and `FileLogSink` when the file sink is active.
@@ -30,6 +30,11 @@ not be logged.
 ```dart
 gate.logger.info('User signed in', data: {'id': userId});
 gate.logger.error('Upload failed', error: err);
+
+final level = gate.logLevel;              // LogLevel
+await gate.setLogLevel(LogLevel.debug);   // Result<void> (Err in production)
+final records = gate.logRecords;          // List<LogRecord>
+gate.clearLogs();                         // empties the buffer
 ```
 
 Synchronous access through the facade.

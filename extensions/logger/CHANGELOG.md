@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Add `gate_logger.dart` so the runtime log level (`logLevel`,
+  `setLogLevel`) and the buffered records (`logRecords`, `clearLogs`) are
+  reachable through the `Gate` facade.
+- Fix a duplicated phrase in the README feature list.
+
 ## 0.2.0
 
 - Removed `DebugLogPage`. Applications read log sinks and render their own log viewer.

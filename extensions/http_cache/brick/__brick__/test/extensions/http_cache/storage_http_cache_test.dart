@@ -73,4 +73,24 @@ void main() {
     expect(await cache.read('get|https://api.kiln.dev/users'), isNull);
     expect(await cache.read('get|https://api.kiln.dev/posts'), isNotNull);
   });
+
+  test('invalidates by tag without matching response data', () async {
+    final storage = _MemoryStorage();
+    final cache = StorageHttpCache(storage: storage);
+    await cache.write(
+      'get|https://api.kiln.dev/a',
+      const HttpResponse(statusCode: 200, data: {'role': 'users'}),
+      tags: const {'posts'},
+    );
+    await cache.write(
+      'get|https://api.kiln.dev/b',
+      const HttpResponse(statusCode: 200),
+      tags: const {'users'},
+    );
+
+    await cache.invalidate('/nonexistent', tag: 'users');
+
+    expect(await cache.read('get|https://api.kiln.dev/a'), isNotNull);
+    expect(await cache.read('get|https://api.kiln.dev/b'), isNull);
+  });
 }

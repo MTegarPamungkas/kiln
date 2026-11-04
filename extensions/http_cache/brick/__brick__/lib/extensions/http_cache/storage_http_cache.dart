@@ -93,13 +93,30 @@ final class StorageHttpCache implements HttpCache {
   @override
   Future<void> invalidate(String prefix, {String? tag}) async {
     for (final key in await _keys()) {
-      final raw = await storage.read(key);
-      if (raw == null) {
+      if (key.contains(prefix)) {
+        await storage.delete(key);
         continue;
       }
-      if (key.contains(prefix) || (tag != null && raw.contains('"$tag"'))) {
+      if (tag != null && await _hasTag(key, tag)) {
         await storage.delete(key);
       }
+    }
+  }
+
+  Future<bool> _hasTag(String key, String tag) async {
+    final raw = await storage.read(key);
+    if (raw == null) {
+      return false;
+    }
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) {
+        return false;
+      }
+      final tags = decoded['tags'];
+      return tags is List && tags.any((value) => '$value' == tag);
+    } catch (_) {
+      return false;
     }
   }
 

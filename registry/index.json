@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T05:53:16.470810Z",
+  "generated_at": "2026-11-04T06:20:17.978401Z",
   "extensions": [
     {
       "id": "analytics",
@@ -359,7 +359,7 @@
       "name": "Dio HTTP client",
       "description": "HTTP client and middleware pipeline built on dio.",
       "category": "network",
-      "latest": "0.2.4",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -418,6 +418,19 @@
           "version": "0.2.4",
           "url": "archives/dio-0.2.4.tgz",
           "sha256": "10cf60b44b3736f90a0b2dabff0a19d1d1031e9d8347e9be14d46cf38b27bb44",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/dio-0.3.0.tgz",
+          "sha256": "656909d539f3f810e33e895f5fc85c97bd972cd7a8e7272baa82f535a788a2de",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -700,7 +713,7 @@
       "name": "HTTP cache",
       "description": "Caches HTTP responses with TTL, ETag, and invalidation.",
       "category": "network",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -723,6 +736,22 @@
           "version": "0.1.1",
           "url": "archives/http_cache-0.1.1.tgz",
           "sha256": "33fe007c03fe93384e25c835d29f137989e045692ea75d3ca07527eae6b818f5",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/http_cache-0.2.0.tgz",
+          "sha256": "e32b3ba9e882607ba6c7a5b86bddf5db20d1f590de01c93034f8c96f6f2fe773",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -952,7 +981,7 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.2.0",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -983,6 +1012,18 @@
           "version": "0.2.0",
           "url": "archives/logger-0.2.0.tgz",
           "sha256": "0857b4e938bca17821d571d01a8b8c5e9a6386983f98e76d61b5d7417814a0f4",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/logger-0.3.0.tgz",
+          "sha256": "302cb89abaa0c6b41e9b174780e374d9d911e19d908f500aca8a675a959388ec",
           "provides": [
             "logger"
           ],

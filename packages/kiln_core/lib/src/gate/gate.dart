@@ -99,6 +99,8 @@ final class Gate {
 
   HttpClient get http => use();
 
+  HttpCache get cache => use();
+
   LocalDatabase get localDb => use();
 
   LocationProvider get location => use();
@@ -187,6 +189,94 @@ final class Gate {
 
   Future<Result<void>> remoteDelete(String collection, String id) =>
       call<void>(() => remoteDb.delete(collection, id));
+
+  // HTTP
+  Future<Result<HttpResponse>> httpSend(HttpRequest request) =>
+      call(() => http.send(request));
+
+  Future<Result<HttpResponse>> httpGet(
+    Uri uri, {
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => call(
+    () => http.get(
+      uri,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  Future<Result<HttpResponse>> httpPost(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => call(
+    () => http.post(
+      uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  Future<Result<HttpResponse>> httpPut(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => call(
+    () => http.put(
+      uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  Future<Result<HttpResponse>> httpPatch(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => call(
+    () => http.patch(
+      uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  Future<Result<HttpResponse>> httpDelete(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => call(
+    () => http.delete(
+      uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  // HTTP cache
+  Future<Result<void>> invalidateCache(String prefix, {String? tag}) =>
+      call<void>(() => cache.invalidate(prefix, tag: tag));
+
+  Future<Result<void>> clearCache() => call<void>(cache.clear);
 
   // File storage
   Future<Result<StoredFile>> uploadFile(

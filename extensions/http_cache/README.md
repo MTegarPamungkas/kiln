@@ -18,7 +18,13 @@ kiln add http_cache
 ## Gate
 
 Caching runs as `HttpPipeline` middleware automatically; there are no
-request/response verbs to call.
+request/response verbs to call. Cache management is exposed through the facade:
+
+```dart
+await gate.invalidateCache('/users');            // Result<void>
+await gate.invalidateCache('/users', tag: 'users'); // Result<void>
+await gate.clearCache();                         // Result<void>
+```
 
 ## Runtime support
 

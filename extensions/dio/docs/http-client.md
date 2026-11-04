@@ -14,3 +14,19 @@ final response = await client.post(
 
 Failures are always `Failure`. Access denied, timeouts, offline devices, and
 server errors carry stable `FailureCode` values.
+
+## Gate
+
+Requests are also available as one-call `Result` verbs:
+
+```dart
+final result = await gate.httpPost(
+  Uri.parse('/auth/login'),
+  body: {'email': email, 'password': password},
+);
+
+final session = result.fold(
+  ok: (response) => response.data,
+  err: (failure) => throw StateError(failure.message),
+);
+```

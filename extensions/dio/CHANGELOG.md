@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Expose `httpSend`, `httpGet`, `httpPost`, `httpPut`, `httpPatch`, and
+  `httpDelete` gate verbs so HTTP requests return a `Result` instead of
+  throwing a `Failure`.
+
 ## 0.2.4
 
 - Add `DioConfig.validate` and `DioSupport` for base URL and timeout checks.

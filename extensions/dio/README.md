@@ -36,9 +36,16 @@ query string. `api_key_prefix` supports values such as `Bearer `.
 ## Gate
 
 ```dart
-final response = await gate.http.get(Uri.parse('https://api.example.com/users'));
-final created = await gate.http.post(uri, body: {'name': 'Ana'});
+final users = await gate.httpGet(Uri.parse('/users'));   // Result<HttpResponse>
+final created = await gate.httpPost(uri, body: {'name': 'Ana'}); // Result<HttpResponse>
+
+users.fold(
+  ok: (response) => print(response.statusCode),
+  err: (failure) => print(failure.code),
+);
 ```
+
+Every request returns a `Result` instead of throwing a `Failure`.
 
 ## Runtime support
 

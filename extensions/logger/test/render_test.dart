@@ -25,8 +25,10 @@ void main() {
         'lib/extensions/logger/log_level_controller.dart',
         'lib/extensions/logger/log_exporter.dart',
         'lib/extensions/logger/http_log_middleware.dart',
+        'lib/extensions/logger/gate_logger.dart',
         'test/extensions/logger/logger_contract_test.dart',
         'test/extensions/logger/file_log_sink_test.dart',
+        'test/extensions/logger/gate_logger_test.dart',
       ]),
     );
 

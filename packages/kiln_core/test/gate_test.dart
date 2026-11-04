@@ -121,6 +121,137 @@ final class _SecureStorage implements SecureStorage {
   }
 }
 
+final class _HttpClient implements HttpClient {
+  int sends = 0;
+  HttpRequest? lastRequest;
+  Failure? failure;
+
+  @override
+  Future<HttpResponse> send(HttpRequest request) async {
+    sends++;
+    lastRequest = request;
+    final programmedFailure = failure;
+    if (programmedFailure != null) {
+      throw programmedFailure;
+    }
+    return const HttpResponse(statusCode: 200);
+  }
+
+  @override
+  Future<HttpResponse> get(
+    Uri uri, {
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => send(
+    HttpRequest(
+      method: HttpMethod.get,
+      uri: uri,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  @override
+  Future<HttpResponse> post(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => send(
+    HttpRequest(
+      method: HttpMethod.post,
+      uri: uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  @override
+  Future<HttpResponse> put(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => send(
+    HttpRequest(
+      method: HttpMethod.put,
+      uri: uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  @override
+  Future<HttpResponse> patch(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => send(
+    HttpRequest(
+      method: HttpMethod.patch,
+      uri: uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+
+  @override
+  Future<HttpResponse> delete(
+    Uri uri, {
+    Object? body,
+    Map<String, String> headers = const <String, String>{},
+    Map<String, Object?>? queryParameters,
+    HttpCancelToken? cancelToken,
+  }) => send(
+    HttpRequest(
+      method: HttpMethod.delete,
+      uri: uri,
+      body: body,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    ),
+  );
+}
+
+final class _HttpCache implements HttpCache {
+  final List<String> invalidated = <String>[];
+  int clears = 0;
+
+  @override
+  Future<CacheEntry?> read(String key) async => null;
+
+  @override
+  Future<void> write(
+    String key,
+    HttpResponse response, {
+    Duration? ttl,
+    Set<String> tags = const <String>{},
+  }) async {}
+
+  @override
+  Future<void> invalidate(String prefix, {String? tag}) async {
+    invalidated.add(prefix);
+  }
+
+  @override
+  Future<void> clear() async {
+    clears++;
+  }
+}
+
 void main() {
   group('Gate', () {
     late GetItRegistry registry;
@@ -333,6 +464,83 @@ void main() {
         (await gate.readSecure('x')).failureOrNull?.code,
         FailureCode.secureStorageUnavailable,
       );
+    });
+  });
+
+  group('Gate http verbs', () {
+    late GetItRegistry registry;
+    late _HttpClient http;
+
+    setUp(() {
+      registry = GetItRegistry();
+      http = _HttpClient();
+      registry.registerSingleton<HttpClient>(http);
+    });
+
+    test('httpSend and httpGet return the response', () async {
+      final gate = Gate(registry);
+
+      final sent = await gate.httpSend(
+        HttpRequest(method: HttpMethod.get, uri: Uri.parse('https://x.dev')),
+      );
+      expect(sent.valueOrNull?.statusCode, 200);
+
+      final got = await gate.httpGet(Uri.parse('https://x.dev'));
+      expect(got.valueOrNull?.statusCode, 200);
+      expect(http.sends, 2);
+    });
+
+    test('httpPost forwards the body', () async {
+      final gate = Gate(registry);
+
+      final result = await gate.httpPost(
+        Uri.parse('https://x.dev'),
+        body: <String, Object?>{'a': 1},
+      );
+
+      expect(result.valueOrNull?.statusCode, 200);
+      expect(http.lastRequest?.body, <String, Object?>{'a': 1});
+    });
+
+    test('http verbs surface failures as Err', () async {
+      http.failure = const Failure(
+        code: FailureCode.networkTimeout,
+        message: 'timeout',
+        kind: FailureKind.network,
+      );
+      final gate = Gate(registry);
+
+      final result = await gate.httpGet(Uri.parse('https://x.dev'));
+
+      expect(result.failureOrNull?.code, FailureCode.networkTimeout);
+    });
+  });
+
+  group('Gate http cache verbs', () {
+    late GetItRegistry registry;
+    late _HttpCache cache;
+
+    setUp(() {
+      registry = GetItRegistry();
+      cache = _HttpCache();
+      registry.registerSingleton<HttpCache>(cache);
+    });
+
+    test('cache getter reads the registered cache', () {
+      expect(Gate(registry).cache, same(cache));
+    });
+
+    test('invalidateCache and clearCache delegate', () async {
+      final gate = Gate(registry);
+
+      expect(
+        (await gate.invalidateCache('/users', tag: 'users')).isOk,
+        isTrue,
+      );
+      expect(cache.invalidated, <String>['/users']);
+
+      expect((await gate.clearCache()).isOk, isTrue);
+      expect(cache.clears, 1);
     });
   });
 }

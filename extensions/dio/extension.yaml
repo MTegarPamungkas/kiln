@@ -1,6 +1,6 @@
 id: dio
 name: Dio HTTP client
-version: 0.2.4
+version: 0.3.0
 description: HTTP client and middleware pipeline built on dio.
 category: network
 tier: official
