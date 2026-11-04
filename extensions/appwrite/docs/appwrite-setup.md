@@ -64,7 +64,9 @@ developing the application without loosening certificate checks in production.
 A local instance without TLS uses the endpoint `http://<host>/v1`. From the
 Android emulator, the host machine is reached via `http://10.0.2.2/v1`, not
 `localhost`. Enable `android:usesCleartextTraffic="true"` only in debug builds so
-Android allows HTTP.
+Android allows HTTP. `kiln doctor` reports `insecure_http: true` in the Appwrite
+support details when the configured endpoint uses cleartext, as a reminder that
+the network security config is required.
 
 Email/password sessions are created over HTTP and the cookie is forwarded as the
 `X-Appwrite-Session` header. The SDK's built-in cookie jar is not always

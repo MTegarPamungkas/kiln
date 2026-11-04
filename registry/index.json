@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T14:33:59.858065Z",
+  "generated_at": "2026-11-04T14:42:36.352570Z",
   "extensions": [
     {
       "id": "analytics",
@@ -41,7 +41,7 @@
       "name": "Appwrite",
       "description": "Appwrite auth, remote database, and file storage backends.",
       "category": "auth",
-      "latest": "0.1.2",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
@@ -76,6 +76,20 @@
           "version": "0.1.2",
           "url": "archives/appwrite-0.1.2.tgz",
           "sha256": "67c2de6f5a188979a4db5e6629d5e9dc791d1802aead41aa5007e31f0d3c7541",
+          "provides": [
+            "auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/appwrite-0.2.0.tgz",
+          "sha256": "4f6952ea19d3af9cb2bc7f4406c2ea201493678b15f74efae554152d57d9eba5",
           "provides": [
             "auth",
             "remote_database",

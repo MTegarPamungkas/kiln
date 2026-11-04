@@ -42,4 +42,16 @@ void main() {
       ),
     );
   });
+
+  test('flags cleartext http endpoints as insecure', () {
+    expect(
+      const AppwriteConfig(endpoint: 'https://appwrite.test/v1')
+          .isInsecureTransport,
+      isFalse,
+    );
+    expect(
+      const AppwriteConfig(endpoint: 'http://10.0.2.2/v1').isInsecureTransport,
+      isTrue,
+    );
+  });
 }

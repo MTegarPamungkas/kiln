@@ -31,6 +31,9 @@ final class AppwriteConfig {
 
   Uri get endpointUri => Uri.parse(endpoint);
 
+  /// Whether the endpoint uses cleartext http, as self-hosted Appwrite often does.
+  bool get isInsecureTransport => Uri.tryParse(endpoint)?.isScheme('http') ?? false;
+
   /// Rejects values the Appwrite client cannot be built from.
   void validate() {
     final uri = Uri.tryParse(endpoint);

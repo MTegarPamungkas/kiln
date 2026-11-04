@@ -19,6 +19,23 @@ void main() {
     expect(info.isSupported, isTrue);
     expect(info.details['endpoint'], 'https://appwrite.test');
     expect(info.details['database'], 'database');
+    expect(info.details['insecure_http'], isFalse);
+  });
+
+  test('flags a cleartext endpoint in the details', () {
+    final support = AppwriteSupport(
+      config: const AppwriteConfig(
+        endpoint: 'http://10.0.2.2/v1',
+        projectId: 'project',
+        databaseId: 'database',
+        bucketId: 'bucket',
+      ),
+    );
+
+    final info = support.info;
+
+    expect(info.isSupported, isTrue);
+    expect(info.details['insecure_http'], isTrue);
   });
 
   test('reports invalid endpoints as not configured', () {

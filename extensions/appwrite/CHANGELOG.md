@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Add `AppwriteConfig.isInsecureTransport` and surface `insecure_http` in the
+  `AppwriteSupport` details, so `kiln doctor` flags a cleartext `http://` endpoint
+  (the common self-hosted setup that needs an Android network security config).
+  Mirrors the Supabase extension and documents the reminder in the setup guide.
+
 ## 0.1.2
 
 - Add `AppwriteSupport` for endpoint and identifier validation.

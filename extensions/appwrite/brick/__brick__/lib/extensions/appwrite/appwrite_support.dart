@@ -16,6 +16,7 @@ final class AppwriteSupport {
           'endpoint': config.endpointUri.origin,
           'project': config.projectId,
           'database': config.databaseId,
+          'insecure_http': config.isInsecureTransport,
         },
       );
     } on Failure catch (failure) {
