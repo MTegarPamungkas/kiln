@@ -36,6 +36,9 @@ name.
 - `usePkce` (default `true`) — the PKCE flow is required for mobile apps.
 - `detectSessionInUri` (default `false`) — leave it off because the callback is
   read by `SupabaseLinkHandler` through the `DeepLinks` contract.
+- A plain `http` project `url` is accepted for local or self-hosted stacks (see
+  section 6). The support report exposes `insecure_http` so a release build on
+  `http` is easy to spot.
 
 `SupabaseConfig.validate()` can be called early to make sure the URL, anon key,
 schema, and redirect are valid. Error messages never contain the anon key.
@@ -52,3 +55,25 @@ in the app.
 `FileStorage` uses a single bucket. Create that bucket in **Storage**, then add
 policies on `storage.objects` for the folders the app uses. `url()` always
 returns a signed URL, so the bucket may be private.
+
+## 6. Local and self-hosted Supabase
+
+A `supabase start` (Docker) stack runs its API behind Kong on
+`http://localhost:54321`. Use that URL for the `url` prompt and the `anon`
+(publishable) key printed by `supabase start`.
+
+`supabase_flutter` accepts a plain `http` project URL, so the client needs no
+extra flag. Use these host forms:
+
+- Native desktop and web: `http://127.0.0.1:54321`.
+- Android emulator: `http://10.0.2.2:54321` (`10.0.2.2` is the emulator's alias
+  for the host machine; `localhost` inside the emulator is the emulator itself).
+
+`SupabaseSupport` records `insecure_http` in its details, so a plain `http` URL
+shows up in the support report.
+
+Android blocks cleartext `http` by default (API 28+). For local development, add
+a debug-only rule in `android/app/src/debug/AndroidManifest.xml`, for example
+`<application android:usesCleartextTraffic="true">`, or scope it to the dev host
+with a network security config. Keep it out of the release manifest; production
+should use an `https` project URL.

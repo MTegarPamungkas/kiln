@@ -82,7 +82,7 @@ final class SupabaseAuthRepository implements AuthRepository {
     if (session == null) {
       throw const Failure(
         code: FailureCode.authEmailNotVerified,
-        message: 'Pendaftaran berhasil. Konfirmasi email sebelum masuk.',
+        message: 'Sign-up succeeded. Confirm the email before signing in.',
         kind: FailureKind.authentication,
       );
     }
@@ -201,7 +201,7 @@ final class SupabaseSocialAuth implements SocialAuth {
     if (redirectTo == null) {
       throw const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'authRedirectUrl wajib diisi untuk masuk lewat browser.',
+        message: 'authRedirectUrl is required to sign in through the browser.',
         kind: FailureKind.configuration,
       );
     }

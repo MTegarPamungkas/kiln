@@ -220,7 +220,7 @@ final class SdkPostgrestGateway implements PostgrestGateway {
       throw Failure(
         code: FailureCode.validationInvalidInput,
         message:
-            'Filter ${filter.operator.name} pada "${filter.column}" butuh daftar nilai.',
+            'Filter ${filter.operator.name} on "${filter.column}" needs a list of values.',
         kind: FailureKind.validation,
       );
     }
@@ -233,7 +233,7 @@ final class SdkPostgrestGateway implements PostgrestGateway {
       throw Failure(
         code: FailureCode.validationInvalidInput,
         message:
-            'Filter ${filter.operator.name} pada "${filter.column}" butuh nilai.',
+            'Filter ${filter.operator.name} on "${filter.column}" needs a value.',
         kind: FailureKind.validation,
       );
     }

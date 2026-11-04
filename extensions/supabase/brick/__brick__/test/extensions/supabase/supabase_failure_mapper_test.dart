@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:{{app_name}}/extensions/supabase/supabase_failure_mapper.dart';
 
 void main() {
-  test('AuthException kredensial salah menjadi auth.invalid_credentials', () {
+  test('a wrong-credentials AuthException becomes auth.invalid_credentials', () {
     final failure = mapSupabaseError(
       const AuthException(
         'Invalid login credentials',
@@ -21,7 +21,7 @@ void main() {
     expect(failure.isRetryable, isFalse);
   });
 
-  test('AuthException email belum dikonfirmasi terdeteksi', () {
+  test('an unconfirmed-email AuthException is detected', () {
     final failure = mapSupabaseError(
       const AuthException('Email not confirmed', code: 'email_not_confirmed'),
     );
@@ -29,7 +29,7 @@ void main() {
     expect(failure.code, FailureCode.authEmailNotVerified);
   });
 
-  test('AuthException sesi hilang menjadi auth.session_expired', () {
+  test('a lost AuthException session becomes auth.session_expired', () {
     final failure = mapSupabaseError(
       const AuthException('Auth session missing!'),
     );
@@ -38,7 +38,7 @@ void main() {
     expect(failure.kind, FailureKind.session);
   });
 
-  test('AuthException rate limit bisa dicoba ulang', () {
+  test('a rate-limit AuthException is retryable', () {
     final failure = mapSupabaseError(
       const AuthException(
         'Request rate limit reached',
@@ -51,7 +51,7 @@ void main() {
     expect(failure.isRetryable, isTrue);
   });
 
-  test('PostgrestException tanpa baris menjadi remote_database.not_found', () {
+  test('a no-rows PostgrestException becomes remote_database.not_found', () {
     final failure = mapSupabaseError(
       const PostgrestException(
         message: 'JSON object requested, multiple (or no) rows returned',
@@ -63,7 +63,7 @@ void main() {
     expect(failure.kind, FailureKind.database);
   });
 
-  test('PostgrestException unique violation menjadi konflik', () {
+  test('a unique-violation PostgrestException becomes a conflict', () {
     final failure = mapSupabaseError(
       const PostgrestException(message: 'duplicate key', code: '23505'),
     );
@@ -71,7 +71,7 @@ void main() {
     expect(failure.code, FailureCode.remoteDatabaseConflict);
   });
 
-  test('PostgrestException RLS menjadi kegagalan otorisasi', () {
+  test('an RLS PostgrestException becomes an authorization failure', () {
     final failure = mapSupabaseError(
       const PostgrestException(
         message: 'new row violates row-level security policy',
@@ -83,7 +83,7 @@ void main() {
     expect(failure.code, FailureCode.remoteDatabaseQueryFailed);
   });
 
-  test('StorageException 404 menjadi file.not_found walau operasi unggah', () {
+  test('a 404 StorageException becomes file.not_found even on upload', () {
     final failure = mapSupabaseError(
       const StorageException('Object not found', statusCode: '404'),
       fallbackCode: FailureCode.fileUploadFailed,
@@ -93,7 +93,7 @@ void main() {
     expect(failure.kind, FailureKind.storage);
   });
 
-  test('StorageException lain memakai kode fallback pemanggil', () {
+  test('other StorageExceptions use the caller fallback code', () {
     final failure = mapSupabaseError(
       const StorageException('Internal error', statusCode: '500'),
       fallbackCode: FailureCode.fileUploadFailed,
@@ -103,7 +103,7 @@ void main() {
     expect(failure.details['status_code'], '500');
   });
 
-  test('TimeoutException menjadi network.timeout yang bisa dicoba ulang', () {
+  test('a TimeoutException becomes a retryable network.timeout', () {
     final failure = mapSupabaseError(
       TimeoutException('slow', const Duration(seconds: 1)),
     );
@@ -113,7 +113,7 @@ void main() {
     expect(failure.isRetryable, isTrue);
   });
 
-  test('error jaringan teks dikenali sebagai network', () {
+  test('a network text error is recognized as network', () {
     final failure = mapSupabaseError(
       Exception('SocketException: Failed host lookup: demo.supabase.co'),
       fallbackCode: FailureCode.remoteDatabaseUnavailable,
@@ -123,7 +123,7 @@ void main() {
     expect(failure.kind, FailureKind.network);
   });
 
-  test('Failure yang sudah ada diteruskan apa adanya', () {
+  test('an existing Failure passes through as-is', () {
     const original = Failure(
       code: FailureCode.fileNotFound,
       message: 'hilang',
@@ -133,7 +133,7 @@ void main() {
     expect(mapSupabaseError(original), same(original));
   });
 
-  test('error tak dikenal memakai kode dan kind fallback', () {
+  test('an unknown error uses the fallback code and kind', () {
     final failure = mapSupabaseError(
       StateError('aneh'),
       fallbackCode: FailureCode.remoteDatabaseQueryFailed,

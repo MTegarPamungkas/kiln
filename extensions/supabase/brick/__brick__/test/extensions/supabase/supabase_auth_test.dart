@@ -17,7 +17,7 @@ void main() {
     );
   });
 
-  test('signIn menyimpan sesi dan meneruskannya ke authStateChanges', () async {
+  test('signIn stores the session and forwards it to authStateChanges', () async {
     final emitted = <AuthSession?>[];
     final subscription = auth.authStateChanges.listen(emitted.add);
 
@@ -39,7 +39,7 @@ void main() {
     await auth.dispose();
   });
 
-  test('signIn dengan kredensial salah menjadi Failure auth', () async {
+  test('signIn with wrong credentials becomes an auth Failure', () async {
     await expectLater(
       auth.signIn(email: 'user@kiln.dev', password: 'wrong-password'),
       throwsA(
@@ -56,7 +56,7 @@ void main() {
     await auth.dispose();
   });
 
-  test('signUp meneruskan displayName dan redirectUri', () async {
+  test('signUp forwards displayName and redirectUri', () async {
     final session = await auth.signUp(
       email: 'new@kiln.dev',
       password: 'password123',
@@ -69,7 +69,7 @@ void main() {
     await auth.dispose();
   });
 
-  test('signUp tanpa sesi berarti menunggu konfirmasi email', () async {
+  test('signUp without a session waits for email confirmation', () async {
     gateway.requireEmailConfirmation = true;
 
     await expectLater(
@@ -86,7 +86,7 @@ void main() {
     await auth.dispose();
   });
 
-  test('signOut membersihkan sesi dan mengirim null', () async {
+  test('signOut clears the session and emits null', () async {
     await auth.signIn(email: 'user@kiln.dev', password: 'password123');
     final emitted = <AuthSession?>[];
     final subscription = auth.authStateChanges.listen(emitted.add);
@@ -101,7 +101,7 @@ void main() {
     await auth.dispose();
   });
 
-  test('restore memakai sesi yang sudah ada di gateway', () async {
+  test('restore uses the session already in the gateway', () async {
     gateway.initialSession = const SupabaseSession(
       userId: 'user-9',
       email: 'stored@kiln.dev',
@@ -117,7 +117,7 @@ void main() {
     await auth.dispose();
   });
 
-  test('authStateChanges dari gateway diteruskan tanpa duplikasi', () async {
+  test('gateway authStateChanges forward without duplication', () async {
     final emitted = <AuthSession?>[];
     final subscription = auth.authStateChanges.listen(emitted.add);
 

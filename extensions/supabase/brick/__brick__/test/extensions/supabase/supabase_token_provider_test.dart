@@ -13,11 +13,11 @@ void main() {
     tokens = SupabaseTokenProvider(gateway: gateway);
   });
 
-  test('accessToken null saat belum ada sesi', () async {
+  test('accessToken is null when there is no session', () async {
     expect(await tokens.accessToken(), isNull);
   });
 
-  test('accessToken diambil dari access token sesi aktif', () async {
+  test('accessToken comes from the active session token', () async {
     await gateway.signInWithPassword(
       email: 'user@kiln.dev',
       password: 'password123',
@@ -27,7 +27,7 @@ void main() {
     expect(gateway.forceRefreshRequested, isFalse);
   });
 
-  test('forceRefresh meminta gateway memperbarui sesi lebih dulu', () async {
+  test('forceRefresh asks the gateway to refresh the session first', () async {
     await gateway.signInWithPassword(
       email: 'user@kiln.dev',
       password: 'password123',
@@ -38,7 +38,7 @@ void main() {
     expect(gateway.forceRefreshRequested, isTrue);
   });
 
-  test('clear mengakhiri sesi sehingga token berikutnya null', () async {
+  test('clear ends the session so the next token is null', () async {
     await gateway.signInWithPassword(
       email: 'user@kiln.dev',
       password: 'password123',
@@ -50,7 +50,7 @@ void main() {
     expect(await tokens.accessToken(), isNull);
   });
 
-  test('error gateway dipetakan menjadi Failure sesi', () async {
+  test('a gateway error maps to a session Failure', () async {
     final failing = _ThrowingGateway();
 
     await expectLater(

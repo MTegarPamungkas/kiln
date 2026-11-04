@@ -16,14 +16,14 @@ void main() {
     );
   });
 
-  test('sendPasswordResetEmail meneruskan email dan redirect', () async {
+  test('sendPasswordResetEmail forwards email and redirect', () async {
     await account.sendPasswordResetEmail('user@kiln.dev');
 
     expect(gateway.resetEmails, ['user@kiln.dev']);
     expect(gateway.lastResetRedirect, 'kiln-auth://auth-callback');
   });
 
-  test('sendPasswordResetEmail menolak email tidak valid', () async {
+  test('sendPasswordResetEmail rejects an invalid email', () async {
     await expectLater(
       account.sendPasswordResetEmail('bukan-email'),
       throwsA(
@@ -37,13 +37,13 @@ void main() {
     expect(gateway.resetEmails, isEmpty);
   });
 
-  test('sendEmailVerification memakai redirect callback', () async {
+  test('sendEmailVerification uses the redirect callback', () async {
     await account.sendEmailVerification();
 
     expect(gateway.lastVerificationRedirect, 'kiln-auth://auth-callback');
   });
 
-  test('isEmailVerified mengikuti sesi aktif', () async {
+  test('isEmailVerified follows the active session', () async {
     expect(account.isEmailVerified, isFalse);
 
     await gateway.signInWithPassword(
@@ -72,7 +72,7 @@ void main() {
     },
   );
 
-  test('updateDisplayName mengirim data display_name', () async {
+  test('updateDisplayName sends display_name data', () async {
     await account.updateDisplayName('  Tegar  ');
 
     expect(gateway.updatedUsers, [
@@ -80,7 +80,7 @@ void main() {
     ]);
   });
 
-  test('updateDisplayName menolak nama kosong', () async {
+  test('updateDisplayName rejects an empty name', () async {
     await expectLater(
       account.updateDisplayName('   '),
       throwsA(
@@ -94,7 +94,7 @@ void main() {
     expect(gateway.updatedUsers, isEmpty);
   });
 
-  test('updatePhotoUrl mengirim avatar_url dan bisa menghapusnya', () async {
+  test('updatePhotoUrl sends avatar_url and can clear it', () async {
     await account.updatePhotoUrl('https://cdn.kiln.dev/a.png');
     await account.updatePhotoUrl(null);
 
@@ -106,7 +106,7 @@ void main() {
     expect(gateway.updatedUsers.last['avatar_url'], isNull);
   });
 
-  test('updatePhotoUrl menolak teks kosong', () async {
+  test('updatePhotoUrl rejects empty text', () async {
     await expectLater(
       account.updatePhotoUrl(''),
       throwsA(

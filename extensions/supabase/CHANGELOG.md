@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0
+
+- Document and support local/self-hosted `http` Supabase (Docker on
+  `http://127.0.0.1:54321`, Android emulator on `http://10.0.2.2:54321`); the
+  support report now includes `insecure_http` and `SupabaseConfig` exposes
+  `isInsecureTransport`.
+- Rewrite the extension's failure, validation, and OTP messages in English.
+- Translate the generated test names to English and cover insecure transport in
+  `supabase_config_test.dart`.
+
 ## 0.1.3
 
 - Fix signed storage URLs: Supabase returns `/object/sign/...`, which must be

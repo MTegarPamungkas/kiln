@@ -14,7 +14,7 @@ void main() {
     storage = SupabaseFileStorage(gateway: gateway);
   });
 
-  test('upload mengembalikan path dan ukuran berkas', () async {
+  test('upload returns path and file size', () async {
     final stored = await storage.upload(
       const FileUpload(
         path: 'avatars/user-1.png',
@@ -42,7 +42,7 @@ void main() {
     expect(progress.last, 1.0);
   });
 
-  test('download mengembalikan byte yang diunggah', () async {
+  test('download returns the uploaded bytes', () async {
     await storage.upload(
       const FileUpload(path: 'a.txt', bytes: <int>[7, 8, 9]),
     );
@@ -50,7 +50,7 @@ void main() {
     expect(await storage.download('a.txt'), <int>[7, 8, 9]);
   });
 
-  test('download berkas yang tidak ada menjadi file.not_found', () async {
+  test('downloading a missing file becomes file.not_found', () async {
     await expectLater(
       storage.download('missing.txt'),
       throwsA(
@@ -63,7 +63,7 @@ void main() {
     );
   });
 
-  test('url memakai signed URL dengan masa berlaku bawaan', () async {
+  test('url uses a signed URL with the default lifetime', () async {
     final uri = await storage.url('avatars/user-1.png');
 
     expect(uri.scheme, 'https');
@@ -72,13 +72,13 @@ void main() {
     expect(gateway.signedLifetimes.single, const Duration(hours: 1));
   });
 
-  test('url menerima masa berlaku khusus', () async {
+  test('url accepts a custom lifetime', () async {
     await storage.url('a.txt', expiresIn: const Duration(minutes: 5));
 
     expect(gateway.signedLifetimes.single, const Duration(minutes: 5));
   });
 
-  test('url menolak masa berlaku nol', () async {
+  test('url rejects a zero lifetime', () async {
     await expectLater(
       storage.url('a.txt', expiresIn: Duration.zero),
       throwsA(
@@ -92,7 +92,7 @@ void main() {
     expect(gateway.signedPaths, isEmpty);
   });
 
-  test('delete menghapus berkas dari bucket', () async {
+  test('delete removes the file from the bucket', () async {
     await storage.upload(const FileUpload(path: 'a.txt', bytes: <int>[1]));
 
     await storage.delete('a.txt');
@@ -101,7 +101,7 @@ void main() {
     expect(gateway.files, isEmpty);
   });
 
-  test('delete berkas yang tidak ada menjadi file.not_found', () async {
+  test('deleting a missing file becomes file.not_found', () async {
     await expectLater(
       storage.delete('missing.txt'),
       throwsA(
@@ -114,7 +114,7 @@ void main() {
     );
   });
 
-  test('error SDK saat unggah menjadi file.upload_failed', () async {
+  test('an SDK error during upload becomes file.upload_failed', () async {
     gateway.failure = const StorageException(
       'Internal error',
       statusCode: '500',
@@ -132,7 +132,7 @@ void main() {
     );
   });
 
-  test('path tidak valid ditolak sebelum memanggil SDK', () async {
+  test('an invalid path is rejected before calling the SDK', () async {
     for (final path in <String>[
       '',
       '/absolute.txt',

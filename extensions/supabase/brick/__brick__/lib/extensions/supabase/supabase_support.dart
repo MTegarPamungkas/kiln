@@ -41,7 +41,11 @@ final class SupabaseSupport {
       await probe();
       final uri = Uri.tryParse(config.url);
       return SupportInfo.supported(
-        details: <String, Object?>{'host': uri?.host, 'schema': config.schema},
+        details: <String, Object?>{
+          'host': uri?.host,
+          'schema': config.schema,
+          'insecure_http': config.isInsecureTransport,
+        },
       );
     } on Failure catch (failure) {
       return SupportInfo.unsupported(

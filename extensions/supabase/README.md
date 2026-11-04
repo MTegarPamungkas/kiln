@@ -35,6 +35,14 @@ rendering, complete the manual steps in `extension.yaml`:
 3. `create_storage_bucket` — create a `public` bucket or change
    `SupabaseConfig.storageBucket`.
 
+### Local and self-hosted stacks
+
+A `supabase start` (Docker) API is `http://localhost:54321`. `supabase_flutter`
+accepts the plain `http` URL, so use `http://127.0.0.1:54321` on desktop and web
+and `http://10.0.2.2:54321` on the Android emulator; the support report flags
+`insecure_http`. On Android you also need a debug cleartext rule. See
+[Supabase setup](docs/supabase-setup.md), section 6.
+
 ## Usage example
 
 ```dart

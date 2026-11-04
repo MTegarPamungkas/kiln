@@ -3,7 +3,7 @@ import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/supabase/supabase_config.dart';
 
 void main() {
-  test('nilai bawaan memakai url, anon key, dan schema dari prompt', () {
+  test('defaults use the url, anon key, and schema from the prompts', () {
     const config = SupabaseConfig.defaults;
 
     expect(config.url, '{{{url}}}');
@@ -18,7 +18,7 @@ void main() {
     expect(config.redirectUri.toString(), 'kiln-auth://auth-callback');
   });
 
-  test('konfigurasi valid tidak mengembalikan Failure', () {
+  test('valid configuration returns no Failure', () {
     const config = SupabaseConfig(
       url: 'https://demo.supabase.co',
       anonKey: 'anon-key',
@@ -27,7 +27,7 @@ void main() {
     expect(config.validate(), isNull);
   });
 
-  test('url bukan http/https ditolak', () {
+  test('a non http/https url is rejected', () {
     const config = SupabaseConfig(url: 'demo.supabase.co', anonKey: 'anon-key');
 
     final failure = config.validate();
@@ -36,7 +36,7 @@ void main() {
     expect(failure?.kind, FailureKind.configuration);
   });
 
-  test('anon key kosong ditolak tanpa membocorkan nilainya', () {
+  test('an empty anon key is rejected without leaking its value', () {
     const config = SupabaseConfig(
       url: 'https://demo.supabase.co',
       anonKey: '   ',
@@ -48,7 +48,7 @@ void main() {
     expect(failure?.message, isNot(contains('   ')));
   });
 
-  test('schema dengan karakter aneh ditolak', () {
+  test('a schema with odd characters is rejected', () {
     const config = SupabaseConfig(
       url: 'https://demo.supabase.co',
       anonKey: 'anon-key',
@@ -58,7 +58,7 @@ void main() {
     expect(config.validate()?.code, FailureCode.configurationInvalid);
   });
 
-  test('redirect tanpa scheme ditolak', () {
+  test('a redirect without a scheme is rejected', () {
     const config = SupabaseConfig(
       url: 'https://demo.supabase.co',
       anonKey: 'anon-key',
@@ -68,7 +68,7 @@ void main() {
     expect(config.validate()?.code, FailureCode.configurationInvalid);
   });
 
-  test('masa berlaku signed URL nol ditolak', () {
+  test('a zero signed url lifetime is rejected', () {
     const config = SupabaseConfig(
       url: 'https://demo.supabase.co',
       anonKey: 'anon-key',
@@ -78,7 +78,26 @@ void main() {
     expect(config.validate()?.code, FailureCode.configurationInvalid);
   });
 
-  test('copyWith mengganti hanya nilai yang diminta', () {
+  test('a local http url is valid and reports insecure transport', () {
+    const config = SupabaseConfig(
+      url: 'http://127.0.0.1:54321',
+      anonKey: 'anon-key',
+    );
+
+    expect(config.validate(), isNull);
+    expect(config.isInsecureTransport, isTrue);
+  });
+
+  test('an https url is secure transport', () {
+    const config = SupabaseConfig(
+      url: 'https://demo.supabase.co',
+      anonKey: 'anon-key',
+    );
+
+    expect(config.isInsecureTransport, isFalse);
+  });
+
+  test('copyWith changes only the requested values', () {
     const config = SupabaseConfig.defaults;
 
     final updated = config.copyWith(schema: 'app', usePkce: false);
