@@ -13,6 +13,9 @@ final class CrashReportConfig {
     Set<AppFlavor>? enabledFlavors,
     this.noopWhenDsnEmpty = true,
     this.sendDefaultPii = false,
+    this.dedupWindow = const Duration(seconds: 60),
+    this.dedupEnabled = true,
+    this.httpBreadcrumbsEnabled = true,
   }) : enabledFlavors = Set<AppFlavor>.unmodifiable(
          enabledFlavors ?? defaultEnabledFlavors,
        );
@@ -47,6 +50,15 @@ final class CrashReportConfig {
 
   /// Whether Sentry may attach device identifiers as personal data.
   final bool sendDefaultPii;
+
+  /// Window during which repeated identical errors are collapsed to one.
+  final Duration dedupWindow;
+
+  /// Whether [ErrorDeduplicator] collapses repeated errors before sending.
+  final bool dedupEnabled;
+
+  /// Whether to record HTTP exchanges as breadcrumbs when the pipeline exists.
+  final bool httpBreadcrumbsEnabled;
 
   bool get hasDsn => dsn.trim().isNotEmpty;
 
@@ -116,6 +128,9 @@ final class CrashReportConfig {
     Set<AppFlavor>? enabledFlavors,
     bool? noopWhenDsnEmpty,
     bool? sendDefaultPii,
+    Duration? dedupWindow,
+    bool? dedupEnabled,
+    bool? httpBreadcrumbsEnabled,
   }) {
     return CrashReportConfig(
       dsn: dsn ?? this.dsn,
@@ -125,6 +140,10 @@ final class CrashReportConfig {
       enabledFlavors: enabledFlavors ?? this.enabledFlavors,
       noopWhenDsnEmpty: noopWhenDsnEmpty ?? this.noopWhenDsnEmpty,
       sendDefaultPii: sendDefaultPii ?? this.sendDefaultPii,
+      dedupWindow: dedupWindow ?? this.dedupWindow,
+      dedupEnabled: dedupEnabled ?? this.dedupEnabled,
+      httpBreadcrumbsEnabled:
+          httpBreadcrumbsEnabled ?? this.httpBreadcrumbsEnabled,
     );
   }
 

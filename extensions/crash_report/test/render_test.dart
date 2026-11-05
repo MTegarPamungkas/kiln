@@ -27,6 +27,8 @@ void main() {
           'lib/extensions/crash_report/consent_gate_crash_reporter.dart',
           'lib/extensions/crash_report/pii_scrubbing_crash_reporter.dart',
           'lib/extensions/crash_report/safe_crash_reporter.dart',
+          'lib/extensions/crash_report/error_deduplicator.dart',
+          'lib/extensions/crash_report/http_breadcrumb_middleware.dart',
           'lib/extensions/crash_report/crash_report_failure_mapper.dart',
           'lib/extensions/crash_report/crash_report_support.dart',
           'lib/extensions/crash_report/gate_crash_report.dart',
@@ -42,6 +44,8 @@ void main() {
           'test/extensions/crash_report/crash_report_module_test.dart',
           'test/extensions/crash_report/gate_crash_report_test.dart',
           'test/extensions/crash_report/noop_crash_reporter_test.dart',
+          'test/extensions/crash_report/error_deduplicator_test.dart',
+          'test/extensions/crash_report/http_breadcrumb_middleware_test.dart',
         ]),
       );
 

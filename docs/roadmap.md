@@ -114,9 +114,9 @@
 
 ## Parked until a decision is made
 
-- Deferred crash_report refinements: error deduplication, an expected-Failure
-  classifier, HTTP breadcrumb middleware, a release-info reader, and a
-  non-production crash-test trigger.
+- Deferred crash_report refinements: an expected-Failure classifier, a
+  release-info reader, and a non-production crash-test trigger (error
+  deduplication and HTTP breadcrumb middleware are now shipped in Phase 6).
 - Registry distribution model: Git URL, separate registry, or both.
 
 ## Decisions already made

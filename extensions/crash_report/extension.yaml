@@ -9,6 +9,7 @@ provides:
   - crash_reporter
 optional_requires:
   - flavor
+  - http_pipeline
 dependencies:
   sentry_flutter: ^10.3.0
 prompts:
