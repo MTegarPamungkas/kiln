@@ -12,6 +12,7 @@ workspace:
   - extensions/biometric
   - extensions/bloc
   - extensions/calendar
+  - extensions/codegen
   - extensions/connectivity
   - extensions/crash_report
   - extensions/deep_link

@@ -66,8 +66,9 @@
 - [x] `SupportInfo`, `SupportState`, `SupportRegistry`, and `KilnModule.support`.
 - [x] Bootstrap probes runtime support, records it, and skips `ready()` for
       unsupported extensions.
-- [x] All 30 extensions report platform, device, and configuration readiness;
-      unsupported calls return typed failures instead of blocking startup.
+- [x] All runtime extensions report platform, device, and configuration
+      readiness; unsupported calls return typed failures instead of blocking
+      startup.
 - [x] `kiln create` defaults to the minimal template; `go_router` sample shell
       and auth redirect are opt-in.
 - [x] Native setup for permission kinds, plus `android.compile_sdk` patches.
@@ -87,13 +88,23 @@
 - [x] Manifest, brick, goldens, registry, catalog, docs, and the kiln_testing
   `crashReporterContract` suite all pass.
 
+## Phase 7 — Code generation
+
+- [x] `codegen` wires `json_serializable` + `freezed` into a project with a
+  shared `build.yaml`, epoch/URI/Duration `JsonConverter`s, and a sample
+  freezed+JSON model (generated output committed for CI-safe analysis).
+- [x] First extension to use install hooks: a `post_gen` hook runs
+  `build_runner`, gated by `HookPolicy` so it only executes for an approved
+  official-tier install.
+- [x] A `generators` multi-select prompt lets apps enable one or both.
+- [x] Manifest, brick, goldens, registry, catalog, docs, and a real
+  `flutter analyze` of the rendered model all pass.
+
 ## Parked until a decision is made
 
 - Deferred crash_report refinements: error deduplication, an expected-Failure
   classifier, HTTP breadcrumb middleware, a release-info reader, and a
   non-production crash-test trigger.
-- `codegen`: the preferred generator (`json_serializable`/`freezed`) is not
-  final.
 - Registry distribution model: Git URL, separate registry, or both.
 
 ## Decisions already made

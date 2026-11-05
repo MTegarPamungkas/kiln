@@ -8,6 +8,7 @@ import 'appwrite_bundle.dart';
 import 'biometric_bundle.dart';
 import 'bloc_bundle.dart';
 import 'calendar_bundle.dart';
+import 'codegen_bundle.dart';
 import 'connectivity_bundle.dart';
 import 'crash_report_bundle.dart';
 import 'deep_link_bundle.dart';
@@ -40,6 +41,7 @@ final List<AvailableExtension> bundledExtensions = <AvailableExtension>[
   biometricExtension,
   blocExtension,
   calendarExtension,
+  codegenExtension,
   connectivityExtension,
   crashReportExtension,
   deepLinkExtension,
