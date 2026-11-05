@@ -171,4 +171,43 @@ void main() {
       ),
     );
   });
+
+  test('a non-JSON sign-in success becomes an unexpected failure', () async {
+    final gateway = gatewayReturning(200, '<html>proxy page</html>');
+
+    await expectLater(
+      gateway.signIn(email: 'user@kiln.dev', password: 'password123'),
+      throwsA(
+        isA<Failure>()
+            .having((f) => f.code, 'code', FailureCode.unexpected)
+            .having((f) => f.kind, 'kind', FailureKind.authentication),
+      ),
+    );
+  });
+
+  test('a non-JSON token response yields no JWT', () async {
+    final gateway = BetterAuthGateway(
+      authUrl: 'https://auth.test/db/auth',
+      client: MockClient((request) async {
+        if (request.url.path.endsWith('/sign-in/email')) {
+          return http.Response(
+            jsonEncode(<String, Object?>{
+              'token': 'sess-1',
+              'user': <String, Object?>{
+                'id': 'user-1',
+                'email': 'user@kiln.dev',
+              },
+            }),
+            200,
+            headers: <String, String>{'content-type': 'application/json'},
+          );
+        }
+        return http.Response('<html>', 200);
+      }),
+    );
+
+    await gateway.signIn(email: 'user@kiln.dev', password: 'password123');
+
+    expect(await gateway.accessJwt(), isNull);
+  });
 }

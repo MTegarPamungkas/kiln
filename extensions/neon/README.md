@@ -78,7 +78,8 @@ surviving restarts.
 final stored = await gate.uploadFile(
   FileUpload(path: 'avatars/user-1.png', bytes: bytes, contentType: 'image/png'),
 );
-final link = await gate.files.url('avatars/user-1.png'); // presigned
+stored.url; // presigned link returned with the upload
+final link = await gate.files.url('avatars/user-1.png'); // or mint a fresh one
 ```
 
 ## Setup checklist

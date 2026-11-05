@@ -286,7 +286,6 @@ final class FakeNeonStorageGateway implements NeonStorageGateway {
     List<int> bytes, {
     String? contentType,
     Map<String, String> metadata = const <String, String>{},
-    bool upsert = false,
     ProgressCallback? onProgress,
   }) async {
     _throwIfNeeded();

@@ -24,7 +24,28 @@ void main() {
 
     expect(uploaded.path, 'a/b.txt');
     expect(uploaded.size, 3);
+    expect(uploaded.url, contains('a/b.txt'));
     expect(await storage.download('a/b.txt'), <int>[1, 2, 3]);
+  });
+
+  test('upload with a zero lifetime is rejected before the gateway runs',
+      () async {
+    final broken = NeonFileStorage(
+      gateway: gateway,
+      signedUrlLifetime: Duration.zero,
+    );
+
+    await expectLater(
+      broken.upload(const FileUpload(path: 'a.txt', bytes: <int>[1])),
+      throwsA(
+        isA<Failure>().having(
+          (value) => value.code,
+          'code',
+          FailureCode.validationInvalidInput,
+        ),
+      ),
+    );
+    expect(gateway.uploadedPaths, isEmpty);
   });
 
   test('url returns a signed link that names the file', () async {

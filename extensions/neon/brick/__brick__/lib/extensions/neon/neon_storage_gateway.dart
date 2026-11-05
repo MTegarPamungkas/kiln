@@ -16,7 +16,6 @@ abstract interface class NeonStorageGateway {
     List<int> bytes, {
     String? contentType,
     Map<String, String> metadata,
-    bool upsert,
     ProgressCallback? onProgress,
   });
 
@@ -58,7 +57,6 @@ final class S3NeonStorageGateway implements NeonStorageGateway {
     List<int> bytes, {
     String? contentType,
     Map<String, String> metadata = const <String, String>{},
-    bool upsert = false,
     ProgressCallback? onProgress,
   }) async {
     final uri = _config.objectUri(key);
