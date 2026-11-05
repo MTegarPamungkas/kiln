@@ -98,10 +98,24 @@ KilnCommandRunner buildKilnCommandRunner({
     KilnContext(
       cwd: cwd ?? Directory.current,
       logger: logger ?? KilnLogger(),
-      prompter: prompter ?? Prompter(interactive: stdin.hasTerminal),
+      prompter: prompter ?? Prompter(interactive: _stdinInteractive()),
       processRunner: processRunner ?? const ProcessRunner(),
       fileSystem: fileSystem ?? const LocalFileSystem(),
       globalConfig: globalConfig ?? GlobalConfig.load(),
     ),
   );
+}
+
+/// Whether stdin can actually carry an interactive prompt. A handle can claim
+/// to be a terminal and still fail every console query (no console attached),
+/// so the flag is only trusted after one real mode read succeeds.
+bool _stdinInteractive() {
+  if (!stdin.hasTerminal) {
+    return false;
+  }
+  try {
+    return stdin.echoMode;
+  } on Object {
+    return false;
+  }
 }

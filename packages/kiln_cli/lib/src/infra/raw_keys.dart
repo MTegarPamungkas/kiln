@@ -1,7 +1,3 @@
-// Private fields fed through named constructor parameters.
-// ignore_for_file: prefer_initializing_formals
-
-import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -34,86 +30,47 @@ abstract interface class RawKeySource {
 /// Arrow keys reach the process as ANSI escape sequences on POSIX terminals;
 /// on Windows the console is switched to virtual terminal input so it reports
 /// them the same way (Windows 10 or newer).
+///
+/// Keys are read with blocking `readByteSync` calls. The stream API is
+/// deliberately avoided: on Windows, listening to `stdin` as a stream
+/// invalidates the handle for later mode changes (`OS Error 6`), which would
+/// break both this restore and every later prompt.
 final class TerminalRawKeySource implements RawKeySource {
   const TerminalRawKeySource();
 
   @override
   RawModeSession? enter() {
-    if (!stdin.hasTerminal) {
-      return null;
-    }
     final modes = _enableRawModes();
     if (modes == null) {
       return null;
     }
-    final buffer = <int>[];
-    Object? error;
-    var notified = Completer<void>();
-    final subscription = stdin.listen(
-      (data) {
-        buffer.addAll(data);
-        if (!notified.isCompleted) {
-          notified.complete();
-        }
-      },
-      onError: (Object value) {
-        error = value;
-        if (!notified.isCompleted) {
-          notified.complete();
-        }
-      },
-    );
-    return _TerminalSession(
-      buffer: buffer,
-      hasError: () => error != null,
-      waitForData: () => notified.future,
-      onNotify: () => notified = Completer<void>(),
-      close: () {
-        subscription.cancel();
-        _restoreModes(modes);
-      },
-    );
+    return _SyncSession(modes);
   }
 }
 
-final class _TerminalSession implements RawModeSession {
-  _TerminalSession({
-    required List<int> buffer,
-    required bool Function() hasError,
-    required Future<void> Function() waitForData,
-    required void Function() onNotify,
-    required void Function() close,
-  }) : _buffer = buffer,
-       _hasError = hasError,
-       _waitForData = waitForData,
-       _onNotify = onNotify,
-       _close = close;
+final class _SyncSession implements RawModeSession {
+  _SyncSession(this._modes);
 
-  final List<int> _buffer;
-  final bool Function() _hasError;
-  final Future<void> Function() _waitForData;
-  final void Function() _onNotify;
-  final void Function() _close;
+  final ({int input, int? output, bool windows}) _modes;
 
   @override
   Future<RawKey> read() async {
     while (true) {
-      final byte = await _nextByte();
+      final byte = _readByte();
       switch (byte) {
         case 0x1b:
-          // An escape sequence, or a lone escape used as cancel.
-          final second = await _nextByteOrNull();
-          if (second == null) {
+          // An escape sequence (arrows) or a lone escape used as cancel. The
+          // tail is read blocking; anything that is not a CSI sequence counts
+          // as cancel, so Escape followed by any other key still cancels.
+          final second = _readByte();
+          if (second != 0x5b && second != 0x4f) {
             return RawKey.cancel;
           }
-          final third = await _nextByteOrNull();
-          if ((second == 0x5b || second == 0x4f) && third != null) {
-            switch (third) {
-              case 0x41:
-                return RawKey.up;
-              case 0x42:
-                return RawKey.down;
-            }
+          switch (_readByte()) {
+            case 0x41:
+              return RawKey.up;
+            case 0x42:
+              return RawKey.down;
           }
           continue; // unknown sequence; ignore and read the next key
         case 0x20:
@@ -128,38 +85,17 @@ final class _TerminalSession implements RawModeSession {
   }
 
   @override
-  void restore() {
-    _close();
-  }
+  void restore() => _restoreModes(_modes);
 
-  Future<int> _nextByte() async {
-    while (true) {
-      if (_buffer.isNotEmpty) {
-        final byte = _buffer.removeAt(0);
-        if (_buffer.isEmpty) {
-          _onNotify();
-        }
-        return byte;
-      }
-      if (_hasError()) {
-        throw const KilnException(
-          'The terminal input stream failed.',
-          code: 'prompt.invalid',
-        );
-      }
-      await _waitForData();
-      _onNotify();
+  static int _readByte() {
+    final byte = stdin.readByteSync();
+    if (byte < 0) {
+      throw const KilnException(
+        'The terminal input closed.',
+        code: 'prompt.invalid',
+      );
     }
-  }
-
-  Future<int?> _nextByteOrNull() async {
-    // A lone escape (cancel) vs an escape sequence (arrows) is decided by
-    // whether more bytes arrive quickly.
-    try {
-      return await _nextByte().timeout(const Duration(milliseconds: 60));
-    } on TimeoutException {
-      return null;
-    }
+    return byte;
   }
 }
 
@@ -222,9 +158,7 @@ final class _TerminalSession implements RawModeSession {
   }
 }
 
-void _restoreModes(
-  ({int input, int? output, bool windows}) modes,
-) {
+void _restoreModes(({int input, int? output, bool windows}) modes) {
   try {
     if (modes.windows) {
       final kernel32 = DynamicLibrary.open('kernel32.dll');
@@ -241,6 +175,11 @@ void _restoreModes(
   } on Object {
     // The console is best-effort; never crash on restore.
   }
-  stdin.lineMode = true;
-  stdin.echoMode = true;
+  try {
+    stdin.lineMode = true;
+    stdin.echoMode = true;
+  } on Object {
+    // dart:io can disagree about the handle after foreign mode changes; the
+    // console mode itself was already restored above.
+  }
 }
