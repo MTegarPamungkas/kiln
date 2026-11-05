@@ -116,8 +116,8 @@ final class CreateCommand extends KilnCommand {
     final platforms = argResults!.wasParsed('platforms')
         ? parseCsv(argResults!['platforms'] as String)
         : canAsk
-        ? prompter.selectMany(
-            'Platforms (numbers toggle, Enter keeps the selection):',
+        ? await prompter.selectMany(
+            'Platforms:',
             const <String>['android', 'ios', 'web', 'windows', 'linux', 'macos'],
             defaults: const <String>{'android', 'ios', 'web'},
           )
@@ -133,11 +133,7 @@ final class CreateCommand extends KilnCommand {
     final withExtensions = argResults!.wasParsed('with')
         ? (argResults!['with'] as List<String>)
         : canAsk
-        ? prompter.selectMany(
-            'Extensions to install (numbers toggle, Enter keeps the '
-            'selection):',
-            extensionOptions,
-          )
+        ? await prompter.selectMany('Extensions to install:', extensionOptions)
         : (argResults!['with'] as List<String>);
 
     var corePath = argResults!['core-path'] as String?;

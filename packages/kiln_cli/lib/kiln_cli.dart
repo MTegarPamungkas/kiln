@@ -13,5 +13,6 @@ export 'src/infra/json_reporter.dart';
 export 'src/infra/kiln_logger.dart';
 export 'src/infra/process_runner.dart';
 export 'src/infra/prompter.dart';
+export 'src/infra/raw_keys.dart';
 export 'src/project_context.dart';
 export 'src/version.dart';
