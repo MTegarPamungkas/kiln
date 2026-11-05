@@ -1,0 +1,26 @@
+name: neon
+description: Neon Data API remote database files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: neon
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  data_api_url:
+    type: string
+    description: Neon Data API base URL
+    default: https://example.aws.neon.tech/sql/rest
+  api_key:
+    type: string
+    description: Neon Data API bearer token
+    default: your-data-api-token
+  schema:
+    type: string
+    description: Postgres schema
+    default: public

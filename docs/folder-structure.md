@@ -132,7 +132,7 @@ kiln/
 │                 └─ test/extensions/{{id.snakeCase()}}/  # extension tests that go into the user project test/
 │                    ├─ {{id.snakeCase()}}_module_test.dart          # tests that the module registers its services with the Registry
 │                    └─ {{id.snakeCase()}}_failure_mapper_test.dart  # tests that third-party errors map to the correct Failure
-├─ extensions/                               # 32 extension folders, described in the Extension sections
+├─ extensions/                               # 33 extension folders, described in the Extension sections
 ├─ examples/                                 # generated example projects as Kiln usage references
 │  ├─ minimal/                               # kiln create output without extensions
 │  │  ├─ kiln.yaml                           # project configuration without extensions
@@ -436,7 +436,7 @@ packages/kiln_cli/
 │     └─ bundles/  # bundle of all extensions, generated from extensions/, do not edit
 │        ├─ catalog.g.dart  # catalog of available extensions, generated from extension.yaml, do not edit
 │        ├─ app_basic_bundle.dart  # app_basic bundle for create, generated from extensions/app_basic, do not edit
-│        └─ <id>_bundle.dart  # per-extension bundle (32 files), generated from extensions/<id>, do not edit
+│        └─ <id>_bundle.dart  # per-extension bundle (33 files), generated from extensions/<id>, do not edit
 ├─ test/  # kiln_cli package tests: command runner, commands, infra, fixtures, and goldens
 │  ├─ command_runner_test.dart  # tests argument mapping to commands and the command runner exit codes
 │  ├─ commands/  # one test file for each CLI command
@@ -997,11 +997,13 @@ extensions/local_db/
 
 ## Extension: backend and auth
 
-Six extensions for identity and remote data. Three backends (`appwrite`,
+Seven extensions for identity and remote data. Three backends (`appwrite`,
 `firebase`, `supabase`) satisfy three contracts at once: `AuthRepository`,
-`RemoteDatabase`, and `FileStorage`. `rest_auth` satisfies `AuthRepository`
-only, on top of `http_client`. `social_login` and `biometric` add sign-in
-paths without changing the auth contract.
+`RemoteDatabase`, and `FileStorage`. `neon` implements `RemoteDatabase` alone,
+over the Neon Data API (a PostgREST-compatible endpoint). `rest_auth` satisfies
+`AuthRepository` only, on top of `http_client`. `social_login` and `biometric`
+add sign-in paths without changing the auth contract. Install one
+`RemoteDatabase` provider per app; the resolver rejects two that provide it.
 
 Backends deliberately have **no** static facade. Application code reads the contract from
 the Registry, and the `prefer_contract_over_impl` lint rule rejects direct imports of
@@ -1296,6 +1298,45 @@ extensions/biometric/
          ├─ biometric_gate_test.dart  # tests the guard: authenticate first and the grace period using a fake Clock
          ├─ app_lock_test.dart  # tests that the lock engages after onPause exceeds the limit
          └─ biometric_protected_storage_test.dart  # tests that read requires authentication first
+```
+
+### neon
+
+`neon` is the `remote_database`-only counterpart to the three bundled backends.
+It drives the Neon Data API (PostgREST) over `package:http` and, because the
+Data API has no socket, simulates `watch` by polling the row on a timer.
+
+```text
+extensions/neon/
+├─ extension.yaml  # manifest: provides: remote_database · category: database · prompts: data_api_url, api_key, schema
+├─ README.md  # overview, install, configuration, usage, and the Data API security note
+├─ CHANGELOG.md
+├─ docs/neon.md  # setup and usage guide for the Neon Data API connector
+├─ test/                                        # repo-level tests (run in the kiln repo)
+│  ├─ manifest_test.dart
+│  ├─ render_test.dart
+│  └─ analyze_test.dart                         # renders the brick and runs flutter analyze against package:http
+└─ brick/
+   ├─ brick.yaml
+   └─ __brick__/
+      ├─ lib/extensions/neon/
+      │  ├─ neon_config.dart                    # typed config: dataApiUrl, apiKey, schema, watchInterval, and validate()
+      │  ├─ neon_gateway.dart                   # PostgrestQuery/Filter/Order types, PostgrestGateway interface, and HttpNeonGateway (package:http)
+      │  ├─ neon_query_mapper.dart              # maps RemoteQuery to PostgREST and validates identifiers
+      │  ├─ neon_failure_mapper.dart            # maps NeonApiException/status to Failure(remote_database.*)
+      │  ├─ neon_remote_database.dart           # RemoteDatabase over PostgREST, with a polling watch
+      │  ├─ neon_support.dart                   # config validation and optional reachability probe
+      │  └─ neon_module.dart                     # registers NeonConfig, NeonSupport, PostgrestGateway, and RemoteDatabase
+      └─ test/extensions/neon/
+         ├─ test_support.dart                   # FakeDocumentStore and FakePostgrestGateway (no realtime; polling watch)
+         ├─ neon_contract_test.dart              # runs the shared remoteDatabaseContract
+         ├─ neon_remote_database_test.dart       # CRUD, polling watch, notFound, and validation
+         ├─ neon_gateway_test.dart               # HttpNeonGateway request building with a MockClient
+         ├─ neon_query_mapper_test.dart          # operator, order, limit/offset, and rejection mapping
+         ├─ neon_config_test.dart                # validate() and copyWith
+         ├─ neon_failure_mapper_test.dart        # status-to-code mapping
+         ├─ neon_support_test.dart               # supported/notConfigured/unavailable states
+         └─ neon_module_test.dart                # registration wiring
 ```
 
 ## Extension: navigation and UI

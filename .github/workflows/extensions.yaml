@@ -36,6 +36,7 @@ jobs:
           - l10n
           - local_db
           - logger
+          - neon
           - notifications
           - permission
           - rest_auth

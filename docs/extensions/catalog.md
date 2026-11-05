@@ -26,6 +26,7 @@ This catalog is generated from extension manifests by
 | `l10n` | Localization | 0.1.0 | l10n | official | `l10n` |
 | `local_db` | Local database | 0.1.0 | database | official | `local_db` |
 | `logger` | Logger | 0.1.0 | logging | official | `logger` |
+| `neon` | Neon | 0.1.0 | database | official | `remote_database` |
 | `notifications` | Notifications | 0.1.0 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.0 | config | official | `remote_config` |
@@ -213,6 +214,15 @@ Structured application logging with redaction, rotating files, and crash breadcr
 - Provides: `logger`
 - Prompts: file_sink, http_logging
 - Dependencies: `path_provider: ^2.1.6`
+- Platforms: android, ios, macos, web, windows, linux
+
+## neon
+
+Neon Lakebase Postgres remote database through the Data API (PostgREST), read through the Gate.
+
+- Provides: `remote_database`
+- Prompts: data_api_url, api_key, schema
+- Dependencies: `http: ^1.6.0`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## notifications

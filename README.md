@@ -14,12 +14,12 @@ and `extensions.g.dart`); and generated projects pass `flutter analyze` and
 `flutter test`. `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`,
 `cache`, `store`, `completion`, and `ext new/validate/test/pack` are available.
 
-### Extensions (32)
+### Extensions (33)
 
 | Group | Extensions |
 | --- | --- |
 | Auth & backends | `rest_auth`, `supabase`, `firebase`, `appwrite`, `social_login`, `biometric` |
-| Data & storage | `storage`, `secure_storage`, `local_db` |
+| Data & storage | `storage`, `secure_storage`, `local_db`, `neon` |
 | Network | `dio`, `http_retry`, `http_cache` |
 | Navigation & UI | `go_router`, `deep_link`, `theme`, `l10n`, `flavors` |
 | Device | `connectivity`, `permission`, `notifications`, `image_picker`, `geolocation`, `share`, `calendar` |

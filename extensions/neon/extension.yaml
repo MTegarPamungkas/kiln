@@ -1,0 +1,46 @@
+id: neon
+name: Neon
+version: 0.1.0
+description: Neon Lakebase Postgres remote database through the Data API (PostgREST), read through the Gate.
+category: database
+tier: official
+exclusive: false
+provides:
+  - remote_database
+dependencies:
+  http: ^1.6.0
+prompts:
+  - name: data_api_url
+    type: url
+    label: Neon Data API URL
+    description: PostgREST-compatible Data API base URL for your Neon project, for example https://your-endpoint.aws.neon.tech/sql/rest.
+    required: true
+  - name: api_key
+    type: secret
+    label: Neon Data API bearer token
+    description: Client-safe token sent as a bearer token on every request. Never use a service-role or password-holding key here.
+    required: true
+    secret: true
+  - name: schema
+    type: string
+    label: Postgres schema
+    description: Schema exposed through the Data API.
+    default: public
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.INTERNET
+manual_steps:
+  - id: enable_data_api
+    description: Enable the Data API (PostgREST) on the Neon project and confirm its base URL; the endpoint must be reachable from the app.
+  - id: scope_the_token
+    description: "Protect rows with Postgres row-level security and a per-user Neon Auth JWT. A single bearer token shared by every client exposes the whole schema, so do not ship a privileged key."
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"
