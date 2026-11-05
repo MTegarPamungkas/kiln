@@ -1,0 +1,21 @@
+name: kiln_lints
+description: Optional custom lint rules that keep Kiln applications on contracts.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+# custom_lint_builder 0.8.1 is still the newest release and pins analyzer ^8.
+# The rules below target analyzer 8 so they work today; bump both packages
+# together when custom_lint publishes analyzer 14 support.
+dependencies:
+  analyzer: ^8.4.0
+  custom_lint_builder: ^0.8.1
+  path: ^1.9.1
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.31.1
