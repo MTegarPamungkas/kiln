@@ -203,13 +203,21 @@ void main() {
     });
 
     test('asks for the options one by one on an interactive terminal', () async {
+      final extensionOptions =
+          extensionCatalog
+              .map((extension) => extension.id)
+              .where(
+                (id) => id != 'l10n' && id != 'bloc' && id != 'riverpod',
+              )
+              .toList()
+            ..sort();
       final answers = <String>[
         '2', // template: app
         '3', // state: riverpod
         'com.kiln.demo',
         'A demo application.',
-        'android',
-        'dio',
+        '', // platforms: keep the checked defaults
+        '${extensionOptions.indexOf('dio') + 1}', // extensions: check dio
         'en', // l10n supported locales
       ];
       var index = 0;
