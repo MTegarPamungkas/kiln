@@ -95,7 +95,7 @@ final class BetterAuthGateway implements NeonAuthGateway {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw _failureFor(response, fallback: 'Invalid email or password.');
     }
-    return _adopt(jsonDecode(response.body) as Map<String, Object?>);
+    return _adoptSession(response.body);
   }
 
   @override
@@ -116,7 +116,7 @@ final class BetterAuthGateway implements NeonAuthGateway {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw _failureFor(response, fallback: 'The account could not be created.');
     }
-    return _adopt(jsonDecode(response.body) as Map<String, Object?>);
+    return _adoptSession(response.body);
   }
 
   @override
@@ -160,7 +160,10 @@ final class BetterAuthGateway implements NeonAuthGateway {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       return null;
     }
-    final body = jsonDecode(response.body) as Map<String, Object?>;
+    final body = _decodeBody(response.body);
+    if (body == null) {
+      return null;
+    }
     final token = body['token'] as String?;
     if (token == null) {
       return null;
@@ -171,6 +174,31 @@ final class BetterAuthGateway implements NeonAuthGateway {
   }
 
   void close() => _client.close();
+
+  /// Decodes a successful sign-in/sign-up body so a response the gateway
+  /// cannot read becomes a [Failure] instead of a raw decoding error.
+  NeonAuthSession _adoptSession(String body) {
+    final decoded = _decodeBody(body);
+    if (decoded == null) {
+      throw const Failure(
+        code: FailureCode.unexpected,
+        message: 'Neon Auth returned a response we could not read.',
+        kind: FailureKind.authentication,
+      );
+    }
+    return _adopt(decoded);
+  }
+
+  /// Decodes a JSON object body, or null when it is not readable JSON.
+  static Map<String, Object?>? _decodeBody(String body) {
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(body);
+    } on FormatException {
+      return null;
+    }
+    return decoded is Map<String, Object?> ? decoded : null;
+  }
 
   NeonAuthSession _adopt(Map<String, Object?> body) {
     final user = body['user'] is Map<String, Object?>

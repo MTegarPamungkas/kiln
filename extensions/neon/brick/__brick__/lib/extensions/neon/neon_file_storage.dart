@@ -29,6 +29,7 @@ final class NeonFileStorage implements FileStorage {
     ProgressCallback? onProgress,
   }) async {
     _validatePath(file.path);
+    final lifetime = _requireLifetime(signedUrlLifetime);
     var reported = 0.0;
     await _call(
       () => _gateway.upload(
@@ -48,8 +49,13 @@ final class NeonFileStorage implements FileStorage {
     if (onProgress != null && reported < 1) {
       onProgress(1);
     }
+    final link = await _call(
+      () => _gateway.createSignedUrl(file.path, lifetime),
+      FailureCode.fileUploadFailed,
+    );
     return StoredFile(
       path: file.path,
+      url: link.toString(),
       size: file.size,
       contentType: file.contentType,
     );
@@ -70,14 +76,7 @@ final class NeonFileStorage implements FileStorage {
   @override
   Future<Uri> url(String path, {Duration? expiresIn}) async {
     _validatePath(path);
-    final lifetime = expiresIn ?? signedUrlLifetime;
-    if (lifetime <= Duration.zero) {
-      throw const Failure(
-        code: FailureCode.validationInvalidInput,
-        message: 'The link lifetime must be greater than zero.',
-        kind: FailureKind.validation,
-      );
-    }
+    final lifetime = _requireLifetime(expiresIn ?? signedUrlLifetime);
     return _call(
       () => _gateway.createSignedUrl(path, lifetime),
       FailureCode.fileDownloadFailed,
@@ -106,6 +105,17 @@ final class NeonFileStorage implements FileStorage {
         kind: FailureKind.validation,
       );
     }
+  }
+
+  Duration _requireLifetime(Duration lifetime) {
+    if (lifetime <= Duration.zero) {
+      throw const Failure(
+        code: FailureCode.validationInvalidInput,
+        message: 'The link lifetime must be greater than zero.',
+        kind: FailureKind.validation,
+      );
+    }
+    return lifetime;
   }
 
   Future<T> _call<T>(
