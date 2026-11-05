@@ -344,9 +344,17 @@ final class CreateCommand extends KilnCommand {
   /// the framework by path while kiln_core has no published release. Null
   /// when the CLI runs from an installed copy without a checkout nearby.
   Future<String?> _detectedCorePath() async {
-    final fromScript = _corePathNear(Platform.script.toFilePath());
-    if (fromScript != null) {
-      return fromScript;
+    // In an AOT executable, Platform.script mirrors the invoked name (which
+    // may not exist), while resolvedExecutable is always the real binary.
+    // In a `dart run` checkout it is the other way around, so try both.
+    for (final start in <String>[
+      Platform.resolvedExecutable,
+      Platform.script.toFilePath(),
+    ]) {
+      final found = _corePathNear(start);
+      if (found != null) {
+        return found;
+      }
     }
     final configUri = await Isolate.packageConfig;
     if (configUri == null) {
