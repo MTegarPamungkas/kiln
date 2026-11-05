@@ -79,7 +79,7 @@ final class ExtNewCommand extends KilnCommand {
     }
 
     logger.success('Extension $id created at ${extensionRoot.path}');
-    logger.info('Berikutnya:');
+    logger.info('Next steps:');
     logger.info('  kiln ext validate ${p.relative(extensionRoot.path)}');
     logger.info('  kiln ext test ${p.relative(extensionRoot.path)}');
     return ExitCodes.success;

@@ -110,6 +110,63 @@ final class Prompter {
     );
   }
 
+  /// Multi-select with a checkbox display. [defaults] start checked; typed
+  /// numbers (separated by spaces or commas) toggle entries, and an empty
+  /// line keeps the selection exactly as shown.
+  List<String> selectMany(
+    String question,
+    List<String> options, {
+    Set<String> defaults = const <String>{},
+  }) {
+    if (options.isEmpty) {
+      throw const KilnException(
+        'No options available',
+        code: 'prompt.no_options',
+      );
+    }
+    if (assumeYes || !interactive) {
+      return <String>[
+        for (final option in options)
+          if (defaults.contains(option)) option,
+      ];
+    }
+
+    final selected = <String>{...defaults};
+    _write('$question\n');
+    for (var index = 0; index < options.length; index++) {
+      final marker = selected.contains(options[index]) ? 'x' : ' ';
+      _write('  ${index + 1}. [$marker] ${options[index]}\n');
+    }
+    _write('> ');
+    final answer = _readLine(question)?.trim();
+    if (answer == null || answer.isEmpty) {
+      return <String>[
+        for (final option in options)
+          if (selected.contains(option)) option,
+      ];
+    }
+    for (final token in answer.split(RegExp(r'[,\s]+'))) {
+      if (token.isEmpty) {
+        continue;
+      }
+      final index = int.tryParse(token);
+      if (index == null || index < 1 || index > options.length) {
+        throw KilnException(
+          '"$token" is not a checkbox number (1-${options.length})',
+          code: 'prompt.invalid',
+        );
+      }
+      final option = options[index - 1];
+      if (!selected.remove(option)) {
+        selected.add(option);
+      }
+    }
+    return <String>[
+      for (final option in options)
+        if (selected.contains(option)) option,
+    ];
+  }
+
   int? integer(String question, {int? defaultValue, int? min, int? max}) {
     if (assumeYes) {
       return defaultValue;

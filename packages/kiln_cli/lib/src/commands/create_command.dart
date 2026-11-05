@@ -107,22 +107,37 @@ final class CreateCommand extends KilnCommand {
     );
     final org = enteredArg('org', 'Organization:');
     final description = enteredArg('description', 'Description:');
-    final platforms = enteredArg('platforms', 'Platforms (comma separated):')
+
+    List<String> parseCsv(String value) => value
         .split(',')
-        .map((value) => value.trim())
-        .where((value) => value.isNotEmpty)
+        .map((entry) => entry.trim())
+        .where((entry) => entry.isNotEmpty)
         .toList(growable: false);
+    final platforms = argResults!.wasParsed('platforms')
+        ? parseCsv(argResults!['platforms'] as String)
+        : canAsk
+        ? prompter.selectMany(
+            'Platforms (numbers toggle, Enter keeps the selection):',
+            const <String>['android', 'ios', 'web', 'windows', 'linux', 'macos'],
+            defaults: const <String>{'android', 'ios', 'web'},
+          )
+        : parseCsv(argResults!['platforms'] as String);
+    // l10n is always installed and bloc/riverpod come from the state prompt.
+    final extensionOptions = <String>[
+      for (final extension in extensionCatalog)
+        if (extension.id != 'l10n' &&
+            extension.id != 'bloc' &&
+            extension.id != 'riverpod')
+          extension.id,
+    ];
     final withExtensions = argResults!.wasParsed('with')
         ? (argResults!['with'] as List<String>)
         : canAsk
-        ? (prompter.text(
-              'Extensions to install (comma separated ids, empty to skip):',
-              defaultValue: '',
-            ) ?? '')
-            .split(',')
-            .map((value) => value.trim())
-            .where((value) => value.isNotEmpty)
-            .toList(growable: false)
+        ? prompter.selectMany(
+            'Extensions to install (numbers toggle, Enter keeps the '
+            'selection):',
+            extensionOptions,
+          )
         : (argResults!['with'] as List<String>);
 
     var corePath = argResults!['core-path'] as String?;
@@ -291,7 +306,7 @@ final class CreateCommand extends KilnCommand {
     }
 
     logger.success('Project $name created at ${target.path}');
-    logger.info('Berikutnya:');
+    logger.info('Next steps:');
     logger.info('  cd ${p.relative(target.path, from: context.cwd.path)}');
     logger.info(requested.isEmpty ? '  kiln add dio' : '  flutter run');
     return ExitCodes.success;
