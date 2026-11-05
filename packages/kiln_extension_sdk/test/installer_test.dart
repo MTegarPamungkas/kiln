@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
@@ -220,6 +221,128 @@ void main() {
 
       expect(verifierCalls, 2);
       expect(result.verification?.isSuccess, isTrue);
+    });
+  });
+
+  group('ExtensionInstaller documentation', () {
+    late Directory project;
+
+    setUp(() async {
+      project = await copyProjectFixture('fresh_app');
+    });
+
+    tearDown(() async {
+      await project.delete(recursive: true);
+    });
+
+    AvailableExtension documentedExtension() {
+      return makeExtension(
+        id: 'demo',
+        name: 'Demo',
+        provides: const ['demo'],
+        dependencies: const {'demo_pkg': '^1.0.0'},
+        docs: <String, List<int>>{
+          'README.md': utf8.encode('# Demo\n\nEvery feature the app can use.\n'),
+          'docs/usage.md': utf8.encode('# Usage\n'),
+        },
+      );
+    }
+
+    ExtensionInstaller installer() {
+      return ExtensionInstaller(
+        projectRoot: project,
+        available: [documentedExtension()],
+      );
+    }
+
+    test('installs the README and docs next to the extension code', () async {
+      final result = await installer().add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+
+      expect(result.hasConflicts, isFalse);
+      final readme = File('${project.path}/lib/extensions/demo/README.md');
+      expect(readme.existsSync(), isTrue);
+      expect(readme.readAsStringSync(), contains('Every feature'));
+      expect(
+        File('${project.path}/lib/extensions/demo/docs/usage.md').existsSync(),
+        isTrue,
+      );
+      expect(
+        LockfileStore(project).read().extensions['demo']?.files.keys,
+        containsAll(<String>[
+          'lib/extensions/demo/README.md',
+          'lib/extensions/demo/docs/usage.md',
+        ]),
+      );
+    });
+
+    test('remove deletes the installed docs', () async {
+      final adder = installer();
+      await adder.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+
+      await adder.remove(id: 'demo');
+
+      expect(
+        File('${project.path}/lib/extensions/demo/README.md').existsSync(),
+        isFalse,
+      );
+      expect(
+        File('${project.path}/lib/extensions/demo/docs/usage.md').existsSync(),
+        isFalse,
+      );
+    });
+
+    test('store extensions read docs from the extension root', () async {
+      final root = await newTempDirectory('kiln_ext_docs_');
+      File('${root.path}/README.md').writeAsStringSync('# Root readme');
+      Directory('${root.path}/docs').createSync();
+      File('${root.path}/docs/guide.md').writeAsStringSync('# Guide');
+      addTearDown(() => root.delete(recursive: true));
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [
+          AvailableExtension(
+            manifest: ExtensionManifest(
+              id: 'demo',
+              name: 'Demo',
+              version: '1.0.0',
+              description: 'Extension demo for tests',
+              category: 'tooling',
+              provides: const ['demo'],
+              dependencies: const {'demo_pkg': '^1.0.0'},
+              rootPath: root.path,
+            ),
+            bundle: MasonBundle(
+              name: 'demo',
+              description: 'demo bundle',
+              version: '1.0.0',
+            ),
+          ),
+        ],
+      );
+
+      await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+
+      expect(
+        File('${project.path}/lib/extensions/demo/README.md')
+            .readAsStringSync(),
+        contains('Root readme'),
+      );
+      expect(
+        File('${project.path}/lib/extensions/demo/docs/guide.md').existsSync(),
+        isTrue,
+      );
     });
   });
 

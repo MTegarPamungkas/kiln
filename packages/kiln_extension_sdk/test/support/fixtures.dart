@@ -47,6 +47,7 @@ AvailableExtension makeExtension({
   List<PromptSpec> prompts = const <PromptSpec>[],
   PlatformSetup platformSetup = const PlatformSetup(),
   List<ManualStep> manualSteps = const <ManualStep>[],
+  Map<String, List<int>> docs = const <String, List<int>>{},
   MasonBundle? bundle,
 }) {
   return AvailableExtension(
@@ -68,6 +69,7 @@ AvailableExtension makeExtension({
       platformSetup: platformSetup,
       manualSteps: manualSteps,
     ),
+    docs: docs,
     bundle:
         bundle ??
         MasonBundle(name: id, description: '$id bundle', version: version),

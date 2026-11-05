@@ -209,11 +209,19 @@ final class AvailableExtension {
   const AvailableExtension({
     required this.manifest,
     required this.bundle,
+    this.docs = const <String, List<int>>{},
     this.source = ExtensionSource.bundled,
   });
 
   final ExtensionManifest manifest;
   final MasonBundle bundle;
+
+  /// Documentation installed into the app next to the extension's code, keyed
+  /// by path relative to the extension root (`README.md`, `docs/neon.md`).
+  /// Bundled extensions embed these; store extensions fall back to reading
+  /// them from [ExtensionManifest.rootPath].
+  final Map<String, List<int>> docs;
+
   final ExtensionSource source;
 
   String get id => manifest.id;
