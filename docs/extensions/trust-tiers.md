@@ -6,10 +6,11 @@
 | `verified` | Reviewed and checksum-verified | Allowed |
 | `community` | From the community | Explicit approval required |
 
-`HookPolicy` in the SDK rejects hooks from community-tier extensions unless the
-user approves them (`--yes`). The foundation-phase installer does not execute
-hooks automatically; extensions that have hooks are reported so the user can
-decide.
+`HookPolicy` gates hook execution: `official`/`verified` extensions may run their
+hooks only with explicit approval (`--yes`), and community hooks are rejected
+without it. The `codegen` extension ships the first install hook (it runs
+`build_runner`), which is why hooks are wired into the installer at all.
 
-A later registry phase adds archive checksums, release signatures/metadata, and
-trust checks before install.
+The `kiln_store` registry client already verifies archive checksums and applies a
+trust policy before installing. Publishing to a hosted HTTP registry — as opposed
+to a local `registry/` folder — is the remaining step.

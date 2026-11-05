@@ -1,5 +1,8 @@
 # Key-value storage
 
+Store small app values — feature flags, cached ids, "seen" markers — through the
+`Storage` contract, backed by SharedPreferences:
+
 ```dart
 final storage = RegistryScope.read<Storage>(context);
 await storage.write('onboarding_done', 'true');
