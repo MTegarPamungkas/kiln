@@ -436,7 +436,7 @@ packages/kiln_cli/
 │     └─ bundles/  # bundle of all extensions, generated from extensions/, do not edit
 │        ├─ catalog.g.dart  # catalog of available extensions, generated from extension.yaml, do not edit
 │        ├─ app_basic_bundle.dart  # app_basic bundle for create, generated from extensions/app_basic, do not edit
-│        └─ <id>_bundle.dart  # per-extension bundle (29 files), generated from extensions/<id>, do not edit
+│        └─ <id>_bundle.dart  # per-extension bundle (32 files), generated from extensions/<id>, do not edit
 ├─ test/  # kiln_cli package tests: command runner, commands, infra, fixtures, and goldens
 │  ├─ command_runner_test.dart  # tests argument mapping to commands and the command runner exit codes
 │  ├─ commands/  # one test file for each CLI command
@@ -1877,9 +1877,9 @@ extensions/analytics/
 
 ### crash_report
 
-The roadmap still parks this extension because no vendor has been chosen yet, so
-this picture uses **Sentry as an example** behind `crash_report_gateway.dart`.
-Swapping the vendor means swapping one gateway, not the layers above it.
+`crash_report` ships with **Sentry** as the vendor behind `sentry_crash_gateway.dart`.
+Swapping the vendor means swapping that one gateway, not the consent gate, PII
+redaction, dedup, and safe-wrapper layers above it.
 
 ```text
 extensions/crash_report/
@@ -2221,14 +2221,14 @@ implementation.
    the present state the baseline, so user edits made before the migration are no
    longer detected. The migration should mark files without an original hash as
    "origin unknown" and `remove` should treat them as already edited.
-6. **Manifest fields used by this picture but not yet present in
-   `docs/extension-manifest.md`.** All of them must land in `extension.schema.json`,
-   `manifest_validator.dart`, and the document before they are used:
+6. **Manifest fields used by this picture.** Several were gaps when the design was
+   written and have since landed in `extension.schema.json`, `manifest_validator.dart`,
+   and `docs/extension-manifest.md`; any still missing must land before they are used:
 
    | Field | Used by | Notes |
    | --- | --- | --- |
-   | `prompts` with types `url`, `int`, `enum`, `secret`, `bool`, **multi-select** | almost all | the multi-select type is not in `prompt_spec.dart` yet (used by `permission`, `codegen`, `env`) |
-   | `dev_dependencies` | `codegen` | currently only `dependencies` |
+   | `prompts` with types `url`, `int`, `enum`, `secret`, `bool`, `multi` | almost all | multi-select (`PromptType.multi`) now exists in `prompt_spec.dart`; `codegen` uses it for the generator choice |
+   | `dev_dependencies` | `codegen` | now parsed by the manifest and merged into the app's pubspec by the installer |
    | `manual_steps` | `firebase` | tracked by `doctor`, completed by the user |
    | `platforms` | `biometric`, `permission` | platform restriction; `doctor` flags web |
    | `android.app_links`, `ios.associated_domains` | `deep_link` | universal links; needs a new entitlement patch |
