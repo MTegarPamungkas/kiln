@@ -51,7 +51,8 @@ void main() {
     final info = support.info;
 
     expect(info.state, SupportState.notConfigured);
-    expect(info.toFailure().code, FailureCode.configurationInvalid);
+    expect(info.details['code'], FailureCode.configurationInvalid.value);
+    expect(info.toFailure().code, FailureCode.configurationMissing);
   });
 
   test('reports missing identifiers as not configured', () {

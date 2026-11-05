@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T15:41:04.906338Z",
+  "generated_at": "2026-11-05T16:11:08.472191Z",
   "extensions": [
     {
       "id": "analytics",
@@ -35,7 +35,7 @@
         {
           "version": "0.1.0",
           "url": "archives/appwrite-0.1.0.tgz",
-          "sha256": "01e0edb480091babed44d6b7647d526c22c101e99d55b95f59e641c44224a3b7",
+          "sha256": "8f97466bf0c7113f7b20a4e119b7514f569eda645c73d9eab52dde41f2d52428",
           "provides": [
             "auth",
             "social_auth",
@@ -466,7 +466,7 @@
         {
           "version": "0.1.0",
           "url": "archives/logger-0.1.0.tgz",
-          "sha256": "7bce45e7845fdd2616c76bd7cc7f455ea5f60eeae76b6a17240ae8d539cd2b0d",
+          "sha256": "841ff2854fb2d8c8dc13edfc8a72225c57d4741e1ecc6fdb3a2c69ef24155338",
           "provides": [
             "logger"
           ],
@@ -488,7 +488,7 @@
         {
           "version": "0.1.0",
           "url": "archives/neon-0.1.0.tgz",
-          "sha256": "d1017ca62d9c36e892d5d1dc1f122f27afe3d0c3b3127feac440a2862328eebd",
+          "sha256": "949da8faa9751d7f19a808f72001a47a5e8c664a789876dc5ef3ffffe45c6e48",
           "provides": [
             "auth",
             "remote_database",

@@ -10,7 +10,7 @@
     "lib/extensions/logger/http_log_middleware.dart": "17488c8070ac02c3ba9aa8a9f5f2976aa95406479058808b8db26dc4a4684ff5",
     "lib/extensions/logger/log_exporter.dart": "da8dedb648a115a9ba738c9a90b42dcbaf6ad184df1196d0df854168ff54e9fa",
     "lib/extensions/logger/log_formatter.dart": "17c88c6be23063056efe6847ccf3c5168d72436cd2d1e1f4d954654ad97dba24",
-    "lib/extensions/logger/log_level_controller.dart": "eac2b5a35345852583fe0f5409f988a0c5960358b5be95bf00693cafb50d9611",
+    "lib/extensions/logger/log_level_controller.dart": "28102e636dac7a6140b61970bf3f50e301c5ad083b6b4561e18b87b0c2ae28be",
     "lib/extensions/logger/log_sink.dart": "9d72a548c5fc91f144b1f3329b22e1606b48c63bb81c7b9f7bf4350276901a2b",
     "lib/extensions/logger/logger_config.dart": "1e053b38a3620e7a2b9c2d12e958e4039d5cb0b49a2236fcba8078042f436ee5",
     "lib/extensions/logger/logger_module.dart": "f7dcc72281a5a8cd0d4dbc765e473839bca08d4385bf08eac3514b8e12ffa94e",
