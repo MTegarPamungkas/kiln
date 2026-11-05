@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'package:path/path.dart' as p;
@@ -65,20 +67,71 @@ final class CreateCommand extends KilnCommand {
       usageException('The application name must be snake_case, for example my_app.');
     }
 
-    final state = argResults!['state'] as String;
-    final template = argResults!['template'] as String;
-    final org = argResults!['org'] as String;
-    final description = argResults!['description'] as String;
-    final platforms = (argResults!['platforms'] as String)
+    final force = argResults!['force'] == true;
+    final assumeYes = argResults!['yes'] == true;
+    final runPub = argResults!['pub'] == true;
+    final output = argResults!['output'] as String;
+
+    // Without --yes, on an interactive terminal, ask for every option the
+    // user did not pass, one by one; each prompt shows its default.
+    final canAsk = !assumeYes && prompter.interactive;
+
+    String selectedArg(String name, String question, List<String> options) {
+      if (argResults!.wasParsed(name)) {
+        return argResults![name] as String;
+      }
+      final fallback = argResults![name] as String;
+      return canAsk
+          ? prompter.select(question, options, defaultValue: fallback)
+          : fallback;
+    }
+
+    String enteredArg(String name, String question) {
+      if (argResults!.wasParsed(name)) {
+        return argResults![name] as String;
+      }
+      final fallback = argResults![name] as String;
+      return canAsk
+          ? prompter.text(question, defaultValue: fallback) ?? fallback
+          : fallback;
+    }
+
+    final template = selectedArg('template', 'Template:', const <String>[
+      'minimal',
+      'app',
+    ]);
+    final state = selectedArg(
+      'state',
+      'State management:',
+      const <String>['none', 'bloc', 'riverpod'],
+    );
+    final org = enteredArg('org', 'Organization:');
+    final description = enteredArg('description', 'Description:');
+    final platforms = enteredArg('platforms', 'Platforms (comma separated):')
         .split(',')
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
         .toList(growable: false);
-    final force = argResults!['force'] == true;
-    final assumeYes = argResults!['yes'] == true;
-    final runPub = argResults!['pub'] == true;
-    final corePath = argResults!['core-path'] as String?;
-    final output = argResults!['output'] as String;
+    final withExtensions = argResults!.wasParsed('with')
+        ? (argResults!['with'] as List<String>)
+        : canAsk
+        ? (prompter.text(
+              'Extensions to install (comma separated ids, empty to skip):',
+              defaultValue: '',
+            ) ?? '')
+            .split(',')
+            .map((value) => value.trim())
+            .where((value) => value.isNotEmpty)
+            .toList(growable: false)
+        : (argResults!['with'] as List<String>);
+
+    var corePath = argResults!['core-path'] as String?;
+    if (corePath == null) {
+      corePath = await _detectedCorePath();
+      if (corePath != null) {
+        logger.info('Using the local kiln_core checkout at $corePath');
+      }
+    }
 
     final target = Directory(
       p.normalize(p.join(context.cwd.path, output, name)),
@@ -93,7 +146,7 @@ final class CreateCommand extends KilnCommand {
 
     final requested = <String>{
       if (findAvailableExtension('l10n') != null) 'l10n',
-      ...(argResults!['with'] as List<String>),
+      ...withExtensions,
       if (state != 'none') state,
     };
     if (requested.isNotEmpty) {
@@ -225,6 +278,10 @@ final class CreateCommand extends KilnCommand {
         throw KilnException(
           'flutter pub get failed in the new project',
           code: 'verification.pub_get',
+          suggestion: corePath == null
+              ? 'kiln_core has no published release yet; pass '
+                  '--core-path <checkout>/packages/kiln_core'
+              : null,
           details: <String, Object?>{
             'stdout': pubResult.stdout,
             'stderr': pubResult.stderr,
@@ -281,6 +338,59 @@ final class CreateCommand extends KilnCommand {
       );
     }
     pubspecFile.writeAsStringSync(edited);
+  }
+
+  /// The kiln_core checkout this CLI itself runs from, so a new app resolves
+  /// the framework by path while kiln_core has no published release. Null
+  /// when the CLI runs from an installed copy without a checkout nearby.
+  Future<String?> _detectedCorePath() async {
+    final fromScript = _corePathNear(Platform.script.toFilePath());
+    if (fromScript != null) {
+      return fromScript;
+    }
+    final configUri = await Isolate.packageConfig;
+    if (configUri == null) {
+      return null;
+    }
+    try {
+      final config = File.fromUri(configUri).readAsStringSync();
+      final decoded = jsonDecode(config);
+      if (decoded is! Map<String, Object?>) {
+        return null;
+      }
+      final packages = decoded['packages'];
+      if (packages is! List<Object?>) {
+        return null;
+      }
+      for (final entry in packages) {
+        if (entry is Map<String, Object?> &&
+            entry['name'] == 'kiln_extension_sdk') {
+          // rootUri is relative to the package config's own location.
+          final root = configUri.resolve('${entry['rootUri']}');
+          return _corePathNear(File.fromUri(root).path);
+        }
+      }
+    } on Object {
+      return null;
+    }
+    return null;
+  }
+
+  /// Walks up from [start] looking for a `packages/kiln_core` checkout.
+  String? _corePathNear(String start) {
+    var current = p.dirname(start);
+    for (var i = 0; i < 6; i++) {
+      final candidate = p.join(current, 'packages', 'kiln_core');
+      if (File(p.join(candidate, 'pubspec.yaml')).existsSync()) {
+        return candidate.replaceAll('\\', '/');
+      }
+      final parent = p.dirname(current);
+      if (parent == current) {
+        return null;
+      }
+      current = parent;
+    }
+    return null;
   }
 
   /// Applies mobile patches that every generated app benefits from.

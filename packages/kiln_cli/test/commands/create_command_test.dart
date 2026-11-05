@@ -183,6 +183,87 @@ void main() {
       );
     });
 
+    test('defaults to the local kiln_core checkout next to the cli', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+
+      final code = await runner.run(<String>['create', 'created_app', '--yes']);
+
+      final target = Directory(p.join(workspace.path, 'created_app'));
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      final pubspec = File(
+        p.join(target.path, 'pubspec.yaml'),
+      ).readAsStringSync();
+      expect(pubspec, contains('path:'));
+      expect(pubspec, contains('packages/kiln_core'));
+      expect(pubspec, contains('dependency_overrides:'));
+    });
+
+    test('asks for the options one by one on an interactive terminal', () async {
+      final answers = <String>[
+        '2', // template: app
+        '3', // state: riverpod
+        'com.kiln.demo',
+        'A demo application.',
+        'android',
+        'dio',
+        'en', // l10n supported locales
+      ];
+      var index = 0;
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+        prompter: Prompter(readLine: (_) => answers[index++], write: (_) {}),
+      );
+
+      final code = await runner.run(<String>[
+        'create',
+        'asked_app',
+        '--core-path',
+        corePath,
+        '--answer',
+        'base_url=https://api.example.com',
+      ]);
+
+      final target = Directory(p.join(workspace.path, 'asked_app'));
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      expect(
+        File(p.join(target.path, 'lib', 'app', 'app_shell.dart'))
+            .readAsStringSync(),
+        contains('StarterHome'),
+      );
+      expect(
+        File(
+          p.join(
+            target.path,
+            'lib',
+            'extensions',
+            'riverpod',
+            'riverpod_module.dart',
+          ),
+        ).existsSync(),
+        isTrue,
+      );
+      expect(
+        File(
+          p.join(target.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
+        ).existsSync(),
+        isTrue,
+      );
+      expect(
+        File(p.join(target.path, 'lib', 'l10n', 'app_en.arb')).existsSync(),
+        isTrue,
+      );
+      expect(
+        File(p.join(target.path, 'kiln.yaml')).readAsStringSync(),
+        contains('riverpod'),
+      );
+    });
+
     test('repair restores generated files and preserves edited ARBs', () async {
       final createRunner = buildTestRunner(
         cwd: workspace,
