@@ -1,4 +1,5 @@
 import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/neon/neon_auth_gateway.dart';
 import 'package:{{app_name}}/extensions/neon/neon_config.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
 import 'package:{{app_name}}/extensions/neon/neon_storage_config.dart';
@@ -197,6 +198,76 @@ NeonStorageConfig testStorageConfig() {
     accessKeyId: 'token-id',
     secretAccessKey: 's3-secret',
   );
+}
+
+/// In-memory Neon Auth (Better Auth) gateway for tests.
+final class FakeNeonAuthGateway implements NeonAuthGateway {
+  FakeNeonAuthGateway({
+    this.validEmail = 'user@kiln.dev',
+    this.validPassword = 'password123',
+  });
+
+  final String validEmail;
+  final String validPassword;
+  NeonAuthSession? session;
+  String? jwt;
+  int signOutCalls = 0;
+  Object? signInError;
+
+  @override
+  Future<NeonAuthSession> signIn({
+    required String email,
+    required String password,
+  }) async {
+    final error = signInError;
+    if (error != null) {
+      throw error;
+    }
+    if (email != validEmail || password != validPassword) {
+      throw const Failure(
+        code: FailureCode.authInvalidCredentials,
+        message: 'Invalid email or password.',
+        kind: FailureKind.authentication,
+      );
+    }
+    session = NeonAuthSession(
+      userId: 'user-1',
+      email: email,
+      displayName: 'Demo User',
+      sessionToken: 'sess-1',
+    );
+    jwt = 'h.p.authenticated';
+    return session!;
+  }
+
+  @override
+  Future<NeonAuthSession> signUp({
+    required String email,
+    required String password,
+    String? displayName,
+  }) async {
+    session = NeonAuthSession(
+      userId: 'user-new',
+      email: email,
+      displayName: displayName,
+      sessionToken: 'sess-2',
+    );
+    jwt = 'h.p.authenticated';
+    return session!;
+  }
+
+  @override
+  Future<void> signOut() async {
+    signOutCalls += 1;
+    session = null;
+    jwt = null;
+  }
+
+  @override
+  Future<NeonAuthSession?> currentSession() async => session;
+
+  @override
+  Future<String?> accessJwt() async => session == null ? null : jwt;
 }
 
 /// In-memory [NeonStorageGateway] for tests.

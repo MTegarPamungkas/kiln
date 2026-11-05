@@ -12,6 +12,7 @@ void main() {
       answers: const <String, Object?>{
         'data_api_url': 'https://demo.aws.neon.tech/sql/rest',
         'api_key': 'demo-token',
+        'auth_url': 'https://demo.neonauth.test/neondb/auth',
         'schema': 'app',
         's3_endpoint': 'https://demo.storage.c-us-east-2.aws.neon.tech',
         's3_bucket': 'media',
@@ -27,7 +28,11 @@ void main() {
       containsAll(<String>[
         'lib/extensions/neon/neon_config.dart',
         'lib/extensions/neon/neon_gateway.dart',
+        'lib/extensions/neon/neon_auth_gateway.dart',
+        'lib/extensions/neon/neon_auth_repository.dart',
+        'lib/extensions/neon/neon_session_token_provider.dart',
         'lib/extensions/neon/neon_failure_mapper.dart',
+        'lib/extensions/neon/neon_token_provider.dart',
         'lib/extensions/neon/neon_query_mapper.dart',
         'lib/extensions/neon/neon_remote_database.dart',
         'lib/extensions/neon/neon_support.dart',
@@ -44,7 +49,9 @@ void main() {
         'test/extensions/neon/neon_failure_mapper_test.dart',
         'test/extensions/neon/neon_support_test.dart',
         'test/extensions/neon/neon_module_test.dart',
+        'test/extensions/neon/neon_auth_repository_test.dart',
         'test/extensions/neon/neon_gateway_test.dart',
+        'test/extensions/neon/neon_token_provider_test.dart',
         'test/extensions/neon/neon_s3_signer_test.dart',
         'test/extensions/neon/neon_storage_config_test.dart',
         'test/extensions/neon/neon_storage_gateway_test.dart',
@@ -61,6 +68,7 @@ void main() {
       contains("dataApiUrl: 'https://demo.aws.neon.tech/sql/rest'"),
     );
     expect(configSource, contains("apiKey: 'demo-token'"));
+    expect(configSource, contains("authUrl: 'https://demo.neonauth.test/neondb/auth'"));
     expect(configSource, contains("schema: 'app'"));
     expect(configSource, isNot(contains('{{{')));
 
@@ -82,8 +90,10 @@ void main() {
       (file) => file.relativePath.endsWith('neon_module.dart'),
     );
     final moduleSource = String.fromCharCodes(module.bytes);
+    expect(moduleSource, contains("'auth'"));
     expect(moduleSource, contains("'remote_database'"));
     expect(moduleSource, contains("'file_storage'"));
+    expect(moduleSource, contains('NeonAuthRepository'));
     expect(moduleSource, contains('NeonRemoteDatabase'));
     expect(moduleSource, contains('NeonFileStorage'));
   });

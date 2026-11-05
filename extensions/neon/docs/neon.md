@@ -1,36 +1,70 @@
 # Neon setup
 
-The `neon` extension talks to one Neon project through its **Data API** — a
-PostgREST-compatible HTTP endpoint in front of Lakebase Postgres — and its
-**Object Storage** — an S3-compatible bucket. It registers the `RemoteDatabase`
-and `FileStorage` contracts (not auth; add a login extension separately). All
-rendered values come from `extension.yaml`; the rest live in `NeonConfig` and
-`NeonStorageConfig`.
+The `neon` extension talks to one Neon project through **Neon Auth** (Better
+Auth), the **Data API** — a PostgREST-compatible HTTP endpoint in front of
+Lakebase Postgres — and **Object Storage** — an S3-compatible bucket. It
+registers the `AuthRepository`, `RemoteDatabase`, and `FileStorage` contracts.
+All rendered values come from `extension.yaml`; the rest live in `NeonConfig`
+and `NeonStorageConfig`.
 
 ## 1. Enable the Data API
 
 In the Neon Console (`console.neon.tech`), open your project and turn on the
-Data API. Note the base URL — it looks like
-`https://<endpoint>.aws.neon.tech/sql/rest` — and paste it into the
-`data_api_url` prompt.
+Data API. Note the base URL and paste it into the `data_api_url` prompt. The URL
+is compute/branch-specific and looks like
+`https://<compute-or-branch>.apirest.c-2.<region>.aws.neon.tech/<db>/rest/v1`.
+Neon embeds a cluster segment (for example `c-2`) **before** the region, so copy
+the exact host from the console or `neon data-api get` rather than
+hand-assembling it.
 
 The Data API and its companion primitives are available only in supported
 regions (`aws-us-east-2`, `aws-us-east-1`, `aws-eu-central-1`,
 `aws-ap-southeast-1`). If your project is elsewhere, create it in one of those
 regions first.
 
-## 2. Provide a client-safe bearer token
+## 2. Authentication
 
-The `api_key` prompt becomes the bearer token on every request (`Authorization:
-Bearer <token>`). Use a token that is safe to ship in a client — a **per-user
-Neon Auth JWT** guarded by row-level security — never a service-role key or a
-token that carries a password.
+The Data API requires a bearer token on **every** request — Neon rejects
+anonymous calls with *"required authorization bearer token in JWT format"*. The
+connector supplies that token one of two ways:
+
+- **Fixed token (`api_key`)** — a Neon Auth JWT you provide.
+- **Anonymous JWT (`auth_url`)** — leave `api_key` empty and set `auth_url` to
+  the Neon Auth base URL (`https://<…>.neonauth.c-2.<region>.aws.neon.tech/<db>/auth`).
+  The connector fetches `{auth_url}/token/anonymous` automatically and caches it,
+  so `remote_database` runs as the `anonymous` role with zero token plumbing.
+
+### Email/password sign-in
+
+`neon` also provides `AuthRepository` over Neon Auth:
+
+```dart
+final result = await gate.signIn(email: 'you@example.com', password: 'secret');
+// The signed-in user's JWT is forwarded to the Data API automatically, so
+// remote_database runs as the `authenticated` role until signOut.
+await gate.signOut();
+```
+
+### Grants for the anonymous / authenticated roles
+
+Run once in the Neon SQL Editor, then `neon data-api refresh-schema`:
+
+```sql
+create table if not exists tasks (
+  id bigint generated always as identity primary key,
+  title text,
+  done boolean not null default false
+);
+grant usage on schema public to anonymous, authenticated;
+grant select, insert, update, delete on tasks to anonymous, authenticated;
+grant usage, select on sequence tasks_id_seq to anonymous, authenticated;
+```
 
 > [!WARNING]
-> A single bearer token shared by all clients exposes everything it can reach.
-> Enforce authorization with Postgres **row-level security** so the token only
-> sees the rows its user may access. Review Neon's Data API guidance before
-> pointing an app at it.
+> A token shared by all clients exposes everything it can reach. Enforce
+> authorization with Postgres **row-level security** (using `auth.user_id()`)
+> and scope the Object Storage token to one bucket. Never ship a service-role
+> key. Review Neon's Data API guidance before pointing an app at it.
 
 ## 3. Schema
 
@@ -94,9 +128,13 @@ regions. To use `FileStorage`:
 2. Issue a Neon token and note its **token id** (the `s3_access_key_id` prompt,
    the S3 access key id) and **S3 secret** (the `s3_secret_access_key` prompt,
    sent to the client here — scope it to this bucket).
-3. Set `s3_endpoint` to the branch storage host, for example
-   `https://<branch>.storage.c-<region>.aws.neon.tech`, and `s3_region` to the
-   SigV4 region (for example `us-east-2`).
+3. Set `s3_endpoint` to the branch storage host and `s3_region` to the SigV4
+   region. The host looks like
+   `https://<branch-id>.storage.c-2.<region>.aws.neon.tech` — a cluster segment
+   such as `c-2` sits **before** the region — so copy the exact value from the
+   console or a presigned URL instead of assembling it. The `s3_region` is the
+   region in that host (for example `ap-southeast-1`), and is the value Neon
+   expects in the SigV4 credential scope.
 
 The connector signs every request with AWS Signature Version 4 using path-style
 addressing (`endpoint/bucket/key`) and returns presigned links from `url`.

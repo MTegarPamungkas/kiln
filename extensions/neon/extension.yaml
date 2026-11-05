@@ -1,11 +1,12 @@
 id: neon
 name: Neon
 version: 0.1.0
-description: Neon Lakebase Postgres database (Data API / PostgREST) and Object Storage (S3-compatible) for Kiln, read through the Gate.
+description: Neon Auth (Better Auth), Lakebase Postgres database (Data API / PostgREST), and Object Storage (S3-compatible) for Kiln, read through the Gate.
 category: database
 tier: official
 exclusive: false
 provides:
+  - auth
   - remote_database
   - file_storage
 dependencies:
@@ -15,14 +16,19 @@ prompts:
   - name: data_api_url
     type: url
     label: Neon Data API URL
-    description: PostgREST-compatible Data API base URL for your Neon project, for example https://your-endpoint.aws.neon.tech/sql/rest.
+    description: "PostgREST Data API base URL, for example https://<compute>.apirest.c-2.<region>.aws.neon.tech/<db>/rest/v1. Copy the exact host from the console."
     required: true
   - name: api_key
     type: secret
     label: Neon Data API bearer token
-    description: Client-safe token sent as a bearer token on every request. Never use a service-role or password-holding key here.
-    required: true
+    description: Client-safe bearer token (a Neon Auth JWT). Optional when auth_url is set and anonymous access is enough. Never use a service-role key.
+    required: false
     secret: true
+  - name: auth_url
+    type: string
+    label: Neon Auth base URL
+    description: "Base URL of Neon Auth (Better Auth), for example https://<compute>.neonauth.c-2.<region>.aws.neon.tech/<db>/auth. With an empty api_key, the connector fetches anonymous JWTs from {auth_url}/token/anonymous."
+    required: false
   - name: schema
     type: string
     label: Postgres schema
@@ -31,7 +37,7 @@ prompts:
   - name: s3_endpoint
     type: url
     label: Neon Object Storage endpoint
-    description: "S3-compatible endpoint host for the branch, for example https://your-branch.storage.c-us-east-2.aws.neon.tech."
+    description: "S3-compatible endpoint host for the branch, for example https://<branch-id>.storage.c-2.<region>.aws.neon.tech. Copy the exact host from the console or a presigned URL."
     required: true
   - name: s3_bucket
     type: string

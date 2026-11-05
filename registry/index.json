@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T13:07:39.219524Z",
+  "generated_at": "2026-11-05T14:57:49.680127Z",
   "extensions": [
     {
       "id": "analytics",
@@ -480,7 +480,7 @@
     {
       "id": "neon",
       "name": "Neon",
-      "description": "Neon Lakebase Postgres database (Data API / PostgREST) and Object Storage (S3-compatible) for Kiln, read through the Gate.",
+      "description": "Neon Auth (Better Auth), Lakebase Postgres database (Data API / PostgREST), and Object Storage (S3-compatible) for Kiln, read through the Gate.",
       "category": "database",
       "latest": "0.1.0",
       "tier": "official",
@@ -488,8 +488,9 @@
         {
           "version": "0.1.0",
           "url": "archives/neon-0.1.0.tgz",
-          "sha256": "a93660ff048b9aff6d73f503c7f04163988e3b4536d5c713318a3ef626bfe515",
+          "sha256": "b0a09ec159d0473819c832d6a6093f2266e52a90645b8547a5f51d6cbe729fb1",
           "provides": [
+            "auth",
             "remote_database",
             "file_storage"
           ],

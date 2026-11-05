@@ -999,12 +999,13 @@ extensions/local_db/
 
 Seven extensions for identity and remote data. Three backends (`appwrite`,
 `firebase`, `supabase`) satisfy three contracts at once: `AuthRepository`,
-`RemoteDatabase`, and `FileStorage`. `neon` implements `RemoteDatabase` (Data
-API / PostgREST) and `FileStorage` (S3-compatible Object Storage) but not auth.
-`rest_auth` satisfies `AuthRepository` only, on top of `http_client`.
-`social_login` and `biometric` add sign-in paths without changing the auth
-contract. Install one provider per `RemoteDatabase`/`FileStorage`; the resolver
-rejects duplicates.
+`RemoteDatabase`, and `FileStorage`. `neon` also provides all three — auth
+through Neon Auth (Better Auth), database through the Data API (PostgREST), and
+files through Object Storage (S3) — but not `social_auth` (Better Auth social is
+a browser redirect). `rest_auth` satisfies `AuthRepository` only, on top of
+`http_client`. `social_login` and `biometric` add sign-in paths without
+changing the auth contract. Install one provider per `AuthRepository` /
+`RemoteDatabase` / `FileStorage`; the resolver rejects duplicates.
 
 Backends deliberately have **no** static facade. Application code reads the contract from
 the Registry, and the `prefer_contract_over_impl` lint rule rejects direct imports of
@@ -1323,8 +1324,12 @@ extensions/neon/
    ├─ brick.yaml
    └─ __brick__/
       ├─ lib/extensions/neon/
-      │  ├─ neon_config.dart                    # Data API config: dataApiUrl, apiKey, schema, watchInterval, and validate()
+      │  ├─ neon_config.dart                    # Data API config: dataApiUrl, apiKey, authUrl, schema, watchInterval, and validate()
       │  ├─ neon_gateway.dart                   # PostgREST types, PostgrestGateway interface, and HttpNeonGateway (package:http)
+      │  ├─ neon_token_provider.dart            # NeonTokenProvider: static apiKey or auto-fetched anonymous JWT
+      │  ├─ neon_auth_gateway.dart              # NeonAuthGateway + BetterAuthGateway (email/password, session, accessJwt)
+      │  ├─ neon_auth_repository.dart           # AuthRepository over Neon Auth, backed by the shared SessionController
+      │  ├─ neon_session_token_provider.dart    # prefers the signed-in user's JWT, falls back to anonymous/static
       │  ├─ neon_query_mapper.dart              # maps RemoteQuery to PostgREST and validates identifiers
       │  ├─ neon_failure_mapper.dart            # maps NeonApiException/status to Failure(remote_database.*)
       │  ├─ neon_remote_database.dart           # RemoteDatabase over PostgREST, with a polling watch
@@ -1333,21 +1338,23 @@ extensions/neon/
       │  ├─ neon_storage_gateway.dart           # NeonStorageGateway interface + S3NeonStorageGateway (package:http)
       │  ├─ neon_file_storage.dart              # FileStorage over NeonStorageGateway (path validation, progress, signed url)
       │  ├─ neon_support.dart                   # config validation and optional reachability probe (db + storage)
-      │  └─ neon_module.dart                     # registers config, gateways, RemoteDatabase, and FileStorage
+      │  └─ neon_module.dart                     # registers config, gateways, AuthRepository, RemoteDatabase, and FileStorage
       └─ test/extensions/neon/
-         ├─ test_support.dart                   # FakePostgrestGateway, FakeNeonStorageGateway, and test configs (no network)
-         ├─ neon_contract_test.dart              # runs the shared remoteDatabaseContract and fileStorageContract
+         ├─ test_support.dart                   # FakePostgrestGateway, FakeNeonStorageGateway, FakeNeonAuthGateway, test configs
+         ├─ neon_contract_test.dart              # runs the shared authRepositoryContract, remoteDatabaseContract, fileStorageContract
          ├─ neon_remote_database_test.dart       # CRUD, polling watch, notFound, and validation
          ├─ neon_gateway_test.dart               # HttpNeonGateway request building with a MockClient
          ├─ neon_query_mapper_test.dart          # operator, order, limit/offset, and rejection mapping
          ├─ neon_config_test.dart                # Data API validate() and copyWith
          ├─ neon_failure_mapper_test.dart        # status-to-code mapping
          ├─ neon_support_test.dart               # supported/notConfigured/unavailable states
+         ├─ neon_auth_repository_test.dart       # sign-in/up/out and controller state
+         ├─ neon_token_provider_test.dart        # static + anonymous token fetch/cache/expiry
          ├─ neon_s3_signer_test.dart             # matches the official AWS SigV4 conformance vectors
          ├─ neon_storage_config_test.dart        # Object Storage validate() and path-style objectUri
          ├─ neon_storage_gateway_test.dart       # S3NeonStorageGateway PUT/GET/DELETE with a MockClient
          ├─ neon_file_storage_test.dart          # upload/download/url/delete round-trip on the fake gateway
-         └─ neon_module_test.dart                # registration wiring for both capabilities
+         └─ neon_module_test.dart                # registration wiring for auth, database, and storage
 ```
 
 ## Extension: navigation and UI

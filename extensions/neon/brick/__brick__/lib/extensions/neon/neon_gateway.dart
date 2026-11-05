@@ -7,6 +7,7 @@ import 'package:kiln_core/kiln_core.dart';
 
 import 'neon_config.dart';
 import 'neon_failure_mapper.dart';
+import 'neon_token_provider.dart';
 
 /// PostgREST filter operators used by the extension.
 enum PostgrestOperator {
@@ -100,18 +101,37 @@ final class NeonApiException implements Exception {
 /// through `Accept-Profile`/`Content-Profile`. All bodies are JSON and
 /// mutations request a representation back so the caller gets the row.
 final class HttpNeonGateway implements PostgrestGateway {
-  HttpNeonGateway({required NeonConfig config, http.Client? client})
-    : _config = config,
-      _client = client ?? http.Client();
+  HttpNeonGateway({
+    required NeonConfig config,
+    http.Client? client,
+    NeonTokenProvider? tokenProvider,
+  }) : _config = config,
+       _client = client ?? http.Client(),
+       _tokenProvider = tokenProvider ?? _providerFor(config);
 
   final NeonConfig _config;
   final http.Client _client;
+  final NeonTokenProvider? _tokenProvider;
 
-  Map<String, String> get _baseHeaders => <String, String>{
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    if (_config.apiKey.isNotEmpty) 'Authorization': 'Bearer ${_config.apiKey}',
-  };
+  static NeonTokenProvider? _providerFor(NeonConfig config) {
+    if (config.apiKey.trim().isNotEmpty) {
+      return StaticNeonTokenProvider(config.apiKey);
+    }
+    final authUrl = config.authUrl?.trim();
+    if (authUrl != null && authUrl.isNotEmpty) {
+      return NeonAnonymousTokenProvider(authUrl: authUrl);
+    }
+    return null;
+  }
+
+  Future<Map<String, String>> _baseHeaders() async {
+    final token = await _tokenProvider?.token();
+    return <String, String>{
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+  }
 
   @override
   Future<Map<String, Object?>> insert(
@@ -121,7 +141,7 @@ final class HttpNeonGateway implements PostgrestGateway {
     final response = await _client.post(
       _resource(table),
       headers: <String, String>{
-        ..._baseHeaders,
+        ...await _baseHeaders(),
         'Content-Profile': _config.schema,
         'Prefer': 'return=representation',
       },
@@ -138,7 +158,7 @@ final class HttpNeonGateway implements PostgrestGateway {
         'id': 'eq.$id',
         'select': '*',
       }),
-      headers: <String, String>{..._baseHeaders, 'Accept-Profile': _config.schema},
+      headers: <String, String>{...await _baseHeaders(), 'Accept-Profile': _config.schema},
     );
     final rows = _rows(response, FailureCode.remoteDatabaseQueryFailed);
     return rows.isEmpty ? null : rows.first;
@@ -151,7 +171,7 @@ final class HttpNeonGateway implements PostgrestGateway {
   }) async {
     final response = await _client.get(
       _resource(table).replace(queryParameters: _queryParams(query)),
-      headers: <String, String>{..._baseHeaders, 'Accept-Profile': _config.schema},
+      headers: <String, String>{...await _baseHeaders(), 'Accept-Profile': _config.schema},
     );
     return _rows(response, FailureCode.remoteDatabaseQueryFailed);
   }
@@ -165,7 +185,7 @@ final class HttpNeonGateway implements PostgrestGateway {
     final response = await _client.patch(
       _resource(table).replace(queryParameters: <String, String>{'id': 'eq.$id'}),
       headers: <String, String>{
-        ..._baseHeaders,
+        ...await _baseHeaders(),
         'Content-Profile': _config.schema,
         'Prefer': 'return=representation',
       },
@@ -180,7 +200,7 @@ final class HttpNeonGateway implements PostgrestGateway {
     final response = await _client.delete(
       _resource(table).replace(queryParameters: <String, String>{'id': 'eq.$id'}),
       headers: <String, String>{
-        ..._baseHeaders,
+        ...await _baseHeaders(),
         'Content-Profile': _config.schema,
         'Prefer': 'return=representation',
       },
@@ -190,7 +210,13 @@ final class HttpNeonGateway implements PostgrestGateway {
   }
 
   /// Releases the underlying HTTP client. The gateway is unusable afterwards.
-  void close() => _client.close();
+  void close() {
+    final provider = _tokenProvider;
+    if (provider is NeonAnonymousTokenProvider) {
+      provider.close();
+    }
+    _client.close();
+  }
 
   Uri _resource(String table) => Uri.parse('${_config.dataApiUrl}/$table');
 

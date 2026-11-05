@@ -16,7 +16,7 @@ void main() {
     expect(manifest.exclusive, isFalse);
     expect(
       manifest.provides,
-      containsAll(<String>['remote_database', 'file_storage']),
+      containsAll(<String>['auth', 'remote_database', 'file_storage']),
     );
     expect(manifest.optionalRequires, isEmpty);
     expect(manifest.dependencies, containsPair('http', '^1.6.0'));
@@ -35,6 +35,12 @@ void main() {
     expect(apiKey, isNotNull);
     expect(apiKey!.type.name, 'secret');
     expect(apiKey.secret, isTrue);
+    expect(apiKey.required, isFalse);
+
+    final authUrl = manifest.promptsByName['auth_url'];
+    expect(authUrl, isNotNull);
+    expect(authUrl!.type.name, 'string');
+    expect(authUrl.required, isFalse);
 
     final s3Endpoint = manifest.promptsByName['s3_endpoint'];
     expect(s3Endpoint, isNotNull);

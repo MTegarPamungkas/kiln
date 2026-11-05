@@ -69,4 +69,27 @@ void main() {
     expect(updated.apiKey, valid.apiKey);
     expect(updated.watchInterval, valid.watchInterval);
   });
+
+  test('an empty key with an auth URL is valid (anonymous mode)', () {
+    final config = valid.copyWith(
+      apiKey: '',
+      authUrl: 'https://h.neonauth.test/db/auth',
+    );
+
+    expect(config.validate(), isNull);
+  });
+
+  test('both key and auth URL empty is reported as missing', () {
+    expect(
+      valid.copyWith(apiKey: '').validate()?.code,
+      FailureCode.configurationMissing,
+    );
+  });
+
+  test('an invalid auth URL is rejected', () {
+    expect(
+      valid.copyWith(apiKey: '', authUrl: 'not-a-url').validate()?.code,
+      FailureCode.configurationInvalid,
+    );
+  });
 }

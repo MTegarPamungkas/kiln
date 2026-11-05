@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/neon/neon_auth_gateway.dart';
+import 'package:{{app_name}}/extensions/neon/neon_auth_repository.dart';
 import 'package:{{app_name}}/extensions/neon/neon_config.dart';
 import 'package:{{app_name}}/extensions/neon/neon_file_storage.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
@@ -19,17 +21,18 @@ void main() {
     expect(module.id, 'neon');
     expect(
       module.provides,
-      containsAll(<String>['remote_database', 'file_storage']),
+      containsAll(<String>['auth', 'remote_database', 'file_storage']),
     );
   });
 
-  test('module registers the database and storage wiring', () {
+  test('module registers the auth, database, and storage wiring', () {
     final registry = GetItRegistry();
     NeonModule(
       config: testConfig(),
       storageConfig: testStorageConfig(),
-      gatewayFactory: (_) => FakePostgrestGateway(),
+      gatewayFactory: (_, __) => FakePostgrestGateway(),
       storageGatewayFactory: (_) => FakeNeonStorageGateway(),
+      authGatewayFactory: (_) => FakeNeonAuthGateway(),
     ).register(registry);
 
     expect(registry.read<NeonConfig>(), isA<NeonConfig>());
@@ -41,6 +44,9 @@ void main() {
       registry.read<NeonStorageGateway>(),
       isA<FakeNeonStorageGateway>(),
     );
+    expect(registry.read<NeonAuthGateway>(), isA<FakeNeonAuthGateway>());
+    expect(registry.read<AuthRepository>(), isA<NeonAuthRepository>());
+    expect(registry.read<SessionController>(), isA<SessionController>());
     expect(registry.read<RemoteDatabase>(), isA<NeonRemoteDatabase>());
     expect(registry.read<FileStorage>(), isA<NeonFileStorage>());
   });
@@ -52,9 +58,10 @@ void main() {
 
     expect(registry.read<PostgrestGateway>(), isA<HttpNeonGateway>());
     expect(registry.read<NeonStorageGateway>(), isA<S3NeonStorageGateway>());
+    expect(registry.read<NeonAuthGateway>(), isA<BetterAuthGateway>());
   });
 
-  test('support reports both database and storage configured', () async {
+  test('support reports database and storage configured', () async {
     final registry = GetItRegistry();
     final module = NeonModule(
       config: testConfig(),
