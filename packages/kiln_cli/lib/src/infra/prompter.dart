@@ -30,6 +30,11 @@ final class Prompter {
     rawKeys: _rawKeys,
   );
 
+  /// Writes a free-standing line, for feedback between prompts.
+  void say(String message) {
+    _write('$message\n');
+  }
+
   bool confirm(String question, {bool defaultValue = false}) {
     if (assumeYes) {
       return true;
@@ -156,7 +161,7 @@ final class Prompter {
     final selected = <String>{...defaults};
     var cursor = 0;
     _write('$question\n');
-    _write('↑/↓ move, Space toggles, Enter confirms, Esc cancels\n');
+    _write('↑/↓ move, Space toggles, 1-9 jumps, Enter confirms, Esc cancels\n');
     try {
       _write('\x1b[?25l'); // hide the cursor while the frame redraws
       void draw({required bool moveBack}) {
@@ -174,10 +179,16 @@ final class Prompter {
         _write(frame.toString());
       }
 
+      void toggleAt(int index) {
+        if (!selected.remove(options[index])) {
+          selected.add(options[index]);
+        }
+      }
+
       draw(moveBack: false);
       while (true) {
-        final key = await session.read();
-        switch (key) {
+        final press = await session.read();
+        switch (press.key) {
           case RawKey.up:
             if (cursor > 0) {
               cursor--;
@@ -189,8 +200,12 @@ final class Prompter {
             }
             draw(moveBack: true);
           case RawKey.space:
-            if (!selected.remove(options[cursor])) {
-              selected.add(options[cursor]);
+            toggleAt(cursor);
+            draw(moveBack: true);
+          case RawKey.digit:
+            if (press.digit <= options.length) {
+              cursor = press.digit - 1;
+              toggleAt(cursor);
             }
             draw(moveBack: true);
           case RawKey.enter:

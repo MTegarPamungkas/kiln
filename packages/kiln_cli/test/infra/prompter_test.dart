@@ -148,12 +148,12 @@ void main() {
     });
 
     test('selectMany navigates with arrows and toggles with space', () async {
-      final session = _ScriptedRawKeys(<RawKey>[
-        RawKey.down,
-        RawKey.space,
-        RawKey.down,
-        RawKey.space,
-        RawKey.enter,
+      final session = _ScriptedRawKeys(<RawKeyPress>[
+        const RawKeyPress(RawKey.down),
+        const RawKeyPress(RawKey.space),
+        const RawKeyPress(RawKey.down),
+        const RawKeyPress(RawKey.space),
+        const RawKeyPress(RawKey.enter),
       ]);
       final prompter = Prompter(
         interactive: true,
@@ -170,7 +170,7 @@ void main() {
     });
 
     test('selectMany cancels on escape in raw mode', () async {
-      final session = _ScriptedRawKeys(<RawKey>[RawKey.cancel]);
+      final session = _ScriptedRawKeys(<RawKeyPress>[const RawKeyPress(RawKey.cancel)]);
       final prompter = Prompter(
         interactive: true,
         readLine: (_) => null,
@@ -190,13 +190,30 @@ void main() {
       );
       expect(session.restoreCount, 1);
     });
+
+    test('selectMany jumps and toggles with a digit', () async {
+      final session = _ScriptedRawKeys(
+        <RawKeyPress>[const RawKeyPress(RawKey.digit, digit: 3)],
+      );
+      final prompter = Prompter(
+        interactive: true,
+        readLine: (_) => null,
+        write: (_) {},
+        rawKeys: session,
+      );
+
+      expect(
+        await prompter.selectMany('Pick:', ['a', 'b', 'c']),
+        <String>['c'],
+      );
+    });
   });
 }
 
 final class _ScriptedRawKeys implements RawKeySource {
   _ScriptedRawKeys(this.keys);
 
-  final List<RawKey> keys;
+  final List<RawKeyPress> keys;
   int restoreCount = 0;
 
   @override
@@ -204,7 +221,7 @@ final class _ScriptedRawKeys implements RawKeySource {
     var index = 0;
     return _ScriptedSession(() {
       if (index >= keys.length) {
-        return RawKey.enter;
+        return const RawKeyPress(RawKey.enter);
       }
       return keys[index++];
     }, () {
@@ -216,11 +233,11 @@ final class _ScriptedRawKeys implements RawKeySource {
 final class _ScriptedSession implements RawModeSession {
   _ScriptedSession(this.nextKey, this.onRestore);
 
-  final RawKey Function() nextKey;
+  final RawKeyPress Function() nextKey;
   final void Function() onRestore;
 
   @override
-  Future<RawKey> read() async => nextKey();
+  Future<RawKeyPress> read() async => nextKey();
 
   @override
   void restore() {
