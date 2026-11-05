@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T09:52:18.132246Z",
+  "generated_at": "2026-11-05T10:46:14.489352Z",
   "extensions": [
     {
       "id": "analytics",
@@ -129,6 +129,28 @@
           "sha256": "413ea6c4811e1ae3243c46b7975dbc72c1b2b6844034ee0b7c271cafd05859e9",
           "provides": [
             "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "crash_report",
+      "name": "Crash Report",
+      "description": "Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.",
+      "category": "crash",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/crash_report-0.1.0.tgz",
+          "sha256": "d967cc99c2ab1f8cb120c46165cbd9ecf5aee69373fe287a7051412447d4e349",
+          "provides": [
+            "crash_reporter"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",

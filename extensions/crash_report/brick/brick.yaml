@@ -1,0 +1,22 @@
+name: crash_report
+description: Crash reporting files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: crash_report
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  dsn:
+    type: string
+    description: Sentry DSN
+    default: ""
+  release:
+    type: string
+    description: Sentry release for grouping reports
+    default: ""

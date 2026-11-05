@@ -1,0 +1,40 @@
+id: crash_report
+name: Crash Report
+version: 0.1.0
+description: Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.
+category: crash
+tier: official
+exclusive: true
+provides:
+  - crash_reporter
+optional_requires:
+  - flavor
+dependencies:
+  sentry_flutter: ^10.3.0
+prompts:
+  - name: dsn
+    type: secret
+    label: Sentry DSN
+    description: Leave empty to keep crash reporting disabled at runtime.
+    default: ""
+    required: false
+    secret: true
+  - name: release
+    type: string
+    label: Release version for grouping
+    description: Optional Sentry release, for example 1.2.3+123. Empty lets Sentry read it from the app package.
+    default: ""
+    required: false
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.INTERNET
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

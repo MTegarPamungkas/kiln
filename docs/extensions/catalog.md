@@ -11,6 +11,7 @@ This catalog is generated from extension manifests by
 | `bloc` | Bloc state management | 0.1.0 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
 | `connectivity` | Connectivity | 0.1.0 | connectivity | official | `connectivity` |
+| `crash_report` | Crash Report | 0.1.0 | crash | official | `crash_reporter` |
 | `deep_link` | Deep links | 0.1.0 | deep_link | official | `deep_links` |
 | `dio` | Dio HTTP client | 0.1.0 | network | official | `http_client`, `http_pipeline` |
 | `env` | Environment | 0.1.0 | config | official | `env` |
@@ -84,6 +85,15 @@ Network status monitoring and an offline guard middleware.
 - Provides: `connectivity`
 - Prompts: probe_url, probe_interval, probe_timeout, debounce_ms
 - Dependencies: `connectivity_plus: ^7.3.2`
+
+## crash_report
+
+Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.
+
+- Provides: `crash_reporter`
+- Prompts: dsn, release
+- Dependencies: `sentry_flutter: ^10.3.0`
+- Platforms: android, ios, macos, web, windows, linux
 
 ## deep_link
 

@@ -1,0 +1,29 @@
+{
+  "extension": "crash_report",
+  "files": {
+    "lib/extensions/crash_report/consent_gate_crash_reporter.dart": "bdda3fe0f708ef1b4c2ea3c8f2437369639e08f662067daab4790a66a2a0add5",
+    "lib/extensions/crash_report/crash_report_config.dart": "2c0508c8d2a14765dba702ecb7fb9a16aec9ed60c26073e29e1a83ab1ffc1c62",
+    "lib/extensions/crash_report/crash_report_failure_mapper.dart": "1896654e996f8d829e4de3b3b06dd5c833eb2abad609d920a89659f0e92a5e44",
+    "lib/extensions/crash_report/crash_report_gateway.dart": "1a4923998a6d4d4f2887509960722f565564fe28100f170f30c30b62aa060d98",
+    "lib/extensions/crash_report/crash_report_module.dart": "583b4bd01f2532ed0b916029c037fdebc0f09abf1b2598d1118f99ae295a0fe5",
+    "lib/extensions/crash_report/crash_report_support.dart": "a0a3b2d05e4cea7902168fbfa152b5bf0c750c8002512171bdf0a34706f5fa57",
+    "lib/extensions/crash_report/gate_crash_report.dart": "46b76ea13450c8a10870d7c1bea01a29f9a0d8e61b096df23aaa93cc81288e36",
+    "lib/extensions/crash_report/noop_crash_reporter.dart": "8905f7c1ab6031da88e153b14291a9e63aac04eb3de7093317443abd99beea17",
+    "lib/extensions/crash_report/pii_scrubbing_crash_reporter.dart": "d45c40da33ab07c9fc7c3f9f5c26f7e973349f646f853fdddaea49aabca88f9c",
+    "lib/extensions/crash_report/safe_crash_reporter.dart": "4d6790dcfe1036215e7407750717a64fc1cbe3b199e7d260aada54c56c55e631",
+    "lib/extensions/crash_report/sentry_crash_gateway.dart": "bcbe65fed0d1db7a8e6099ffa58d80c5a95e7d586ff4e13faa7e5d35a4783bba",
+    "lib/extensions/crash_report/sentry_crash_reporter.dart": "fdc2b816027b045b8177d3e94cc0105510926a48fd7f970d9a28a37fdce21bb6",
+    "test/extensions/crash_report/consent_gate_crash_reporter_test.dart": "90e92eac980ce44a0c375897d1f4f1080e87c061aa4ff7ceaba2f443e1451070",
+    "test/extensions/crash_report/crash_report_config_test.dart": "fb9a14ec74374d575006474954ccd92497ec9a0f1fcf15d7c7d2b56fef7e7c51",
+    "test/extensions/crash_report/crash_report_failure_mapper_test.dart": "76cd348740c13bc9aa9221e9e2d9b5ddc1c70952bba80e25da7a1e86253c09bf",
+    "test/extensions/crash_report/crash_report_module_test.dart": "bb0e54c70383abb00d4013746eeb2ff67db1d7c6bab13551ed2ea88c1b92c5a8",
+    "test/extensions/crash_report/crash_report_support_test.dart": "d8b57c0008aa2fb69ff18affd5efea377cd0e4c0e09ac7fe13a4b7ab75057c57",
+    "test/extensions/crash_report/crash_reporter_contract_test.dart": "2bd7402c3b19f63a041e9aec46a78e1a51e01322678d3b87a3afed18ca5990e1",
+    "test/extensions/crash_report/gate_crash_report_test.dart": "3fc26a5d1c59067a227a7796d86821ddc8897160eee746dbff1cfab4b017658f",
+    "test/extensions/crash_report/noop_crash_reporter_test.dart": "1494696f4d3f2d3f20e23ed70ea86d916ea50effc0af89f097a6e70db2d9cba5",
+    "test/extensions/crash_report/pii_scrubbing_crash_reporter_test.dart": "4f3b2d1ab2d8aadb3aa2aec8091c5ccfc8d35187306b417de92b4504dd8989a3",
+    "test/extensions/crash_report/safe_crash_reporter_test.dart": "295ec99a952b99ffb958cf5c2f64da06cd5e4b984c6e73b91e3fc757ef176fed",
+    "test/extensions/crash_report/sentry_crash_reporter_test.dart": "c85958a1d29c3ebf41d9d5c8d5fd7cc5e53edb0a4b893f862f709cd61098f5e2",
+    "test/extensions/crash_report/test_support.dart": "72c6f4ba4b6ad3423494e007f4cb3d3d89b23903eea060f6b80a9973c4318a6c"
+  }
+}

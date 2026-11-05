@@ -66,16 +66,32 @@
 - [x] `SupportInfo`, `SupportState`, `SupportRegistry`, and `KilnModule.support`.
 - [x] Bootstrap probes runtime support, records it, and skips `ready()` for
       unsupported extensions.
-- [x] All 29 extensions report platform, device, and configuration readiness;
+- [x] All 30 extensions report platform, device, and configuration readiness;
       unsupported calls return typed failures instead of blocking startup.
 - [x] `kiln create` defaults to the minimal template; `go_router` sample shell
       and auth redirect are opt-in.
 - [x] Native setup for permission kinds, plus `android.compile_sdk` patches.
 - [x] Runtime support report verified on an Android emulator.
 
+## Phase 6 — Crash reporting (Sentry)
+
+- [x] `crash_report` implements the `kiln_core` `CrashReporter` contract over
+  `sentry_flutter`, with the SDK isolated to a single fakeable gateway file.
+- [x] A decorator chain (`Safe` → `ConsentGate` → `PiiScrubbing` → vendor/noop)
+  makes reporting failure-safe, opt-in, and PII-redacted.
+- [x] Gate verbs added (`reportBreadcrumb`, `setReportUser`, `setReportContext`,
+  `crashReportsConsented`) alongside the `reportError`/`reportMessage` verbs that
+  already live in `kiln_core`.
+- [x] The logger's `BreadcrumbSink` forwards warnings and errors into the
+  reporter and inherits its consent and redaction automatically.
+- [x] Manifest, brick, goldens, registry, catalog, docs, and the kiln_testing
+  `crashReporterContract` suite all pass.
+
 ## Parked until a decision is made
 
-- `crash_report`: no vendor chosen yet; the Sentry gateway is only a sample.
+- Deferred crash_report refinements: error deduplication, an expected-Failure
+  classifier, HTTP breadcrumb middleware, a release-info reader, and a
+  non-production crash-test trigger.
 - `codegen`: the preferred generator (`json_serializable`/`freezed`) is not
   final.
 - Registry distribution model: Git URL, separate registry, or both.
