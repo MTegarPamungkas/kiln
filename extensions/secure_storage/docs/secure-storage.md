@@ -1,5 +1,8 @@
 # Secure storage
 
+Read and write secrets through `SecureStorage` (Keychain on iOS, Keystore on
+Android, encrypted IndexedDB on web). Never place server-only keys in the client:
+
 ```dart
 final vault = RegistryScope.read<SecureStorage>(context);
 await vault.write('token', token);
