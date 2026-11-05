@@ -149,6 +149,9 @@ The bundled catalog provides:
   sheet, and calendar events.
 - `env`, `flavors`, `logger`, and `analytics` for build-time configuration,
   per-flavor entry points, logging, and consent-based analytics.
+- `crash_report` (Sentry error reporting behind a consent gate and PII redaction),
+  `remote_config` (vendor-neutral feature flags), and `codegen` (`json_serializable`
+  + `freezed` model generation).
 
 ```bash
 kiln create state_app --state bloc

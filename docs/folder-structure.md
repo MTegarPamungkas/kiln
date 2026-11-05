@@ -132,7 +132,7 @@ kiln/
 │                 └─ test/extensions/{{id.snakeCase()}}/  # extension tests that go into the user project test/
 │                    ├─ {{id.snakeCase()}}_module_test.dart          # tests that the module registers its services with the Registry
 │                    └─ {{id.snakeCase()}}_failure_mapper_test.dart  # tests that third-party errors map to the correct Failure
-├─ extensions/                               # 29 extension folders, described in the Extension sections
+├─ extensions/                               # 32 extension folders, described in the Extension sections
 ├─ examples/                                 # generated example projects as Kiln usage references
 │  ├─ minimal/                               # kiln create output without extensions
 │  │  ├─ kiln.yaml                           # project configuration without extensions
@@ -2304,16 +2304,10 @@ wrote, besides adding the contents per extension:
 
 ### C. Still parked in the roadmap
 
-This picture shows the end shape, not a decision. The following three things are still
-marked "do not start without a new decision" in `roadmap.md`:
-
-- **`crash_report`**: no vendor has been chosen. Sentry is only used as an example
-  behind the gateway.
-- **`codegen`**: its generated-code contract is not concrete yet. `json_serializable` and
-  `freezed` are the initial proposal.
-- **`kiln_store`** and `registry/`: they need a package that is already published, and
-  the distribution model (Git URL, registry, or both) is not decided yet. The number
-  "29 extensions" depends on those first two extensions also being opened up.
+This picture shows the end shape, not a decision. `crash_report`, `codegen`, and
+`remote_config` described earlier are now implemented (see roadmap Phases 6–8).
+The remaining open decision is the registry distribution model — whether
+`kiln_store` and `registry/` publish through a Git URL, a hosted registry, or both.
 
 ### D. Suggested order of work
 
