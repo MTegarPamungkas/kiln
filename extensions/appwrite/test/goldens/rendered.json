@@ -29,7 +29,7 @@
     "test/extensions/appwrite/appwrite_remote_database_test.dart": "6b894cd69c4d8837482b7dd851cc536ef743d03316e8972bf14b0e811de8bff6",
     "test/extensions/appwrite/appwrite_session_bridge_test.dart": "686ba1d24b9e2a2a1d7502b62793bf9f0a2270e027db7d6fe24ab5a557bf913d",
     "test/extensions/appwrite/appwrite_social_auth_test.dart": "2e401d0923f16d9dfe39aed3e1a4f2d20fc020100b087a93b28b8a1b2c222b2b",
-    "test/extensions/appwrite/appwrite_support_test.dart": "da8a24a7f642055216bca17a3a10184357d0931337c045411af3cbc6b9096b01",
+    "test/extensions/appwrite/appwrite_support_test.dart": "b04e106c7204a650bb795df7be1ac7a8f46ce421b708ea2b5a35358109120913",
     "test/extensions/appwrite/test_support.dart": "24c5d61367efa38ef88668256076e4585cac0543e4d5b464b672aad6d51e24b9"
   }
 }

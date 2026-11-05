@@ -49,3 +49,17 @@ jobs:
               (cd "$extension" && dart test)
             fi
           done
+
+  extension-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Renders every extension brick into a fixture app and runs its own
+      # test suite (flutter test), which plain `dart test` never reaches.
+      - run: dart run tool/verify_extensions.dart --test

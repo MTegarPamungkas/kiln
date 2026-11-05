@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 Future<void> main(List<String> arguments) async {
   final update = arguments.contains('--update');
   final analyze = arguments.contains('--analyze');
+  final tests = arguments.contains('--test');
   final onlyIndex = arguments.indexOf('--only');
   final only = onlyIndex >= 0 && onlyIndex + 1 < arguments.length
       ? arguments[onlyIndex + 1]
@@ -76,15 +77,17 @@ Future<void> main(List<String> arguments) async {
       }
     }
 
-    if (analyze) {
+    if (analyze || tests) {
       final passed = await _analyzeExtension(
         root: root,
         manifest: manifest,
         rendered: rendered,
         appFiles: appFiles,
+        runAnalysis: analyze,
+        runTests: tests,
       );
       if (!passed) {
-        failure.writeln('analyze failed: $id');
+        failure.writeln('extension checks failed: $id');
       }
     }
   }
@@ -134,6 +137,8 @@ Future<bool> _analyzeExtension({
   required ExtensionManifest manifest,
   required List<RenderedFile> rendered,
   required List<RenderedFile> appFiles,
+  bool runAnalysis = true,
+  bool runTests = false,
 }) async {
   final temp = await Directory.systemTemp.createTemp(
     'kiln_verify_${manifest.id}_',
@@ -200,17 +205,32 @@ flutter:
       stderr.writeln('${manifest.id}: ${pubGet.stdout}${pubGet.stderr}');
       return false;
     }
-    final analyze = await Process.run(
-      'flutter',
-      const <String>['analyze'],
-      workingDirectory: temp.path,
-      runInShell: Platform.isWindows,
-    );
-    if (analyze.exitCode != 0) {
-      stderr.writeln('${manifest.id}: ${analyze.stdout}${analyze.stderr}');
-      return false;
+    if (runAnalysis) {
+      final analyze = await Process.run(
+        'flutter',
+        const <String>['analyze'],
+        workingDirectory: temp.path,
+        runInShell: Platform.isWindows,
+      );
+      if (analyze.exitCode != 0) {
+        stderr.writeln('${manifest.id}: ${analyze.stdout}${analyze.stderr}');
+        return false;
+      }
+      stdout.writeln('analyzed ${manifest.id}');
     }
-    stdout.writeln('analyzed ${manifest.id}');
+    if (runTests) {
+      final test = await Process.run(
+        'flutter',
+        const <String>['test'],
+        workingDirectory: temp.path,
+        runInShell: Platform.isWindows,
+      );
+      if (test.exitCode != 0) {
+        stderr.writeln('${manifest.id}: ${test.stdout}${test.stderr}');
+        return false;
+      }
+      stdout.writeln('tested ${manifest.id}');
+    }
     return true;
   } finally {
     try {
