@@ -10,6 +10,7 @@ final class NeonConfig {
   const NeonConfig({
     required this.dataApiUrl,
     required this.apiKey,
+    this.authUrl,
     this.schema = 'public',
     this.watchInterval = const Duration(seconds: 5),
   });
@@ -18,6 +19,7 @@ final class NeonConfig {
   static const NeonConfig defaults = NeonConfig(
     dataApiUrl: '{{{data_api_url}}}',
     apiKey: '{{{api_key}}}',
+    authUrl: '{{{auth_url}}}',
     schema: '{{{schema}}}',
   );
 
@@ -29,6 +31,10 @@ final class NeonConfig {
   /// Bearer token sent with every request. Use a Neon Auth JWT, not a service key.
   final String apiKey;
 
+  /// Base URL of Neon Auth (Better Auth), used to mint anonymous Data API
+  /// JWTs from `{authUrl}/token/anonymous` when [apiKey] is empty.
+  final String? authUrl;
+
   /// Postgres schema exposed through the Data API.
   final String schema;
 
@@ -38,6 +44,8 @@ final class NeonConfig {
   /// Whether the Data API URL uses plain `http` (self-hosted/local dev).
   bool get isInsecureTransport =>
       Uri.tryParse(dataApiUrl)?.isScheme('http') ?? false;
+
+  bool get _hasAuthUrl => authUrl != null && authUrl!.trim().isNotEmpty;
 
   /// Validates the configuration before any request is made. The key never
   /// appears in the returned message.
@@ -52,10 +60,24 @@ final class NeonConfig {
         kind: FailureKind.configuration,
       );
     }
-    if (apiKey.trim().isEmpty) {
+    if (apiKey.trim().isEmpty && _hasAuthUrl) {
+      final authUri = Uri.tryParse(authUrl!);
+      if (authUri == null ||
+          authUri.host.isEmpty ||
+          !(authUri.isScheme('http') || authUri.isScheme('https'))) {
+        return const Failure(
+          code: FailureCode.configurationInvalid,
+          message:
+              'authUrl must be a complete http or https address, for example the Neon Auth base URL.',
+          kind: FailureKind.configuration,
+        );
+      }
+    }
+    if (apiKey.trim().isEmpty && !_hasAuthUrl) {
       return const Failure(
         code: FailureCode.configurationMissing,
-        message: 'The Neon Data API bearer token is not set.',
+        message:
+            'Provide a Data API bearer token (api_key) or a Neon Auth URL (auth_url) for anonymous access.',
         kind: FailureKind.configuration,
       );
     }
@@ -79,12 +101,14 @@ final class NeonConfig {
   NeonConfig copyWith({
     String? dataApiUrl,
     String? apiKey,
+    String? authUrl,
     String? schema,
     Duration? watchInterval,
   }) {
     return NeonConfig(
       dataApiUrl: dataApiUrl ?? this.dataApiUrl,
       apiKey: apiKey ?? this.apiKey,
+      authUrl: authUrl ?? this.authUrl,
       schema: schema ?? this.schema,
       watchInterval: watchInterval ?? this.watchInterval,
     );

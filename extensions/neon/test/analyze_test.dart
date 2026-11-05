@@ -22,6 +22,7 @@ void main() {
             'app_name': 'neon_analyze',
             'data_api_url': 'https://demo.aws.neon.tech/sql/rest',
             'api_key': 'demo-token',
+            'auth_url': 'https://demo.neonauth.test/neondb/auth',
             'schema': 'public',
             's3_endpoint': 'https://demo.storage.c-us-east-2.aws.neon.tech',
             's3_bucket': 'files',

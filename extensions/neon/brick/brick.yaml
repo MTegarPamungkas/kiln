@@ -19,7 +19,11 @@ vars:
   api_key:
     type: string
     description: Neon Data API bearer token
-    default: your-data-api-token
+    default: ""
+  auth_url:
+    type: string
+    description: Neon Auth base URL (for anonymous tokens)
+    default: ""
   schema:
     type: string
     description: Postgres schema
