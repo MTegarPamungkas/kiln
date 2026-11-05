@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:kiln_core/kiln_core.dart';
 
+import 'neon_change_signal.dart';
 import 'neon_config.dart';
 import 'neon_failure_mapper.dart';
 import 'neon_gateway.dart';
@@ -16,21 +17,25 @@ import 'neon_query_mapper.dart';
 /// missing document throw `Failure(remote_database.notFound)`.
 ///
 /// The Data API is request/response only, so [watch] polls the row on a timer
-/// and emits whenever its content changes. This mirrors Supabase's realtime
-/// stream closely enough for the [RemoteDatabase] contract without a socket, at
-/// the cost of up to [NeonConfig.watchInterval] of latency.
+/// and emits whenever its content changes. When a [NeonChangeSignal] is
+/// supplied, a matching hint re-polls the row immediately — turn the interval
+/// into a backstop and let an out-of-band push channel (FCM, socket, webhook
+/// relay) carry the freshness.
 final class NeonRemoteDatabase implements RemoteDatabase {
   NeonRemoteDatabase({
     required PostgrestGateway gateway,
     required NeonConfig config,
     NeonQueryMapper mapper = const NeonQueryMapper(),
+    NeonChangeSignal? changeSignal,
   }) : _gateway = gateway,
        _config = config,
-       _mapper = mapper;
+       _mapper = mapper,
+       _changeSignal = changeSignal;
 
   final PostgrestGateway _gateway;
   final NeonConfig _config;
   final NeonQueryMapper _mapper;
+  final NeonChangeSignal? _changeSignal;
 
   @override
   Future<Map<String, Object?>> create(
@@ -112,6 +117,7 @@ final class NeonRemoteDatabase implements RemoteDatabase {
     _validateId(id);
     final controller = StreamController<Map<String, Object?>?>();
     Timer? timer;
+    StreamSubscription<NeonChangeHint>? signalSubscription;
     var cancelled = false;
     var polling = false;
     String? lastSignature;
@@ -154,6 +160,25 @@ final class NeonRemoteDatabase implements RemoteDatabase {
     }
 
     controller.onListen = () async {
+      final signal = _changeSignal;
+      if (signal != null) {
+        signalSubscription = signal.changes.listen(
+          (hint) {
+            if (cancelled || controller.isClosed) {
+              return;
+            }
+            if (!_hintMatches(hint, collection, id)) {
+              return;
+            }
+            // The polling guard coalesces hints that arrive mid-poll.
+            unawaited(poll(initial: false));
+          },
+          onError: (Object _) {
+            // The signal is best-effort; the interval timer keeps the watch
+            // fresh when a hint is missed.
+          },
+        );
+      }
       await poll(initial: true);
       if (cancelled || controller.isClosed) {
         return;
@@ -168,10 +193,23 @@ final class NeonRemoteDatabase implements RemoteDatabase {
       cancelled = true;
       timer?.cancel();
       timer = null;
+      await signalSubscription?.cancel();
+      signalSubscription = null;
       await controller.close();
     };
 
     return controller.stream;
+  }
+
+  /// Whether [hint] concerns the watched [collection] row [id]. A null side
+  /// means "any", so app channels can emit coarse or precise hints.
+  bool _hintMatches(NeonChangeHint hint, String collection, String id) {
+    final table = hint.table;
+    if (table != null && table != collection) {
+      return false;
+    }
+    final rowId = hint.id;
+    return rowId == null || rowId == id;
   }
 
   void _validateCollection(String collection) {

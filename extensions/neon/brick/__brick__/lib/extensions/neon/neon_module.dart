@@ -2,6 +2,7 @@ import 'package:kiln_core/kiln_core.dart';
 
 import 'neon_auth_gateway.dart';
 import 'neon_auth_repository.dart';
+import 'neon_change_signal.dart';
 import 'neon_config.dart';
 import 'neon_file_storage.dart';
 import 'neon_gateway.dart';
@@ -18,17 +19,21 @@ import 'neon_token_provider.dart';
 /// Auth goes through Neon Auth (Better Auth); database access goes through the
 /// Data API (PostgREST) with the signed-in user's JWT (or an anonymous JWT when
 /// signed out); files go through Object Storage (S3-compatible). Factories can
-/// swap the HTTP gateways for in-memory fakes in tests.
+/// swap the HTTP gateways for in-memory fakes in tests. An optional
+/// [changeSignal] carries out-of-band change hints so `RemoteDatabase.watch`
+/// refreshes on push instead of only on the polling interval.
 final class NeonModule extends KilnModule {
   NeonModule({
     NeonConfig? config,
     NeonStorageConfig? storageConfig,
+    NeonChangeSignal? changeSignal,
     PostgrestGateway Function(NeonConfig config, NeonTokenProvider? tokenProvider)?
     gatewayFactory,
     NeonStorageGateway Function(NeonStorageConfig config)? storageGatewayFactory,
     NeonAuthGateway Function(String authUrl)? authGatewayFactory,
   }) : _config = config ?? NeonConfig.defaults,
        _storageConfig = storageConfig ?? NeonStorageConfig.defaults,
+       _changeSignal = changeSignal,
        _gatewayFactory = gatewayFactory ??
            ((config, tokenProvider) =>
                HttpNeonGateway(config: config, tokenProvider: tokenProvider)),
@@ -39,6 +44,7 @@ final class NeonModule extends KilnModule {
 
   final NeonConfig _config;
   final NeonStorageConfig _storageConfig;
+  final NeonChangeSignal? _changeSignal;
   final PostgrestGateway Function(NeonConfig config, NeonTokenProvider? tokenProvider)
   _gatewayFactory;
   final NeonStorageGateway Function(NeonStorageConfig config)
@@ -97,6 +103,7 @@ final class NeonModule extends KilnModule {
       gateway: gateway,
       config: _config,
       mapper: mapper,
+      changeSignal: _changeSignal,
     );
     final storage = NeonFileStorage(
       gateway: storageGateway,
@@ -117,6 +124,10 @@ final class NeonModule extends KilnModule {
       ..registerSingleton<AuthRepository>(auth)
       ..registerSingleton<RemoteDatabase>(database)
       ..registerSingleton<FileStorage>(storage);
+    final signal = _changeSignal;
+    if (signal != null) {
+      registry.registerSingleton<NeonChangeSignal>(signal);
+    }
     if (!registry.isRegistered<SessionController>()) {
       registry.registerSingleton<SessionController>(controller);
     }
