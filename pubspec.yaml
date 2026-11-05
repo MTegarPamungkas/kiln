@@ -13,6 +13,7 @@ workspace:
   - extensions/bloc
   - extensions/calendar
   - extensions/connectivity
+  - extensions/crash_report
   - extensions/deep_link
   - extensions/dio
   - extensions/env
