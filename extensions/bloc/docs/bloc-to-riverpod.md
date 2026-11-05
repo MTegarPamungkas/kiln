@@ -1,11 +1,10 @@
 # Migrating Bloc to Riverpod
 
-The two state extensions are mutually exclusive. The general steps:
+`bloc` and `riverpod` are mutually exclusive; the contracts and the Registry are
+unaffected, only the state layer changes. The full step-by-step walkthrough lives
+in
+[docs/guides/migrate-bloc-to-riverpod.md](../../../docs/guides/migrate-bloc-to-riverpod.md).
 
-1. Move per-feature state into providers/Notifiers.
-2. Replace `BlocBuilder` with `Consumer`/`ConsumerWidget`.
-3. Keep the contracts and Registry; only the state layer changes.
-4. Run `kiln remove bloc` then `kiln add riverpod`.
-
-Because the change touches the application wrapper and tests, do it at the start
-of the project or when there is time to adjust the features.
+Short version: `kiln remove bloc --yes`, `kiln add riverpod`, move each Cubit/Bloc
+into a provider/Notifier, swap `BlocBuilder` for `Consumer`/`ConsumerWidget`, and
+update your tests. Do it early, or when there is time to revisit every feature.
