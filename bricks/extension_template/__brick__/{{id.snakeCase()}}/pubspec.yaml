@@ -1,0 +1,13 @@
+name: {{id.snakeCase()}}_extension
+description: Development package for the {{name}} Kiln extension.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+dev_dependencies:
+  kiln_extension_sdk: ^0.1.0
+  lints: ^6.1.0
+  path: ^1.9.1
+  test: ^1.31.1

@@ -1,0 +1,15 @@
+# Konfigurasi proyek Kiln. Boleh diedit; kiln tidak menimpanya.
+kiln: ">=0.1.0 <0.2.0"
+core: ^0.1.0
+project:
+  name: {{name}}
+  org: {{org}}
+  platforms:
+{{#platforms}}    - {{.}}
+{{/platforms}}
+state: {{state}}
+extensions: {}
+verify:
+  after_add: [pub_get, analyze]
+registry:
+  offline: false
