@@ -13,6 +13,10 @@ final class ErrorPresenter {
   final KilnLogger logger;
 
   int present(Object error, [StackTrace? stackTrace]) {
+    if (error is KilnException && error.code == 'prompt.cancelled') {
+      logger.info('Cancelled.');
+      return ExitCodes.cancelled;
+    }
     if (error is ResolutionException) {
       logger.error('Extensions cannot be installed together:');
       for (final conflict in error.conflicts) {

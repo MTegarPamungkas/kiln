@@ -5,12 +5,23 @@ import 'package:ffi/ffi.dart';
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 
 /// One key press read from a terminal in raw mode.
-enum RawKey { up, down, space, enter, cancel }
+enum RawKey { up, down, space, enter, cancel, digit }
+
+/// One parsed key press.
+final class RawKeyPress {
+  const RawKeyPress(this.key, {this.digit = 0});
+
+  final RawKey key;
+
+  /// `1`-`9` when [key] is [RawKey.digit], so checkbox lists can offer number
+  /// shortcuts alongside the arrows.
+  final int digit;
+}
 
 /// A terminal prepared for single-key reading.
 abstract interface class RawModeSession {
   /// Blocks until one key is pressed.
-  Future<RawKey> read();
+  Future<RawKeyPress> read();
 
   /// Restores the terminal modes that were active before [RawKeySource.enter].
   void restore();
@@ -54,7 +65,7 @@ final class _SyncSession implements RawModeSession {
   final ({int input, int? output, bool windows}) _modes;
 
   @override
-  Future<RawKey> read() async {
+  Future<RawKeyPress> read() async {
     while (true) {
       final byte = _readByte();
       switch (byte) {
@@ -64,22 +75,27 @@ final class _SyncSession implements RawModeSession {
           // as cancel, so Escape followed by any other key still cancels.
           final second = _readByte();
           if (second != 0x5b && second != 0x4f) {
-            return RawKey.cancel;
+            return const RawKeyPress(RawKey.cancel);
           }
           switch (_readByte()) {
             case 0x41:
-              return RawKey.up;
+              return const RawKeyPress(RawKey.up);
             case 0x42:
-              return RawKey.down;
+              return const RawKeyPress(RawKey.down);
           }
           continue; // unknown sequence; ignore and read the next key
         case 0x20:
-          return RawKey.space;
+          return const RawKeyPress(RawKey.space);
         case 0x0d:
         case 0x0a:
-          return RawKey.enter;
+          return const RawKeyPress(RawKey.enter);
         case 0x03:
-          return RawKey.cancel;
+          return const RawKeyPress(RawKey.cancel);
+        default:
+          if (byte >= 0x31 && byte <= 0x39) {
+            return RawKeyPress(RawKey.digit, digit: byte - 0x30);
+          }
+          continue; // ignore every other byte
       }
     }
   }

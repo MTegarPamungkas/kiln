@@ -74,32 +74,34 @@ Map<String, Object?> answerForExtension(
     }
 
     final label = prompt.label ?? prompt.name;
-    final answer = switch (prompt.type) {
-      PromptType.intValue => prompter.integer(
-        label,
-        min: prompt.min,
-        max: prompt.max,
-      ),
-      PromptType.boolValue => prompter.confirm(label),
-      PromptType.enumValue => prompter.select(label, prompt.options),
-      PromptType.multi =>
-        prompter
-            .text('$label (comma separated)')
-            ?.split(',')
-            .map((value) => value.trim())
-            .where((value) => value.isNotEmpty)
-            .toList(),
-      PromptType.secret => prompter.text(label, secret: true),
-      PromptType.string || PromptType.url => prompter.text(label),
-    };
-    final validation = prompt.validate(answer);
-    if (!validation.isValid) {
-      throw KilnException(
-        '${extension.id}: ${validation.error}',
-        code: 'prompt.invalid',
-      );
+    while (true) {
+      final answer = switch (prompt.type) {
+        PromptType.intValue => prompter.integer(
+          label,
+          min: prompt.min,
+          max: prompt.max,
+        ),
+        PromptType.boolValue => prompter.confirm(label),
+        PromptType.enumValue => prompter.select(label, prompt.options),
+        PromptType.multi =>
+          prompter
+              .text('$label (comma separated)')
+              ?.split(',')
+              .map((value) => value.trim())
+              .where((value) => value.isNotEmpty)
+              .toList(),
+        PromptType.secret => prompter.text(label, secret: true),
+        PromptType.string || PromptType.url => prompter.text(label),
+      };
+      final validation = prompt.validate(answer);
+      if (validation.isValid) {
+        answers[prompt.name] = validation.value;
+        break;
+      }
+      // An invalid answer re-asks instead of aborting the whole command; the
+      // user has already invested every earlier prompt at this point.
+      prompter.say('${validation.error}; try again.');
     }
-    answers[prompt.name] = validation.value;
   }
   return answers;
 }

@@ -7,4 +7,7 @@ abstract final class ExitCodes {
   static const int network = 69;
   static const int verification = 70;
   static const int internal = 71;
+
+  /// The user cancelled an interactive prompt.
+  static const int cancelled = 130;
 }
