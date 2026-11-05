@@ -13,6 +13,11 @@ void main() {
         'data_api_url': 'https://demo.aws.neon.tech/sql/rest',
         'api_key': 'demo-token',
         'schema': 'app',
+        's3_endpoint': 'https://demo.storage.c-us-east-2.aws.neon.tech',
+        's3_bucket': 'media',
+        's3_region': 'us-east-2',
+        's3_access_key_id': 'token-id',
+        's3_secret_access_key': 's3-secret',
       },
     );
 
@@ -27,6 +32,10 @@ void main() {
         'lib/extensions/neon/neon_remote_database.dart',
         'lib/extensions/neon/neon_support.dart',
         'lib/extensions/neon/neon_module.dart',
+        'lib/extensions/neon/neon_s3_signer.dart',
+        'lib/extensions/neon/neon_storage_config.dart',
+        'lib/extensions/neon/neon_storage_gateway.dart',
+        'lib/extensions/neon/neon_file_storage.dart',
         'test/extensions/neon/test_support.dart',
         'test/extensions/neon/neon_contract_test.dart',
         'test/extensions/neon/neon_remote_database_test.dart',
@@ -36,24 +45,46 @@ void main() {
         'test/extensions/neon/neon_support_test.dart',
         'test/extensions/neon/neon_module_test.dart',
         'test/extensions/neon/neon_gateway_test.dart',
+        'test/extensions/neon/neon_s3_signer_test.dart',
+        'test/extensions/neon/neon_storage_config_test.dart',
+        'test/extensions/neon/neon_storage_gateway_test.dart',
+        'test/extensions/neon/neon_file_storage_test.dart',
       ]),
     );
 
     final config = files.firstWhere(
       (file) => file.relativePath.endsWith('neon_config.dart'),
     );
-    final source = String.fromCharCodes(config.bytes);
-    expect(source, contains("dataApiUrl: 'https://demo.aws.neon.tech/sql/rest'"));
-    expect(source, contains("apiKey: 'demo-token'"));
-    expect(source, contains("schema: 'app'"));
-    expect(source, isNot(contains('{{{')));
-    expect(source, isNot(contains('&quot;')));
+    final configSource = String.fromCharCodes(config.bytes);
+    expect(
+      configSource,
+      contains("dataApiUrl: 'https://demo.aws.neon.tech/sql/rest'"),
+    );
+    expect(configSource, contains("apiKey: 'demo-token'"));
+    expect(configSource, contains("schema: 'app'"));
+    expect(configSource, isNot(contains('{{{')));
+
+    final storageConfig = files.firstWhere(
+      (file) => file.relativePath.endsWith('neon_storage_config.dart'),
+    );
+    final storageSource = String.fromCharCodes(storageConfig.bytes);
+    expect(
+      storageSource,
+      contains("endpoint: 'https://demo.storage.c-us-east-2.aws.neon.tech'"),
+    );
+    expect(storageSource, contains("bucket: 'media'"));
+    expect(storageSource, contains("region: 'us-east-2'"));
+    expect(storageSource, contains("accessKeyId: 'token-id'"));
+    expect(storageSource, contains("secretAccessKey: 's3-secret'"));
+    expect(storageSource, isNot(contains('&quot;')));
 
     final module = files.firstWhere(
       (file) => file.relativePath.endsWith('neon_module.dart'),
     );
     final moduleSource = String.fromCharCodes(module.bytes);
     expect(moduleSource, contains("'remote_database'"));
+    expect(moduleSource, contains("'file_storage'"));
     expect(moduleSource, contains('NeonRemoteDatabase'));
+    expect(moduleSource, contains('NeonFileStorage'));
   });
 }

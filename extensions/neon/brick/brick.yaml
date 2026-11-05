@@ -1,5 +1,5 @@
 name: neon
-description: Neon Data API remote database files for Kiln.
+description: Neon Data API and Object Storage files for Kiln.
 version: 0.1.0
 environment:
   mason: ">=0.1.0 <0.2.0"
@@ -24,3 +24,23 @@ vars:
     type: string
     description: Postgres schema
     default: public
+  s3_endpoint:
+    type: string
+    description: Neon Object Storage endpoint
+    default: https://example.storage.c-us-east-2.aws.neon.tech
+  s3_bucket:
+    type: string
+    description: Object Storage bucket
+    default: files
+  s3_region:
+    type: string
+    description: Object Storage region
+    default: us-east-2
+  s3_access_key_id:
+    type: string
+    description: Object Storage access key id
+    default: your-token-id
+  s3_secret_access_key:
+    type: string
+    description: Object Storage secret access key
+    default: your-s3-secret

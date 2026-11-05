@@ -14,21 +14,17 @@ void main() {
     expect(manifest.id, 'neon');
     expect(manifest.category, 'database');
     expect(manifest.exclusive, isFalse);
-    expect(manifest.provides, <String>['remote_database']);
+    expect(
+      manifest.provides,
+      containsAll(<String>['remote_database', 'file_storage']),
+    );
     expect(manifest.optionalRequires, isEmpty);
     expect(manifest.dependencies, containsPair('http', '^1.6.0'));
+    expect(manifest.dependencies, containsPair('crypto', '^3.0.8'));
     expect(manifest.platformSetup.android.permissions, <String>[
       'android.permission.INTERNET',
     ]);
-    expect(manifest.platformSetup.platforms, <String>[
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]);
-    expect(manifest.manualSteps, hasLength(2));
+    expect(manifest.manualSteps, hasLength(3));
 
     final url = manifest.promptsByName['data_api_url'];
     expect(url, isNotNull);
@@ -40,10 +36,24 @@ void main() {
     expect(apiKey!.type.name, 'secret');
     expect(apiKey.secret, isTrue);
 
-    final schema = manifest.promptsByName['schema'];
-    expect(schema, isNotNull);
-    expect(schema!.type.name, 'string');
-    expect(schema.defaultValue, 'public');
+    final s3Endpoint = manifest.promptsByName['s3_endpoint'];
+    expect(s3Endpoint, isNotNull);
+    expect(s3Endpoint!.type.name, 'url');
+    expect(s3Endpoint.required, isTrue);
+
+    final s3Secret = manifest.promptsByName['s3_secret_access_key'];
+    expect(s3Secret, isNotNull);
+    expect(s3Secret!.type.name, 'secret');
+    expect(s3Secret.secret, isTrue);
+
+    final bucket = manifest.promptsByName['s3_bucket'];
+    expect(bucket, isNotNull);
+    expect(bucket!.type.name, 'string');
+    expect(bucket.defaultValue, 'files');
+
+    final region = manifest.promptsByName['s3_region'];
+    expect(region, isNotNull);
+    expect(region!.defaultValue, 'us-east-2');
 
     expect(manifest.compatibility.kiln, '>=0.1.0 <0.2.0');
     expect(manifest.compatibility.dart, '>=3.9.0');

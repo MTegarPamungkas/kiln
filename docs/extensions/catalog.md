@@ -26,7 +26,7 @@ This catalog is generated from extension manifests by
 | `l10n` | Localization | 0.1.0 | l10n | official | `l10n` |
 | `local_db` | Local database | 0.1.0 | database | official | `local_db` |
 | `logger` | Logger | 0.1.0 | logging | official | `logger` |
-| `neon` | Neon | 0.1.0 | database | official | `remote_database` |
+| `neon` | Neon | 0.1.0 | database | official | `remote_database`, `file_storage` |
 | `notifications` | Notifications | 0.1.0 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.0 | config | official | `remote_config` |
@@ -218,11 +218,11 @@ Structured application logging with redaction, rotating files, and crash breadcr
 
 ## neon
 
-Neon Lakebase Postgres remote database through the Data API (PostgREST), read through the Gate.
+Neon Lakebase Postgres database (Data API / PostgREST) and Object Storage (S3-compatible) for Kiln, read through the Gate.
 
-- Provides: `remote_database`
-- Prompts: data_api_url, api_key, schema
-- Dependencies: `http: ^1.6.0`
+- Provides: `remote_database`, `file_storage`
+- Prompts: data_api_url, api_key, schema, s3_endpoint, s3_bucket, s3_region, s3_access_key_id, s3_secret_access_key
+- Dependencies: `http: ^1.6.0`, `crypto: ^3.0.8`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## notifications

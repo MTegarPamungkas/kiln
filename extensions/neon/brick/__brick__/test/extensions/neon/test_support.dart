@@ -1,5 +1,8 @@
+import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/neon/neon_config.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
+import 'package:{{app_name}}/extensions/neon/neon_storage_config.dart';
+import 'package:{{app_name}}/extensions/neon/neon_storage_gateway.dart';
 
 /// In-memory document store backing [FakePostgrestGateway].
 final class FakeDocumentStore {
@@ -183,4 +186,91 @@ NeonConfig testConfig({Duration watchInterval = const Duration(milliseconds: 5)}
     apiKey: 'demo-token',
     watchInterval: watchInterval,
   );
+}
+
+/// Object Storage configuration used by the fake gateway (no network).
+NeonStorageConfig testStorageConfig() {
+  return const NeonStorageConfig(
+    endpoint: 'https://demo.storage.c-us-east-2.aws.neon.tech',
+    bucket: 'files',
+    region: 'us-east-2',
+    accessKeyId: 'token-id',
+    secretAccessKey: 's3-secret',
+  );
+}
+
+/// In-memory [NeonStorageGateway] for tests.
+final class FakeNeonStorageGateway implements NeonStorageGateway {
+  final Map<String, List<int>> files = <String, List<int>>{};
+  final Map<String, String> contentTypes = <String, String>{};
+  final List<String> uploadedPaths = <String>[];
+  final List<String> deletedPaths = <String>[];
+
+  /// Error thrown by the next call, consumed once.
+  Object? failure;
+
+  @override
+  Future<void> upload(
+    String key,
+    List<int> bytes, {
+    String? contentType,
+    Map<String, String> metadata = const <String, String>{},
+    bool upsert = false,
+    ProgressCallback? onProgress,
+  }) async {
+    _throwIfNeeded();
+    uploadedPaths.add(key);
+    files[key] = List<int>.from(bytes);
+    if (contentType != null) {
+      contentTypes[key] = contentType;
+    }
+    onProgress?.call(1);
+  }
+
+  @override
+  Future<List<int>> download(
+    String key, {
+    ProgressCallback? onProgress,
+  }) async {
+    _throwIfNeeded();
+    final bytes = files[key];
+    if (bytes == null) {
+      throw const Failure(
+        code: FailureCode.fileNotFound,
+        message: 'The file was not found.',
+        kind: FailureKind.storage,
+      );
+    }
+    onProgress?.call(1);
+    return List<int>.from(bytes);
+  }
+
+  @override
+  Future<Uri> createSignedUrl(String key, Duration expiresIn) async {
+    _throwIfNeeded();
+    return Uri.parse(
+      'https://storage.neon.test/$key?expires=${expiresIn.inSeconds}',
+    );
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    _throwIfNeeded();
+    deletedPaths.add(key);
+    if (files.remove(key) == null) {
+      throw const Failure(
+        code: FailureCode.fileNotFound,
+        message: 'The file was not found.',
+        kind: FailureKind.storage,
+      );
+    }
+  }
+
+  void _throwIfNeeded() {
+    final error = failure;
+    if (error != null) {
+      failure = null;
+      throw error;
+    }
+  }
 }
