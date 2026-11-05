@@ -114,9 +114,25 @@ final subscription = gate.remoteDb.watch('tasks', '$id').listen((row) {
 await subscription.cancel();
 ```
 
-The cadence is `NeonConfig.watchInterval` (default five seconds). Expect up to
-one interval of latency and prefer `SupabaseRemoteDatabase` or
-`AppwriteRemoteDatabase` when you need push-based realtime.
+The cadence is `NeonConfig.watchInterval` (default five seconds), so expect up
+to one interval of latency. To refresh faster, hand the module a
+`NeonChangeSignal` and emit a hint whenever the app learns that rows changed —
+from a push notification, a socket, or any other out-of-band channel. A matching
+hint re-polls the row immediately; the interval stays as a backstop for missed
+hints:
+
+```dart
+final module = NeonModule(config: config, changeSignal: mySignal);
+
+// Later, wherever the app hears about a change (here: an FCM data message):
+FirebaseMessaging.onMessage.listen((message) {
+  mySignal.emit(table: message.data['table'], id: message.data['id']);
+});
+```
+
+Hints are best-effort: `table` or `id` may be null to match everything, and a
+hint that never arrives only means the watch refreshes on the interval as
+before.
 
 ## 6. Object Storage
 
@@ -149,9 +165,17 @@ final bytes = await gate.downloadFile('avatars/user-1.png');
 
 ## 7. Which realtime model do you need?
 
-The Data API is request/response, so `watch` polls; Object Storage has no live
-listing. If you need push-based database realtime, use the Supabase or Appwrite
-connector instead.
+The Data API is request/response, so `watch` polls and a `NeonChangeSignal`
+carries freshness from your own push channel. Neon's **Realtime (beta)** fits
+that shape: its wire protocol is undocumented and unsupported for direct
+clients, and its branch-scoped secret must never ship inside an app, so run it
+on your backend instead — subscribe there with the official `@neon/realtime`
+TypeScript SDK and push a hint to the app (FCM, socket) on every change. The app
+never holds the Realtime secret or speaks the beta protocol, and the Data API
+keeps enforcing Neon Auth JWTs and Postgres RLS. When Neon documents the wire
+protocol or ships a Dart SDK, this connector can adopt it behind the same
+`RemoteDatabase.watch` contract. For push-based realtime with no backend of
+your own, use the Supabase or Appwrite connector instead.
 
 ## Local development
 

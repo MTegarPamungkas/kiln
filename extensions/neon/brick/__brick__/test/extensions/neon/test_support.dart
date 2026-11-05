@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/neon/neon_auth_gateway.dart';
+import 'package:{{app_name}}/extensions/neon/neon_change_signal.dart';
 import 'package:{{app_name}}/extensions/neon/neon_config.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
 import 'package:{{app_name}}/extensions/neon/neon_storage_config.dart';
@@ -342,5 +345,24 @@ final class FakeNeonStorageGateway implements NeonStorageGateway {
       failure = null;
       throw error;
     }
+  }
+}
+
+/// In-memory change signal so tests can emit hints on demand.
+final class FakeNeonChangeSignal implements NeonChangeSignal {
+  final StreamController<NeonChangeHint> _controller =
+      StreamController<NeonChangeHint>.broadcast();
+
+  int get listenerCount => _controller.hasListener ? 1 : 0;
+
+  @override
+  Stream<NeonChangeHint> get changes => _controller.stream;
+
+  void emit({String? table, String? id}) {
+    _controller.add(NeonChangeHint(table: table, id: id));
+  }
+
+  void fail(Object error) {
+    _controller.addError(error);
   }
 }

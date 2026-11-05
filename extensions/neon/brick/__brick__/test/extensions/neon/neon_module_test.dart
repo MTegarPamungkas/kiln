@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/neon/neon_auth_gateway.dart';
 import 'package:{{app_name}}/extensions/neon/neon_auth_repository.dart';
+import 'package:{{app_name}}/extensions/neon/neon_change_signal.dart';
 import 'package:{{app_name}}/extensions/neon/neon_config.dart';
 import 'package:{{app_name}}/extensions/neon/neon_file_storage.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
@@ -59,6 +60,23 @@ void main() {
     expect(registry.read<PostgrestGateway>(), isA<HttpNeonGateway>());
     expect(registry.read<NeonStorageGateway>(), isA<S3NeonStorageGateway>());
     expect(registry.read<NeonAuthGateway>(), isA<BetterAuthGateway>());
+    expect(registry.isRegistered<NeonChangeSignal>(), isFalse);
+  });
+
+  test('a change signal is registered and handed to the database', () {
+    final registry = GetItRegistry();
+    final signal = FakeNeonChangeSignal();
+    NeonModule(
+      config: testConfig(),
+      storageConfig: testStorageConfig(),
+      changeSignal: signal,
+      gatewayFactory: (_, __) => FakePostgrestGateway(),
+      storageGatewayFactory: (_) => FakeNeonStorageGateway(),
+      authGatewayFactory: (_) => FakeNeonAuthGateway(),
+    ).register(registry);
+
+    expect(registry.read<NeonChangeSignal>(), same(signal));
+    expect(registry.read<RemoteDatabase>(), isA<NeonRemoteDatabase>());
   });
 
   test('support reports database and storage configured', () async {

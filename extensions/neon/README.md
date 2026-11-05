@@ -5,7 +5,7 @@ Auth, remote database, and object storage for [Neon](https://neon.tech) apps.
 
 - **`AuthRepository`** — email/password sign-in through **Neon Auth (Better
   Auth)**.
-- **`RemoteDatabase`** — CRUD and polling `watch` over the **Data API**
+- **`RemoteDatabase`** — CRUD and `watch` over the **Data API** (PostgREST), with optional push-triggered refresh via a `NeonChangeSignal`.
   (PostgREST).
 - **`FileStorage`** — upload/download/signed URLs over **Object Storage**
   (S3-compatible, SigV4-signed).
@@ -71,6 +71,21 @@ await gate.signOut();
 
 Sessions live in memory for the app process; wire a persistent store for
 surviving restarts.
+
+## Realtime
+
+`watch` polls the row every `NeonConfig.watchInterval` (default five seconds).
+For faster refresh, give the module a `NeonChangeSignal` and emit hints from
+your own push channel — a matching hint re-polls the row immediately:
+
+```dart
+final module = NeonModule(config: config, changeSignal: mySignal);
+mySignal.emit(table: 'tasks', id: '42'); // re-poll now
+```
+
+See `docs/neon.md` for the Neon Realtime (beta) pattern: your backend
+subscribes with the official TypeScript SDK and pushes hints to the app, which
+never holds the Realtime secret.
 
 ## Storage
 

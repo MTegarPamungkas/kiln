@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T16:11:08.472191Z",
+  "generated_at": "2026-11-05T16:37:02.302332Z",
   "extensions": [
     {
       "id": "analytics",
@@ -488,7 +488,7 @@
         {
           "version": "0.1.0",
           "url": "archives/neon-0.1.0.tgz",
-          "sha256": "949da8faa9751d7f19a808f72001a47a5e8c664a789876dc5ef3ffffe45c6e48",
+          "sha256": "60848d677ff386a84a50f8132efb7324705a94268015a94a2c08b4c44c7ef411",
           "provides": [
             "auth",
             "remote_database",

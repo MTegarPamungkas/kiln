@@ -159,6 +159,63 @@ void main() {
     await subscription.cancel();
   });
 
+  test('a change hint re-polls before the interval tick', () async {
+    final signal = FakeNeonChangeSignal();
+    final slow = NeonRemoteDatabase(
+      gateway: gateway,
+      // An interval far longer than the test, so only the hint can refresh.
+      config: testConfig(watchInterval: const Duration(minutes: 10)),
+      changeSignal: signal,
+    );
+    final created = await slow.create('users', <String, Object?>{
+      'name': 'First',
+    });
+    final id = '${created['id']}';
+    final received = <Map<String, Object?>?>[];
+    final subscription = slow.watch('users', id).listen(received.add);
+
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+    await slow.update('users', id, <String, Object?>{'name': 'Second'});
+    signal.emit(table: 'users', id: id);
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+
+    expect(received.first?['name'], 'First');
+    expect(received.last?['name'], 'Second');
+
+    await subscription.cancel();
+  });
+
+  test('hints for another table or row never trigger a poll', () async {
+    final signal = FakeNeonChangeSignal();
+    final slow = NeonRemoteDatabase(
+      gateway: gateway,
+      config: testConfig(watchInterval: const Duration(minutes: 10)),
+      changeSignal: signal,
+    );
+    final created = await slow.create('users', <String, Object?>{
+      'name': 'Still',
+    });
+    final id = '${created['id']}';
+    final received = <Map<String, Object?>?>[];
+    final subscription = slow.watch('users', id).listen(received.add);
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+
+    final callsAfterInitial = gateway.callCount;
+    signal.emit(table: 'tasks');
+    signal.emit(table: 'users', id: 'someone-else');
+    signal.fail(StateError('the signal channel blew up'));
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+
+    expect(gateway.callCount, callsAfterInitial);
+    expect(received, hasLength(1));
+
+    signal.emit(table: 'users', id: id);
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+    expect(gateway.callCount, greaterThan(callsAfterInitial));
+
+    await subscription.cancel();
+  });
+
   test('an invalid table name is rejected before the request', () async {
     final before = gateway.callCount;
 
