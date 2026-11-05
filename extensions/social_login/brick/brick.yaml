@@ -1,0 +1,30 @@
+name: social_login
+description: Social login files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: social_login
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  google_server_client_id:
+    type: string
+    description: Google server client id
+    default: ""
+  google_ios_client_id:
+    type: string
+    description: Google iOS client id
+    default: ""
+  apple_service_id:
+    type: string
+    description: Apple service id
+    default: ""
+  apple_redirect_uri:
+    type: string
+    description: Apple web redirect URI
+    default: ""

@@ -1,0 +1,30 @@
+name: firebase
+description: Firebase Auth, Firestore, and Storage files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: firebase
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  options_source:
+    type: string
+    description: FirebaseOptions source (generated or explicit)
+    default: generated
+  firebase_options_path:
+    type: string
+    description: Path to the generated firebase_options.dart
+    default: lib/firebase_options.dart
+  emulator_host:
+    type: string
+    description: Firebase Emulator Suite host
+    default: localhost
+  use_emulator_in_development:
+    type: boolean
+    description: Use emulators on the development flavor
+    default: true

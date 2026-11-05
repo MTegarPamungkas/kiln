@@ -1,0 +1,16 @@
+name: fresh_app
+description: Test project without extensions.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  kiln_core: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

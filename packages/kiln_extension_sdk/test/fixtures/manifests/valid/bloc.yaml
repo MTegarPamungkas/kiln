@@ -1,0 +1,11 @@
+id: bloc
+name: Bloc state management
+version: 0.1.0
+description: State management with Bloc and Cubit.
+category: state
+tier: official
+exclusive: true
+provides:
+  - state_bloc
+dependencies:
+  flutter_bloc: ^9.1.0

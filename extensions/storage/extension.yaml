@@ -1,0 +1,13 @@
+id: storage
+name: Key-value storage
+version: 0.1.0
+description: Persistent key-value storage backed by shared_preferences.
+category: storage
+tier: official
+provides:
+  - storage
+dependencies:
+  shared_preferences: ^2.5.6
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

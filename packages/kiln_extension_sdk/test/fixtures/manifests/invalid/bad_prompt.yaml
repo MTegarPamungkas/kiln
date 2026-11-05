@@ -1,0 +1,8 @@
+id: Bad-Id
+name: Bad prompt
+version: not-semver
+description: Bad prompt definition.
+category: tooling
+prompts:
+  - name: choice
+    type: enum

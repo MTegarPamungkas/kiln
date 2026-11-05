@@ -1,0 +1,40 @@
+id: rest_auth
+name: REST auth
+version: 0.1.0
+description: Email and password authentication against a REST API.
+category: auth
+tier: official
+exclusive: true
+provides:
+  - auth
+requires:
+  - http_client
+  - secure_storage
+prompts:
+  - name: base_url
+    type: url
+    label: API base URL
+    required: true
+  - name: login_path
+    type: string
+    label: Login endpoint path
+    default: /auth/login
+  - name: register_path
+    type: string
+    label: Register endpoint path
+    default: /auth/register
+  - name: refresh_path
+    type: string
+    label: Refresh endpoint path
+    default: /auth/refresh
+  - name: logout_path
+    type: string
+    label: Logout endpoint path
+    default: /auth/logout
+  - name: me_path
+    type: string
+    label: Current user endpoint path
+    default: /auth/me
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

@@ -1,0 +1,60 @@
+{
+  "@@locale": "en",
+  "appTitle": "Kiln App",
+  "readyTitle": "App ready",
+  "readyBody": "The Kiln shell is running. Start building features in lib/features.",
+  "starterHint": "Add extensions with kiln add, then run kiln doctor.",
+  "errorTitle": "The app failed to start",
+  "errorBody": "Check the project configuration, then restart the app.",
+  "failureTitle": "Something went wrong",
+  "failureBody": "Please try again. Contact support if the problem continues.",
+  "actionRetry": "Try again",
+  "actionCancel": "Cancel",
+  "actionOk": "OK",
+  "actionSave": "Save",
+  "actionClose": "Close",
+  "languageLabel": "Language",
+  "languageFollowSystem": "Follow system",
+  "languageName": "English",
+  "itemsCount": "{count, plural, =0{No items} =1{1 item} other{{count} items}}",
+  "@itemsCount": {
+    "description": "Number of items in a list",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "helloName": "Hello, {name}!",
+  "@helloName": {
+    "description": "Greeting with the user's name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "failureNetwork": "There was a network problem. Check your connection and try again.",
+  "failureNetworkOffline": "No internet connection. Check your network and try again.",
+  "failureAuth": "Your session or credentials are invalid. Sign in again to continue.",
+  "failureAuthExpired": "Your session expired. Sign in again.",
+  "failureAuthEmail": "Verify your email address first.",
+  "failurePermission": "Permission is required to continue. Open the app settings.",
+  "failurePermissionPermanently": "Permission is blocked. Enable it in the app settings.",
+  "failureValidation": "The information you entered is not valid yet.",
+  "failureConfiguration": "The application configuration is incomplete.",
+  "failureStorage": "Data could not be saved or read. Try again.",
+  "failureSecureStorage": "Secure storage is not available on this device.",
+  "failureDatabase": "The local database is unavailable. Try again.",
+  "failureRemoteDatabase": "The data server cannot be reached. Try again.",
+  "failureFile": "The file could not be processed. Try again.",
+  "failureNotifications": "Notifications are unavailable. Check the notification permission.",
+  "failureDeepLink": "The link is invalid or cannot be opened.",
+  "failureMedia": "The media could not be opened or captured.",
+  "failureCache": "The cache is unavailable. Data will be reloaded.",
+  "failureSession": "Your session expired. Sign in again.",
+  "failureCancelled": "The action was cancelled.",
+  "failureUnavailable": "This feature is not available yet.",
+  "failureUnsupported": "This feature is not supported on this device.",
+  "failureUnexpected": "An unexpected error occurred. Try again."
+}

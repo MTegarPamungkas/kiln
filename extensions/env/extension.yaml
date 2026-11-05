@@ -1,0 +1,34 @@
+id: env
+name: Environment
+version: 0.1.0
+description: Typed build-time configuration from --dart-define values.
+category: config
+tier: official
+exclusive: true
+provides:
+  - env
+prompts:
+  - name: keys
+    type: multi
+    label: Environment keys
+    description: Curated keys included in the environment schema.
+    default:
+      - api_base_url
+      - api_key
+      - feature_flags
+      - enable_debug_tools
+    options:
+      - api_base_url
+      - api_key
+      - feature_flags
+      - enable_debug_tools
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

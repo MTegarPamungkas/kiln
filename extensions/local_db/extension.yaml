@@ -1,0 +1,27 @@
+id: local_db
+name: Local database
+version: 0.1.0
+description: Offline-first document database backed by Sembast.
+category: database
+tier: official
+exclusive: true
+provides:
+  - local_db
+optional_requires:
+  - secure_storage
+dependencies:
+  sembast: ^3.9.0
+  sembast_web: ^2.4.6+1
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  encrypt: ^5.0.3
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

@@ -1,0 +1,11 @@
+{
+  "extension": "calendar",
+  "files": {
+    "lib/extensions/calendar/add_2_calendar_gateway.dart": "af335c8ab894492a02a3606b4fdb8eb71c865d6782129545f479115cdbc2fc80",
+    "lib/extensions/calendar/calendar_gateway.dart": "da5665656a86e32865e7bf96ae6c865ca93ed1c345c56727d850e84a8489d142",
+    "lib/extensions/calendar/calendar_module.dart": "6772d1cf65e34505a69f7adafc17537225d3487c88c94264dcb7102f6a3b2ddb",
+    "lib/extensions/calendar/calendar_support.dart": "8829c24a187b67928078500c6044de0f28e9665c76c3450b84209aa8ef9a0912",
+    "lib/extensions/calendar/device_calendar_service.dart": "f28fab181e5cf854b37feb308144b9e9c866749d3ee2517b95c3162e9cdfcbd4",
+    "test/extensions/calendar/calendar_test.dart": "345217a3e40b3237822f2773dc46185b28c4edcc040192715b66c140f62c0a6d"
+  }
+}

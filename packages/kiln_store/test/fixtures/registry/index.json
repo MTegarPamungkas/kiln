@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-01-15T09:30:00.000Z",
+  "extensions": [
+    {
+      "id": "demo_ext",
+      "name": "Demo Extension",
+      "description": "A demo extension for registry tests.",
+      "category": "testing",
+      "latest": "1.2.0",
+      "tier": "verified",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "url": "valid.tgz",
+          "sha256": "90b5b2eb0343ccdcbdb9b2d542ee47a986bbe7ed8c204edf8403226606e04556",
+          "provides": ["demo"],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.3.0",
+            "dart": ">=3.0.0"
+          }
+        },
+        {
+          "version": "1.1.0",
+          "url": "archives/demo_ext-1.1.0.tgz",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "requires": ["app_basic"],
+          "provides": ["demo", "demo_hooks"],
+          "compatibility": {
+            "kiln": ">=0.2.0 <0.4.0"
+          }
+        },
+        {
+          "version": "1.2.0",
+          "url": "https://cdn.example.com/kiln/demo_ext-1.2.0.tgz",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "compatibility": {
+            "kiln": ">=0.3.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "http_retry",
+      "name": "HTTP Retry",
+      "description": "Retries failed HTTP requests with backoff.",
+      "category": "network",
+      "latest": "0.3.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.2.0",
+          "url": "archives/http_retry-0.2.0.tgz",
+          "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.3.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/http_retry-0.3.0.tgz",
+          "sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+          "compatibility": {
+            "kiln": ">=0.2.0 <0.4.0"
+          }
+        }
+      ]
+    }
+  ]
+}

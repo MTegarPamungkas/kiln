@@ -1,0 +1,18 @@
+{
+  "extension": "riverpod",
+  "files": {
+    "lib/app/provider_root.dart": "84d8cd62294d74052b954489d5a4b7a38b9b3f4b8d8b36e0b46cd1ad68ed1ca7",
+    "lib/core/riverpod/app_provider_observer.dart": "edb9ff1d75707005dfa07b27862b41de49323d19dfb0135626deac64fe8879e1",
+    "lib/core/riverpod/async_value_x.dart": "4c3e18af1273aaf16bafa738e48de65e675a959c6e6dfc5fc043cbb1f50a9cb4",
+    "lib/core/riverpod/kiln_providers.dart": "87be4860a4331d1f74f5dfbbec54e92703412eeea2f15d77953099dae146547b",
+    "lib/core/riverpod/provider_overrides.dart": "7eea7badd2914d29454ca9dad7b2332ea74d54c57dec5fb468de951718cad5a2",
+    "lib/core/riverpod/session_notifier.dart": "6f7900ea5d0524b88c76bcf1e4ed18828a22a29683d2f2cc8306c463a795641c",
+    "lib/extensions/riverpod/riverpod_module.dart": "56b308ac51192119173ae423e40cba95514cd12c0c1c6f81fafbf7e47b58e2e0",
+    "lib/extensions/riverpod/riverpod_support.dart": "b4d2e5f833c19f7725376e84c808690ce2f73bfa7056224f4a0a1df4b025553a",
+    "test/extensions/riverpod/core/riverpod/async_value_x_test.dart": "a8550bee98af8487a1288cd28ff1ba5050609a1629da6bd2199021365917f671",
+    "test/extensions/riverpod/core/riverpod/kiln_providers_test.dart": "0c9323034f950ecfee008162744279521774127c5cb297eb6db661d4a990b194",
+    "test/extensions/riverpod/core/riverpod/session_notifier_test.dart": "c1574d5aebb9d1119cbb071fac470befe4928f07bd3cfb9d879567005a63b699",
+    "test/extensions/riverpod/riverpod_bootstrap_test.dart": "c602ab25fca967231ab8757b10e17300232d95cbedda389a91be98cfafbf2b64",
+    "test/extensions/riverpod/riverpod_module_test.dart": "6e2ee9a6241a2291366e31083a64f4f6ae458283f35de61551837849edb9a836"
+  }
+}

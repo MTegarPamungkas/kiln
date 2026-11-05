@@ -1,0 +1,9 @@
+id: broken
+name: Broken
+version: 0.1.0
+description: Requires its own capability.
+category: tooling
+provides:
+  - broken
+requires:
+  - broken

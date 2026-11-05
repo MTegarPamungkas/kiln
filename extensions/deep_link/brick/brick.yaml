@@ -1,0 +1,27 @@
+name: deep_link
+description: Deep link files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: deep_link
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  scheme:
+    type: string
+    description: URI scheme that opens the app
+    default: kiln
+  hosts:
+    type: list
+    description: Allowed hosts for https app links
+    default:
+      - kiln.dev
+  path_prefixes:
+    type: list
+    description: Allowed path prefixes for https app links
+    default: []

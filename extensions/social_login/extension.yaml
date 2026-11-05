@@ -1,0 +1,46 @@
+id: social_login
+name: Social login
+version: 0.1.0
+description: Google and Apple credential sign-in for a social auth backend.
+category: social
+tier: official
+provides:
+  - social_login
+requires:
+  - social_auth
+dependencies:
+  google_sign_in: ^7.2.0
+  sign_in_with_apple: ^8.2.0
+  crypto: ^3.0.8
+prompts:
+  - name: google_server_client_id
+    type: string
+    label: Google server client id
+    default: ""
+  - name: google_ios_client_id
+    type: string
+    label: Google iOS client id
+    default: ""
+  - name: apple_service_id
+    type: string
+    label: Apple service id
+    default: ""
+  - name: apple_redirect_uri
+    type: string
+    label: Apple web redirect URI
+    default: ""
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+android:
+  permissions:
+    - android.permission.INTERNET
+ios:
+  entitlements:
+    com.apple.developer.applesignin:
+      - Default
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

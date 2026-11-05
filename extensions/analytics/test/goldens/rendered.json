@@ -1,0 +1,31 @@
+{
+  "extension": "analytics",
+  "files": {
+    "lib/extensions/analytics/analytics_config.dart": "2361a20f034a24d3ac241b8a33f7b12a7e908d1218a3be88a96f6161a2a078a9",
+    "lib/extensions/analytics/analytics_event.dart": "6fb344cd70f2ea6187c4c4b2a9d2ecddb4821e03959ae9202ff786031b72d4c4",
+    "lib/extensions/analytics/analytics_failure_mapper.dart": "d2a56df66e98417984f5c98b0426c5d39fe060d873d692faf74a2ce095fe06c8",
+    "lib/extensions/analytics/analytics_gateway.dart": "e3f06620cfaeaab932f77b917e242e0fdd5f7ff2c6d0f351096420c83d9bb9db",
+    "lib/extensions/analytics/analytics_module.dart": "81ffcd1933e505f6a4ba6b88d436bb0c40ac0f9c29e98c4671e259c1454af82f",
+    "lib/extensions/analytics/analytics_support.dart": "f0928e61a0a3a808277ed1cef365ff05179cac22e6f3298b8c6bb372a5503e88",
+    "lib/extensions/analytics/consent_gate_analytics.dart": "f2e77d536c6440b6e506db4904f654d9f7cf1581f8c5eecceef338ab42168be4",
+    "lib/extensions/analytics/noop_analytics.dart": "75326b1edc2bb558a023b11f586b11176b013767f597c45507f9fddb4dfc14cd",
+    "lib/extensions/analytics/pii_scrubbing_analytics.dart": "156968f584c9ca726b7e3003e59eeff3b623835003d8473ba8c1fee72a2c70a6",
+    "lib/extensions/analytics/posthog_analytics.dart": "bde7f8f8b417daeb2ef61b820061c9b5363b7753e89f0d24c44afaf554726f31",
+    "lib/extensions/analytics/property_sanitizer.dart": "cd6185a8b034bc424cb7b47ba8b8f8c3c2c697f376b0e2c1fdce6906a95c182a",
+    "lib/extensions/analytics/sdk_posthog_gateway.dart": "95a79f0c0d60db15e2c57353868691ee10f512a05c2d6de0456a5c438e799483",
+    "lib/extensions/analytics/session_identity_listener.dart": "bb35e1681a640b23118686cae3d642a631ab904cd8e483c2c96b5406150f8d73",
+    "test/extensions/analytics/analytics_config_test.dart": "ceffc0f5b8ab7595d19f1966d2ee86fb6480c819d9d8c3046872f588060dd094",
+    "test/extensions/analytics/analytics_contract_test.dart": "05b2d4a23bfdd19411e315f8fa519877a690be0bbe788ff56d2c3ea3bd5d4f9d",
+    "test/extensions/analytics/analytics_event_test.dart": "5fca05ce28fa5b9df628775629c44ef5ac1abd88082d77593db53f21b8d2db3a",
+    "test/extensions/analytics/analytics_failure_mapper_test.dart": "dfee2b41f44b329c73c2cecb7cbebdea7667799d47c4e6c83e0f72058d2c3300",
+    "test/extensions/analytics/analytics_module_test.dart": "256735e5b836cb728845afb48e7402048cc7439b87b0e01b27d0742fd1cde5a9",
+    "test/extensions/analytics/analytics_support_test.dart": "f918e224592b66249330f4f310f63b549ee4a420cff9e2cac549503355354dd5",
+    "test/extensions/analytics/analytics_test.dart": "7603a637a56d8db17ee8780dd2ab22a45d9bfa999ad46e43773547fb254ea5e5",
+    "test/extensions/analytics/consent_gate_analytics_test.dart": "c366c1fa2036b95259803f48ab2420b68de7a347b988da58b5dbfd1d8b610cee",
+    "test/extensions/analytics/noop_analytics_test.dart": "aa36143c57a972933e97e9bebf3072c09441f6922c22e393bfc61bdb47c03585",
+    "test/extensions/analytics/pii_scrubbing_analytics_test.dart": "960b8995af9d1e39cb2c3cc957e45f5de05190a74324a8ca96696440de045d25",
+    "test/extensions/analytics/property_sanitizer_test.dart": "acfa5c4d36eb95b7e84401147d8c170f8f794be73c5a21aed75e2a44dfccf1f8",
+    "test/extensions/analytics/session_identity_listener_test.dart": "51485ee1d29e460f5b1da2d21a257ff33924c84f7832245ae18ab55815187413",
+    "test/extensions/analytics/test_support.dart": "b9037c6c5fa67f27c244a752a9c89a8708ac2d0f8e0e26d4d57b524378784bea"
+  }
+}

@@ -1,0 +1,15 @@
+name: kiln_dio_extension
+description: Tests and tooling for the dio Kiln extension.
+version: 0.2.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dev_dependencies:
+  kiln_extension_sdk: ^0.1.0
+  lints: ^6.1.0
+  path: ^1.9.1
+  test: ^1.31.1

@@ -1,0 +1,58 @@
+id: notifications
+name: Notifications
+version: 0.1.0
+description: Local notifications with channels, scheduling, and tap routing.
+category: notifications
+tier: official
+exclusive: true
+provides:
+  - notifications
+optional_requires:
+  - permission
+dependencies:
+  flutter_local_notifications: ^22.3.3
+  flutter_timezone: ^5.1.1
+  timezone: ^0.11.2
+prompts:
+  - name: default_channel
+    type: string
+    label: Default Android notification channel id
+    default: kiln_default
+  - name: small_icon
+    type: string
+    label: Android small icon resource
+    default: "@mipmap/ic_launcher"
+  - name: exact_alarms
+    type: bool
+    label: Schedule exact alarms
+    default: false
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.POST_NOTIFICATIONS
+    - android.permission.RECEIVE_BOOT_COMPLETED
+  receivers:
+    - name: com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver
+      exported: false
+    - name: com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver
+      exported: false
+      actions:
+        - android.intent.action.BOOT_COMPLETED
+        - android.intent.action.MY_PACKAGE_REPLACED
+        - android.intent.action.QUICKBOOT_POWERON
+        - com.htc.intent.action.QUICKBOOT_POWERON
+conditional:
+  - when:
+      exact_alarms: true
+    android:
+      permissions:
+        - android.permission.SCHEDULE_EXACT_ALARM
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

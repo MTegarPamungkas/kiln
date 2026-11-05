@@ -1,0 +1,29 @@
+{
+  "extension": "l10n",
+  "files": {
+    "l10n.yaml": "dcb2415bce40aa6113d0938282fd5e810d834fa8f0b80c0197db4b8c20ae8f12",
+    "lib/extensions/l10n/failure_messages.dart": "42e53c72e013800a76d363ce572378b5c112e6beba52c61a15d6acf0ee701256",
+    "lib/extensions/l10n/gate_l10n.dart": "3df0a826883a29169fef82fbf9f432c9ec6287c08e4482bb1b614b5b3da4c866",
+    "lib/extensions/l10n/l10n_config.dart": "617c9290592cdec133e9fb2ae92f8ae7b514db2ca83344420a2cacf295ba2f45",
+    "lib/extensions/l10n/l10n_module.dart": "915d30879e21245c8bb221ef1927d2a682e38357db9b62d309719a77c70aa897",
+    "lib/extensions/l10n/l10n_support.dart": "8db13854d7288fd5ee5ea8adbfa102f71a18e26d3740044d78370d9fb8daae0a",
+    "lib/extensions/l10n/locale_controller.dart": "5152302a6b9a8850f141f91148f7da44d8d74268f3c76d488496dfe4ca0ecae0",
+    "lib/extensions/l10n/locale_formatters.dart": "8a0b353b3ef11d5fdf500e60e087029eda2b05c07ed438c2e08f964a61366a46",
+    "lib/extensions/l10n/locale_resolution.dart": "be3ca10b84866ba54184f17c97cbaa27fc0fb0baa54582608f6388589d3d56f4",
+    "lib/extensions/l10n/locale_store.dart": "53110c60400e48923e82375997bb4476c9776140bd3a5efb450e7eb1ebc11aa1",
+    "lib/extensions/l10n/localized_core_copy.dart": "7de791e4edb127774b1d1a20dc5595ad0fe85a3ec7c7b0cb996e0520b7b59a27",
+    "lib/l10n/app_en.arb": "ff06984798c0ad45e62b70cabefd1a459a5417462213966780a7f84ab51a8899",
+    "lib/l10n/app_id.arb": "1b945a212317913371275e0bda6b2589e76009e45350dad2c8d3901c85172548",
+    "test/extensions/l10n/failure_messages_test.dart": "dbbf6afe67e4dac89bb4db92bb7e98f31a13b162f507c6bd452f2307241d00a7",
+    "test/extensions/l10n/gate_l10n_test.dart": "ad020ca8e71c5687408b23eb718c7df351cca4b40dd126366d3315dc3088afd7",
+    "test/extensions/l10n/l10n_config_test.dart": "0a42c81f3090d9f9293b683fc0bab9067f5bda1d9deb86e4467ce6dadd60126a",
+    "test/extensions/l10n/l10n_coverage_test.dart": "6284c7848176ab5233e446e6b3e846d18701d4dcb2d06a7ae0bdebe8bde72e0a",
+    "test/extensions/l10n/l10n_module_test.dart": "7d0bef3d2b340c54a11e06b2184ca9a2a1579d05c1792996b9e503e9529f2e35",
+    "test/extensions/l10n/l10n_support_test.dart": "da902be48fa5eadb63d1d2cb47b1bf8ca48919aa8ee975e49d6dd93fcd5859f4",
+    "test/extensions/l10n/l10n_test.dart": "1cf884c0dd437b80ee2c4370fed1e797cd93e957a5e5f2079c4d0c3200cf1242",
+    "test/extensions/l10n/locale_controller_test.dart": "78070b3476b6f9b983415483f38500e31c200747e94288db1b74a2fa587d52dc",
+    "test/extensions/l10n/locale_formatters_test.dart": "fcbbebc1e706f77ae4791d42a3b592bdb3a5f9b67b7f4df55b86f45642687042",
+    "test/extensions/l10n/locale_resolution_test.dart": "2e19985013d86ad22c48a9d69cb11791b29aab6dfe40221d4b207aed6e5014d9",
+    "test/extensions/l10n/locale_store_test.dart": "cf241b46254490d39fa36640e3ac5f8ebb7355f3054b87f309e4ad701534b51e"
+  }
+}

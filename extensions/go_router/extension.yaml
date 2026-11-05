@@ -1,0 +1,30 @@
+id: go_router
+name: GoRouter
+version: 0.1.0
+description: Declarative routing with route slots, guards, and deep link mapping.
+category: navigation
+tier: official
+exclusive: true
+provides:
+  - navigation
+optional_requires:
+  - deep_links
+  - notifications
+  - analytics
+  - logger
+dependencies:
+  go_router: ^18.1.2
+slots:
+  - name: router.routes
+    item: AppRoute
+    description: Route contributed by feature extensions without importing go_router.
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

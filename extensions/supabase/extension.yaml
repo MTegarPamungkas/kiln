@@ -1,0 +1,58 @@
+id: supabase
+name: Supabase
+version: 0.1.0
+description: Supabase auth, PostgREST database, realtime, and storage for Kiln.
+category: auth
+tier: official
+exclusive: true
+provides:
+  - auth
+  - social_auth
+  - remote_database
+  - file_storage
+optional_requires:
+  - deep_links
+dependencies:
+  supabase_flutter: ^2.18.3
+prompts:
+  - name: url
+    type: url
+    label: Supabase project URL
+    description: Project URL from the Supabase dashboard, for example https://abcdefgh.supabase.co.
+    required: true
+  - name: anon_key
+    type: secret
+    label: Supabase anon (publishable) key
+    description: Client-safe key from Project settings > API keys. Never use the service role key here.
+    required: true
+    secret: true
+  - name: schema
+    type: string
+    label: PostgREST schema
+    description: Schema exposed through PostgREST.
+    default: public
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+android:
+  permissions:
+    - android.permission.INTERNET
+  url_schemes:
+    - kiln-auth
+ios:
+  url_schemes:
+    - kiln-auth
+manual_steps:
+  - id: configure_auth_redirect
+    description: Set authRedirectUrl to kiln-auth://auth-callback and register the same scheme in the deep_link extension so email confirmation and OAuth callbacks return to the app.
+  - id: enable_realtime
+    description: Add every table used by RemoteDatabase.watch to the supabase_realtime publication in the Supabase dashboard.
+  - id: create_storage_bucket
+    description: Create the storage bucket named by SupabaseConfig.storageBucket (default public) and add storage RLS policies for it.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

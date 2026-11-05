@@ -1,0 +1,55 @@
+id: firebase
+name: Firebase
+version: 0.1.0
+description: Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.
+category: auth
+tier: official
+exclusive: true
+provides:
+  - auth
+  - social_auth
+  - remote_database
+  - file_storage
+dependencies:
+  firebase_core: ^5.1.0
+  firebase_auth: ^7.0.1
+  cloud_firestore: ^7.1.0
+  firebase_storage: ^14.0.1
+prompts:
+  - name: options_source
+    type: enum
+    label: FirebaseOptions source
+    description: Use "generated" to read lib/firebase_options.dart produced by the FlutterFire CLI, or "explicit" to pass a FirebaseOptions instance to FirebaseModule.
+    default: generated
+    options:
+      - generated
+      - explicit
+  - name: firebase_options_path
+    type: string
+    label: firebase_options.dart location
+    default: lib/firebase_options.dart
+  - name: emulator_host
+    type: string
+    label: Host Firebase Emulator Suite
+    default: localhost
+  - name: use_emulator_in_development
+    type: bool
+    label: Use the emulator in the development flavor
+    default: true
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+manual_steps:
+  - id: firebase_flutterfire_configure
+    description: Run flutterfire configure so lib/firebase_options.dart and the native Firebase configuration exist before the app runs.
+  - id: firebase_social_sign_in
+    description: Enable the Google and Apple providers in the Firebase Console, then add the Android SHA fingerprint and the iOS reversed URL scheme as described in docs/firebase-setup.md.
+  - id: firebase_emulator_start
+    description: Run firebase emulators:start in the project root when the development flavor uses the emulator.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"
+  flutter: ">=3.35.0"

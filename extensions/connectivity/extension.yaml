@@ -1,0 +1,43 @@
+id: connectivity
+name: Connectivity
+version: 0.1.0
+description: Network status monitoring and an offline guard middleware.
+category: connectivity
+tier: official
+exclusive: true
+provides:
+  - connectivity
+optional_requires:
+  - http_pipeline
+dependencies:
+  connectivity_plus: ^7.3.2
+prompts:
+  - name: probe_url
+    type: url
+    label: Optional reachability probe URL
+    required: false
+  - name: probe_interval
+    type: int
+    label: Probe interval in seconds
+    default: 30
+    min: 5
+    max: 600
+  - name: probe_timeout
+    type: int
+    label: Probe timeout in seconds
+    default: 5
+    min: 1
+    max: 60
+  - name: debounce_ms
+    type: int
+    label: Status debounce window in milliseconds
+    default: 500
+    min: 0
+    max: 5000
+android:
+  permissions:
+    - android.permission.ACCESS_NETWORK_STATE
+    - android.permission.INTERNET
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

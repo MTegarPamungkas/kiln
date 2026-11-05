@@ -1,0 +1,23 @@
+name: kiln_store
+description: Registry client, archive verification, and publishing for Kiln extensions.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  archive: ^4.6.0
+  crypto: ^3.0.8
+  http: ^1.6.0
+  kiln_core: ^0.1.0
+  kiln_extension_sdk: ^0.1.0
+  path: ^1.9.1
+  pub_semver: ^2.2.1
+  yaml: ^3.1.4
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.31.1

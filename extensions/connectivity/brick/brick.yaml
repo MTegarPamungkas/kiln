@@ -1,0 +1,30 @@
+name: connectivity
+description: Connectivity monitoring files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: connectivity
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  probe_url:
+    type: string
+    description: Optional probe URL
+    default: ""
+  probe_interval:
+    type: number
+    description: Probe interval in seconds
+    default: 30
+  probe_timeout:
+    type: number
+    description: Probe timeout in seconds
+    default: 5
+  debounce_ms:
+    type: number
+    description: Status debounce window in milliseconds
+    default: 500

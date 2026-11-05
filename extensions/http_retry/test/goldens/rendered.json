@@ -1,0 +1,22 @@
+{
+  "extension": "http_retry",
+  "files": {
+    "lib/extensions/http_retry/backoff.dart": "2302a1541ccc3851ecb5a9f91c122bb32f3db7f1c7d9395a11ea6163023c158c",
+    "lib/extensions/http_retry/http_retry_module.dart": "787b81f787afbe1ae7a5ac6669ab8c6a0aa46196240376c7ccb831619735439a",
+    "lib/extensions/http_retry/http_retry_support.dart": "bf080239ebfd96a610d35bad8b02d7ec708e23cca332b566151b2c72503d85e1",
+    "lib/extensions/http_retry/idempotency.dart": "2fb4ca5fc26331e0c36ad7b559ce519553723d684946fe0775cb649d066fffac",
+    "lib/extensions/http_retry/retry_after_parser.dart": "5a581c98ca015892ca8bc773ceec47d319704893385e6945f59fbcc66d0418a9",
+    "lib/extensions/http_retry/retry_budget.dart": "9dec1a33aac62b0106b9d7f9dee6679beeeb936fdeac0b20b3f6e4251d54f239",
+    "lib/extensions/http_retry/retry_events.dart": "a1e1dc79b66ab5f9fee1b9ed1181e6529cd7fd177b366b1bca72f86d29630782",
+    "lib/extensions/http_retry/retry_middleware.dart": "c7dd096089ac36e6f9920776df182b487893d2aa267dc16cfdcd0fbe28dbf22b",
+    "lib/extensions/http_retry/retry_policy.dart": "d204a6b01d4d7418d384905608200aad6fabe705a266fd1d9419ca12ffb8db1f",
+    "lib/extensions/http_retry/retry_settings.dart": "4adf2c3d5a1d3042f300ca01311a519b3cefb9e8d269f4edefe84c7951669b51",
+    "test/extensions/http_retry/backoff_test.dart": "08a2411ef68815aa711e61a906134f26e6510303294c67022eb046587eb55764",
+    "test/extensions/http_retry/http_retry_module_test.dart": "cee10c3316d433390d6d35aa55eb59b5a61352e2722648f1bfdc6dcefba1936b",
+    "test/extensions/http_retry/http_retry_support_test.dart": "43e9f5c77c9482eefe236b704fa95274d87f6c7e556d53f47500a434e80e989e",
+    "test/extensions/http_retry/idempotency_test.dart": "78625da42df4e86d5cd9dd17a1cfac915a2070701b65cb6d1e7c46e32618ce39",
+    "test/extensions/http_retry/retry_after_parser_test.dart": "0f0c9e690f95d5202479a772ec3b3db6008b6c1350a55cb2db735a95d824d34a",
+    "test/extensions/http_retry/retry_budget_test.dart": "2a80b60f613dcc3d8851b4e26ef6d77bdfd6aafdd145a999a2b5561221e1f693",
+    "test/extensions/http_retry/retry_middleware_test.dart": "28bc62f5a5c6f021b2d15e07046e757d5e5a18b45e63bd7de1f3f636b2618529"
+  }
+}

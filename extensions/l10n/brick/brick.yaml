@@ -1,0 +1,24 @@
+name: l10n
+description: Localized strings, locale selection, and formatting for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: l10n
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  locales:
+    type: list
+    description: Supported locales
+    default:
+      - id
+      - en
+  fallback_locale:
+    type: string
+    description: Fallback locale
+    default: id

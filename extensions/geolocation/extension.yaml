@@ -1,0 +1,32 @@
+id: geolocation
+name: Geolocation
+version: 0.1.0
+description: Device location with permission-aware reads and streaming updates.
+category: location
+tier: official
+exclusive: true
+provides:
+  - location
+optional_requires:
+  - permission
+dependencies:
+  geolocator: ^14.0.1
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+android:
+  permissions:
+    - android.permission.ACCESS_COARSE_LOCATION
+    - android.permission.ACCESS_FINE_LOCATION
+ios:
+  plist:
+    NSLocationWhenInUseUsageDescription: This app needs your location to show nearby content.
+macos:
+  entitlements:
+    com.apple.security.personal-information.location: true
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

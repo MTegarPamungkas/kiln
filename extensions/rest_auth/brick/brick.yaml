@@ -1,0 +1,38 @@
+name: rest_auth
+description: REST authentication files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: rest_auth
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  base_url:
+    type: string
+    description: API base URL
+    default: https://api.example.com
+  login_path:
+    type: string
+    description: Login endpoint path
+    default: /auth/login
+  register_path:
+    type: string
+    description: Register endpoint path
+    default: /auth/register
+  refresh_path:
+    type: string
+    description: Refresh endpoint path
+    default: /auth/refresh
+  logout_path:
+    type: string
+    description: Logout endpoint path
+    default: /auth/logout
+  me_path:
+    type: string
+    description: Current user endpoint path
+    default: /auth/me

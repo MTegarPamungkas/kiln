@@ -1,0 +1,26 @@
+name: supabase
+description: Supabase auth, database, realtime, and storage for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: supabase
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  url:
+    type: string
+    description: Supabase project URL
+    default: https://example.supabase.co
+  anon_key:
+    type: string
+    description: Supabase anon key
+    default: your-anon-key
+  schema:
+    type: string
+    description: PostgREST schema
+    default: public

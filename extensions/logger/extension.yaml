@@ -1,0 +1,34 @@
+id: logger
+name: Logger
+version: 0.1.0
+description: Structured application logging with redaction, rotating files, and crash breadcrumbs.
+category: logging
+tier: official
+exclusive: true
+provides:
+  - logger
+optional_requires:
+  - crash_reporter
+  - http_pipeline
+  - flavor
+dependencies:
+  path_provider: ^2.1.6
+prompts:
+  - name: file_sink
+    type: bool
+    label: Write logs to rotating files
+    default: true
+  - name: http_logging
+    type: bool
+    label: Log HTTP requests through the shared pipeline
+    default: true
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

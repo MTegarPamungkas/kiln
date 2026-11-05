@@ -1,0 +1,13 @@
+id: flavors
+name: Flavors
+version: 0.1.0
+description: Development, staging, and production flavors.
+category: flavor
+tier: official
+exclusive: true
+provides:
+  - flavor
+contributes:
+  - slot: app.wrappers
+    item: FlavorBanner
+    priority: 10

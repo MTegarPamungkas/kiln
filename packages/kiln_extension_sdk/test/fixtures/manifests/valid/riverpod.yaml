@@ -1,0 +1,11 @@
+id: riverpod
+name: Riverpod state management
+version: 0.1.0
+description: State management with Riverpod.
+category: state
+tier: official
+exclusive: true
+provides:
+  - state_riverpod
+dependencies:
+  flutter_riverpod: ^3.0.0

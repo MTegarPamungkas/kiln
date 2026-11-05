@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Development",
+      "request": "launch",
+      "type": "dart",
+      "program": "${workspaceFolder}/lib/main_development.dart",
+      "toolArgs": ["--dart-define-from-file=env/development.json"]
+    },
+    {
+      "name": "Staging",
+      "request": "launch",
+      "type": "dart",
+      "program": "${workspaceFolder}/lib/main_staging.dart",
+      "toolArgs": ["--dart-define-from-file=env/staging.json"]
+    },
+    {
+      "name": "Production",
+      "request": "launch",
+      "type": "dart",
+      "program": "${workspaceFolder}/lib/main_production.dart",
+      "toolArgs": ["--dart-define-from-file=env/production.json"]
+    }
+  ]
+}

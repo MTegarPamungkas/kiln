@@ -1,0 +1,26 @@
+name: notifications
+description: Notification files for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: notifications
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  default_channel:
+    type: string
+    description: Default Android notification channel id
+    default: kiln_default
+  small_icon:
+    type: string
+    description: Android small icon resource
+    default: "@mipmap/ic_launcher"
+  exact_alarms:
+    type: boolean
+    description: Schedule exact alarms
+    default: false

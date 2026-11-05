@@ -1,0 +1,119 @@
+import 'package:kiln_core/kiln_core.dart';
+
+/// Settings for the PostHog-backed [Analytics] implementation.
+///
+/// The values are rendered from the install prompts. Keep the API key out of
+/// logs and never send it to an analytics event.
+final class AnalyticsConfig {
+  AnalyticsConfig({
+    this.apiKey = '',
+    this.host = 'https://us.i.posthog.com',
+    this.flushInterval = const Duration(seconds: 30),
+    Set<AppFlavor>? enabledFlavors,
+    this.noopWhenApiKeyEmpty = true,
+  }) : enabledFlavors = Set<AppFlavor>.unmodifiable(
+         enabledFlavors ?? defaultEnabledFlavors,
+       );
+
+  /// Flavors that send events unless the application narrows the set.
+  static final Set<AppFlavor> defaultEnabledFlavors = <AppFlavor>{
+    AppFlavor.development,
+    AppFlavor.staging,
+    AppFlavor.production,
+  };
+
+  /// Values the Kiln installer writes into the application.
+  static final AnalyticsConfig defaults = AnalyticsConfig();
+
+  /// PostHog project token. An empty token disables sending by default.
+  final String apiKey;
+
+  /// PostHog ingestion host, for example `https://us.i.posthog.com`.
+  final String host;
+
+  /// How often the SDK flushes queued events.
+  final Duration flushInterval;
+
+  /// Flavors whose events are allowed to leave the device.
+  final Set<AppFlavor> enabledFlavors;
+
+  /// Whether an empty [apiKey] turns the extension into a noop analytics.
+  ///
+  /// Set this to `false` only when the key is supplied at runtime, for example
+  /// from a remote configuration service.
+  final bool noopWhenApiKeyEmpty;
+
+  bool get hasApiKey => apiKey.trim().isNotEmpty;
+
+  /// Whether this configuration intentionally sends nothing.
+  bool get isNoop => noopWhenApiKeyEmpty && !hasApiKey;
+
+  /// Whether [flavor] is allowed to send events.
+  ///
+  /// A `null` flavor means the application does not use the flavors extension,
+  /// so only the non-empty [enabledFlavors] check applies.
+  bool isFlavorEnabled(AppFlavor? flavor) {
+    if (enabledFlavors.isEmpty) {
+      return false;
+    }
+    if (flavor == null) {
+      return true;
+    }
+    return enabledFlavors.contains(flavor);
+  }
+
+  /// Whether the extension should talk to PostHog in [flavor].
+  bool isActiveFor(AppFlavor? flavor) => !isNoop && isFlavorEnabled(flavor);
+
+  /// Rejects values the PostHog SDK cannot be configured with.
+  void validate() {
+    final uri = Uri.tryParse(host);
+    if (uri == null ||
+        (uri.scheme != 'http' && uri.scheme != 'https') ||
+        uri.host.isEmpty) {
+      throw Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Analytics host "$host" is not an absolute HTTP URL.',
+        kind: FailureKind.configuration,
+        details: <String, Object?>{'host': host},
+      );
+    }
+    if (flushInterval <= Duration.zero) {
+      throw Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Analytics flush interval must be greater than zero.',
+        kind: FailureKind.configuration,
+        details: <String, Object?>{'flushInterval': flushInterval.toString()},
+      );
+    }
+    if (!noopWhenApiKeyEmpty && !hasApiKey) {
+      throw const Failure(
+        code: FailureCode.configurationMissing,
+        message: 'Analytics API key is required when the empty-key noop is off.',
+        kind: FailureKind.configuration,
+      );
+    }
+  }
+
+  AnalyticsConfig copyWith({
+    String? apiKey,
+    String? host,
+    Duration? flushInterval,
+    Set<AppFlavor>? enabledFlavors,
+    bool? noopWhenApiKeyEmpty,
+  }) {
+    return AnalyticsConfig(
+      apiKey: apiKey ?? this.apiKey,
+      host: host ?? this.host,
+      flushInterval: flushInterval ?? this.flushInterval,
+      enabledFlavors: enabledFlavors ?? this.enabledFlavors,
+      noopWhenApiKeyEmpty: noopWhenApiKeyEmpty ?? this.noopWhenApiKeyEmpty,
+    );
+  }
+
+  @override
+  String toString() =>
+      'AnalyticsConfig(host: $host, flushInterval: $flushInterval, '
+      'enabledFlavors: ${enabledFlavors.map((flavor) => flavor.name).join(',')}, '
+      'isNoop: $isNoop)';
+}

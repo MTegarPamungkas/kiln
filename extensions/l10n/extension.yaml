@@ -1,0 +1,45 @@
+id: l10n
+name: Localization
+version: 0.1.0
+description: ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.
+category: l10n
+tier: official
+exclusive: true
+provides:
+  - l10n
+optional_requires:
+  - storage
+dependencies:
+  flutter_localizations: {sdk: flutter}
+  intl: ^0.20.3
+flutter:
+  generate: true
+prompts:
+  - name: locales
+    type: multi
+    label: Supported locales
+    description: Languages the application ships with.
+    default:
+      - id
+      - en
+    options:
+      - id
+      - en
+  - name: fallback_locale
+    type: enum
+    label: Fallback locale
+    description: Locale used when the device language is not supported.
+    default: id
+    options:
+      - id
+      - en
+platforms:
+  - android
+  - ios
+  - macos
+  - web
+  - windows
+  - linux
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"
