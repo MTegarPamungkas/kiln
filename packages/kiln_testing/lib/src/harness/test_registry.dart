@@ -13,6 +13,7 @@ import '../fakes/fake_local_database.dart';
 import '../fakes/fake_media_picker.dart';
 import '../fakes/fake_notifications.dart';
 import '../fakes/fake_permissions.dart';
+import '../fakes/fake_remote_config.dart';
 import '../fakes/fake_remote_database.dart';
 import '../fakes/fake_social_auth.dart';
 import '../fakes/in_memory_secure_storage.dart';
@@ -30,6 +31,7 @@ Registry createTestRegistry({
   AccountManagement? accountManagement,
   SocialAuth? socialAuth,
   LocalDatabase? localDatabase,
+  RemoteConfig? remoteConfig,
   RemoteDatabase? remoteDatabase,
   FileStorage? fileStorage,
   NetworkMonitor? networkMonitor,
@@ -63,6 +65,9 @@ Registry createTestRegistry({
   registry.registerSingleton<SocialAuth>(socialAuth ?? FakeSocialAuth());
   registry.registerSingleton<LocalDatabase>(
     localDatabase ?? FakeLocalDatabase(),
+  );
+  registry.registerSingleton<RemoteConfig>(
+    remoteConfig ?? FakeRemoteConfig(),
   );
   registry.registerSingleton<RemoteDatabase>(
     remoteDatabase ?? FakeRemoteDatabase(),

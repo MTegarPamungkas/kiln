@@ -28,6 +28,7 @@ This catalog is generated from extension manifests by
 | `logger` | Logger | 0.1.0 | logging | official | `logger` |
 | `notifications` | Notifications | 0.1.0 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
+| `remote_config` | Remote Config | 0.1.0 | config | official | `remote_config` |
 | `rest_auth` | REST auth | 0.1.0 | auth | official | `auth` |
 | `riverpod` | Riverpod state management | 0.1.0 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.0 | storage | official | `secure_storage` |
@@ -230,6 +231,15 @@ Typed permission checks and requests with rationale flow.
 - Provides: `permission`
 - Prompts: kinds
 - Dependencies: `permission_handler: ^13.0.2`
+- Platforms: android, ios, macos, web, windows, linux
+
+## remote_config
+
+Feature flags and remote configuration fetched from any JSON HTTP endpoint, read through the Gate.
+
+- Provides: `remote_config`
+- Prompts: endpoint
+- Dependencies: `http: ^1.6.0`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## rest_auth

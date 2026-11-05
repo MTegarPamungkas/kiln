@@ -18,6 +18,7 @@ export 'src/contracts/logger.dart';
 export 'src/contracts/media_picker.dart';
 export 'src/contracts/notifications.dart';
 export 'src/contracts/permissions.dart';
+export 'src/contracts/remote_config.dart';
 export 'src/contracts/remote_database.dart';
 export 'src/contracts/secure_storage.dart';
 export 'src/contracts/share.dart';

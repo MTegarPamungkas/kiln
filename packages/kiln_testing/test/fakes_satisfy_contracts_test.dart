@@ -66,8 +66,20 @@ final class _CrashReporterHarness implements CrashReporterContractHarness {
   Map<String, Object?>? contextFor(String key) => fake.contexts[key];
 }
 
-final class _LoggerHarness implements LoggerContractHarness {
-  final RecordingLogger fake = RecordingLogger();
+final class _RemoteConfigHarness implements RemoteConfigContractHarness {
+  final FakeRemoteConfig fake = FakeRemoteConfig();
+
+  @override
+  RemoteConfig get config => fake;
+
+  @override
+  void seedRemote(Map<String, Object?> values) => fake.seedRemote(values);
+
+  @override
+  void failFetch() => fake.fetchFails = true;
+}
+
+final class _LoggerHarness implements LoggerContractHarness {  final RecordingLogger fake = RecordingLogger();
 
   @override
   AppLogger get logger => fake;
@@ -165,6 +177,10 @@ void main() {
     create: _CrashReporterHarness.new,
     description: 'FakeCrashReporter',
   );
+  remoteConfigContract(
+    create: _RemoteConfigHarness.new,
+    description: 'FakeRemoteConfig',
+  );
   loggerContract(create: _LoggerHarness.new, description: 'RecordingLogger');
 
   group('test registry', () {
@@ -187,6 +203,7 @@ void main() {
       expect(registry.read<MediaPicker>(), isA<MediaPicker>());
       expect(registry.read<Analytics>(), isA<Analytics>());
       expect(registry.read<CrashReporter>(), isA<CrashReporter>());
+      expect(registry.read<RemoteConfig>(), isA<RemoteConfig>());
       expect(registry.read<AppLogger>(), isA<AppLogger>());
       expect(registry.read<Env>(), isA<Env>());
       expect(registry.read<Clock>(), isA<Clock>());

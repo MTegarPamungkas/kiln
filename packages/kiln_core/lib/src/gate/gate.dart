@@ -17,6 +17,7 @@ import '../contracts/logger.dart';
 import '../contracts/media_picker.dart';
 import '../contracts/notifications.dart';
 import '../contracts/permissions.dart';
+import '../contracts/remote_config.dart';
 import '../contracts/remote_database.dart';
 import '../contracts/secure_storage.dart';
 import '../contracts/share.dart';
@@ -114,6 +115,8 @@ final class Gate {
   Permissions get permissions => use();
 
   RemoteDatabase get remoteDb => use();
+
+  RemoteConfig get remoteConfig => use();
 
   SecureStorage get secureStorage => use();
 
@@ -313,6 +316,10 @@ final class Gate {
   }) => call<void>(() => analytics.identify(userId, traits: traits));
 
   Future<Result<void>> resetAnalytics() => call<void>(analytics.reset);
+
+  // Remote config
+  Future<Result<void>> fetchRemoteConfig() =>
+      call<void>(remoteConfig.fetchAndActivate);
 
   // Account management
   Future<Result<void>> sendPasswordReset(String email) =>

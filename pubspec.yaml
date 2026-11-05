@@ -30,6 +30,7 @@ workspace:
   - extensions/logger
   - extensions/notifications
   - extensions/permission
+  - extensions/remote_config
   - extensions/rest_auth
   - extensions/riverpod
   - extensions/secure_storage
