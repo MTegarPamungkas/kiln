@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kiln.dev/schemas/migration.schema.json",
+  "title": "Kiln extension migration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "from", "to", "actions"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "from": { "type": "string" },
+    "to": { "type": "string" },
+    "description": { "type": "string" },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "enum": ["rename_file", "delete_file", "replace_dependency", "update_config", "message"]
+          },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "path": { "type": "string" },
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "key": { "type": "string" },
+          "value": {},
+          "text": { "type": "string" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "rename_file" } } },
+            "then": { "required": ["from", "to"] }
+          },
+          {
+            "if": { "properties": { "type": { "const": "delete_file" } } },
+            "then": { "required": ["path"] }
+          },
+          {
+            "if": { "properties": { "type": { "const": "replace_dependency" } } },
+            "then": { "required": ["name", "version"] }
+          },
+          {
+            "if": { "properties": { "type": { "const": "update_config" } } },
+            "then": { "required": ["key"] }
+          },
+          {
+            "if": { "properties": { "type": { "const": "message" } } },
+            "then": { "required": ["text"] }
+          }
+        ]
+      }
+    }
+  }
+}

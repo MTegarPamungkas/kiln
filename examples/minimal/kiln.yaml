@@ -1,0 +1,17 @@
+# Konfigurasi proyek Kiln. Boleh diedit; kiln tidak menimpanya.
+kiln: ">=0.1.0 <0.2.0"
+core: ^0.1.0
+project:
+  name: minimal
+  org: com.example
+  platforms:
+    - android
+    - ios
+    - web
+
+state: none
+extensions: {}
+verify:
+  after_add: [pub_get, analyze]
+registry:
+  offline: false

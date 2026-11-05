@@ -1,0 +1,105 @@
+name: Smoke
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  create-add-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Create and add platform extensions
+        run: |
+          dart run packages/kiln_cli/bin/kiln.dart create smoke_app \
+            --org com.kiln.smoke \
+            --core-path "$GITHUB_WORKSPACE/packages/kiln_core" \
+            --with connectivity,permission,notifications,image_picker \
+            --yes
+      - name: Analyze
+        working-directory: smoke_app
+        run: flutter analyze
+      - name: Test
+        working-directory: smoke_app
+        run: flutter test
+
+  create-auth-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Create and add auth extensions
+        run: |
+          dart run packages/kiln_cli/bin/kiln.dart create smoke_auth \
+            --org com.kiln.smoke \
+            --platforms android,ios \
+            --core-path "$GITHUB_WORKSPACE/packages/kiln_core" \
+            --with dio,secure_storage,rest_auth,biometric \
+            --answer base_url=https://api.example.com \
+            --yes
+      - name: Analyze
+        working-directory: smoke_auth
+        run: flutter analyze
+      - name: Test
+        working-directory: smoke_auth
+        run: flutter test
+
+  create-ui-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Create and add UI extensions
+        run: |
+          dart run packages/kiln_cli/bin/kiln.dart create smoke_ui \
+            --org com.kiln.smoke \
+            --core-path "$GITHUB_WORKSPACE/packages/kiln_core" \
+            --with go_router,deep_link,theme,l10n \
+            --yes
+      - name: Analyze
+        working-directory: smoke_ui
+        run: flutter analyze
+      - name: Test
+        working-directory: smoke_ui
+        run: flutter test
+
+  create-tooling-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Create and add tooling extensions
+        run: |
+          dart run packages/kiln_cli/bin/kiln.dart create smoke_tooling \
+            --org com.kiln.smoke \
+            --core-path "$GITHUB_WORKSPACE/packages/kiln_core" \
+            --with env,flavors,logger,analytics \
+            --yes
+      - name: Analyze
+        working-directory: smoke_tooling
+        run: flutter analyze
+      - name: Test
+        working-directory: smoke_tooling
+        run: flutter test

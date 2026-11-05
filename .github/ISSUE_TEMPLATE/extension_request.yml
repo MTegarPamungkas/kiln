@@ -1,0 +1,31 @@
+name: Extension request
+description: Usulkan extension baru untuk katalog Kiln.
+labels: [extension]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Nama extension
+    validations:
+      required: true
+  - type: input
+    id: capability
+    attributes:
+      label: Capability yang disediakan
+      description: Gunakan nama capability, bukan id extension lain.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Cakupan
+      description: Kontrak yang dipenuhi, prompt, slot, dan patch native.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatif
+      description: Extension atau pendekatan lain yang sudah dipertimbangkan.
+    validations:
+      required: false

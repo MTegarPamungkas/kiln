@@ -1,0 +1,35 @@
+name: Bug report
+description: Laporkan bug di Kiln.
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Ringkasan
+      description: Apa yang terjadi dan apa yang diharapkan?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Langkah reproduksi
+      placeholder: |
+        1. kiln create ...
+        2. kiln add ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versi
+      description: Output `kiln version` dan versi Flutter.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: Jalankan dengan `--verbose` bila memungkinkan.
+    validations:
+      required: false

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kiln.dev/schemas/kiln.schema.json",
+  "title": "Kiln project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kiln", "core", "project"],
+  "properties": {
+    "kiln": { "type": "string", "description": "CLI version range compatible with this project." },
+    "core": { "type": "string", "description": "kiln_core version range." },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "org"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "org": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)+$" },
+        "platforms": {
+          "type": "array",
+          "items": { "enum": ["android", "ios", "macos", "web", "windows", "linux"] },
+          "uniqueItems": true
+        }
+      }
+    },
+    "state": { "enum": ["bloc", "riverpod", "none"] },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "verify": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "after_add": {
+          "type": "array",
+          "items": { "enum": ["pub_get", "analyze", "test"] },
+          "uniqueItems": true
+        }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "offline": { "type": "boolean" },
+        "url": { "type": "string" },
+        "ref": { "type": "string" }
+      }
+    }
+  }
+}

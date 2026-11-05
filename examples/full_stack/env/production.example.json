@@ -1,0 +1,6 @@
+{
+  "api_base_url": "https://api.example.com",
+  "api_key": "",
+  "feature_flags": "",
+  "enable_debug_tools": "false"
+}

@@ -1,0 +1,40 @@
+# Dart and Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+*.lock.tmp
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated bundles and goldens are committed; transient outputs are not.
+*.iml
+.idea/
+.vscode/*.log
+
+# Local Kiln state
+.kiln/backups/
+.kiln/journal/
+.kiln/logs/
+
+# Local environment files
+env/*.json
+!env/*.example.json
+
+# Local end-to-end proof output
+/e2e_app/
+/e2e_appwrite/
+/e2e_auth/
+/e2e_bloc/
+/e2e_firebase/
+/e2e_l10n/
+/e2e_riverpod/
+/e2e_http/
+/e2e_platform/
+/e2e_storage/
+/e2e_store/
+/e2e_supabase/
+/e2e_tooling/
+/e2e_ui/

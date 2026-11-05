@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kiln.dev/schemas/extension.schema.json",
+  "title": "Kiln extension manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "version", "description", "category"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(_[a-z0-9]+)*$",
+      "description": "Stable snake_case identifier, also used as the folder name."
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "category": {
+      "enum": [
+        "state",
+        "network",
+        "storage",
+        "database",
+        "auth",
+        "social",
+        "security",
+        "navigation",
+        "theme",
+        "l10n",
+        "platform",
+        "notifications",
+        "media",
+        "config",
+        "flavor",
+        "logging",
+        "analytics",
+        "crash_reporting",
+        "ci",
+        "codegen",
+        "tooling"
+      ]
+    },
+    "tier": { "enum": ["official", "verified", "community"] },
+    "exclusive": { "type": "boolean" },
+    "provides": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+      "uniqueItems": true
+    },
+    "requires": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+      "uniqueItems": true
+    },
+    "optional_requires": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+      "uniqueItems": true
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "dev_dependencies": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "item"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+          "item": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "contributes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slot"],
+        "properties": {
+          "slot": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+          "item": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 0 },
+          "when": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "type"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "type": {
+            "enum": ["string", "url", "int", "bool", "enum", "secret", "multi"]
+          },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "default": {},
+          "required": { "type": "boolean" },
+          "secret": { "type": "boolean" },
+          "multiple": { "type": "boolean" },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          },
+          "min": { "type": "integer" },
+          "max": { "type": "integer" }
+        }
+      }
+    },
+    "platforms": {
+      "type": "array",
+      "items": { "enum": ["android", "ios", "macos", "web", "windows", "linux"] },
+      "uniqueItems": true
+    },
+    "flutter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generate": { "type": "boolean" }
+      }
+    },
+    "android": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "permissions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "app_links": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hosts": { "type": "array", "items": { "type": "string" } },
+            "path_prefixes": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "allow_backup": { "type": "boolean" },
+        "activity": { "type": "string" },
+        "min_sdk": { "type": "integer" },
+        "receivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)+$" },
+              "exported": { "type": "boolean" },
+              "actions": {
+                "type": "array",
+                "items": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)+$" },
+                "uniqueItems": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "ios": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plist": { "type": "object", "additionalProperties": true },
+        "podfile_permissions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "associated_domains": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "entitlements": { "type": "object", "additionalProperties": true },
+        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "macos": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "entitlements": { "type": "object", "additionalProperties": true },
+        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "web": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "index_html": { "type": "boolean" }
+      }
+    },
+    "conditional": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["when"],
+        "properties": {
+          "when": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": true
+          },
+          "android": { "$ref": "#/properties/android" },
+          "ios": { "$ref": "#/properties/ios" },
+          "macos": { "$ref": "#/properties/macos" },
+          "web": { "$ref": "#/properties/web" }
+        }
+      }
+    },
+    "manual_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kiln": { "type": "string" },
+        "dart": { "type": "string" },
+        "flutter": { "type": "string" }
+      }
+    }
+  }
+}
