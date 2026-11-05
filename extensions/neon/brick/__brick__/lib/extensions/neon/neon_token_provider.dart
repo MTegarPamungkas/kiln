@@ -16,6 +16,14 @@ abstract interface class NeonTokenProvider {
   Future<String?> token();
 }
 
+/// A [NeonTokenProvider] that holds resources, such as an HTTP client, and can
+/// release them when the owning gateway is closed.
+abstract interface class DisposableNeonTokenProvider
+    implements NeonTokenProvider {
+  /// Releases the held resources; the provider is unusable afterwards.
+  void close();
+}
+
 /// Uses a fixed bearer token from configuration.
 final class StaticNeonTokenProvider implements NeonTokenProvider {
   StaticNeonTokenProvider(String token) : _token = token;
@@ -29,7 +37,7 @@ final class StaticNeonTokenProvider implements NeonTokenProvider {
 /// Fetches and caches the anonymous JWT from Neon Auth
 /// (`{authUrl}/token/anonymous`), reusing it until a minute before its `exp`
 /// claim.
-final class NeonAnonymousTokenProvider implements NeonTokenProvider {
+final class NeonAnonymousTokenProvider implements DisposableNeonTokenProvider {
   NeonAnonymousTokenProvider({
     required this.authUrl,
     http.Client? client,

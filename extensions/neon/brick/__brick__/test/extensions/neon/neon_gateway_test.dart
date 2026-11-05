@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/neon/neon_auth_gateway.dart';
 import 'package:{{app_name}}/extensions/neon/neon_config.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
+import 'package:{{app_name}}/extensions/neon/neon_session_token_provider.dart';
+import 'package:{{app_name}}/extensions/neon/neon_token_provider.dart';
 
 void main() {
   const config = NeonConfig(
@@ -161,4 +165,39 @@ void main() {
       ),
     );
   });
+
+  test('closing the gateway releases a wrapped anonymous fallback client', () {
+    final anonymousClient = RecordingClient();
+    final gateway = HttpNeonGateway(
+      config: config.copyWith(apiKey: '', authUrl: 'https://auth.test/db/auth'),
+      client: MockClient((request) async => http.Response('[]', 200)),
+      tokenProvider: NeonSessionTokenProvider(
+        auth: BetterAuthGateway(
+          authUrl: 'https://auth.test/db/auth',
+          client: MockClient((request) async => http.Response('{}', 404)),
+        ),
+        fallback: NeonAnonymousTokenProvider(
+          authUrl: 'https://auth.test/db/auth',
+          client: anonymousClient,
+        ),
+      ),
+    );
+
+    gateway.close();
+
+    expect(anonymousClient.closeCalls, 1);
+  });
+}
+
+/// A client that counts `close()` calls so disposal can be asserted.
+final class RecordingClient extends http.BaseClient {
+  int closeCalls = 0;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    return http.StreamedResponse(Stream.value(<int>[]), 200);
+  }
+
+  @override
+  void close() => closeCalls++;
 }

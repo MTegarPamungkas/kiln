@@ -47,8 +47,11 @@ abstract interface class NeonAuthGateway {
 /// [NeonAuthGateway] backed by Better Auth's HTTP API.
 ///
 /// The gateway keeps the session in memory and re-sends its token as the
-/// `__Secure-neon-auth.session_token` cookie on authenticated calls. Sign-in
-/// failures map to `Failure(auth.invalid_credentials)`.
+/// `__Secure-neon-auth.session_token` cookie on authenticated calls. Bad
+/// credentials map to `Failure(auth.invalid_credentials)`; rejections Better
+/// Auth classifies as input problems (taken email, weak password) map to
+/// `validation.invalid_input`, and server or rate-limit errors stay retryable
+/// instead of blaming the credentials.
 final class BetterAuthGateway implements NeonAuthGateway {
   BetterAuthGateway({
     required this.authUrl,
@@ -90,11 +93,7 @@ final class BetterAuthGateway implements NeonAuthGateway {
       body: jsonEncode(<String, String>{'email': email, 'password': password}),
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Failure(
-        code: FailureCode.authInvalidCredentials,
-        message: _message(response.body, 'Invalid email or password.'),
-        kind: FailureKind.authentication,
-      );
+      throw _failureFor(response, fallback: 'Invalid email or password.');
     }
     return _adopt(jsonDecode(response.body) as Map<String, Object?>);
   }
@@ -115,11 +114,7 @@ final class BetterAuthGateway implements NeonAuthGateway {
       }),
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Failure(
-        code: FailureCode.authInvalidCredentials,
-        message: _message(response.body, 'The account could not be created.'),
-        kind: FailureKind.authentication,
-      );
+      throw _failureFor(response, fallback: 'The account could not be created.');
     }
     return _adopt(jsonDecode(response.body) as Map<String, Object?>);
   }
@@ -191,6 +186,82 @@ final class BetterAuthGateway implements NeonAuthGateway {
     _jwt = null;
     _jwtExpires = null;
     return session;
+  }
+
+  /// Maps a non-2xx Better Auth response to a [Failure].
+  ///
+  /// Better Auth answers with a JSON body carrying an upper-snake `code`, for
+  /// example `INVALID_EMAIL_OR_PASSWORD` or `USER_ALREADY_EXISTS`. Server
+  /// errors and rate limits must not read as bad credentials, so they map to
+  /// retryable network/unavailable failures first; rejections Better Auth
+  /// classifies as input problems follow the validation codes.
+  static Failure _failureFor(
+    http.Response response, {
+    required String fallback,
+  }) {
+    final status = response.statusCode;
+    final details = <String, Object?>{'statusCode': status};
+    if (status >= 500) {
+      return Failure(
+        code: FailureCode.networkServer,
+        message: 'Neon Auth could not complete the request. Try again later.',
+        kind: FailureKind.network,
+        isRetryable: true,
+        details: details,
+      );
+    }
+    if (status == 429) {
+      return Failure(
+        code: FailureCode.unavailable,
+        message: 'Too many attempts. Try again in a moment.',
+        kind: FailureKind.unavailable,
+        isRetryable: true,
+        details: details,
+      );
+    }
+    final code = _errorCode(response.body);
+    if (code != null) {
+      details['better_auth_code'] = code;
+    }
+    switch (code) {
+      case 'USER_ALREADY_EXISTS':
+        return Failure(
+          code: FailureCode.validationInvalidInput,
+          message: 'An account with this email already exists.',
+          kind: FailureKind.validation,
+          details: details,
+        );
+      case 'INVALID_EMAIL':
+      case 'INVALID_PASSWORD':
+      case 'PASSWORD_TOO_SHORT':
+      case 'PASSWORD_TOO_LONG':
+        return Failure(
+          code: FailureCode.validationInvalidInput,
+          message: _message(response.body, fallback),
+          kind: FailureKind.validation,
+          details: details,
+        );
+      default:
+        return Failure(
+          code: FailureCode.authInvalidCredentials,
+          message: _message(response.body, fallback),
+          kind: FailureKind.authentication,
+          details: details,
+        );
+    }
+  }
+
+  /// Better Auth's upper-snake error code, or null on a non-JSON body.
+  static String? _errorCode(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map && decoded['code'] is String) {
+        return decoded['code'] as String;
+      }
+    } on FormatException {
+      // fall through to the status-based mapping
+    }
+    return null;
   }
 
   static String _message(String body, String fallback) {
