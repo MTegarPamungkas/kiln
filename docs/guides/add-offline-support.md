@@ -1,6 +1,6 @@
 # Adding offline support
 
-Planned combination:
+Recommended combination:
 
 - `connectivity` — monitors the network and provides the `offline_guard`
   middleware.
