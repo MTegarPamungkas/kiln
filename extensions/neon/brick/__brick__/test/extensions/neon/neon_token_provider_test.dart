@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -5,7 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/neon/neon_gateway.dart';
+import 'package:{{app_name}}/extensions/neon/neon_session_token_provider.dart';
 import 'package:{{app_name}}/extensions/neon/neon_token_provider.dart';
+
+import 'test_support.dart';
 
 String _jwt(int exp) {
   final header =
@@ -82,4 +86,41 @@ void main() {
       ),
     );
   });
+
+  test('closing the session provider closes a disposable fallback', () {
+    final anonymousClient = RecordingClient();
+    final provider = NeonSessionTokenProvider(
+      auth: FakeNeonAuthGateway(),
+      fallback: NeonAnonymousTokenProvider(
+        authUrl: 'https://auth.test/db/auth',
+        client: anonymousClient,
+      ),
+    );
+
+    provider.close();
+
+    expect(anonymousClient.closeCalls, 1);
+  });
+
+  test('closing the session provider tolerates a static or absent fallback',
+      () {
+    NeonSessionTokenProvider(
+      auth: FakeNeonAuthGateway(),
+      fallback: StaticNeonTokenProvider('abc'),
+    ).close();
+    NeonSessionTokenProvider(auth: FakeNeonAuthGateway()).close();
+  });
+}
+
+/// A client that counts `close()` calls so disposal can be asserted.
+final class RecordingClient extends http.BaseClient {
+  int closeCalls = 0;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    return http.StreamedResponse(Stream.value(<int>[]), 200);
+  }
+
+  @override
+  void close() => closeCalls++;
 }

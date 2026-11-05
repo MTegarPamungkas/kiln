@@ -212,7 +212,7 @@ final class HttpNeonGateway implements PostgrestGateway {
   /// Releases the underlying HTTP client. The gateway is unusable afterwards.
   void close() {
     final provider = _tokenProvider;
-    if (provider is NeonAnonymousTokenProvider) {
+    if (provider is DisposableNeonTokenProvider) {
       provider.close();
     }
     _client.close();
