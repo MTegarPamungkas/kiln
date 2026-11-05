@@ -67,7 +67,7 @@ void main() {
       expect(prompter.integer('Timeout', min: 1, max: 60), 30);
     });
 
-    test('selectMany keeps the shown selection on an empty answer', () {
+    test('selectMany keeps the shown selection on an empty answer', () async {
       final prompter = Prompter(
         interactive: true,
         readLine: (_) => '',
@@ -75,7 +75,7 @@ void main() {
       );
 
       expect(
-        prompter.selectMany(
+        await prompter.selectMany(
           'Platforms:',
           ['android', 'ios', 'web'],
           defaults: {'android', 'web'},
@@ -84,7 +84,7 @@ void main() {
       );
     });
 
-    test('selectMany toggles entries by number', () {
+    test('selectMany toggles entries by number', () async {
       final answers = <String?>['1 3', '2,2'];
       var index = 0;
       final prompter = Prompter(
@@ -94,7 +94,7 @@ void main() {
       );
 
       expect(
-        prompter.selectMany(
+        await prompter.selectMany(
           'Platforms:',
           ['android', 'ios', 'web'],
           defaults: {'ios'},
@@ -102,15 +102,15 @@ void main() {
         <String>['android', 'ios', 'web'],
       );
       expect(
-        prompter.selectMany('Platforms:', ['android', 'ios', 'web']),
+        await prompter.selectMany('Platforms:', ['android', 'ios', 'web']),
         <String>[],
       );
     });
 
-    test('selectMany falls back to defaults without interaction', () {
+    test('selectMany falls back to defaults without interaction', () async {
       final quiet = Prompter(interactive: false);
       expect(
-        quiet.selectMany(
+        await quiet.selectMany(
           'Platforms:',
           ['android', 'ios'],
           defaults: {'ios'},
@@ -119,7 +119,7 @@ void main() {
       );
       final assumed = Prompter(assumeYes: true, interactive: false);
       expect(
-        assumed.selectMany(
+        await assumed.selectMany(
           'Platforms:',
           ['android', 'ios'],
           defaults: {'android'},
@@ -128,15 +128,15 @@ void main() {
       );
     });
 
-    test('selectMany rejects a number outside the options', () {
+    test('selectMany rejects a number outside the options', () async {
       final prompter = Prompter(
         interactive: true,
         readLine: (_) => '9',
         write: (_) {},
       );
 
-      expect(
-        () => prompter.selectMany('Platforms:', ['android', 'ios']),
+      await expectLater(
+        prompter.selectMany('Platforms:', ['android', 'ios']),
         throwsA(
           isA<KilnException>().having(
             (error) => error.code,
@@ -146,5 +146,84 @@ void main() {
         ),
       );
     });
+
+    test('selectMany navigates with arrows and toggles with space', () async {
+      final session = _ScriptedRawKeys(<RawKey>[
+        RawKey.down,
+        RawKey.space,
+        RawKey.down,
+        RawKey.space,
+        RawKey.enter,
+      ]);
+      final prompter = Prompter(
+        interactive: true,
+        readLine: (_) => null,
+        write: (_) {},
+        rawKeys: session,
+      );
+
+      expect(
+        await prompter.selectMany('Pick:', ['a', 'b', 'c']),
+        <String>['b', 'c'],
+      );
+      expect(session.restoreCount, 1);
+    });
+
+    test('selectMany cancels on escape in raw mode', () async {
+      final session = _ScriptedRawKeys(<RawKey>[RawKey.cancel]);
+      final prompter = Prompter(
+        interactive: true,
+        readLine: (_) => null,
+        write: (_) {},
+        rawKeys: session,
+      );
+
+      await expectLater(
+        prompter.selectMany('Pick:', ['a', 'b']),
+        throwsA(
+          isA<KilnException>().having(
+            (error) => error.code,
+            'code',
+            'prompt.cancelled',
+          ),
+        ),
+      );
+      expect(session.restoreCount, 1);
+    });
   });
+}
+
+final class _ScriptedRawKeys implements RawKeySource {
+  _ScriptedRawKeys(this.keys);
+
+  final List<RawKey> keys;
+  int restoreCount = 0;
+
+  @override
+  RawModeSession? enter() {
+    var index = 0;
+    return _ScriptedSession(() {
+      if (index >= keys.length) {
+        return RawKey.enter;
+      }
+      return keys[index++];
+    }, () {
+      restoreCount++;
+    });
+  }
+}
+
+final class _ScriptedSession implements RawModeSession {
+  _ScriptedSession(this.nextKey, this.onRestore);
+
+  final RawKey Function() nextKey;
+  final void Function() onRestore;
+
+  @override
+  Future<RawKey> read() async => nextKey();
+
+  @override
+  void restore() {
+    onRestore();
+  }
 }

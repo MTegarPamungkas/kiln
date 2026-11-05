@@ -11,6 +11,7 @@ resolution: workspace
 dependencies:
   archive: ^4.6.0
   args: ^2.7.0
+  ffi: ^2.2.0
   kiln_core: ^0.1.0
   kiln_extension_sdk: ^0.1.0
   kiln_store: ^0.1.0
