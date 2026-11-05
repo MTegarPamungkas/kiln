@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T10:46:14.489352Z",
+  "generated_at": "2026-11-05T11:10:24.587441Z",
   "extensions": [
     {
       "id": "analytics",
@@ -107,6 +107,28 @@
           "sha256": "7936e42d77e2beddccf80ca3391bae75a205562e1c6ae6a029a1543e0aee2a70",
           "provides": [
             "calendar"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "codegen",
+      "name": "Codegen",
+      "description": "JSON model code generation with json_serializable and freezed, wired through build_runner.",
+      "category": "codegen",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/codegen-0.1.0.tgz",
+          "sha256": "694845eaffca636c8c60af97c5155f569e4bb48f8674ff454c330d0a377071a1",
+          "provides": [
+            "codegen"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",

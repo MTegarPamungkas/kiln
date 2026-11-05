@@ -10,6 +10,7 @@ This catalog is generated from extension manifests by
 | `biometric` | Biometric | 0.1.0 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.1.0 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
+| `codegen` | Codegen | 0.1.0 | codegen | official | `codegen` |
 | `connectivity` | Connectivity | 0.1.0 | connectivity | official | `connectivity` |
 | `crash_report` | Crash Report | 0.1.0 | crash | official | `crash_reporter` |
 | `deep_link` | Deep links | 0.1.0 | deep_link | official | `deep_links` |
@@ -77,6 +78,15 @@ Add events to the device calendar through the native calendar UI.
 - Provides: `calendar`
 - Dependencies: `add_2_calendar: ^3.1.1`
 - Platforms: android, ios
+
+## codegen
+
+JSON model code generation with json_serializable and freezed, wired through build_runner.
+
+- Provides: `codegen`
+- Prompts: generators
+- Dependencies: `json_annotation: ^4.12.0`, `freezed_annotation: ^3.1.0`
+- Platforms: android, ios, macos, web, windows, linux
 
 ## connectivity
 

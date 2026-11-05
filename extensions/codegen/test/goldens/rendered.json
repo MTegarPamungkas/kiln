@@ -1,0 +1,12 @@
+{
+  "extension": "codegen",
+  "files": {
+    "build.yaml": "1d3437a0b27a0f0e9ad55d7c6be036788a6fe5550e3bd4dd9eed5b2d9d10cf89",
+    "lib/extensions/codegen/example/example_model.dart": "9b0fd1ba65606e2404b0d8c484720c468c20a710334679b9bba8ada194d6bd0e",
+    "lib/extensions/codegen/example/example_model.freezed.dart": "e9da5f8141d347f8add2addae4a2f6f1a1aa370d74e4f233d99cadfa0dd81038",
+    "lib/extensions/codegen/example/example_model.g.dart": "2f52441e8799eac0f392a53ad2bcd33397bd0f27f1add0f9509bc3236a23d629",
+    "lib/extensions/codegen/json_converters.dart": "c087b1b4f5af9b59220f3d1a3a69ef2c86812c4ae0e4ec9921d88cbbf8a44624",
+    "test/extensions/codegen/example_model_test.dart": "a8d83acc82948465e81ed10235664f0c3fb44b2c381f9999d494e7646137ad72",
+    "test/extensions/codegen/json_converters_test.dart": "b3951f3baac788dbcffb66b20dee7e76a38d082c011ae902c7469dfa2494744f"
+  }
+}
