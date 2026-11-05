@@ -200,8 +200,7 @@ final class ExtensionInstaller {
       );
       final filesForLock = <String, String>{};
 
-      for (final file in rendered) {
-        final relative = _posix(file.relativePath);
+      void planFile(String relative, List<int> bytes) {
         final target = File(p.join(projectRoot.path, relative));
         final exists = target.existsSync();
         final currentHash = exists ? ownership.hashFile(target) : null;
@@ -218,25 +217,25 @@ final class ExtensionInstaller {
           warnings.add(
             'File "$relative" was edited by the user; it was not replaced',
           );
-          continue;
+          return;
         }
         if (action == CollisionAction.skip) {
           _recordChange(changes, relative, FileChangeKind.skip);
-          continue;
+          return;
         }
 
         final previous = plannedFiles[relative];
         if (previous != null &&
-            !const ListEquality<int>().equals(previous.bytes, file.bytes)) {
+            !const ListEquality<int>().equals(previous.bytes, bytes)) {
           _recordChange(changes, relative, FileChangeKind.conflict);
           warnings.add(
             'Extensions "${previous.owner}" and "${manifest.id}" render "$relative" differently',
           );
-          continue;
+          return;
         }
 
-        plannedFiles[relative] = _PlannedFile(file.bytes, manifest.id);
-        filesForLock[relative] = ownership.hashBytes(file.bytes);
+        plannedFiles[relative] = _PlannedFile(bytes, manifest.id);
+        filesForLock[relative] = ownership.hashBytes(bytes);
         _recordChange(
           changes,
           relative,
@@ -244,6 +243,16 @@ final class ExtensionInstaller {
               ? FileChangeKind.create
               : FileChangeKind.overwrite,
         );
+      }
+
+      for (final file in rendered) {
+        planFile(_posix(file.relativePath), file.bytes);
+      }
+
+      // Documentation travels with the code, so an installed app carries its
+      // extension docs without visiting the source repository.
+      for (final (relative, bytes) in _documentationFiles(extension)) {
+        planFile(relative, bytes);
       }
 
       final native = nativeSetup.plan(
@@ -655,6 +664,45 @@ final class ExtensionInstaller {
       warnings: List<String>.unmodifiable(warnings),
       verification: verification,
     );
+  }
+
+  /// Documentation files for [extension], as `(app-relative path, bytes)`
+  /// pairs installed under `lib/extensions/<id>/`. Bundled extensions carry
+  /// the bytes in [AvailableExtension.docs]; store extensions are read
+  /// verbatim from the extension root. Copied raw, never templated.
+  List<(String, List<int>)> _documentationFiles(AvailableExtension extension) {
+    final id = extension.id;
+    final embedded = extension.docs;
+    if (embedded.isNotEmpty) {
+      return <(String, List<int>)>[
+        for (final entry in embedded.entries)
+          ('lib/extensions/$id/${_posix(entry.key)}', entry.value),
+      ];
+    }
+    final root = extension.manifest.rootPath;
+    if (root == null) {
+      return const <(String, List<int>)>[];
+    }
+    final files = <(String, List<int>)>[];
+    final readme = File(p.join(root, 'README.md'));
+    if (readme.existsSync()) {
+      files.add((
+        'lib/extensions/$id/README.md',
+        readme.readAsBytesSync(),
+      ));
+    }
+    final docs = Directory(p.join(root, 'docs'));
+    if (!docs.existsSync()) {
+      return files;
+    }
+    final docFiles =
+        docs.listSync(recursive: true).whereType<File>().toList()
+          ..sort((left, right) => left.path.compareTo(right.path));
+    for (final doc in docFiles) {
+      final relative = p.relative(doc.path, from: root).replaceAll('\\', '/');
+      files.add(('lib/extensions/$id/$relative', doc.readAsBytesSync()));
+    }
+    return files;
   }
 
   bool _wantsFlutterGenerate(ExtensionManifest manifest) {
