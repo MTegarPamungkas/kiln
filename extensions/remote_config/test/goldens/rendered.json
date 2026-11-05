@@ -1,0 +1,21 @@
+{
+  "extension": "remote_config",
+  "files": {
+    "lib/extensions/remote_config/gate_remote_config.dart": "13bfe5e6677516af65ea05b6610a8707e0539ad53c42302bfead51265b5af07a",
+    "lib/extensions/remote_config/http_remote_config_gateway.dart": "a4e2f9e1ffc38af50912f843ab09d4ebee159f785f157d7c902793013e013187",
+    "lib/extensions/remote_config/remote_config_client.dart": "79398b10242b2556ef59962d2361f8e5dfaa7d91a5d7a1f63484a6f9f6be9d4d",
+    "lib/extensions/remote_config/remote_config_config.dart": "21cafcc7fa128f03b3099e229aa12119eea5a14ea1bd8c474706f5a3f06cdf06",
+    "lib/extensions/remote_config/remote_config_failure_mapper.dart": "d0ee3b8fe07165af171ec67a484d37c291ddf9b801d92feec44ddadbea2d8c79",
+    "lib/extensions/remote_config/remote_config_gateway.dart": "3d9d13674e6ab6b474a9756cbc2cd7c6937a10841ad8af5c59331e5ac35efb67",
+    "lib/extensions/remote_config/remote_config_module.dart": "f6cb5e1f021b11127b5b6ca4d057435b801dc4e5d1af8fd2c5b801b636ea3450",
+    "lib/extensions/remote_config/remote_config_support.dart": "29c82c97f16072ce58e2c7c91a559d23e4a12e5720f7491018af52492d5abeed",
+    "test/extensions/remote_config/gate_remote_config_test.dart": "da06d919b9d6e5109d8a1b0f3558c1cf4c1f6b9b3a367d8326ebd041c10ee94d",
+    "test/extensions/remote_config/remote_config_client_test.dart": "68e2908b3e687169c0ef87e9332de9bde4bd9c7d77f63d77aa3060aef4ec46e1",
+    "test/extensions/remote_config/remote_config_config_test.dart": "a58107e9d4faa02ffa4f47686c641fcacbb780183c1fba40ff28a7847708f3bb",
+    "test/extensions/remote_config/remote_config_contract_test.dart": "7c9e63720509f22a35f9a0e1ef2ca71ea3079ab7fd387b6f75525a395362d436",
+    "test/extensions/remote_config/remote_config_failure_mapper_test.dart": "96dd3095dd90971f2254b6f0f98f56e5fadad452b87e567c9186845900060f46",
+    "test/extensions/remote_config/remote_config_module_test.dart": "8ae01580f57b46edf8a0d7087220bc7e0a6bad1570cba60872a14dff8328d6f0",
+    "test/extensions/remote_config/remote_config_support_test.dart": "249d297a4fbbaca5884a2c2986f38c20f192666b807b931e1096871e3c262bd5",
+    "test/extensions/remote_config/test_support.dart": "63c4cdef165a17e3fc9bc89e5edc85a27284fdfe54017c4ad75d22d384bf7d4c"
+  }
+}

@@ -26,6 +26,7 @@ import 'local_db_bundle.dart';
 import 'logger_bundle.dart';
 import 'notifications_bundle.dart';
 import 'permission_bundle.dart';
+import 'remote_config_bundle.dart';
 import 'rest_auth_bundle.dart';
 import 'riverpod_bundle.dart';
 import 'secure_storage_bundle.dart';
@@ -59,6 +60,7 @@ final List<AvailableExtension> bundledExtensions = <AvailableExtension>[
   loggerExtension,
   notificationsExtension,
   permissionExtension,
+  remoteConfigExtension,
   restAuthExtension,
   riverpodExtension,
   secureStorageExtension,

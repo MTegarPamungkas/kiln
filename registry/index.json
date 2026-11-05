@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T11:10:24.587441Z",
+  "generated_at": "2026-11-05T11:26:22.453210Z",
   "extensions": [
     {
       "id": "analytics",
@@ -513,6 +513,28 @@
           "sha256": "ca79d2862d32f26a8595cd5ebaf5ac71207219b30ae06a2fadbb5aa58aaf7b8c",
           "provides": [
             "permission"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "remote_config",
+      "name": "Remote Config",
+      "description": "Feature flags and remote configuration fetched from any JSON HTTP endpoint, read through the Gate.",
+      "category": "config",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/remote_config-0.1.0.tgz",
+          "sha256": "9b74531a237f40839dc841ee442c7bb4fa20e572ebdaba8efc49e43bbaf62ecd",
+          "provides": [
+            "remote_config"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",

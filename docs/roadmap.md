@@ -100,6 +100,18 @@
 - [x] Manifest, brick, goldens, registry, catalog, docs, and a real
   `flutter analyze` of the rendered model all pass.
 
+## Phase 8 — Remote config
+
+- [x] `RemoteConfig` contract added to `kiln_core` with typed synchronous reads,
+  `setDefaults`, `fetch`/`activate`, and a `changes` stream; `Gate.remoteConfig`
+  and a `fetchRemoteConfig` verb expose it.
+- [x] `FakeRemoteConfig` and a shared `remoteConfigContract` suite in
+  `kiln_testing`, auto-registered in the default test registry.
+- [x] `remote_config` extension: a vendor-neutral gateway reading a flat JSON
+  object over `package:http`, with an empty endpoint serving only defaults.
+- [x] Gate ergonomics (`featureEnabled`, typed reads, `setRemoteDefaults`,
+  `remoteConfigChanges`). Firebase/LaunchDarkly can drop in as a gateway.
+
 ## Parked until a decision is made
 
 - Deferred crash_report refinements: error deduplication, an expected-Failure
