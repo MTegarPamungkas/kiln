@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T11:40:11.614429Z",
+  "generated_at": "2026-11-05T12:45:21.575307Z",
   "extensions": [
     {
       "id": "analytics",
@@ -82,7 +82,7 @@
         {
           "version": "0.1.0",
           "url": "archives/bloc-0.1.0.tgz",
-          "sha256": "bec9241b8afd776114951d381bc19429b4d76ec25371dd498200970ccfc36f70",
+          "sha256": "496cad2285641799f50d14a8224b8ca525fdbbf6bfe824967a94fb4f3bc1b8fe",
           "provides": [
             "state_bloc"
           ],
@@ -444,7 +444,7 @@
         {
           "version": "0.1.0",
           "url": "archives/local_db-0.1.0.tgz",
-          "sha256": "52cd67430ac186dc4581ec8955da9aa0645a9d56acfc7c3375d3d4805853b00b",
+          "sha256": "3e33a689632f394f9d53b264aa8c5d7cd4bf53c6b703291687244da85de7875f",
           "provides": [
             "local_db"
           ],
@@ -469,6 +469,28 @@
           "sha256": "7bce45e7845fdd2616c76bd7cc7f455ea5f60eeae76b6a17240ae8d539cd2b0d",
           "provides": [
             "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "neon",
+      "name": "Neon",
+      "description": "Neon Lakebase Postgres remote database through the Data API (PostgREST), read through the Gate.",
+      "category": "database",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/neon-0.1.0.tgz",
+          "sha256": "8b636dcd13c2f1dff38faafb07bc7b2ddb3ae3d8ad8a64e981cdae63ab04eb27",
+          "provides": [
+            "remote_database"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",
@@ -510,7 +532,7 @@
         {
           "version": "0.1.0",
           "url": "archives/permission-0.1.0.tgz",
-          "sha256": "ca79d2862d32f26a8595cd5ebaf5ac71207219b30ae06a2fadbb5aa58aaf7b8c",
+          "sha256": "b3a66e9875efae7139488ba74813ed450e6f966821c4c6aa3739ea605c479a93",
           "provides": [
             "permission"
           ],
@@ -580,7 +602,7 @@
         {
           "version": "0.1.0",
           "url": "archives/riverpod-0.1.0.tgz",
-          "sha256": "6fc118494df63560d0790d126c94ba244c2ef707841b7dbf1ef8586c7403e15f",
+          "sha256": "5981896b3d3ed77e5abde056e049362c3d7ea75b015242d5f31f4c2ff035f7da",
           "provides": [
             "state_riverpod"
           ],
@@ -602,7 +624,7 @@
         {
           "version": "0.1.0",
           "url": "archives/secure_storage-0.1.0.tgz",
-          "sha256": "f9cd4a0466e93035bf593f9c1a1e83cd84e9d88bd281f5b6419248c991875272",
+          "sha256": "80fcfed0809caf238968443e5b49a9375c04c10e18de9c49f487090f32c99d69",
           "provides": [
             "secure_storage"
           ],
@@ -671,7 +693,7 @@
         {
           "version": "0.1.0",
           "url": "archives/storage-0.1.0.tgz",
-          "sha256": "c8d4cb1dd9a6ff8d2bcecd389f095c8df7e098ec7b2ee85dc6985bb5c16624b1",
+          "sha256": "31603a3eee3a94109fbd51f5cc754a0b364a831e3c2f7fad359971e737d81056",
           "provides": [
             "storage"
           ],

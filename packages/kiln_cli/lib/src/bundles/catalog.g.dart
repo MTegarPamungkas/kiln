@@ -24,6 +24,7 @@ import 'image_picker_bundle.dart';
 import 'l10n_bundle.dart';
 import 'local_db_bundle.dart';
 import 'logger_bundle.dart';
+import 'neon_bundle.dart';
 import 'notifications_bundle.dart';
 import 'permission_bundle.dart';
 import 'remote_config_bundle.dart';
@@ -58,6 +59,7 @@ final List<AvailableExtension> bundledExtensions = <AvailableExtension>[
   l10nExtension,
   localDbExtension,
   loggerExtension,
+  neonExtension,
   notificationsExtension,
   permissionExtension,
   remoteConfigExtension,

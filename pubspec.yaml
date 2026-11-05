@@ -28,6 +28,7 @@ workspace:
   - extensions/l10n
   - extensions/local_db
   - extensions/logger
+  - extensions/neon
   - extensions/notifications
   - extensions/permission
   - extensions/remote_config
