@@ -65,6 +65,23 @@ and error records into this reporter as breadcrumbs — and because the register
 `CrashReporter` is already consent- and PII-wrapped, those breadcrumbs respect
 the same rules for free.
 
+## Reliability
+
+Two decorators keep reporting safe under load:
+
+- **Error deduplication** — `ErrorDeduplicator` collapses repeated identical
+  errors (same runtime type and message) into one report within
+  `CrashReportConfig.dedupWindow` (default 60s), using the shared `Clock` so it
+  is deterministic in tests. Disable with `dedupEnabled: false`.
+- **HTTP breadcrumbs** — when the `http_pipeline` capability is present (the
+  `dio` extension), `HttpBreadcrumbMiddleware` records one breadcrumb per
+  exchange (method, sanitized URL, status, duration) at pipeline priority 95.
+  It never captures request bodies or headers, and the URL drops the query
+  string. Toggle with `httpBreadcrumbsEnabled`.
+
+Because the registered `CrashReporter` is the full `Safe → Consent → PII →
+Dedup → vendor` chain, both features inherit consent gating and redaction.
+
 ## Support
 
 `kiln doctor` reports the extension as unsupported when the DSN is empty or the

@@ -4,6 +4,8 @@ import 'consent_gate_crash_reporter.dart';
 import 'crash_report_config.dart';
 import 'crash_report_gateway.dart';
 import 'crash_report_support.dart';
+import 'error_deduplicator.dart';
+import 'http_breadcrumb_middleware.dart';
 import 'noop_crash_reporter.dart';
 import 'pii_scrubbing_crash_reporter.dart';
 import 'safe_crash_reporter.dart';
@@ -13,9 +15,12 @@ import 'sentry_crash_reporter.dart';
 /// Registers [CrashReporter] on top of Sentry.
 ///
 /// The decorator order is [SafeCrashReporter] outermost, then
-/// [ConsentGateCrashReporter], then [PiiScrubbingCrashReporter], then either
-/// [SentryCrashReporter] or [NoopCrashReporter]. Reporting never throws, nothing
-/// leaves the device before crash-report consent, and nothing is sent unredacted.
+/// [ConsentGateCrashReporter], then [PiiScrubbingCrashReporter], then
+/// [ErrorDeduplicator], then either [SentryCrashReporter] or
+/// [NoopCrashReporter]. Reporting never throws, nothing leaves the device before
+/// crash-report consent, nothing is sent unredacted, and repeated identical
+/// errors collapse to one within a window. When the `http_pipeline` capability is
+/// present, [HttpBreadcrumbMiddleware] records each exchange as a breadcrumb.
 final class CrashReportModule extends KilnModule {
   CrashReportModule({
     CrashReportConfig? config,
@@ -36,7 +41,8 @@ final class CrashReportModule extends KilnModule {
   Set<String> get provides => const <String>{'crash_reporter'};
 
   @override
-  Set<String> get optionalRequires => const <String>{'flavor'};
+  Set<String> get optionalRequires =>
+      const <String>{'flavor', 'http_pipeline'};
 
   @override
   void register(Registry registry) {
@@ -46,9 +52,16 @@ final class CrashReportModule extends KilnModule {
     final flavor = registry.readOrNull<AppFlavor>();
     _flavor = flavor;
     final sends = _config.isActiveFor(flavor);
+    final clock = registry.readOrNull<Clock>() ?? const SystemClock();
 
-    final CrashReporter base = sends ? sentry : const NoopCrashReporter();
-    final scrubbed = PiiScrubbingCrashReporter(delegate: base);
+    final CrashReporter inner = sends ? sentry : const NoopCrashReporter();
+    final deduped = ErrorDeduplicator(
+      delegate: inner,
+      clock: clock,
+      window: _config.dedupWindow,
+      enabled: _config.dedupEnabled,
+    );
+    final scrubbed = PiiScrubbingCrashReporter(delegate: deduped);
     final consented = ConsentGateCrashReporter(
       delegate: scrubbed,
       consent: registry.read<ConsentController>(),
@@ -70,6 +83,14 @@ final class CrashReportModule extends KilnModule {
       ..registerSingleton<CrashReportGateway>(gateway)
       ..registerSingleton<SentryCrashReporter>(sentry)
       ..registerSingleton<CrashReporter>(reporter);
+
+    final httpPipeline = registry.readOrNull<HttpPipeline>();
+    if (httpPipeline != null && _config.httpBreadcrumbsEnabled) {
+      httpPipeline.use(
+        HttpBreadcrumbMiddleware(reporter: reporter, clock: clock),
+        priority: HttpBreadcrumbMiddleware.priority,
+      );
+    }
   }
 
   Future<void> _ensureSetup() {
