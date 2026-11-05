@@ -1,0 +1,18 @@
+name: {{id.snakeCase()}}
+description: {{name}} files rendered into the user project.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id
+    default: {{id.snakeCase()}}
+  name:
+    type: string
+    description: Extension name
+    default: {{name}}
+  app_name:
+    type: string
+    description: Application name
+    default: my_app

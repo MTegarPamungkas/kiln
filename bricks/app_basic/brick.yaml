@@ -1,0 +1,33 @@
+name: app_basic
+description: Kiln application shell with a minimal and a starter variant.
+version: 0.2.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  name:
+    type: string
+    description: Package name of the generated application
+    default: my_app
+  description:
+    type: string
+    description: Short application description
+    default: A Kiln application.
+  org:
+    type: string
+    description: Organization identifier
+    default: com.example
+  state:
+    type: string
+    description: State management choice (none, bloc, or riverpod)
+    default: none
+  platforms:
+    type: list
+    description: Platforms enabled for the project
+    default:
+      - android
+      - ios
+      - web
+  minimal:
+    type: boolean
+    description: Render only the minimal root without starter pages
+    default: true

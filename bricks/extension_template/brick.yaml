@@ -1,0 +1,34 @@
+name: extension_template
+description: Starting point for a new Kiln extension.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  id:
+    type: string
+    description: Extension id in snake_case
+    default: my_extension
+  name:
+    type: string
+    description: Human readable extension name
+    default: My extension
+  category:
+    type: string
+    description: Extension category
+    default: tooling
+  provides:
+    type: string
+    description: Primary capability provided by this extension
+    default: my_capability
+  requires:
+    type: string
+    description: Comma separated capabilities required by this extension
+    default: ""
+  with_hooks:
+    type: boolean
+    description: Generate Mason hooks
+    default: false
+  with_native_patch:
+    type: boolean
+    description: Generate a native setup block in the manifest
+    default: false
