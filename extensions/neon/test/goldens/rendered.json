@@ -3,19 +3,27 @@
   "files": {
     "lib/extensions/neon/neon_config.dart": "6d284dfe951e19da3f44c05fe0efc58025f16ab01304e4b6819fcf25ce753b3c",
     "lib/extensions/neon/neon_failure_mapper.dart": "50c4c6780fd5e1acd6c6a5515088bb106c5fe5ae4f50c37e56df1066f732cc87",
+    "lib/extensions/neon/neon_file_storage.dart": "2bb0cf2b52e7d822025af7de9d66bd3a8859f1998e1ab8f569886762bd59f5c8",
     "lib/extensions/neon/neon_gateway.dart": "80381d89168c246ef0d4f47be3bb3ba7184803885ec569bcbcc4a1c4f13ccc1f",
-    "lib/extensions/neon/neon_module.dart": "86133a01ed3d0d30ef95442305f362f4c06f15691ba488dace8bfae1b69dd227",
+    "lib/extensions/neon/neon_module.dart": "5fdf4726b67b072ae27460aca18acb1908da7416c92e774d5a17569372e17fd4",
     "lib/extensions/neon/neon_query_mapper.dart": "2ab802483dfd0b926db867fd72015dd80edacfc7b2ec2baec79966a95a94e255",
     "lib/extensions/neon/neon_remote_database.dart": "d3ec51a7e45e5cce76767d8bcd876020334df9df3205c546369dfe06ee51a2c1",
-    "lib/extensions/neon/neon_support.dart": "afd2d5721d58da7f8061cb25c5f77ea6df9184d5c2567a60dff2745fcc690a72",
+    "lib/extensions/neon/neon_s3_signer.dart": "21075d196888f17c1a0c50aa81d4b4ed7a657696a9e2dbf3f91a06f66a7e12d7",
+    "lib/extensions/neon/neon_storage_config.dart": "d9cc848c5d70ebad37ce755952bde4266299d0ab3fbd0be8ed76280c268e89e7",
+    "lib/extensions/neon/neon_storage_gateway.dart": "17632babbac63153de0f7bbeb6ab31bd0adaa470e685ee52695d1f6f2d07e3c6",
+    "lib/extensions/neon/neon_support.dart": "026771fd3202683a1d0d4941b95d99089a9cea678f432f79e75ad891149eaed7",
     "test/extensions/neon/neon_config_test.dart": "6bfe5704e1acc1fb05f319198415c2bf66c4b3b22b4ea421d7a37a3223c5f689",
-    "test/extensions/neon/neon_contract_test.dart": "13bd586125e3caaa68ff927e5d048fcf028c015df854ee4fd67adce6dbff5e22",
+    "test/extensions/neon/neon_contract_test.dart": "150ab34192e1e49cd6f33ca7b5e1e64c6e3f1dbe466fee9cd9ede4280bbbfa10",
     "test/extensions/neon/neon_failure_mapper_test.dart": "0d98d9fa525f372747bf7737c68d17d722eab15f839826dac51f31411f5eb928",
+    "test/extensions/neon/neon_file_storage_test.dart": "86ff65528f15992942e5e9f3acb6af00f6e131723d8f63a1ccf4d41348864e4e",
     "test/extensions/neon/neon_gateway_test.dart": "4b0027f61d2c7756fe2163613b2be5c98e4a35f8a8303d0039dc67af610c5790",
-    "test/extensions/neon/neon_module_test.dart": "3a6869592b5d11a594ccc01c8e00194febc5412ddca09e5724ba2fbe5a425a3f",
+    "test/extensions/neon/neon_module_test.dart": "d523322892e14426bd80b124308a42bb5353ffe53c6bb449f16bd34a7b7909c1",
     "test/extensions/neon/neon_query_mapper_test.dart": "9ff7d0d2767706f1bb7f6d213488c9800ac76fb4f6d2a3cf56184b7c6c222c63",
     "test/extensions/neon/neon_remote_database_test.dart": "4e7c80d94955510e60d53f9eb0d9710952adf0449c62a9e5b4e63002776cde5a",
+    "test/extensions/neon/neon_s3_signer_test.dart": "7658a3698291100a16e88fc7fc3f0a4ebe32cc7be4bf93ac5d18f3d247bc8373",
+    "test/extensions/neon/neon_storage_config_test.dart": "55b8dc93856f4c7938873579839c081cdce323ae42c4b3421b14f8dd0d8689e6",
+    "test/extensions/neon/neon_storage_gateway_test.dart": "c905179e0e81c8ef11395185d1d6c7dac38efbf0dc8038f383638cb96ddac34f",
     "test/extensions/neon/neon_support_test.dart": "735735de51f514a75f1cd48e7fbf1dd918aca6494ce5f254f8dabbd9418e2c55",
-    "test/extensions/neon/test_support.dart": "1e51869ded874675fb800eb9abf2a5065c0d75a658785b272d8edbbc33a7bbbc"
+    "test/extensions/neon/test_support.dart": "ba6fe5b46aa3f5e3ffe73c322898fc6514b0f5d4807c1f86dfd5c19181ee9824"
   }
 }

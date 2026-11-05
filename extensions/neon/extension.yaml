@@ -1,14 +1,16 @@
 id: neon
 name: Neon
 version: 0.1.0
-description: Neon Lakebase Postgres remote database through the Data API (PostgREST), read through the Gate.
+description: Neon Lakebase Postgres database (Data API / PostgREST) and Object Storage (S3-compatible) for Kiln, read through the Gate.
 category: database
 tier: official
 exclusive: false
 provides:
   - remote_database
+  - file_storage
 dependencies:
   http: ^1.6.0
+  crypto: ^3.0.8
 prompts:
   - name: data_api_url
     type: url
@@ -26,6 +28,32 @@ prompts:
     label: Postgres schema
     description: Schema exposed through the Data API.
     default: public
+  - name: s3_endpoint
+    type: url
+    label: Neon Object Storage endpoint
+    description: "S3-compatible endpoint host for the branch, for example https://your-branch.storage.c-us-east-2.aws.neon.tech."
+    required: true
+  - name: s3_bucket
+    type: string
+    label: Object Storage bucket
+    description: Bucket name used for every file.
+    default: files
+  - name: s3_region
+    type: string
+    label: Object Storage region
+    description: Region used in the SigV4 credential scope, for example us-east-2.
+    default: us-east-2
+  - name: s3_access_key_id
+    type: string
+    label: Object Storage access key id
+    description: Neon token id used as the S3 access key id.
+    required: true
+  - name: s3_secret_access_key
+    type: secret
+    label: Object Storage secret access key
+    description: S3 secret for the token above. Scope it to this bucket; it is shipped to the client in this direct-from-app setup.
+    required: true
+    secret: true
 platforms:
   - android
   - ios
@@ -41,6 +69,8 @@ manual_steps:
     description: Enable the Data API (PostgREST) on the Neon project and confirm its base URL; the endpoint must be reachable from the app.
   - id: scope_the_token
     description: "Protect rows with Postgres row-level security and a per-user Neon Auth JWT. A single bearer token shared by every client exposes the whole schema, so do not ship a privileged key."
+  - id: enable_object_storage
+    description: Enable Object Storage on the project (supported regions only), create the bucket named in the s3_bucket prompt, and issue a Neon token whose access key id and secret are scoped to that bucket.
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

@@ -1,19 +1,24 @@
 import 'package:kiln_core/kiln_core.dart';
 
 import 'neon_config.dart';
+import 'neon_storage_config.dart';
 
 typedef NeonReachabilityProbe = Future<void> Function();
 
-/// Validates the Neon Data API configuration during bootstrap.
+/// Validates the Neon Data API (and, when configured, Object Storage) during
+/// bootstrap.
 ///
 /// A missing or invalid URL/token is reported as `notConfigured`. An optional
 /// [probe] can reach the Data API once to prove it is answering; when it is
 /// omitted the support check stays offline and only validates configuration.
-/// The bearer token never appears in the support details.
+/// Storage configuration is reported in the details but does not change the
+/// Data API support state. Neither the bearer token nor the S3 secret appears
+/// in the details.
 final class NeonSupport {
-  NeonSupport({required this.config, this.probe});
+  NeonSupport({required this.config, this.storageConfig, this.probe});
 
   final NeonConfig config;
+  final NeonStorageConfig? storageConfig;
   final NeonReachabilityProbe? probe;
   SupportInfo? _last;
 
@@ -39,40 +44,39 @@ final class NeonSupport {
       );
     }
     final reachability = probe;
-    if (reachability == null) {
-      final uri = Uri.tryParse(config.dataApiUrl);
-      return SupportInfo.supported(
-        details: <String, Object?>{
-          'host': uri?.host,
-          'schema': config.schema,
-          'insecure_http': config.isInsecureTransport,
-        },
-      );
+    if (reachability != null) {
+      try {
+        await reachability();
+      } on Failure catch (failure) {
+        return SupportInfo.unsupported(
+          failure.kind == FailureKind.configuration
+              ? SupportState.notConfigured
+              : SupportState.unavailable,
+          message: failure.message,
+          details: <String, Object?>{'code': failure.code.value},
+        );
+      } on Object catch (error) {
+        return SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'The Neon Data API could not be reached: $error',
+          details: <String, Object?>{'error': '$error'},
+        );
+      }
     }
-    try {
-      await reachability();
-      final uri = Uri.tryParse(config.dataApiUrl);
-      return SupportInfo.supported(
-        details: <String, Object?>{
-          'host': uri?.host,
-          'schema': config.schema,
-          'insecure_http': config.isInsecureTransport,
-        },
-      );
-    } on Failure catch (failure) {
-      return SupportInfo.unsupported(
-        failure.kind == FailureKind.configuration
-            ? SupportState.notConfigured
-            : SupportState.unavailable,
-        message: failure.message,
-        details: <String, Object?>{'code': failure.code.value},
-      );
-    } on Object catch (error) {
-      return SupportInfo.unsupported(
-        SupportState.unavailable,
-        message: 'The Neon Data API could not be reached: $error',
-        details: <String, Object?>{'error': '$error'},
-      );
-    }
+    return SupportInfo.supported(details: _details());
+  }
+
+  Map<String, Object?> _details() {
+    final uri = Uri.tryParse(config.dataApiUrl);
+    final storage = storageConfig;
+    return <String, Object?>{
+      'host': uri?.host,
+      'schema': config.schema,
+      'insecure_http': config.isInsecureTransport,
+      if (storage != null) ...{
+        'storage_configured': storage.validate() == null,
+        if (storage.validate() == null) 'storage_bucket': storage.bucket,
+      },
+    };
   }
 }
