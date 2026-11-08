@@ -13,9 +13,13 @@ final client = ref.watch(kilnProvider<HttpClient>());
 Brick contents:
 
 - `kiln_providers.dart` — `registryProvider` and `kilnProvider<T>()`.
-- `provider_overrides.dart` — Registry overrides for tests.
+- `provider_overrides.dart` — `testProviderContainer` with the Registry overridden.
 - `async_value_x.dart` — concise failure/data access.
 - `session_notifier.dart` — wraps `SessionController`.
+- `app_provider_observer.dart` — provider updates and failures to the `AppLogger`.
+- `features/notes/` — a clean-architecture sample feature: `domain/` and
+  `data/`, byte-identical to the `bloc` brick, plus `presentation/providers/`,
+  `screens/`, and `widgets/`.
 
 ## Gate
 

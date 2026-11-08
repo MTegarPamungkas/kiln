@@ -78,11 +78,13 @@ my_app/
 ├─ lib/
 │  ├─ main.dart
 │  ├─ app/            # KilnApp, RegistryScope, AppShell seams, error screen
-│  ├─ features/home/  # application-owned starting page (minimal template)
-│  ├─ core/           # theme, l10n seams, global error handler
+│  ├─ features/home/  # application-owned starting feature (minimal template)
+│  │  └─ presentation/screens/  # home_page.dart, the layer folders a feature grows into
+│  ├─ core/           # architecture contracts, theme, l10n seams, global error handler
 │  ├─ extensions/     # extension code + extensions.g.dart
 │  └─ ...
 ├─ test/
+├─ ARCHITECTURE.md    # folder map, the dependency rule, and the recipe for a new feature
 ├─ kiln.yaml
 ├─ kiln.lock.yaml
 └─ .kiln/             # journal and backups, ignored by Git
@@ -90,6 +92,10 @@ my_app/
 
 The starter template (`--template app`) also includes `app_home.dart` and the
 starter page. The minimal template passes its own `HomePage` to `KilnApp`.
+
+`ARCHITECTURE.md` at the project root carries the folder map, the dependency
+rule, and the recipe for adding a feature. Every feature follows it, including
+the `notes` sample a state extension installs under `lib/features/notes/`.
 
 `lib/extensions/extensions.g.dart` is the only application file owned by Kiln.
 Do not edit it by hand; `kiln doctor --fix` keeps it in sync.

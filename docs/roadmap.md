@@ -20,7 +20,7 @@
 ## Phase 2 — Core extensions
 
 - [x] State management: `bloc`, `riverpod` with the `app.wrappers` wrapper,
-      session bridge, counter example, and bootstrap test.
+      session bridge, a clean-architecture `notes` example, and a wrapper test.
 - [x] Networking: `http_retry` and `http_cache` with pipeline priority
       (retry 20 before cache 30), ETag, stale-while-revalidate, and budget.
 - [x] Storage: `storage`, `secure_storage`, and `local_db` (Sembast,

@@ -1,6 +1,7 @@
 /// Parses, resolves, renders, installs, and migrates Kiln extensions.
 library;
 
+export 'src/analysis/feature_layers.dart';
 export 'src/installer/extension_installer.dart';
 export 'src/installer/extensions_codegen.dart';
 export 'src/installer/lockfile.dart';

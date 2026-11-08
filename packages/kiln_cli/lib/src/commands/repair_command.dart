@@ -160,7 +160,7 @@ final class RepairCommand extends KilnCommand {
 
     final codegen = const ExtensionsCodegen();
     final codegenFile = codegen.fileIn(project.root);
-    final codegenSource = codegen.build(updated.keys);
+    final codegenSource = codegen.build(updated);
     final codegenChanged =
         !codegenFile.existsSync() ||
         codegenFile.readAsStringSync() != codegenSource;

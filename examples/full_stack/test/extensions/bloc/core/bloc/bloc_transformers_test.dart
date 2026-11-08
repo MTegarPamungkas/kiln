@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:full_stack/core/bloc/bloc_transformers.dart';
 
 final class _IntBloc extends Bloc<int, int> {
-  _IntBloc()
-      : super(0) {
+  _IntBloc() : super(0) {
     on<int>(
       (event, emit) => emit(event),
       transformer: debounceEvents<int>(const Duration(milliseconds: 10)),

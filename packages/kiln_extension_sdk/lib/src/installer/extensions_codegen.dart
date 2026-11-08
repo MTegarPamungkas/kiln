@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import 'lockfile.dart';
+
 /// Writes `lib/extensions/extensions.g.dart`, the only project file Kiln owns.
 final class ExtensionsCodegen {
   const ExtensionsCodegen();
@@ -11,8 +13,20 @@ final class ExtensionsCodegen {
   File fileIn(Directory projectRoot) =>
       File(p.join(projectRoot.path, relativePath));
 
-  String build(Iterable<String> extensionIds) {
-    final ids = extensionIds.toSet().toList(growable: false)..sort();
+  /// Builds the module list for the locked extensions, keyed by extension id.
+  ///
+  /// Only extensions that actually ship a `<id>_module.dart` appear in the
+  /// output. A build-time extension such as `codegen` installs configuration
+  /// and dev dependencies but no runtime module, and naming one here would
+  /// break the application build. That break stays invisible to
+  /// `flutter analyze` because `**/*.g.dart` is excluded from analysis, so the
+  /// filter belongs here rather than in the template.
+  String build(Map<String, LockedExtension> extensions) {
+    final ids = extensions.entries
+        .where((entry) => _hasModule(entry.key, entry.value))
+        .map((entry) => entry.key)
+        .toList(growable: false)
+      ..sort();
     final imports = ids
         .map((id) => "import '$id/${id}_module.dart';")
         .join('\n');
@@ -32,11 +46,14 @@ ${modules.isEmpty ? '' : '$modules\n'}  ];
 ''';
   }
 
-  void write(Directory projectRoot, Iterable<String> extensionIds) {
+  void write(Directory projectRoot, Map<String, LockedExtension> extensions) {
     final file = fileIn(projectRoot);
     file.parent.createSync(recursive: true);
-    file.writeAsStringSync(build(extensionIds));
+    file.writeAsStringSync(build(extensions));
   }
+
+  bool _hasModule(String id, LockedExtension extension) =>
+      extension.files.keys.any((path) => path.endsWith('/${id}_module.dart'));
 }
 
 String _pascalCase(String value) {

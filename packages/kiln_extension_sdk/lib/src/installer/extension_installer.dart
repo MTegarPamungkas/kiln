@@ -339,7 +339,7 @@ final class ExtensionInstaller {
     final newLockfile = Lockfile(core: lockfile.core, extensions: newEntries);
     final codegen = const ExtensionsCodegen();
     final codegenFile = codegen.fileIn(projectRoot);
-    final codegenSource = codegen.build(newEntries.keys);
+    final codegenSource = codegen.build(newEntries);
     if (!codegenFile.existsSync()) {
       _recordChange(
         changes,
@@ -592,7 +592,7 @@ final class ExtensionInstaller {
     }
     final codegen = const ExtensionsCodegen();
     final codegenFile = codegen.fileIn(projectRoot);
-    final codegenSource = codegen.build(newLockfile.ids);
+    final codegenSource = codegen.build(newLockfile.extensions);
     if (codegenFile.existsSync() &&
         codegenFile.readAsStringSync() != codegenSource) {
       _recordChange(
@@ -645,6 +645,7 @@ final class ExtensionInstaller {
       transaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
       transaction.writeText('kiln.lock.yaml', lockSource);
       transaction.commit();
+      _removeEmptiedDirectories(deleted);
     } catch (_) {
       transaction.rollback();
       rethrow;
@@ -664,6 +665,40 @@ final class ExtensionInstaller {
       warnings: List<String>.unmodifiable(warnings),
       verification: verification,
     );
+  }
+
+  /// Deletes directories that [deletedPaths] emptied, bottom-up.
+  ///
+  /// A state extension owns a deep feature tree, so removing it would leave
+  /// folders such as `lib/features/notes/presentation/bloc` behind forever.
+  /// Only directories that are now empty and deeper than the shared template
+  /// layout are removed, so a folder the application may still use stays.
+  void _removeEmptiedDirectories(List<String> deletedPaths) {
+    final candidates = <String>{};
+    for (final path in deletedPaths) {
+      var parent = p.posix.dirname(_posix(path));
+      while (p.posix.split(parent).length >= 3) {
+        candidates.add(parent);
+        parent = p.posix.dirname(parent);
+      }
+    }
+
+    final deepestFirst = candidates.toList()
+      ..sort(
+        (left, right) => p.posix
+            .split(right)
+            .length
+            .compareTo(p.posix.split(left).length),
+      );
+    for (final relative in deepestFirst) {
+      final directory = Directory(p.join(projectRoot.path, relative));
+      if (!directory.existsSync()) {
+        continue;
+      }
+      if (directory.listSync().isEmpty) {
+        directory.deleteSync();
+      }
+    }
   }
 
   /// Documentation files for [extension], as `(app-relative path, bytes)`

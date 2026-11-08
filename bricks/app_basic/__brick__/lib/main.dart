@@ -6,7 +6,7 @@ import 'app/error_screen.dart';
 import 'core/error/global_error_handler.dart';
 import 'extensions/extensions.g.dart';
 {{#minimal}}
-import 'features/home/home_page.dart';
+import 'features/home/presentation/screens/home_page.dart';
 {{/minimal}}
 
 Future<void> main() async {

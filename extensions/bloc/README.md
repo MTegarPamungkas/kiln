@@ -3,13 +3,19 @@
 Kiln state management based on `flutter_bloc`.
 
 This extension is exclusive in the `state` category, provides `state_bloc`, and
-adds a global `SessionCubit` through the `app.wrappers` slot. The brick also includes
-the Cubit/Bloc foundation used by features:
+adds a global `SessionBloc` through the `app.wrappers` slot. The brick installs
+the Bloc foundation together with a sample feature that follows it:
 
-- `BaseCubit` with `safeEmit` and `runGuarded`.
-- `AsyncState` and `AsyncCubit` for load/refresh/retry.
+- `BaseBloc` with `runGuarded` and `reportResult`; handlers emit through their
+  `Emitter`, and `Bloc.emit` itself stays test-only.
+- `AsyncBloc` with the sealed `AsyncBlocEvent` (`AsyncLoad`, `AsyncRefresh`,
+  `AsyncRetry`) over the `AsyncState` variants in `async_state.dart`.
+- `SessionBloc` that mirrors `SessionController` into the widget tree.
 - `AppBlocObserver` with PII redaction.
-- `SessionCubit` that wraps `SessionController`.
+- `bloc_transformers.dart` — `debounceEvents`, `throttleEvents`,
+  `droppableEvents`, `restartableEvents`.
+- `features/notes/` — a clean-architecture sample feature: `domain/`, `data/`,
+  and `presentation/`, wired together in `feature.dart`.
 
 ```bash
 kiln add bloc
@@ -19,7 +25,7 @@ kiln add bloc
 
 State management has no request/response verbs. The extension wires
 `BlocSupport` and the session bridge into the registry; feature code drives
-cubits directly and owns the UI.
+blocs directly and owns the UI.
 
 ## Runtime support
 

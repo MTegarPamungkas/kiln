@@ -4,6 +4,8 @@ import 'package:full_stack/app/app_wrappers.dart';
 import 'package:full_stack/app/bloc_providers.dart';
 import 'package:full_stack/core/bloc/app_bloc_observer.dart';
 
+import 'bloc_support.dart';
+
 /// Registers the Bloc state management layer.
 final class BlocModule extends KilnModule {
   const BlocModule();
@@ -20,9 +22,21 @@ final class BlocModule extends KilnModule {
     if (logger != null) {
       Bloc.observer = AppBlocObserver(logger: logger);
     }
-    registry
-        .read<SlotRegistry>()
+    var slots = registry.readOrNull<SlotRegistry>();
+    if (slots == null) {
+      slots = SlotRegistry();
+      registry.registerSingleton<SlotRegistry>(slots);
+    }
+    slots
         .open<AppWrapper>(SlotNames.appWrappers)
         .add(buildBlocAppWrapper(registry), priority: 0, owner: 'bloc');
+    registry.registerSingleton<BlocSupport>(
+      BlocSupport(observerAttached: logger != null),
+    );
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<BlocSupport>().info;
   }
 }

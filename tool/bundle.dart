@@ -180,7 +180,7 @@ Map<String, List<int>> _documentation(Directory root) {
     final relative = p
         .relative(doc.path, from: root.path)
         .replaceAll('\\', '/');
-    files['docs/$relative'] = doc.readAsBytesSync();
+    files[relative] = doc.readAsBytesSync();
   }
   return files;
 }

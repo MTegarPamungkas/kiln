@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T16:37:02.302332Z",
+  "generated_at": "2026-11-06T07:42:45.243790Z",
   "extensions": [
     {
       "id": "analytics",
@@ -74,15 +74,27 @@
     {
       "id": "bloc",
       "name": "Bloc state management",
-      "description": "State management with Bloc and Cubit.",
+      "description": "State management with Bloc on a clean architecture feature layout.",
       "category": "state",
-      "latest": "0.1.0",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/bloc-0.1.0.tgz",
           "sha256": "496cad2285641799f50d14a8224b8ca525fdbbf6bfe824967a94fb4f3bc1b8fe",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/bloc-0.2.0.tgz",
+          "sha256": "c94f994d5a84c91c8c09d78895b8fc4cf7c990b5dac18b1420b66e5a8d009e4f",
           "provides": [
             "state_bloc"
           ],
@@ -596,15 +608,27 @@
     {
       "id": "riverpod",
       "name": "Riverpod state management",
-      "description": "State management with Riverpod providers and Notifier.",
+      "description": "State management with Riverpod providers and notifiers on a clean architecture feature layout.",
       "category": "state",
-      "latest": "0.1.0",
+      "latest": "0.2.0",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/riverpod-0.1.0.tgz",
           "sha256": "5981896b3d3ed77e5abde056e049362c3d7ea75b015242d5f31f4c2ff035f7da",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/riverpod-0.2.0.tgz",
+          "sha256": "ff027f7781aafbea412ef60e94fc1b0a67fac1134e236ad88ebb6cff650bb322",
           "provides": [
             "state_riverpod"
           ],

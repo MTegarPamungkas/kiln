@@ -435,15 +435,15 @@ packages:
   kiln_core:
     dependency: "direct main"
     description:
-      path: "D:/dev/projects/ai/Test AI/kiln/packages/kiln_core"
-      relative: false
+      path: "../../../packages/kiln_core"
+      relative: true
     source: path
     version: "0.1.0"
   kiln_testing:
     dependency: "direct dev"
     description:
-      path: "D:/dev/projects/ai/Test AI/kiln/packages/kiln_testing"
-      relative: false
+      path: "../../../packages/kiln_testing"
+      relative: true
     source: path
     version: "0.1.0"
   leak_tracker:

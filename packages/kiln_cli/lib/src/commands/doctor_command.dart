@@ -55,7 +55,7 @@ final class DoctorCommand extends KilnCommand {
 
     final codegen = const ExtensionsCodegen();
     final codegenFile = codegen.fileIn(project.root);
-    final expectedCodegen = codegen.build(project.lockfile.ids);
+    final expectedCodegen = codegen.build(project.lockfile.extensions);
     if (!codegenFile.existsSync()) {
       if (fix) {
         fileSystem.writeAsString(codegenFile.path, expectedCodegen);
@@ -174,7 +174,7 @@ final class DoctorCommand extends KilnCommand {
             DoctorCheck(
               id: 'dependency.$id.$dependency',
               status: DoctorStatus.fail,
-              message: '$id membutuhkan dependency $dependency',
+              message: '$id is missing the $dependency dependency',
               suggestion: 'Run flutter pub add $dependency',
             ),
           );
@@ -212,6 +212,23 @@ final class DoctorCommand extends KilnCommand {
             id: 'compatibility.$id',
             status: DoctorStatus.warn,
             message: '$id: $problem',
+          ),
+        );
+      }
+    }
+
+    final layerSources = readLibSources(project.root);
+    if (layerSources.isNotEmpty) {
+      for (final violation in layerViolations(
+        sourcesByPath: layerSources,
+        packageName: project.appName,
+      )) {
+        checks.add(
+          DoctorCheck(
+            id: 'layer.${violation.relativePath}',
+            status: DoctorStatus.warn,
+            message: '${violation.relativePath}: ${violation.message}',
+            suggestion: 'Follow the dependency rule in ARCHITECTURE.md.',
           ),
         );
       }

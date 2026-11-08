@@ -1,4 +1,4 @@
-# Konfigurasi proyek Kiln. Boleh diedit; kiln tidak menimpanya.
+# Kiln project configuration. May be edited; kiln does not overwrite it.
 kiln: ">=0.1.0 <0.2.0"
 core: ^0.1.0
 project:

@@ -8,7 +8,7 @@ This catalog is generated from extension manifests by
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
 | `appwrite` | Appwrite | 0.1.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `biometric` | Biometric | 0.1.0 | security | official | `biometric` |
-| `bloc` | Bloc state management | 0.1.0 | state | official | `state_bloc` |
+| `bloc` | Bloc state management | 0.2.0 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
 | `codegen` | Codegen | 0.1.0 | codegen | official | `codegen` |
 | `connectivity` | Connectivity | 0.1.0 | connectivity | official | `connectivity` |
@@ -31,7 +31,7 @@ This catalog is generated from extension manifests by
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.0 | config | official | `remote_config` |
 | `rest_auth` | REST auth | 0.1.0 | auth | official | `auth` |
-| `riverpod` | Riverpod state management | 0.1.0 | state | official | `state_riverpod` |
+| `riverpod` | Riverpod state management | 0.2.0 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.0 | storage | official | `secure_storage` |
 | `share` | Share | 0.1.0 | share | official | `share` |
 | `social_login` | Social login | 0.1.0 | social | official | `social_login` |
@@ -68,7 +68,7 @@ Biometric authentication, app lock state, and protected storage.
 
 ## bloc
 
-State management with Bloc and Cubit.
+State management with Bloc on a clean architecture feature layout.
 
 - Provides: `state_bloc`
 - Dependencies: `bloc: ^9.2.1`, `flutter_bloc: ^9.1.1`, `bloc_concurrency: ^0.3.0`, `rxdart: ^0.28.0`
@@ -262,7 +262,7 @@ Email and password authentication against a REST API.
 
 ## riverpod
 
-State management with Riverpod providers and Notifier.
+State management with Riverpod providers and notifiers on a clean architecture feature layout.
 
 - Provides: `state_riverpod`
 - Dependencies: `flutter_riverpod: ^3.4.3`

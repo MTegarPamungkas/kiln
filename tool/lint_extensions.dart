@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'package:path/path.dart' as p;
+
+/// The Mason variable a brick uses for the application package name.
+const String _appNameVar = '{{app_name}}';
 
 Future<void> main() async {
   final root = Directory.current;
@@ -39,6 +43,15 @@ Future<void> main() async {
       failed = true;
       stderr.writeln('[fail] $id: $error');
     }
+
+    final layerErrors = _brickLayerErrors(directory);
+    if (layerErrors.isNotEmpty) {
+      failed = true;
+      stderr.writeln('[fail] $id breaks the feature layer rules');
+      for (final error in layerErrors) {
+        stderr.writeln('       - $error');
+      }
+    }
   }
 
   if (extensions.isEmpty) {
@@ -47,4 +60,33 @@ Future<void> main() async {
   if (failed) {
     exitCode = 1;
   }
+}
+
+/// Runs the application layer rules over the Dart files a brick installs.
+///
+/// The bricks ship a sample feature, so the SDK has to obey the same boundary
+/// it tells applications to keep. Template placeholders are passed through as
+/// the package name because the checker only uses it to recognise in-app
+/// imports.
+List<String> _brickLayerErrors(Directory extensionDirectory) {
+  final lib = Directory(
+    p.join(extensionDirectory.path, 'brick', '__brick__', 'lib'),
+  );
+  if (!lib.existsSync()) {
+    return const <String>[];
+  }
+  final sources = <String, String>{};
+  for (final file in lib.listSync(recursive: true).whereType<File>()) {
+    if (!file.path.endsWith('.dart')) {
+      continue;
+    }
+    final relative = p
+        .relative(file.path, from: lib.path)
+        .replaceAll('\\', '/');
+    sources['lib/$relative'] = utf8.decode(file.readAsBytesSync());
+  }
+  return layerViolations(
+    sourcesByPath: sources,
+    packageName: _appNameVar,
+  ).map((violation) => violation.toString()).toList();
 }

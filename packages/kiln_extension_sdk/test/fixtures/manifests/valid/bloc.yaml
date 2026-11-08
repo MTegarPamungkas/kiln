@@ -1,7 +1,7 @@
 id: bloc
 name: Bloc state management
 version: 0.1.0
-description: State management with Bloc and Cubit.
+description: State management with Bloc on a clean architecture feature layout.
 category: state
 tier: official
 exclusive: true

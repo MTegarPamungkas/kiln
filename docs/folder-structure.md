@@ -90,8 +90,10 @@ kiln/
 │  │     │  │  ├─ app_wrappers.dart          # built-in app.wrappers slot, type AppWrapper = Widget Function(BuildContext, Widget)
 │  │     │  │  ├─ app_route.dart             # neutral AppRoute (path, name, builder) for the router.routes slot, without importing go_router
 │  │     │  │  └─ app_home.dart              # starter template only: AppHome seam for the starter page
-│  │     │  ├─ features/home/home_page.dart  # minimal template starting page owned by the application
-│  │     │  └─ core/                         # core app components: l10n, theme, and error handling
+│  │     │  ├─ features/home/                # minimal template starting feature owned by the application
+│  │     │  │  └─ presentation/screens/home_page.dart  # the starting page KilnApp renders
+│  │     │  └─ core/                         # core app components: architecture, l10n, theme, and error handling
+│  │     │     ├─ architecture/use_case.dart # UseCase, NoParamsUseCase, StreamUseCase contracts shared by features
 │  │     │     ├─ l10n/                      # built-in app localization and the l10n extension integration point
 │  │     │     │  ├─ app_localizations_config.dart  # typed configuration: AppLocalizationsConfig, the l10n extension integration point
 │  │     │     │  └─ core_copy.dart          # CoreCopy seam filled by the l10n extension; no hardcoded UI strings
@@ -294,6 +296,8 @@ packages/kiln_extension_sdk/
 │     │  ├─ conflict_report.dart                            # composes actionable extension conflict messages
 │     │  ├─ dependency_graph.dart                           # requires graph for the kiln graph and kiln remove commands
 │     │  └─ upgrade_planner.dart                            # plans an extension upgrade from the installed version to the target version
+│     ├─ analysis/                                          # static checks over the generated application source
+│     │  └─ feature_layers.dart                             # reports feature imports that break the clean-architecture dependency rule
 │     ├─ renderer/                                          # renders the Mason brick into files in the user project
 │     │  ├─ brick_renderer.dart                             # renders the Mason brick into the user project with template variables
 │     │  ├─ template_vars.dart                              # turns prompt answers and kiln.yaml into Mason variables
@@ -510,6 +514,9 @@ packages/kiln_cli/
   range.
 - Extensions with a new version or a migration that has not been run.
 - Leftover journal entries from an operation interrupted halfway.
+- Feature imports that break the clean-architecture dependency rule, reported as
+  warnings: an outward layer hop, Flutter inside `domain/`, or one feature
+  reaching into another feature's folders instead of its `feature.dart`.
 
 `kiln doctor` does not check runtime device support. That is reported by
 `KilnModule.support()` inside the running app and recorded in
@@ -654,12 +661,12 @@ These five extensions form the foundation of an app: one state management adapte
 ### bloc
 
 ```text
-extensions/bloc/                            # state management extension based on Bloc and Cubit
+extensions/bloc/                            # state management extension built on Bloc and layered features
 ├─ extension.yaml                           # manifest: category: state · exclusive · provides: state_bloc (riverpod is rejected by the exclusive rule)
 ├─ README.md                                # short guide to installing and using the bloc extension
 ├─ CHANGELOG.md                             # bloc extension change history per version
 ├─ docs/                                    # documentation for using the bloc extension
-│  ├─ state-with-bloc.md                    # guide to managing application state with Cubit and Bloc
+│  ├─ state-with-bloc.md                    # guide to managing application state with Bloc on a layered feature
 │  └─ bloc-to-riverpod.md                   # guide to migrating state from bloc to riverpod
 ├─ test/                                    # extension-level tests, running in the kiln repo rather than the user app
 │  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
@@ -670,27 +677,50 @@ extensions/bloc/                            # state management extension based o
    ├─ brick.yaml                            # Mason brick metadata and its variable list
    └─ __brick__/                            # template contents copied into the generated app
       ├─ lib/                               # Dart code copied into the app lib/
-      │  ├─ bootstrap.dart                  # sets up the Registry and AppBlocObserver before runApp
       │  ├─ app/                            # application-level composition for global state
-      │  │  └─ bloc_providers.dart          # MultiBlocProvider for global blocs
-      │  ├─ core/bloc/                      # Bloc and Cubit foundation used by every feature
+      │  │  └─ bloc_providers.dart          # MultiBlocProvider carrying only the global SessionBloc
+      │  ├─ core/bloc/                      # Bloc foundation used by every feature, no Cubit scaffolding
       │  │  ├─ app_bloc_observer.dart       # logs transitions and errors to Logger, with PII masked
-      │  │  ├─ base_cubit.dart              # safeEmit (checks isClosed), runGuarded turns errors into Failure
+      │  │  ├─ base_bloc.dart               # runGuarded turns a throw into Err, reportResult emits through the Emitter
       │  │  ├─ async_state.dart             # sealed: initial, loading, data, failure
-      │  │  ├─ async_cubit.dart             # load, refresh, retry
+      │  │  ├─ async_bloc.dart              # AsyncBloc with AsyncLoad, AsyncRefresh, AsyncRetry, autoLoad, refresh, retry
       │  │  ├─ bloc_transformers.dart       # debounce, throttle, droppable, restartable
-      │  │  └─ session_cubit.dart           # wraps the SessionController from kiln_core
-      │  └─ features/                       # sample feature that uses Bloc state
-      │     └─ counter/                     # counter feature as a Cubit usage example
+      │  │  └─ session_bloc.dart            # mirrors the SessionController from kiln_core through Session events
+      │  ├─ extensions/bloc/                # module installed into the generated app
+      │  │  ├─ bloc_module.dart             # attaches the app wrapper and BlocSupport to the Registry
+      │  │  └─ bloc_support.dart            # reports the state and observer wiring to SupportRegistry
+      │  └─ features/notes/                 # sample feature on the clean architecture layout
+      │     ├─ feature.dart                 # barrel and composition point, the only file knowing all three layers
+      │     ├─ domain/                      # pure Dart: no Flutter, no repository implementation
+      │     │  ├─ entities/note.dart        # Note (id, body, isDone, updatedAt)
+      │     │  ├─ repositories/notes_repository.dart  # contract: watch, add, toggle, remove
+      │     │  └─ usecases/                 # one class per action, implementing core/architecture/use_case.dart
+      │     │     ├─ watch_notes.dart       # StreamUseCase<List<Note>>
+      │     │     ├─ add_note.dart          # UseCase<String, Note>, rejects an empty draft
+      │     │     ├─ toggle_note.dart       # UseCase<String, Note>
+      │     │     └─ remove_note.dart       # UseCase<String, void>
+      │     ├─ data/                        # implements domain, the only layer touching storage
+      │     │  ├─ models/note_dto.dart      # storage shape with fromNote, fromMap, toMap, toEntity
+      │     │  ├─ datasources/notes_local_datasource.dart  # NotesLocalDatasource plus InMemoryNotesDatasource, two seeded rows
+      │     │  └─ repositories/notes_repository_impl.dart  # NotesRepositoryImpl(datasource, {clock}) mapping rows to entities
+      │     └─ presentation/                # calls use cases only, never a repository or a plugin
+      │        ├─ bloc/                     # notes_bloc.dart (BaseBloc), notes_event.dart, notes_state.dart
+      │        ├─ screens/notes_page.dart   # creates its own bloc through BlocProvider
+      │        └─ widgets/note_tile.dart    # one row with toggle and remove callbacks
       └─ test/                              # tests that are generated into the user app together with the code
-         ├─ bootstrap_test.dart             # tests that bootstrap installs the Bloc observer and prepares the Registry
-         └─ core/bloc/                      # tests for the Bloc foundation in core/bloc
-            ├─ app_bloc_observer_test.dart  # tests that the observer records transitions and errors with PII masked
-            ├─ base_cubit_test.dart         # tests that safeEmit does not emit when isClosed and that runGuarded yields a Failure
-            ├─ async_state_test.dart        # tests the sealed AsyncState variants: initial, loading, data, failure
-            ├─ async_cubit_test.dart        # tests that load, refresh, and retry produce the correct state sequence
-            ├─ bloc_transformers_test.dart  # tests the behavior of the debounce, throttle, droppable, and restartable transformers
-            └─ session_cubit_test.dart      # tests that SessionCubit forwards the SessionController status
+         ├─ features/notes/                 # tests for the sample feature
+         │  ├─ notes_bloc_test.dart         # tests the seeded stream, add, toggle, remove, and the failure paths
+         │  └─ notes_page_test.dart         # tests that the page renders the seed and drives the bloc
+         └─ extensions/bloc/                # tests for the code the brick installs
+            ├─ bloc_bootstrap_test.dart     # tests that KilnApp renders with the bloc app wrapper installed
+            ├─ bloc_module_test.dart        # tests that the module registers the app wrapper
+            └─ core/bloc/                   # tests for the Bloc foundation in core/bloc
+               ├─ app_bloc_observer_test.dart  # tests that the observer records transitions with PII masked
+               ├─ base_bloc_test.dart       # tests that runGuarded yields Err and reportResult emits only on failure
+               ├─ async_state_test.dart     # tests the sealed AsyncState variants: initial, loading, data, failure
+               ├─ async_bloc_test.dart      # tests auto load, a throwing fetcher, refresh, and autoLoad false
+               ├─ bloc_transformers_test.dart  # tests the behavior of the debounce, throttle, droppable, and restartable transformers
+               └─ session_bloc_test.dart    # tests that SessionBloc forwards the SessionController status
 ```
 
 ### riverpod
@@ -701,7 +731,7 @@ extensions/riverpod/                        # state management extension based o
 ├─ README.md                                # short guide to installing and using the riverpod extension
 ├─ CHANGELOG.md                             # riverpod extension change history per version
 ├─ docs/                                    # documentation for using the riverpod extension
-│  ├─ state-with-riverpod.md                # guide to managing application state with providers and Notifier
+│  ├─ state-with-riverpod.md                # guide to managing application state with providers and notifiers
 │  └─ riverpod-to-bloc.md                   # guide to migrating state from riverpod to bloc
 ├─ test/                                    # extension-level tests, running in the kiln repo rather than the user app
 │  ├─ manifest_test.dart                    # ensures extension.yaml is valid against extension.schema.json
@@ -712,25 +742,47 @@ extensions/riverpod/                        # state management extension based o
    ├─ brick.yaml                            # Mason brick metadata and its variable list
    └─ __brick__/                            # template contents copied into the generated app
       ├─ lib/                               # Dart code copied into the app lib/
-      │  ├─ bootstrap.dart                  # sets up the Registry and ProviderScope before runApp
       │  ├─ app/                            # application-level composition for global state
       │  │  └─ provider_root.dart           # ProviderScope with a Registry override
       │  ├─ core/riverpod/                  # Riverpod foundation used by every feature
       │  │  ├─ kiln_providers.dart          # registryProvider and kilnProvider<T>() for each contract
-      │  │  ├─ app_provider_observer.dart   # logs provider errors, with PII masked
-      │  │  ├─ async_value_x.dart           # AsyncValue extension: guard into Failure and concise when mapping
-      │  │  ├─ provider_overrides.dart      # ready-made overrides for tests
-      │  │  └─ session_notifier.dart        # wraps the SessionController from kiln_core
-      │  └─ features/                       # sample feature that uses Riverpod state
-      │     └─ counter/                     # counter feature as a provider usage example
+      │  │  ├─ app_provider_observer.dart   # logs provider updates and failures to the AppLogger
+      │  │  ├─ async_value_x.dart           # AsyncValue extension: guard into Failure and concise failure access
+      │  │  ├─ provider_overrides.dart      # testProviderContainer with the Registry overridden
+      │  │  └─ session_notifier.dart        # mirrors the SessionController from kiln_core
+      │  ├─ extensions/riverpod/            # module installed into the generated app
+      │  │  ├─ riverpod_module.dart         # attaches the app wrapper and RiverpodSupport to the Registry
+      │  │  └─ riverpod_support.dart        # reports the state wiring to SupportRegistry
+      │  └─ features/notes/                 # sample feature; domain and data match the bloc brick byte for byte
+      │     ├─ feature.dart                 # export-only barrel; composition lives in the providers
+      │     ├─ domain/                      # identical to the bloc brick: pure Dart, no Flutter
+      │     │  ├─ entities/note.dart        # Note (id, body, isDone, updatedAt)
+      │     │  ├─ repositories/notes_repository.dart  # contract: watch, add, toggle, remove
+      │     │  └─ usecases/                 # one class per action, implementing core/architecture/use_case.dart
+      │     │     ├─ watch_notes.dart       # StreamUseCase<List<Note>>
+      │     │     ├─ add_note.dart          # UseCase<String, Note>, rejects an empty draft
+      │     │     ├─ toggle_note.dart       # UseCase<String, Note>
+      │     │     └─ remove_note.dart       # UseCase<String, void>
+      │     ├─ data/                        # identical to the bloc brick: implements domain, owns storage
+      │     │  ├─ models/note_dto.dart      # storage shape with fromNote, fromMap, toMap, toEntity
+      │     │  ├─ datasources/notes_local_datasource.dart  # NotesLocalDatasource plus InMemoryNotesDatasource, two seeded rows
+      │     │  └─ repositories/notes_repository_impl.dart  # NotesRepositoryImpl(datasource, {clock}) mapping rows to entities
+      │     └─ presentation/                # the only folder that differs from the bloc brick
+      │        ├─ providers/notes_providers.dart  # repository and use-case providers over registryProvider
+      │        ├─ providers/notes_controller.dart  # AsyncNotifier plus notesControllerProvider
+      │        ├─ screens/notes_page.dart   # ConsumerStatefulWidget reading ref.watch
+      │        └─ widgets/note_tile.dart    # one row with toggle and remove callbacks
       └─ test/                              # tests that are generated into the user app together with the code
-         ├─ bootstrap_test.dart             # tests that bootstrap prepares the ProviderScope with the Registry
-         └─ core/riverpod/                  # tests for the Riverpod foundation in core/riverpod
-            ├─ kiln_providers_test.dart     # tests that registryProvider and kilnProvider<T>() resolve contracts from the Registry
-            ├─ app_provider_observer_test.dart  # tests that the observer records provider errors with PII masked
-            ├─ async_value_x_test.dart      # tests that guard turns exceptions into Failure and when maps the state
-            ├─ provider_overrides_test.dart  # tests that the test overrides replace contracts with fakes
-            └─ session_notifier_test.dart   # tests that SessionNotifier forwards the SessionController status
+         ├─ features/notes/                 # tests for the sample feature
+         │  ├─ notes_controller_test.dart   # tests the seeded stream, mutations, failure, invalidate, and overrides
+         │  └─ notes_page_test.dart         # tests the composer, the failure copy, and retry
+         └─ extensions/riverpod/            # tests for the code the brick installs
+            ├─ riverpod_bootstrap_test.dart  # tests that KilnApp renders with the ProviderScope wrapper
+            ├─ riverpod_module_test.dart    # tests that the module registers the app wrapper
+            └─ core/riverpod/               # tests for the Riverpod foundation in core/riverpod
+               ├─ kiln_providers_test.dart  # tests that registryProvider and kilnProvider<T>() resolve contracts from the Registry
+               ├─ async_value_x_test.dart   # tests that guard turns exceptions into Failure and exposes the Failure
+               └─ session_notifier_test.dart  # tests that SessionNotifier forwards the SessionController status
 ```
 
 ### dio
@@ -2125,8 +2177,7 @@ my_app/
 │  ├─ production.example.json
 │  └─ development.json                       # created by the user, ignored by Git
 ├─ lib/
-│  ├─ main.dart
-│  ├─ bootstrap.dart                         # from bloc: runKilnApp, KilnBootstrap, error handler
+│  ├─ main.dart                              # entry point: runs KilnBootstrap.run, then runApp(KilnApp(...))
 │  ├─ app/
 │  │  ├─ app.dart
 │  │  ├─ registry_scope.dart
@@ -2134,14 +2185,21 @@ my_app/
 │  │  ├─ error_screen.dart
 │  │  ├─ app_wrappers.dart
 │  │  ├─ app_route.dart
-│  │  └─ bloc_providers.dart                 # from bloc
+│  │  └─ bloc_providers.dart                 # from bloc: MultiBlocProvider with only the global SessionBloc
 │  ├─ core/
+│  │  ├─ architecture/use_case.dart          # UseCase, NoParamsUseCase, StreamUseCase contracts
 │  │  ├─ l10n/                               # built-in app_basic seam, filled in by l10n
 │  │  ├─ theme/                              # built-in app_basic seam, filled in by theme
 │  │  ├─ error/                              # global_error_handler, failure_presenter
-│  │  └─ bloc/                               # from bloc: observer, base_cubit, async_state, async_cubit, transformers, session_cubit
+│  │  └─ bloc/                               # from bloc: observer, base_bloc, async_state, async_bloc, transformers, session_bloc
 │  ├─ features/
-│  │  └─ counter/                            # sample from bloc; replace it with your own feature
+│  │  ├─ home/                               # starting feature owned by the application
+│  │  │  └─ presentation/screens/home_page.dart
+│  │  └─ notes/                              # from bloc: layered sample feature, replace it with your own
+│  │     ├─ feature.dart                     # barrel and composition point
+│  │     ├─ domain/                          # entities, repository contract, four use cases
+│  │     ├─ data/                            # note_dto, datasource, repository implementation
+│  │     └─ presentation/                    # bloc/, screens/, widgets/
 │  └─ extensions/
 │     ├─ extensions.g.dart                   # generated, the only app file owned by kiln
 │     ├─ dio/
@@ -2156,14 +2214,15 @@ my_app/
 ├─ test/
 │  ├─ app/
 │  │  └─ app_smoke_test.dart
-│  ├─ core/bloc/                             # tests from bloc
-│  ├─ features/counter/
+│  ├─ core/bloc/                             # tests from bloc: base_bloc, async_bloc, session_bloc, observer
+│  ├─ features/notes/                        # from bloc: notes_bloc_test.dart and notes_page_test.dart
 │  └─ extensions/                            # one folder per installed extension, including *_contract_test.dart
 ├─ .gitignore                                # .kiln/backups, .kiln/journal, .kiln/logs, env/*.json (except *.example.json)
 ├─ analysis_options.yaml
 ├─ kiln.yaml                                 # project configuration and prompt answers; may be edited
 ├─ kiln.lock.yaml                            # kiln records; do not edit
 ├─ pubspec.yaml                              # extension dependencies added and removed by kiln through yaml_edit
+├─ ARCHITECTURE.md                           # folder map, the dependency rule, and the recipe for adding a feature
 └─ README.md
 ```
 
@@ -2316,7 +2375,7 @@ implementation.
    documents `throws Failure`. Adding `Result<T>` alongside the
    `require_failure_handling` lint creates two error handling styles. Suggestion:
    contracts keep throwing `Failure`; `Result<T>` is only a helper for
-   feature code (`Result.guard(...)`) and is used by `runGuarded` in `base_cubit` and
+   feature code (`Result.guard(...)`) and is used by `runGuarded` in `base_bloc` and
    `AsyncValue.guard`. The lint should check for an unconsumed `Result`,
    not for an uncaught `Failure`.
 10. **Default privacy.** `ConsentController` needs a clear initial state:

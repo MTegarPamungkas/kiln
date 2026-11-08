@@ -7,19 +7,25 @@ final class _NoopObserver extends BlocObserver {
   const _NoopObserver();
 }
 
-final class _TestCubit extends Cubit<int> {
-  _TestCubit() : super(0);
+enum _TestEvent { incremented }
+
+final class _TestBloc extends Bloc<_TestEvent, int> {
+  _TestBloc() : super(0) {
+    on<_TestEvent>((event, emit) => emit(1));
+  }
 }
 
 void main() {
-  test('observer logs transitions', () {
+  test('observer logs transitions', () async {
     final logger = RecordingLogger();
     Bloc.observer = AppBlocObserver(logger: logger);
 
-    final cubit = _TestCubit()..emit(1);
+    final bloc = _TestBloc();
+    bloc.add(_TestEvent.incremented);
+    await Future<void>.delayed(Duration.zero);
 
-    expect(logger.messages.join('\n'), contains('bloc _TestCubit'));
-    cubit.close();
+    expect(logger.messages.join('\n'), contains('bloc _TestBloc'));
+    await bloc.close();
     Bloc.observer = const _NoopObserver();
   });
 }

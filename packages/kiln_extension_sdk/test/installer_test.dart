@@ -403,6 +403,27 @@ void main() {
       );
     });
 
+    test('removes directories the extension emptied', () async {
+      await installer.remove(id: 'demo');
+
+      expect(
+        Directory('${project.path}/lib/extensions/demo').existsSync(),
+        isFalse,
+      );
+      expect(
+        Directory('${project.path}/test/extensions/demo').existsSync(),
+        isFalse,
+      );
+      expect(
+        Directory('${project.path}/lib/extensions').existsSync(),
+        isTrue,
+      );
+      expect(
+        Directory('${project.path}/test/extensions').existsSync(),
+        isTrue,
+      );
+    });
+
     test('skips edited files', () async {
       final target = File(
         '${project.path}/lib/extensions/demo/demo_module.dart',

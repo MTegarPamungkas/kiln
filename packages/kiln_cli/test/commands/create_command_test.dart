@@ -103,8 +103,17 @@ void main() {
             .readAsStringSync();
         expect(main, contains('HomePage'));
         expect(
-          File(p.join(target.path, 'lib', 'features', 'home', 'home_page.dart'))
-              .existsSync(),
+          File(
+            p.join(
+              target.path,
+              'lib',
+              'features',
+              'home',
+              'presentation',
+              'screens',
+              'home_page.dart',
+            ),
+          ).existsSync(),
           isTrue,
         );
         expect(

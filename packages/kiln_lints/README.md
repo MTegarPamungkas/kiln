@@ -46,6 +46,25 @@ custom_lint:
 analyzer 8 as well. When upstream ships analyzer 14 support, `analyzer` and
 `custom_lint_builder` are bumped together without changing the rule API.
 
+## What actually enforces these rules
+
+`flutter analyze` does not run these rules today. Dart has deprecated the
+legacy `analyzer.plugins` entry point that `custom_lint` uses, so adding
+
+```yaml
+analyzer:
+  plugins:
+    - custom_lint
+```
+
+to a generated app makes `flutter analyze` report
+`analysis_options_deprecated_plugins` and skip the rules entirely. Until
+`custom_lint` moves to the new plugin system, the boundary that matters for the
+feature layout is enforced by `kiln doctor`, which reads `lib/features/**`
+directly through `layerViolations()` in `kiln_extension_sdk`:
+`src/analysis/feature_layers.dart`. Treat this package as opt-in tooling that a
+developer runs with `dart run custom_lint`, not as a build gate.
+
 ## Windows notes
 
 `custom_lint` 0.8.1 fails to load a path-dependency plugin when the project path
