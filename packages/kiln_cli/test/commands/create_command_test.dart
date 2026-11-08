@@ -24,6 +24,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+flutter:
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
 ''');
     for (final platform in <String>['android', 'ios', 'web']) {
       await Directory(p.join(target.path, platform)).create(recursive: true);
@@ -341,6 +347,106 @@ void main() {
 
       expect(code, ExitCodes.usage);
       expect(captured.err.join('\n'), contains('snake_case'));
+    });
+
+    test('resolves kiln_core from a git url', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+
+      final code = await runner.run(<String>[
+        'create',
+        'git_app',
+        '--core-git',
+        'https://github.com/kiln-dev/kiln.git',
+        '--core-ref',
+        'v0.1.0',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      final source = File(
+        p.join(workspace.path, 'git_app', 'pubspec.yaml'),
+      ).readAsStringSync();
+      final pubspec = loadYaml(source) as YamlMap;
+
+      final dependencies = pubspec['dependencies'] as YamlMap;
+      final core = dependencies['kiln_core'] as YamlMap;
+      final coreGit = core['git'] as YamlMap;
+      expect(coreGit['url'], 'https://github.com/kiln-dev/kiln.git');
+      expect(coreGit['path'], 'packages/kiln_core');
+      expect(coreGit['ref'], 'v0.1.0');
+
+      final devDependencies = pubspec['dev_dependencies'] as YamlMap;
+      final testing = devDependencies['kiln_testing'] as YamlMap;
+      final testingGit = testing['git'] as YamlMap;
+      expect(testingGit['path'], 'packages/kiln_testing');
+      expect(testingGit['ref'], 'v0.1.0');
+
+      // pub refuses to resolve one package from two sources, and kiln_testing
+      // depends on kiln_core from the hosted source, so the override has to
+      // point at the same git revision.
+      final overrides = pubspec['dependency_overrides'] as YamlMap;
+      final overrideCore = overrides['kiln_core'] as YamlMap;
+      final overrideGit = overrideCore['git'] as YamlMap;
+      expect(overrideGit['url'], 'https://github.com/kiln-dev/kiln.git');
+
+      // The overrides must sit after the flutter block, not inside it, or
+      // uncommenting the asset example below it would emit invalid YAML.
+      expect(source.indexOf('dependency_overrides:'), greaterThan(0));
+      expect(
+        source.indexOf('dependency_overrides:'),
+        greaterThan(source.indexOf('uses-material-design:')),
+      );
+      expect(
+        (pubspec['flutter'] as YamlMap)['uses-material-design'],
+        isTrue,
+      );
+    });
+
+    test('--core-ref without --core-git is an error', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+
+      final code = await runner.run(<String>[
+        'create',
+        'ref_app',
+        '--core-ref',
+        'v0.1.0',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.project);
+      expect(
+        captured.err.join('\n'),
+        contains('--core-ref needs --core-git'),
+      );
+    });
+
+    test('--core-path and --core-git cannot be combined', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+
+      final code = await runner.run(<String>[
+        'create',
+        'both_app',
+        '--core-path',
+        corePath,
+        '--core-git',
+        'https://github.com/kiln-dev/kiln.git',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.project);
+      expect(captured.err.join('\n'), contains('not both'));
     });
   });
 }

@@ -100,6 +100,17 @@ final class PubspecWriter {
   String editedWithoutDependency(String source, String name) =>
       _remove(source, 'dependencies', name);
 
+  /// Removes a whole root section, if it exists.
+  String editedWithoutSection(String source, String section) {
+    final editor = YamlEditor(source);
+    final root = editor.parseAt(<Object>[]);
+    if (root is! YamlMap || !root.containsKey(section)) {
+      return source;
+    }
+    editor.remove(<Object>[section]);
+    return editor.toString();
+  }
+
   String editedWithoutDevDependency(String source, String name) =>
       _remove(source, 'dev_dependencies', name);
 

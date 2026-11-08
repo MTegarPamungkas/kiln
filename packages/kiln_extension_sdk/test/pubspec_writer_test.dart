@@ -97,5 +97,26 @@ dev_dependencies:
         disabled,
       );
     });
+
+    test('editedWithoutSection drops a whole root section', () {
+      final writer = PubspecWriter(File(''));
+      const source = '''
+name: demo
+dependencies:
+  flutter:
+    sdk: flutter
+dependency_overrides:
+  kiln_core:
+    path: ../kiln_core
+'''; //
+
+      final edited = writer.editedWithoutSection(source, 'dependency_overrides');
+      final yaml = loadYaml(edited) as YamlMap;
+
+      expect(yaml.containsKey('dependency_overrides'), isFalse);
+      expect((yaml['dependencies'] as YamlMap)['flutter'], isNotNull);
+      // A section that is not there is left untouched.
+      expect(writer.editedWithoutSection(edited, 'dependency_overrides'), edited);
+    });
   });
 }

@@ -38,6 +38,9 @@ runtime by `KilnModule.support()` and exposed through `SupportRegistry`. See
 - `--force` on `remove` to delete files that were already edited, and on
   `repair` to overwrite ARB files.
 - `--core-path` on `create` to use a local workspace.
+- `--core-git <url>` with `--core-ref <branch|tag|commit>` on `create` to
+  resolve `kiln_core` and `kiln_testing` from the Kiln repository instead. The
+  two options are mutually exclusive, and `--core-ref` needs `--core-git`.
 
 ## Exit codes
 

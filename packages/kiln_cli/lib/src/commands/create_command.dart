@@ -35,7 +35,21 @@ final class CreateCommand extends KilnCommand {
         splitCommas: false,
         help: 'Prompt answer as name=value.',
       )
-      ..addOption('core-path', help: 'Local path to kiln_core for development.')
+      ..addOption(
+        'core-path',
+        help: 'Local path to the kiln_core package.',
+      )
+      ..addOption(
+        'core-git',
+        help:
+            'Git URL of the Kiln repository to resolve kiln_core and '
+            'kiln_testing from, for example '
+            'https://github.com/you/kiln.git.',
+      )
+      ..addOption(
+        'core-ref',
+        help: 'Branch, tag, or commit used with --core-git.',
+      )
       ..addOption(
         'output',
         defaultsTo: '.',
@@ -136,8 +150,34 @@ final class CreateCommand extends KilnCommand {
         ? await prompter.selectMany('Extensions to install:', extensionOptions)
         : (argResults!['with'] as List<String>);
 
-    var corePath = argResults!['core-path'] as String?;
-    if (corePath == null) {
+    final corePathOption = argResults!['core-path'] as String?;
+    final coreGit = argResults!['core-git'] as String?;
+    final coreRef = argResults!['core-ref'] as String?;
+    final hasCorePath = corePathOption != null;
+    if (coreGit != null && hasCorePath) {
+      throw KilnException(
+        'Pass either --core-path or --core-git, not both',
+        code: 'create.core_source',
+        suggestion:
+            '--core-path resolves kiln_core from a local checkout, '
+            '--core-git from a git URL',
+      );
+    }
+    if (coreRef != null && coreGit == null) {
+      throw KilnException(
+        '--core-ref needs --core-git',
+        code: 'create.core_ref',
+        suggestion: 'Pass --core-git <url> --core-ref <branch|tag|commit>',
+      );
+    }
+
+    var corePath = corePathOption;
+    if (coreGit != null) {
+      logger.info(
+        'Resolving kiln_core from $coreGit'
+        '${coreRef == null ? '' : ' at $coreRef'}',
+      );
+    } else if (corePath == null) {
       corePath = await _detectedCorePath();
       if (corePath != null) {
         logger.info('Using the local kiln_core checkout at $corePath');
@@ -219,7 +259,7 @@ final class CreateCommand extends KilnCommand {
       fileSystem.delete(generatedWidgetTest);
     }
 
-    _writePubspec(target, corePath: corePath);
+    _writePubspec(target, corePath: corePath, coreGit: coreGit, coreRef: coreRef);
 
     if (requested.isNotEmpty) {
       final resolver = ExtensionResolver(extensionCatalog);
@@ -289,9 +329,12 @@ final class CreateCommand extends KilnCommand {
         throw KilnException(
           'flutter pub get failed in the new project',
           code: 'verification.pub_get',
-          suggestion: corePath == null
+          suggestion: coreGit != null
+              ? 'Check that $coreGit is reachable and that --core-ref exists'
+              : corePath == null
               ? 'kiln_core has no published release yet; pass '
-                  '--core-path <checkout>/packages/kiln_core'
+                    '--core-path <checkout>/packages/kiln_core or '
+                    '--core-git <url>'
               : null,
           details: <String, Object?>{
             'stdout': pubResult.stdout,
@@ -308,24 +351,51 @@ final class CreateCommand extends KilnCommand {
     return ExitCodes.success;
   }
 
-  void _writePubspec(Directory target, {String? corePath}) {
+  void _writePubspec(
+    Directory target, {
+    String? corePath,
+    String? coreGit,
+    String? coreRef,
+  }) {
     final pubspecFile = File(p.join(target.path, 'pubspec.yaml'));
     final source = pubspecFile.readAsStringSync();
     final writer = PubspecWriter(pubspecFile);
     var edited = source;
+    Map<String, Object?>? overrideCore;
 
-    if (corePath != null) {
+    if (coreGit != null) {
+      // A git source keeps the app on one source of truth: `kiln_core` and
+      // `kiln_testing` only resolve while the repository stays reachable to
+      // this machine, which is how the SDK is shared without pub.dev.
+      Map<String, Object?> gitSource(String path) => <String, Object?>{
+        'git': <String, Object?>{
+          'url': coreGit,
+          if (coreRef != null && coreRef.isNotEmpty) 'ref': coreRef,
+          'path': path,
+        },
+      };
+      edited = writer.editedWithDependencyValue(
+        edited,
+        'kiln_core',
+        gitSource('packages/kiln_core'),
+      );
+      edited = writer.editedWithDevDependencyValue(
+        edited,
+        'kiln_testing',
+        gitSource('packages/kiln_testing'),
+      );
+      // `kiln_testing` asks for `kiln_core: ^0.1.0`, which pub reads as the
+      // hosted source. Pub refuses to resolve one package from two sources, so
+      // the app pins the override to the same git revision.
+      overrideCore = gitSource('packages/kiln_core');
+    } else if (corePath != null) {
       final normalizedCore = corePath.replaceAll('\\', '/');
       edited = writer.editedWithDependencyValue(
         edited,
         'kiln_core',
         <String, Object?>{'path': normalizedCore},
       );
-      edited = writer.editedWithDependencyOverride(
-        edited,
-        'kiln_core',
-        <String, Object?>{'path': normalizedCore},
-      );
+      overrideCore = <String, Object?>{'path': normalizedCore};
       final testingPath = Directory(p.join(corePath, '..', 'kiln_testing'));
       if (testingPath.existsSync()) {
         edited = writer.editedWithDevDependencyValue(
@@ -341,6 +411,9 @@ final class CreateCommand extends KilnCommand {
       edited = writer.editedWithDevDependency(edited, 'kiln_testing', '^0.1.0');
     }
 
+    if (overrideCore != null) {
+      edited = _appendOverrides(edited, overrideCore);
+    }
     if (!edited.contains('flutter_lints')) {
       edited = writer.editedWithDevDependency(
         edited,
@@ -349,6 +422,46 @@ final class CreateCommand extends KilnCommand {
       );
     }
     pubspecFile.writeAsStringSync(edited);
+  }
+
+  /// Appends `dependency_overrides` as a block mapping at the end of the file.
+  ///
+  /// yaml_edit adds a new root section right after the last key of the final
+  /// mapping, which wedges it inside the `flutter:` block: the commented-out
+  /// asset and font examples that follow then become invalid YAML as soon as an
+  /// app uncomments one. Writing the section last keeps the document valid.
+  String _appendOverrides(String source, Map<String, Object?> core) {
+    final stripped = PubspecWriter(
+      File(''),
+    ).editedWithoutSection(source, 'dependency_overrides').trimRight();
+    final buffer = StringBuffer(stripped)
+      ..writeln()
+      ..writeln()
+      ..writeln('dependency_overrides:')
+      ..writeln('  kiln_core:');
+    _writeYamlBlock(buffer, core, '    ');
+    return buffer.toString();
+  }
+
+  void _writeYamlBlock(
+    StringBuffer buffer,
+    Map<String, Object?> map,
+    String indent,
+  ) {
+    for (final entry in map.entries) {
+      final value = entry.value;
+      if (value is Map) {
+        buffer.writeln('$indent${entry.key}:');
+        _writeYamlBlock(buffer, <String, Object?>{
+          for (final nested in value.entries) '${nested.key}': nested.value,
+        }, '$indent  ');
+      } else if (value is String) {
+        // Quote so Windows paths, URLs, and spaces stay valid YAML.
+        buffer.writeln("$indent${entry.key}: '${value.replaceAll("'", "''")}'");
+      } else {
+        buffer.writeln('$indent${entry.key}: $value');
+      }
+    }
   }
 
   /// The kiln_core checkout this CLI itself runs from, so a new app resolves
