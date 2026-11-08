@@ -26,6 +26,7 @@ Kiln documentation, grouped by what you are trying to do.
 - [Add offline support](guides/add-offline-support.md)
 - [Swap a backend](guides/swap-backend.md)
 - [Migrate bloc to riverpod](guides/migrate-bloc-to-riverpod.md)
+- [Kotlin Gradle Plugin warning](guides/android-kotlin-plugin-warning.md)
 
 ## Authoring and shipping extensions
 
