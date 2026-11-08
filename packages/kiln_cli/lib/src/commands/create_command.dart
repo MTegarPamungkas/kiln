@@ -184,6 +184,19 @@ final class CreateCommand extends KilnCommand {
       }
     }
 
+    // Fail before anything is written: kiln_core is not on pub.dev, so a
+    // project created without a source would only break later at `pub get`.
+    if (corePath == null && coreGit == null) {
+      throw KilnException(
+        'No kiln_core source found',
+        code: 'create.core_missing',
+        suggestion:
+            'kiln_core is not published on pub.dev. Pass '
+            '--core-path <checkout>/packages/kiln_core, or --core-git <url> '
+            'to resolve it from the Kiln repository.',
+      );
+    }
+
     final target = Directory(
       p.normalize(p.join(context.cwd.path, output, name)),
     );
