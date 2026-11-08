@@ -107,6 +107,7 @@ KilnCommandRunner buildTestRunner({
   ProcessRunner? processRunner,
   Prompter? prompter,
   String? home,
+  bool hasCoreCheckout = true,
 }) {
   return buildKilnCommandRunner(
     cwd: cwd,
@@ -123,5 +124,8 @@ KilnCommandRunner buildTestRunner({
     fileSystem: const LocalFileSystem(),
     globalConfig: const GlobalConfig(),
     home: home ?? testHomeFor(cwd),
+    // A test running from the workspace sees a checkout; `hasCoreCheckout:
+    // false` emulates a machine that only has the compiled CLI.
+    corePathDetector: hasCoreCheckout ? null : () async => null,
   );
 }

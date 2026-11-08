@@ -406,6 +406,35 @@ void main() {
       );
     });
 
+    test('falls back to the public repository without a checkout', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+        hasCoreCheckout: false,
+      );
+
+      final code = await runner.run(<String>['create', 'pub_app', '--yes']);
+
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      final source = File(
+        p.join(workspace.path, 'pub_app', 'pubspec.yaml'),
+      ).readAsStringSync();
+      final pubspec = loadYaml(source) as YamlMap;
+      final dependencies = pubspec['dependencies'] as YamlMap;
+      final core = dependencies['kiln_core'] as YamlMap;
+      final git = core['git'] as YamlMap;
+
+      expect(git['url'], defaultCoreGitUrl);
+      expect(git['path'], 'packages/kiln_core');
+      expect(git['ref'], isNull, reason: 'the default branch is followed');
+      expect(core.containsKey('path'), isFalse);
+      expect(
+        captured.out.join('\n'),
+        contains('Resolving kiln_core from $defaultCoreGitUrl'),
+      );
+    });
+
     test('--core-ref without --core-git is an error', () async {
       final runner = buildTestRunner(
         cwd: workspace,

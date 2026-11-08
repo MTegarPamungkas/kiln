@@ -166,8 +166,11 @@ dart run packages/kiln_cli/bin/kiln.dart create my_app \
   --yes
 ```
 
-`kiln_core` is not published on pub.dev. To share an app instead of a checkout,
-resolve the SDK from the repository and pin a revision:
+`kiln_core` is not published on pub.dev. Inside the workspace `kiln create` uses
+the local checkout; anywhere else it resolves the SDK from the public repository
+at `github.com/MTegarPamungkas/kiln`, so a machine with only the compiled CLI can
+create a project with no extra flags. Override the source with `--core-git`, and
+pin a revision with `--core-ref`:
 
 ```bash
 kiln create my_app --core-git https://github.com/you/kiln.git --core-ref v0.1.0

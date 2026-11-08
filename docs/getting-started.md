@@ -39,11 +39,12 @@ dart run packages/kiln_cli/bin/kiln.dart create my_app \
   --yes
 ```
 
-`kiln_core` is not published on pub.dev. If the app should not depend on a
-local checkout on one machine, point it at the repository instead, so anyone
-with access to that repository can resolve the SDK:
+`kiln_core` is not published on pub.dev, so a project needs a source. Inside
+the workspace the CLI uses the local checkout, so edits to `kiln_core` show up
+immediately. Everything else resolves the SDK from the public repository:
 
 ```bash
+kiln create my_app --yes          # kiln_core from github.com/MTegarPamungkas/kiln
 kiln create my_app \
   --core-git https://github.com/you/kiln.git \
   --core-ref v0.1.0 \
@@ -52,9 +53,10 @@ kiln create my_app \
 
 `--core-git` writes both `kiln_core` and `kiln_testing` as git dependencies and
 pins `dependency_overrides` to the same revision, because pub refuses to resolve
-one package from two sources. A private repository works as long as git on that
-machine can already clone it. Pass `--core-ref` (branch, tag, or commit) to pin
-the revision; without it pub follows the default branch.
+one package from two sources. Pass `--core-ref` (branch, tag, or commit) to pin
+the revision; without it pub follows the default branch, and `kiln doctor`
+reports that as a warning so a project can be pinned before it is shipped.
+`--core-path` and `--core-git` cannot be combined.
 
 `kiln create` generates the minimal template by default: bootstrap, registry
 scope, MaterialApp seams, and one application-owned `HomePage`. It does not

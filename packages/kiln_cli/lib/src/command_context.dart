@@ -19,6 +19,7 @@ final class KilnContext {
     required this.fileSystem,
     required this.globalConfig,
     required this.home,
+    this.corePathDetector,
   });
 
   final Directory cwd;
@@ -33,6 +34,11 @@ final class KilnContext {
   /// It is injected rather than read from the environment so that a test never
   /// reads or deletes the developer's real global config and registry cache.
   final String home;
+
+  /// Finds a `kiln_core` checkout, or null when the CLI runs without the
+  /// workspace. Injectable so a test can emulate a machine that only has the
+  /// compiled CLI.
+  final Future<String?> Function()? corePathDetector;
 }
 
 /// Base class for a Kiln subcommand.

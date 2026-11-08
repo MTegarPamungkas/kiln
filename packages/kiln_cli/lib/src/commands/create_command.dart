@@ -9,6 +9,7 @@ import '../bundles/app_basic_bundle.dart';
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
 import '../project_context.dart';
+import '../version.dart';
 import 'command_helpers.dart';
 
 /// Creates a Flutter project from the `app_basic` brick.
@@ -151,10 +152,9 @@ final class CreateCommand extends KilnCommand {
         : (argResults!['with'] as List<String>);
 
     final corePathOption = argResults!['core-path'] as String?;
-    final coreGit = argResults!['core-git'] as String?;
+    final coreGitOption = argResults!['core-git'] as String?;
     final coreRef = argResults!['core-ref'] as String?;
-    final hasCorePath = corePathOption != null;
-    if (coreGit != null && hasCorePath) {
+    if (coreGitOption != null && corePathOption != null) {
       throw KilnException(
         'Pass either --core-path or --core-git, not both',
         code: 'create.core_source',
@@ -163,7 +163,7 @@ final class CreateCommand extends KilnCommand {
             '--core-git from a git URL',
       );
     }
-    if (coreRef != null && coreGit == null) {
+    if (coreRef != null && coreGitOption == null) {
       throw KilnException(
         '--core-ref needs --core-git',
         code: 'create.core_ref',
@@ -172,20 +172,31 @@ final class CreateCommand extends KilnCommand {
     }
 
     var corePath = corePathOption;
+    var coreGit = coreGitOption;
     if (coreGit != null) {
       logger.info(
         'Resolving kiln_core from $coreGit'
         '${coreRef == null ? '' : ' at $coreRef'}',
       );
     } else if (corePath == null) {
-      corePath = await _detectedCorePath();
+      // Running inside the workspace: keep the local checkout so edits to
+      // kiln_core show up immediately.
+      corePath = await (context.corePathDetector ?? _detectedCorePath)();
       if (corePath != null) {
         logger.info('Using the local kiln_core checkout at $corePath');
       }
     }
 
-    // Fail before anything is written: kiln_core is not on pub.dev, so a
-    // project created without a source would only break later at `pub get`.
+    // Nothing local: resolve the SDK from the public repository, so a freshly
+    // compiled CLI works on a machine without the workspace.
+    if (corePath == null && coreGit == null && defaultCoreGitUrl.isNotEmpty) {
+      coreGit = defaultCoreGitUrl;
+      logger.info(
+        'Resolving kiln_core from $coreGit '
+        '(pass --core-path for the local checkout)',
+      );
+    }
+
     if (corePath == null && coreGit == null) {
       throw KilnException(
         'No kiln_core source found',

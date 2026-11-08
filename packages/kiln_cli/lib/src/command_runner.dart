@@ -95,6 +95,7 @@ KilnCommandRunner buildKilnCommandRunner({
   FileSystem? fileSystem,
   GlobalConfig? globalConfig,
   String? home,
+  Future<String?> Function()? corePathDetector,
 }) {
   final resolvedHome = home ?? Paths.home();
   return KilnCommandRunner(
@@ -107,6 +108,7 @@ KilnCommandRunner buildKilnCommandRunner({
       globalConfig:
           globalConfig ?? GlobalConfig.load(Paths.globalConfig(resolvedHome)),
       home: resolvedHome,
+      corePathDetector: corePathDetector,
     ),
   );
 }
