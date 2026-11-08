@@ -16,19 +16,15 @@ abstract final class Paths {
   static String backupsDirectory(Directory root) =>
       p.join(kilnDirectory(root), 'backups');
 
-  static String globalConfig() {
-    final home =
-        Platform.environment['USERPROFILE'] ??
-        Platform.environment['HOME'] ??
-        Directory.current.path;
-    return p.join(home, '.kiln', 'config.yaml');
-  }
+  /// The current user's home directory, where global CLI state lives.
+  static String home() =>
+      Platform.environment['USERPROFILE'] ??
+      Platform.environment['HOME'] ??
+      Directory.current.path;
 
-  static String globalCache() {
-    final home =
-        Platform.environment['USERPROFILE'] ??
-        Platform.environment['HOME'] ??
-        Directory.current.path;
-    return p.join(home, '.kiln', 'cache');
-  }
+  static String globalConfig([String? home]) =>
+      p.join(home ?? Paths.home(), '.kiln', 'config.yaml');
+
+  static String globalCache([String? home]) =>
+      p.join(home ?? Paths.home(), '.kiln', 'cache');
 }

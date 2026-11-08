@@ -22,27 +22,34 @@ final class CacheCommand extends KilnCommand {
 
   @override
   Future<int> run() async {
-    final path = Paths.globalCache();
+    final path = Paths.globalCache(context.home);
     final clean = argResults!.rest.contains('clean');
+    final json = argResults!['json'] == true;
     final exists = fileSystem.directoryExists(path);
+    final entries = !clean && exists
+        ? fileSystem.list(path)
+        : const <FileSystemEntity>[];
 
     if (clean) {
       fileSystem.delete(path);
-      logger.success('Cache dibersihkan: $path');
-    } else {
-      final entries = exists
-          ? fileSystem.list(path)
-          : const <FileSystemEntity>[];
-      logger.info('Cache: $path');
-      logger.info(entries.isEmpty ? '  (kosong)' : '  ${entries.length} entri');
     }
 
-    if (argResults!['json'] == true) {
+    // `--json` is machine output: emitting the human lines as well would break
+    // every caller that pipes the result into a JSON parser.
+    if (json) {
       JsonReporter(logger.raw).write(<String, Object?>{
         'path': path,
         'cleaned': clean,
-        'entries': clean || !exists ? 0 : fileSystem.list(path).length,
+        'entries': entries.length,
       });
+      return ExitCodes.success;
+    }
+
+    if (clean) {
+      logger.success('Cache cleaned: $path');
+    } else {
+      logger.info('Cache: $path');
+      logger.info(entries.isEmpty ? '  (empty)' : '  ${entries.length} entries');
     }
     return ExitCodes.success;
   }

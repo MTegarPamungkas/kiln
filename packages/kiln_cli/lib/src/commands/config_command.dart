@@ -46,7 +46,7 @@ final class ConfigCommand extends KilnCommand {
               ? argResults!['offline'] == true
               : config.offline,
         );
-        config.save();
+        config.save(Paths.globalConfig(context.home));
       }
       return _print(config, argResults!['json'] == true);
     }
@@ -101,7 +101,7 @@ final class ConfigCommand extends KilnCommand {
       logger.info('registry: ${config.registry ?? '(bundled)'}');
       logger.info('mirror: ${config.mirror ?? '(none)'}');
       logger.info('offline: ${config.offline}');
-      logger.detail('File global: ${Paths.globalConfig()}');
+      logger.detail('Global file: ${Paths.globalConfig(context.home)}');
     }
     return ExitCodes.success;
   }

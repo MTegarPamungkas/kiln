@@ -18,6 +18,7 @@ final class KilnContext {
     required this.processRunner,
     required this.fileSystem,
     required this.globalConfig,
+    required this.home,
   });
 
   final Directory cwd;
@@ -26,6 +27,12 @@ final class KilnContext {
   final ProcessRunner processRunner;
   final FileSystem fileSystem;
   final GlobalConfig globalConfig;
+
+  /// Home directory holding global CLI state (`<home>/.kiln`).
+  ///
+  /// It is injected rather than read from the environment so that a test never
+  /// reads or deletes the developer's real global config and registry cache.
+  final String home;
 }
 
 /// Base class for a Kiln subcommand.

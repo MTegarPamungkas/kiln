@@ -35,7 +35,9 @@ final class RegistrySupport {
     final offline =
         (projectRegistry['offline'] as bool?) ??
         context.globalConfig.offline;
-    final cache = LocalCache(Directory(p.join(Paths.globalCache(), 'registry')));
+    final cache = LocalCache(
+      Directory(p.join(Paths.globalCache(context.home), 'registry')),
+    );
     return RegistrySupport._(
       client: RegistryClient(
         config: RegistryConfig(url: url, mirror: mirror),

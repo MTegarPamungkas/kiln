@@ -98,11 +98,15 @@ Future<void> _writeAndroidManifest(Directory root) async {
 ''');
 }
 
+/// Test home so a command never reads or deletes the developer's `~/.kiln`.
+String testHomeFor(Directory cwd) => p.join(cwd.path, '.kiln_home');
+
 KilnCommandRunner buildTestRunner({
   required Directory cwd,
   required CapturedLogger captured,
   ProcessRunner? processRunner,
   Prompter? prompter,
+  String? home,
 }) {
   return buildKilnCommandRunner(
     cwd: cwd,
@@ -118,5 +122,6 @@ KilnCommandRunner buildTestRunner({
     processRunner: processRunner ?? const ProcessRunner(),
     fileSystem: const LocalFileSystem(),
     globalConfig: const GlobalConfig(),
+    home: home ?? testHomeFor(cwd),
   );
 }

@@ -27,6 +27,7 @@ import 'infra/global_config.dart';
 import 'infra/kiln_logger.dart';
 import 'infra/process_runner.dart';
 import 'infra/prompter.dart';
+import 'paths.dart';
 
 /// The `kiln` command runner.
 final class KilnCommandRunner extends CommandRunner<int> {
@@ -93,7 +94,9 @@ KilnCommandRunner buildKilnCommandRunner({
   ProcessRunner? processRunner,
   FileSystem? fileSystem,
   GlobalConfig? globalConfig,
+  String? home,
 }) {
+  final resolvedHome = home ?? Paths.home();
   return KilnCommandRunner(
     KilnContext(
       cwd: cwd ?? Directory.current,
@@ -101,7 +104,9 @@ KilnCommandRunner buildKilnCommandRunner({
       prompter: prompter ?? Prompter(interactive: _stdinInteractive()),
       processRunner: processRunner ?? const ProcessRunner(),
       fileSystem: fileSystem ?? const LocalFileSystem(),
-      globalConfig: globalConfig ?? GlobalConfig.load(),
+      globalConfig:
+          globalConfig ?? GlobalConfig.load(Paths.globalConfig(resolvedHome)),
+      home: resolvedHome,
     ),
   );
 }
