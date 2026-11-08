@@ -1,0 +1,458 @@
+import 'dart:async';
+import 'dart:developer' as developer;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:kiln_e2e/app/registry_scope.dart';
+import 'package:kiln_e2e/extensions/biometric/biometric.dart';
+import 'package:kiln_e2e/extensions/bloc/bloc_support.dart';
+import 'package:kiln_e2e/extensions/codegen/example/example_model.dart';
+import 'package:kiln_e2e/extensions/deep_link/app_link_builder.dart';
+import 'package:kiln_e2e/extensions/env/env_schema.dart';
+import 'package:kiln_e2e/extensions/flavors/flavors_support.dart';
+import 'package:kiln_e2e/extensions/go_router/app_router.dart';
+import 'package:kiln_e2e/extensions/http_retry/http_retry_support.dart';
+import 'package:kiln_e2e/extensions/image_picker/media_picker_support.dart';
+import 'package:kiln_e2e/extensions/l10n/locale_controller.dart';
+import 'package:kiln_e2e/extensions/logger/memory_log_sink.dart';
+import 'package:kiln_e2e/extensions/notifications/notification_support.dart';
+import 'package:kiln_e2e/extensions/share/share_support.dart';
+import 'package:kiln_e2e/extensions/theme/theme_mode_controller.dart';
+
+/// Exercises every installed extension against the real device.
+///
+/// Each probe calls the contract the extension registered in the [Registry],
+/// exactly like application code would. A probe that cannot run reports why
+/// instead of hiding it, so the screen doubles as a device compatibility report.
+
+enum ProbeStatus { idle, running, passed, failed }
+
+final class ProbeOutcome {
+  const ProbeOutcome(this.status, this.detail);
+
+  final ProbeStatus status;
+  final String detail;
+}
+
+final class E2eProbe {
+  const E2eProbe(this.id, this.title, this.run);
+
+  final String id;
+  final String title;
+  final Future<String> Function(Registry registry) run;
+}
+
+/// A cubit created by the screen, to prove `flutter_bloc` really works.
+final class _ProbeCubit extends Cubit<int> {
+  _ProbeCubit() : super(0);
+
+  void bump() => emit(state + 1);
+}
+
+class E2ePage extends StatefulWidget {
+  const E2ePage({super.key});
+
+  @override
+  State<E2ePage> createState() => _E2ePageState();
+}
+
+class _E2ePageState extends State<E2ePage> {
+  final Map<String, ProbeOutcome> _outcomes = <String, ProbeOutcome>{};
+  bool _runningAll = false;
+  bool _autoStarted = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_autoStarted) {
+      return;
+    }
+    _autoStarted = true;
+    // The screen is the report: run everything once as soon as it is visible.
+    unawaited(_runAll(RegistryScope.of(context)));
+  }
+
+  List<E2eProbe> get _probes => e2eProbes();
+
+  int _count(ProbeStatus status) =>
+      _outcomes.values.where((outcome) => outcome.status == status).length;
+
+  Future<void> _run(E2eProbe probe, Registry registry) async {
+    setState(() {
+      _outcomes[probe.id] = const ProbeOutcome(
+        ProbeStatus.running,
+        'running…',
+      );
+    });
+    ProbeOutcome outcome;
+    try {
+      final detail = await probe.run(registry).timeout(
+        const Duration(seconds: 20),
+      );
+      outcome = ProbeOutcome(ProbeStatus.passed, detail);
+    } on TimeoutException {
+      outcome = const ProbeOutcome(ProbeStatus.failed, 'timed out after 20s');
+    } catch (error) {
+      outcome = ProbeOutcome(ProbeStatus.failed, _describeError(error));
+    }
+    developer.log(
+      '${probe.id} ${outcome.status.name}: ${outcome.detail}',
+      name: 'kiln_e2e',
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() => _outcomes[probe.id] = outcome);
+  }
+
+  Future<void> _runAll(Registry registry) async {
+    setState(() => _runningAll = true);
+    for (final probe in _probes) {
+      if (!mounted) {
+        return;
+      }
+      await _run(probe, registry);
+    }
+    if (!mounted) {
+      return;
+    }
+    setState(() => _runningAll = false);
+  }
+
+  static String _describeError(Object error) {
+    if (error is Failure) {
+      return 'Failure(${error.code}): ${error.message}';
+    }
+    return '$error';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final registry = RegistryScope.of(context);
+    final support = registry.readOrNull<SupportRegistry>();
+    final passed = _count(ProbeStatus.passed);
+    final failed = _count(ProbeStatus.failed);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Kiln E2E'),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Center(child: Text('$passed ok / $failed failed')),
+          ),
+          IconButton(
+            tooltip: 'Run all',
+            onPressed: _runningAll ? null : () => _runAll(registry),
+            icon: _runningAll
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.play_arrow_rounded),
+          ),
+        ],
+      ),
+      body: ListView.separated(
+        itemCount: _probes.length,
+        separatorBuilder: (_, _) => const Divider(height: 1),
+        itemBuilder: (context, index) {
+          final probe = _probes[index];
+          final outcome = _outcomes[probe.id];
+          final info = support?[probe.id];
+          return ListTile(
+            dense: true,
+            leading: _statusIcon(outcome),
+            title: Text(probe.title),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  outcome?.detail ?? 'not run yet',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                if (info != null)
+                  Text(
+                    'support: ${info.state.name}',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+              ],
+            ),
+            onTap: _runningAll ? null : () => _run(probe, registry),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _statusIcon(ProbeOutcome? outcome) {
+    switch (outcome?.status) {
+      case ProbeStatus.passed:
+        return const Icon(Icons.check_circle, color: Colors.green);
+      case ProbeStatus.failed:
+        return const Icon(Icons.error, color: Colors.red);
+      case ProbeStatus.running:
+        return const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        );
+      case ProbeStatus.idle:
+      case null:
+        return const Icon(Icons.circle_outlined, color: Colors.grey);
+    }
+  }
+}
+
+/// One probe per installed extension.
+///
+/// Keep the order stable: the list is the report that goes with a device run.
+List<E2eProbe> e2eProbes() {
+  return <E2eProbe>[
+    E2eProbe('analytics', 'analytics · capture event', (registry) async {
+      final analytics = registry.read<Analytics>();
+      await analytics.capture(
+        'e2e_probe',
+        properties: <String, Object?>{'source': 'kiln_e2e'},
+      );
+      await analytics.identify(
+        'e2e-user',
+        traits: <String, Object?>{'plan': 'test'},
+      );
+      return 'captured e2e_probe for e2e-user';
+    }),
+    E2eProbe('biometric', 'biometric · availability', (registry) async {
+      final biometric = registry.read<Biometric>();
+      final info = await biometric.support();
+      return '${info.state.name}: ${info.message}';
+    }),
+    E2eProbe('bloc', 'bloc · cubit emits', (registry) async {
+      final cubit = _ProbeCubit();
+      cubit
+        ..bump()
+        ..bump();
+      final value = cubit.state;
+      await cubit.close();
+      final support = registry.readOrNull<BlocSupport>()?.info;
+      return 'cubit state=$value, slots=${support?.state.name ?? 'n/a'}';
+    }),
+    E2eProbe('calendar', 'calendar · add event', (registry) async {
+      final calendar = registry.readOrNull<CalendarService>();
+      if (calendar == null) {
+        return 'skipped: CalendarService not registered';
+      }
+      final now = DateTime.now();
+      final added = await calendar.addEvent(
+        CalendarEvent(
+          title: 'Kiln E2E',
+          startsAt: now.add(const Duration(hours: 1)),
+          endsAt: now.add(const Duration(hours: 2)),
+        ),
+      );
+      return 'addEvent returned $added';
+    }),
+    E2eProbe('codegen', 'codegen · freezed + json round trip', (registry) {
+      final model = ExampleModel(
+        id: 'e2e',
+        itemCount: 42,
+        createdAt: DateTime.utc(2026, 1, 2, 3, 4),
+        link: Uri.parse('https://kiln.dev/e2e'),
+      );
+      final decoded = ExampleModel.fromJson(model.toJson());
+      return Future<String>.value(
+        'itemCount=${decoded.itemCount}, createdAt='
+        '${decoded.createdAt?.toIso8601String()}, link=${decoded.link}',
+      );
+    }),
+    E2eProbe('connectivity', 'connectivity · network status', (registry) async {
+      final monitor = registry.read<NetworkMonitor>();
+      final first = monitor.status;
+      final next = await monitor.changes.first.timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => first,
+      );
+      return 'status=${first.name} (latest event ${next.name})';
+    }),
+    E2eProbe('crash_report', 'crash_report · capture message', (registry) async {
+      final reporter = registry.read<CrashReporter>();
+      await reporter.captureMessage(
+        'kiln e2e probe',
+        context: <String, Object?>{'source': 'e2e_page'},
+      );
+      await reporter.addBreadcrumb(
+        'e2e breadcrumb',
+        data: <String, Object?>{'step': 1},
+      );
+      return 'captured message and breadcrumb';
+    }),
+    E2eProbe('deep_link', 'deep_link · build link', (registry) async {
+      final builder = registry.read<AppLinkBuilder>();
+      final custom = builder.custom('/e2e', query: <String, String>{'p': '1'});
+      final universal = builder.universal('/home');
+      final links = registry.readOrNull<DeepLinks>();
+      return 'custom=$custom universal=$universal initial=${links?.initialLink}';
+    }),
+    E2eProbe('dio', 'dio · real GET request', (registry) async {
+      final client = registry.read<HttpClient>();
+      final response = await client.get(
+        Uri.parse('https://jsonplaceholder.typicode.com/todos/1'),
+      );
+      return 'status=${response.statusCode} cached=${response.fromCache} '
+          'bytes=${response.data.toString().length}';
+    }),
+    E2eProbe('env', 'env · read configuration', (registry) async {
+      final env = registry.read<Env>();
+      final schema = registry.readOrNull<EnvSchema>();
+      final names = schema?.keys.map((key) => key.name).toList() ?? const [];
+      if (names.isEmpty) {
+        return 'no env keys declared';
+      }
+      final sample = names.first;
+      return 'keys=${names.length}, $sample=${env.read(sample) ?? '(null)'}';
+    }),
+    E2eProbe('flavors', 'flavors · active flavor', (registry) async {
+      final info = registry.readOrNull<FlavorsSupport>()?.info;
+      return '${info?.state.name ?? 'n/a'}: ${info?.message ?? 'no support'}';
+    }),
+    E2eProbe('geolocation', 'geolocation · service enabled', (registry) async {
+      final location = registry.read<LocationProvider>();
+      final enabled = await location.isServiceEnabled();
+      return 'location service enabled=$enabled';
+    }),
+    E2eProbe('go_router', 'go_router · current location', (registry) async {
+      final appRouter = registry.readOrNull<AppRouter>();
+      if (appRouter == null) {
+        return 'skipped: AppRouter not registered';
+      }
+      final location = appRouter.router.routerDelegate.currentConfiguration.uri;
+      return 'current location=$location';
+    }),
+    E2eProbe('http_cache', 'http_cache · write and read entry', (registry) async {
+      final cache = registry.readOrNull<HttpCache>();
+      if (cache == null) {
+        return 'skipped: HttpCache not registered';
+      }
+      const key = 'e2e-cache-key';
+      await cache.write(
+        key,
+        const HttpResponse(
+          statusCode: 200,
+          data: <String, Object?>{'cached': true},
+        ),
+        ttl: const Duration(minutes: 5),
+      );
+      final entry = await cache.read(key);
+      await cache.clear();
+      return 'entry=${entry?.response.statusCode} '
+          'fresh=${entry?.isFresh(DateTime.now())}';
+    }),
+    E2eProbe('http_retry', 'http_retry · policy', (registry) async {
+      final info = registry.readOrNull<HttpRetrySupport>()?.info;
+      return '${info?.state.name ?? 'n/a'}: ${info?.message ?? 'no support'}';
+    }),
+    E2eProbe('image_picker', 'image_picker · media support', (registry) async {
+      final info = registry.readOrNull<MediaPickerSupport>()?.overall;
+      return '${info?.state.name ?? 'n/a'}: ${info?.message ?? 'no support'}';
+    }),
+    E2eProbe('l10n', 'l10n · switch locale', (registry) async {
+      final controller = registry.readOrNull<LocaleController>();
+      if (controller == null) {
+        return 'skipped: LocaleController not registered';
+      }
+      await controller.setLocale(const Locale('id'));
+      final applied = controller.locale?.toLanguageTag();
+      await controller.followSystem();
+      return 'applied=$applied then follow-system';
+    }),
+    E2eProbe('local_db', 'local_db · write and read document', (registry) async {
+      final database = registry.readOrNull<LocalDatabase>();
+      if (database == null) {
+        return 'skipped: LocalDatabase not registered';
+      }
+      await database.put('e2e', 'probe', <String, Object?>{'value': 42});
+      final stored = await database.get('e2e', 'probe');
+      await database.delete('e2e', 'probe');
+      return 'stored value=${stored?['value']}';
+    }),
+    E2eProbe('logger', 'logger · log and inspect sink', (registry) async {
+      final logger = registry.read<AppLogger>();
+      logger.info('e2e probe from logger', data: <String, Object?>{'step': 1});
+      final sink = registry.readOrNull<MemoryLogSink>();
+      return 'logged, memory records=${sink?.length ?? 'n/a'}';
+    }),
+    E2eProbe('notifications', 'notifications · support check', (registry) async {
+      final support = registry.readOrNull<NotificationSupport>();
+      if (support == null) {
+        return 'skipped: NotificationSupport not registered';
+      }
+      final info = await support.check();
+      return '${info.state.name}: ${info.message}';
+    }),
+    E2eProbe('permission', 'permission · camera status', (registry) async {
+      final permissions = registry.readOrNull<Permissions>();
+      if (permissions == null) {
+        return 'skipped: Permissions not registered';
+      }
+      final status = await permissions.status(PermissionKind.camera);
+      return 'camera=${status.name}';
+    }),
+    E2eProbe('rest_auth', 'rest_auth · sign-in failure mapping', (
+      registry,
+    ) async {
+      final auth = registry.readOrNull<AuthRepository>();
+      if (auth == null) {
+        return 'skipped: AuthRepository not registered';
+      }
+      try {
+        final session = await auth.signIn(
+          email: 'e2e@example.com',
+          password: 'not-a-real-password',
+        );
+        return 'unexpected success: ${session.runtimeType}';
+      } on Failure catch (failure) {
+        return 'failure mapped: ${failure.code} (${failure.message})';
+      }
+    }),
+    E2eProbe('secure_storage', 'secure_storage · write and read', (
+      registry,
+    ) async {
+      final storage = registry.readOrNull<SecureStorage>();
+      if (storage == null) {
+        return 'skipped: SecureStorage not registered';
+      }
+      await storage.write('e2e_key', 'secret-value');
+      final read = await storage.read('e2e_key');
+      await storage.delete('e2e_key');
+      final cleared = await storage.read('e2e_key');
+      return 'round trip=${read == 'secret-value'}, cleared=${cleared == null}';
+    }),
+    E2eProbe('share', 'share · support info', (registry) async {
+      final info = registry.readOrNull<ShareSupport>()?.info;
+      return '${info?.state.name ?? 'n/a'}: ${info?.message ?? 'no support'}';
+    }),
+    E2eProbe('storage', 'storage · write and read', (registry) async {
+      final storage = registry.readOrNull<Storage>();
+      if (storage == null) {
+        return 'skipped: Storage not registered';
+      }
+      await storage.write('e2e_key', 'value');
+      final read = await storage.read('e2e_key');
+      await storage.delete('e2e_key');
+      final contains = await storage.containsKey('e2e_key');
+      return 'round trip=${read == 'value'}, contains=$contains';
+    }),
+    E2eProbe('theme', 'theme · switch mode', (registry) async {
+      final controller = registry.readOrNull<ThemeModeController>();
+      if (controller == null) {
+        return 'skipped: ThemeModeController not registered';
+      }
+      final before = controller.mode.name;
+      await controller.setMode(ThemeMode.dark);
+      final after = controller.mode.name;
+      await controller.setMode(ThemeMode.system);
+      return '$before -> $after -> ${controller.mode.name}';
+    }),
+  ];
+}

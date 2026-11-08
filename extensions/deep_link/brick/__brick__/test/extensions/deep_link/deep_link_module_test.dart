@@ -12,7 +12,7 @@ void main() {
     const DeepLinkModule().register(registry);
 
     expect(registry.read<DeepLinks>(), isA<DeviceDeepLinks>());
-    expect(registry.read<DeepLinkConfig>().scheme, 'kiln');
+    expect(registry.read<DeepLinkConfig>().scheme, '{{scheme}}');
     expect(registry.read<AppLinkBuilder>(), isA<AppLinkBuilder>());
   });
 

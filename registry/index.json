@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T07:42:45.243790Z",
+  "generated_at": "2026-11-08T18:03:07.077022Z",
   "extensions": [
     {
       "id": "analytics",
@@ -138,7 +138,7 @@
         {
           "version": "0.1.0",
           "url": "archives/codegen-0.1.0.tgz",
-          "sha256": "694845eaffca636c8c60af97c5155f569e4bb48f8674ff454c330d0a377071a1",
+          "sha256": "a337062463113e95914dcd18b3afc152efe7c577ebedc72bf8bcb622e058acea",
           "provides": [
             "codegen"
           ],
@@ -182,7 +182,7 @@
         {
           "version": "0.1.0",
           "url": "archives/crash_report-0.1.0.tgz",
-          "sha256": "c72cfa31e57fb70eb3e67043f366c126d24df7f7f3c362375c2d2e523bb6334d",
+          "sha256": "6d5658f3263ca738a8716c7be1ad070382e6fb2f754630c8069f80d04d4dd56b",
           "provides": [
             "crash_reporter"
           ],
@@ -204,7 +204,7 @@
         {
           "version": "0.1.0",
           "url": "archives/deep_link-0.1.0.tgz",
-          "sha256": "b0401791abc915defd79c8743f3a8bcfa9cc0cf89eb0f34011f71d983c913730",
+          "sha256": "67f9baab6f2c854f24e335607bcbc653293b0c07c6ff2a486e87baabda171661",
           "provides": [
             "deep_links"
           ],
@@ -226,7 +226,7 @@
         {
           "version": "0.1.0",
           "url": "archives/dio-0.1.0.tgz",
-          "sha256": "18a1eff7940d50d6e8abc79149cca7db42e34bf473d1da04e5c3bb030435896f",
+          "sha256": "9e1638e02fb82253e42f6c6118d053bb8a2cae52f6f1b9018028eee800d79a2e",
           "provides": [
             "http_client",
             "http_pipeline"

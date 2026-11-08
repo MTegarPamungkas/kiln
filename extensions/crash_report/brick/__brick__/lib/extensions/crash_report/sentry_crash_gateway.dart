@@ -55,7 +55,7 @@ final class SdkSentryCrashGateway implements CrashReportGateway {
     String message, {
     Map<String, Object?> data = const <String, Object?>{},
   }) async {
-    Sentry.addBreadcrumb(
+    await Sentry.addBreadcrumb(
       Breadcrumb(
         message: message,
         category: 'app',

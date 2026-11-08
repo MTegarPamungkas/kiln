@@ -36,6 +36,8 @@ platforms:
 android:
   permissions:
     - android.permission.INTERNET
+  # sentry_flutter declares minSdk 26, so the generated app has to match it.
+  min_sdk: 26
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

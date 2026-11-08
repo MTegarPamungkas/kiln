@@ -74,8 +74,8 @@ Failure _mapResponse(DioException error, int statusCode) {
     cause: error,
     stackTrace: error.stackTrace,
     details: <String, Object?>{
-      if (serverMessage != null) 'serverMessage': serverMessage,
-      if (retryAfter != null) 'retryAfterSeconds': retryAfter,
+      'serverMessage': ?serverMessage,
+      'retryAfterSeconds': ?retryAfter,
     },
   );
 }

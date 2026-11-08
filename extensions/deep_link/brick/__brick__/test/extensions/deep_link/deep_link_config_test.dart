@@ -5,10 +5,10 @@ void main() {
   test('defaults carry the rendered prompts', () {
     const config = DeepLinkConfig.defaults;
 
-    expect(config.scheme, 'kiln');
+    expect(config.scheme, '{{scheme}}');
     expect(config.allowedHosts, <String>['kiln.dev']);
     expect(config.pathPrefixes, isEmpty);
-    expect(config.schemeName, 'kiln');
+    expect(config.schemeName, '{{scheme}}');
     expect(config.allowsUniversalLinks, isTrue);
     expect(config.restrictsPaths, isFalse);
   });

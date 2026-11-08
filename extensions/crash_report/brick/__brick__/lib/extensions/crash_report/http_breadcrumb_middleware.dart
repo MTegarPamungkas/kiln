@@ -51,7 +51,7 @@ final class HttpBreadcrumbMiddleware implements HttpMiddleware {
       'method': method,
       'url': url,
       'duration_ms': elapsed.inMilliseconds,
-      if (statusCode != null) 'status': statusCode,
+      'status': ?statusCode,
     };
     final message = 'HTTP $method $url${statusCode == null ? ' failed' : ' -> $statusCode'}';
     return reporter.addBreadcrumb(message, data: redactor.redactMap(data));
