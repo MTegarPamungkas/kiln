@@ -10,7 +10,7 @@ records release-level changes for the monorepo.
 ## 0.1.0
 
 - Initial release of the Kiln Flutter application framework: the `kiln_core`
-  runtime with the one-call `Gate` `Result` facade, 32 app-owned extensions
+  runtime with the one-call `Gate` `Result` facade, 33 app-owned extensions
   (including Sentry crash reporting behind a consent gate, json_serializable +
   freezed code generation, and vendor-neutral remote config / feature flags), the
   `kiln` CLI and extension registry, and CI including a version-drift guard.
