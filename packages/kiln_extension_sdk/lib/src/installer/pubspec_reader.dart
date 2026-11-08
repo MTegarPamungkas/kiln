@@ -22,6 +22,45 @@ final class PubspecInfo {
 
   bool hasDevDependency(String name) => devDependencies.containsKey(name);
 
+  /// Where [name] resolves from: `path`, `git`, `sdk`, or `hosted`.
+  ///
+  /// Returns null when the dependency is absent. A plain version constraint
+  /// counts as hosted, which is how pub reads it.
+  String? dependencySource(String name) => _sourceOf(dependencies[name]);
+
+  /// The `ref` pinned by a git dependency, or null when it tracks the default
+  /// branch.
+  String? gitRef(String name) {
+    final value = dependencies[name];
+    if (value is! Map) {
+      return null;
+    }
+    final git = value['git'];
+    if (git is! Map) {
+      return null;
+    }
+    final ref = git['ref'];
+    return ref == null ? null : '$ref';
+  }
+
+  static String? _sourceOf(Object? value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is Map) {
+      if (value['path'] != null) {
+        return 'path';
+      }
+      if (value['git'] != null) {
+        return 'git';
+      }
+      if (value['sdk'] != null) {
+        return 'sdk';
+      }
+    }
+    return 'hosted';
+  }
+
   bool get usesFlutterSdk {
     final flutter = dependencies['flutter'];
     return flutter is Map && flutter['sdk'] == 'flutter';

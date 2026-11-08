@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:kiln_cli/kiln_cli.dart';
@@ -100,6 +101,92 @@ void main() {
 
       expect(code, ExitCodes.success);
       expect(captured.out.join('\n'), isNot(contains('"layer.')));
+    });
+
+    group('kiln_core source', () {
+      /// Rewrites the fixture pubspec with [coreBlock] as the kiln_core entry.
+      Future<void> writeCore(String coreBlock) async {
+        await File(p.join(project.path, 'pubspec.yaml')).writeAsString('''
+name: test_app
+description: Test project.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+$coreBlock
+  dio: any
+''');
+      }
+
+      /// The `core.source` doctor check from a `--json` run.
+      Future<Map<String, Object?>> coreCheck(int expectedCode) async {
+        final runner = buildTestRunner(cwd: project, captured: captured);
+        final code = await runner.run(<String>['doctor', '--json']);
+        expect(code, expectedCode, reason: captured.err.join('\n'));
+        final report =
+            jsonDecode(captured.out.join('\n').trim()) as Map<String, Object?>;
+        final checks = report['checks'] as List<Object?>;
+        return checks
+            .cast<Map<String, Object?>>()
+            .firstWhere((check) => check['id'] == 'core.source');
+      }
+
+      test('warns when kiln_core comes from a local path', () async {
+        await writeCore('  kiln_core:\n    path: $corePath');
+
+        final check = await coreCheck(ExitCodes.success);
+
+        expect(check['status'], 'warn');
+        expect(check['message'], contains('local path'));
+      });
+
+      test('warns when kiln_core is asked from pub.dev', () async {
+        await writeCore('  kiln_core: ^0.1.0');
+
+        final check = await coreCheck(ExitCodes.success);
+
+        expect(check['status'], 'warn');
+        expect(check['message'], contains('no release is published'));
+      });
+
+      test('warns when a git source tracks the default branch', () async {
+        await writeCore('''
+  kiln_core:
+    git:
+      url: https://github.com/kiln-dev/kiln.git
+      path: packages/kiln_core''');
+
+        final check = await coreCheck(ExitCodes.success);
+
+        expect(check['status'], 'warn');
+        expect(check['message'], contains('default branch'));
+      });
+
+      test('accepts a git source pinned to a ref', () async {
+        await writeCore('''
+  kiln_core:
+    git:
+      url: https://github.com/kiln-dev/kiln.git
+      path: packages/kiln_core
+      ref: v0.1.0''');
+
+        final check = await coreCheck(ExitCodes.success);
+
+        expect(check['status'], 'ok');
+        expect(check['message'], contains('v0.1.0'));
+      });
+
+      test('fails when kiln_core is missing entirely', () async {
+        await writeCore('  intl: ^0.20.3');
+
+        final check = await coreCheck(ExitCodes.project);
+
+        expect(check['status'], 'fail');
+        expect(check['message'], contains('not a dependency'));
+      });
     });
   });
 }

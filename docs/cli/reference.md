@@ -11,7 +11,7 @@
 | `kiln list` | Installed/available extensions |
 | `kiln info <extension>` | Full manifest of a single extension |
 | `kiln graph` | Requires graph, `text`/`mermaid` format |
-| `kiln doctor` | Check hashes, codegen, journal, dependencies, manifest and platform compatibility, and the feature layer rules |
+| `kiln doctor` | Check hashes, codegen, journal, dependencies, manifest and platform compatibility, the feature layer rules, and how `kiln_core` resolves |
 | `kiln upgrade` | Upgrade extensions from the registry; validates the candidate against installed extensions |
 | `kiln rollback` | Undo the last/interrupted transaction |
 | `kiln config` | Registry, mirror, offline mode |

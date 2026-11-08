@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
 import '../infra/json_reporter.dart';
+import '../project_context.dart';
 import '../version.dart';
 import 'command_helpers.dart';
 
@@ -141,7 +142,7 @@ final class DoctorCommand extends KilnCommand {
             DoctorCheck(
               id: 'file.$id.${fileEntry.key}',
               status: DoctorStatus.fail,
-              message: 'File milik $id hilang: ${fileEntry.key}',
+              message: '$id is missing ${fileEntry.key}',
               suggestion: 'Reinstall the extension or restore the file',
             ),
           );
@@ -234,6 +235,8 @@ final class DoctorCommand extends KilnCommand {
       }
     }
 
+    checks.add(_coreSourceCheck(project));
+
     final failCount = checks
         .where((check) => check.status == DoctorStatus.fail)
         .length;
@@ -261,5 +264,68 @@ final class DoctorCommand extends KilnCommand {
       }
     }
     return failCount == 0 ? ExitCodes.success : ExitCodes.project;
+  }
+
+  /// Reports how `kiln_core` resolves, so a project that only builds on one
+  /// machine is visible before it is shared.
+  DoctorCheck _coreSourceCheck(ProjectContext project) {
+    const id = 'core.source';
+    switch (project.pubspec.dependencySource('kiln_core')) {
+      case null:
+        return const DoctorCheck(
+          id: id,
+          status: DoctorStatus.fail,
+          message: 'kiln_core is not a dependency',
+          suggestion: 'Add it with kiln create --core-git <url>',
+        );
+      case 'git':
+        final ref = project.pubspec.gitRef('kiln_core');
+        if (ref == null) {
+          return const DoctorCheck(
+            id: id,
+            status: DoctorStatus.warn,
+            message:
+                'kiln_core resolves from git but tracks the default branch',
+            suggestion:
+                'Pin a branch, tag, or commit with a git ref so every machine '
+                'and CI resolves the same SDK revision.',
+          );
+        }
+        return DoctorCheck(
+          id: id,
+          status: DoctorStatus.ok,
+          message: 'kiln_core resolves from git at $ref',
+        );
+      case 'path':
+        return const DoctorCheck(
+          id: id,
+          status: DoctorStatus.warn,
+          message:
+              'kiln_core resolves from a local path, so this project only '
+              'builds on a machine that has that checkout',
+          suggestion:
+              'Replace the path dependency with a git dependency so anyone '
+              'with access to the repository can build it, or keep the path on '
+              'purpose for local development.',
+        );
+      case 'hosted':
+        return const DoctorCheck(
+          id: id,
+          status: DoctorStatus.warn,
+          message:
+              'kiln_core asks pub.dev for a release, but no release is '
+              'published there',
+          suggestion:
+              'Resolve it from the repository with a git dependency, or from a '
+              'local checkout with a path dependency.',
+        );
+      default:
+        return const DoctorCheck(
+          id: id,
+          status: DoctorStatus.fail,
+          message: 'kiln_core resolves from an unsupported source',
+          suggestion: 'Use a git or path dependency for kiln_core.',
+        );
+    }
   }
 }
