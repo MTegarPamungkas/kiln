@@ -4,45 +4,40 @@ import 'package:{{app_name}}/extensions/neon/neon_storage_config.dart';
 
 void main() {
   const valid = NeonStorageConfig(
-    endpoint: 'https://demo.storage.c-us-east-2.aws.neon.tech',
+    signingUrl: 'https://signing.example.test/storage/sign',
     bucket: 'files',
-    region: 'us-east-2',
-    accessKeyId: 'token-id',
-    secretAccessKey: 's3-secret',
   );
 
   test('a complete configuration is valid', () {
     expect(valid.validate(), isNull);
-    expect(valid.signedUrlLifetime, const Duration(hours: 1));
+    expect(valid.signedUrlLifetime, const Duration(minutes: 5));
   });
 
-  test('object URLs use path-style addressing', () {
-    final uri = valid.objectUri('avatars/my photo.png');
-
-    expect(uri.scheme, 'https');
-    expect(uri.host, 'demo.storage.c-us-east-2.aws.neon.tech');
-    expect(uri.path, '/files/avatars/my%20photo.png');
-  });
-
-  test('a trailing slash on the endpoint is not doubled', () {
-    final uri = valid.copyWith(endpoint: 'https://h/').objectUri('a.txt');
-
-    expect(uri.path, '/files/a.txt');
-  });
-
-  test('insecure transport is detected', () {
-    expect(valid.isInsecureTransport, isFalse);
+  test('the signing URL must be HTTPS', () {
     expect(
-      valid.copyWith(endpoint: 'http://localhost:9000').isInsecureTransport,
-      isTrue,
-    );
-  });
-
-  test('a non-http endpoint is rejected', () {
-    expect(
-      valid.copyWith(endpoint: 'neon://bucket').validate()?.code,
+      valid.copyWith(signingUrl: 'http://signing.example.test/sign').validate()?.code,
       FailureCode.configurationInvalid,
     );
+    expect(
+      valid.copyWith(signingUrl: 'http://localhost:8080/sign').validate(),
+      isNull,
+    );
+  });
+
+  test('credentials, query, and fragment in the signing URL are rejected', () {
+    for (final url in <String>[
+      'https://user:pass@signing.example.test/sign',
+      'https://signing.example.test/sign?secret=1',
+      'https://signing.example.test/sign#fragment',
+      'signing.example.test/sign',
+      'neon://signing.example.test/sign',
+    ]) {
+      expect(
+        valid.copyWith(signingUrl: url).validate()?.code,
+        FailureCode.configurationInvalid,
+        reason: url,
+      );
+    }
   });
 
   test('an invalid bucket name is rejected', () {
@@ -52,37 +47,28 @@ void main() {
     );
   });
 
-  test('blank region and keys are reported as missing', () {
+  test('lifetimes must be whole seconds within fifteen minutes', () {
+    for (final duration in <Duration>[
+      Duration.zero,
+      const Duration(milliseconds: 500),
+      const Duration(seconds: 901),
+      const Duration(minutes: 15, milliseconds: 1),
+    ]) {
+      expect(
+        valid.copyWith(signedUrlLifetime: duration).validate()?.code,
+        FailureCode.configurationInvalid,
+        reason: '$duration',
+      );
+    }
     expect(
-      valid.copyWith(region: ' ').validate()?.code,
-      FailureCode.configurationMissing,
-    );
-    expect(
-      valid.copyWith(accessKeyId: '').validate()?.code,
-      FailureCode.configurationMissing,
-    );
-    expect(
-      valid.copyWith(secretAccessKey: '').validate()?.code,
-      FailureCode.configurationMissing,
+      valid.copyWith(signedUrlLifetime: const Duration(minutes: 15)).validate(),
+      isNull,
     );
   });
 
-  test('the secret is never echoed in a failure message', () {
-    final failure = valid
-        .copyWith(
-          secretAccessKey: 'super-secret-value',
-          region: '',
-        )
-        .validate();
-
-    expect(failure?.code, FailureCode.configurationMissing);
-    expect(failure?.message, isNot(contains('super-secret-value')));
-  });
-
-  test('a non-positive signed URL lifetime is rejected', () {
-    expect(
-      valid.copyWith(signedUrlLifetime: Duration.zero).validate()?.code,
-      FailureCode.configurationInvalid,
-    );
+  test('the configuration never contains an S3 credential', () {
+    final map = valid.copyWith(bucket: 'files').validate();
+    expect(map, isNull);
+    expect(valid.toString(), isNot(contains('secret')));
   });
 }

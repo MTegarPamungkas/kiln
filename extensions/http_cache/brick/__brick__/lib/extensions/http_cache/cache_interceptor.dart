@@ -36,25 +36,32 @@ final class CacheInterceptor implements HttpMiddleware {
 
   @override
   Future<HttpResponse> handle(HttpRequest request, HttpHandler next) async {
+    request.cancelToken?.throwIfCancelled();
     if (invalidation.isMutation(request.method)) {
       final response = await next(request);
       await cache.invalidate(invalidation.prefixFor(request));
       return response;
     }
-    if (request.method != HttpMethod.get &&
-        request.method != HttpMethod.head) {
+    if (!policy.allowsRequest(request)) {
       return next(request);
     }
 
     final key = keyBuilder.build(request);
-    final entry = await cache.read(key);
+    var entry = await cache.read(key);
+    if (entry != null && !_cacheable(request, entry.response)) {
+      await cache.invalidate(key);
+      entry = null;
+    }
+    request.cancelToken?.throwIfCancelled();
+    final requestControl = policy.requestControl(request);
+    final control = _control(entry?.response);
     final now = clock.now().toUtc();
-    if (entry != null && entry.isFresh(now)) {
+    if (entry != null && !requestControl.noCache && !control.noCache &&
+        entry.isFresh(now)) {
       return entry.response.copyWith(fromCache: true);
     }
 
-    final control = parser.parse(entry?.response.header('Cache-Control'));
-    if (entry != null &&
+    if (entry != null && !requestControl.noCache &&
         staleWhileRevalidate.canServe(
           entry: entry,
           control: control,
@@ -70,58 +77,67 @@ final class CacheInterceptor implements HttpMiddleware {
         ? request
         : request.copyWith(
             headers: <String, String>{
-              ...request.headers,
+              for (final header in request.headers.entries)
+                if (header.key.toLowerCase() != 'if-none-match')
+                  header.key: header.value,
               'If-None-Match': etag,
             },
           );
 
+    final HttpResponse response;
     try {
-      final response = await next(outgoing);
-      if (etagValidator.isNotModified(response) && entry != null) {
-        await cache.write(
-          key,
-          entry.response,
-          ttl: entry.ttl ?? settings.defaultTtl,
-          tags: entry.tags,
-        );
-        return entry.response.copyWith(fromCache: true);
-      }
-      final responseControl = parser.parse(response.header('Cache-Control'));
-      if (policy.isCacheable(outgoing, response, responseControl, settings)) {
-        await cache.write(
-          key,
-          response,
-          ttl: policy.ttlFor(responseControl, settings),
-          tags: invalidation.tagsFor(request),
-        );
-      }
-      return response;
-    } on Object {
-      if (entry != null) {
+      response = await next(outgoing);
+    } on Failure catch (failure) {
+      request.cancelToken?.throwIfCancelled();
+      if (entry != null && !requestControl.noCache &&
+          policy.isTransient(failure) &&
+          policy.canServeOnError(entry, control, clock.now().toUtc())) {
         return entry.response.copyWith(fromCache: true);
       }
       rethrow;
     }
+    request.cancelToken?.throwIfCancelled();
+    if (etag != null && etagValidator.isNotModified(response) && entry != null) {
+      final updatedNames = response.headers.keys.map((name) => name.toLowerCase()).toSet();
+      final validated = entry.response.copyWith(headers: <String, List<String>>{
+        for (final header in entry.response.headers.entries)
+          if (!updatedNames.contains(header.key.toLowerCase())) header.key: header.value,
+        ...response.headers,
+      });
+      await _store(key, request, validated);
+      return validated.copyWith(fromCache: true);
+    }
+    await _store(key, request, response);
+    return response;
   }
 
-  Future<void> _refresh(
-    String key,
-    HttpRequest request,
-    HttpHandler next,
-  ) async {
+  CacheControl _control(HttpResponse? response) => parser.parse(
+    response == null ? null : policy.responseHeader(response, 'cache-control'),
+  );
+
+  bool _cacheable(HttpRequest request, HttpResponse response) => policy.isCacheable(
+    request, response, _control(response), settings, keyBuilder: keyBuilder,
+  );
+
+  Future<void> _store(String key, HttpRequest request, HttpResponse response) async {
+    if (_cacheable(request, response)) {
+      await cache.write(
+        key, response,
+        ttl: policy.ttlFor(_control(response), settings),
+        tags: invalidation.tagsFor(request),
+      );
+    } else {
+      await cache.invalidate(key);
+    }
+  }
+
+  Future<void> _refresh(String key, HttpRequest request, HttpHandler next) async {
     try {
       final response = await next(request);
-      final control = parser.parse(response.header('Cache-Control'));
-      if (policy.isCacheable(request, response, control, settings)) {
-        await cache.write(
-          key,
-          response,
-          ttl: policy.ttlFor(control, settings),
-          tags: invalidation.tagsFor(request),
-        );
-      }
-    } on Object {
-      // The stale response was already served.
+      request.cancelToken?.throwIfCancelled();
+      await _store(key, request, response);
+    } on Exception {
+      // The explicitly permitted stale response was already served.
     }
   }
 }

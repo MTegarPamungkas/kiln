@@ -34,3 +34,10 @@ Capabilities decide whether a provider is installed. They do not promise that
 the current device can use it. Runtime readiness is reported separately by
 `KilnModule.support()` and exposed through `SupportRegistry`; see
 [../extensions/support-and-devices.md](../extensions/support-and-devices.md).
+
+## Behavior, not just method names
+
+Every provider must return the same observable outcomes: missing records,
+pagination, combined filters, logout failures, and unsupported backends are
+specified in [contract-behavior.md](contract-behavior.md). The executable
+version lives in the `kiln_testing` contract suites.

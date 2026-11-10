@@ -13,6 +13,8 @@ final class LockedExtension {
     required this.version,
     required this.source,
     this.dependencies = const <String>[],
+    this.devDependencies = const <String>[],
+    this.flutterGenerate,
     this.files = const <String, String>{},
     this.patches = const <String>[],
     this.manualSteps = const <String>[],
@@ -20,7 +22,11 @@ final class LockedExtension {
 
   final String version;
   final ExtensionSource source;
+  /// Required packages, not proof of Kiln ownership.
   final List<String> dependencies;
+  final List<String>? devDependencies;
+  /// Null in legacy locks: requirements are unknown and preserved conservatively.
+  final bool? flutterGenerate;
 
   /// Relative path to SHA-256 hash. An empty hash means origin unknown.
   final Map<String, String> files;
@@ -31,6 +37,8 @@ final class LockedExtension {
     String? version,
     ExtensionSource? source,
     List<String>? dependencies,
+    List<String>? devDependencies,
+    bool? flutterGenerate,
     Map<String, String>? files,
     List<String>? patches,
     List<String>? manualSteps,
@@ -39,6 +47,8 @@ final class LockedExtension {
       version: version ?? this.version,
       source: source ?? this.source,
       dependencies: dependencies ?? this.dependencies,
+      devDependencies: devDependencies ?? this.devDependencies,
+      flutterGenerate: flutterGenerate ?? this.flutterGenerate,
       files: files ?? this.files,
       patches: patches ?? this.patches,
       manualSteps: manualSteps ?? this.manualSteps,
@@ -49,6 +59,8 @@ final class LockedExtension {
     'version': version,
     'source': source.name,
     if (dependencies.isNotEmpty) 'dependencies': dependencies,
+    if (devDependencies != null) 'dev_dependencies': devDependencies,
+    if (flutterGenerate != null) 'flutter_generate': flutterGenerate,
     'files': files,
     if (patches.isNotEmpty) 'patches': patches,
     if (manualSteps.isNotEmpty) 'manual_steps': manualSteps,
@@ -73,6 +85,9 @@ final class LockedExtension {
           ? ExtensionSource.store
           : ExtensionSource.bundled,
       dependencies: _stringList(map['dependencies']),
+      devDependencies: map.containsKey('dev_dependencies')
+          ? _stringList(map['dev_dependencies']) : null,
+      flutterGenerate: map['flutter_generate'] as bool?,
       files: files,
       patches: _stringList(map['patches']),
       manualSteps: _stringList(map['manual_steps']),
@@ -86,6 +101,9 @@ final class Lockfile {
     this.lockVersion = 2,
     this.core = '0.1.0',
     this.extensions = const <String, LockedExtension>{},
+    this.ownedDependencies = const <String, Object?>{},
+    this.ownedDevDependencies = const <String, Object?>{},
+    this.ownedFlutterGenerate = const <String, Object?>{},
   });
 
   factory Lockfile.empty({String core = '0.1.0'}) => Lockfile(core: core);
@@ -112,12 +130,22 @@ final class Lockfile {
       lockVersion: map['lock_version'] is int ? map['lock_version']! as int : 1,
       core: '${map['core'] ?? '0.1.0'}',
       extensions: extensions,
+      ownedDependencies: _asMap(map['owned_dependencies']),
+      ownedDevDependencies: _asMap(map['owned_dev_dependencies']),
+      ownedFlutterGenerate: _asMap(map['owned_flutter_generate']),
     );
   }
 
   final int lockVersion;
   final String core;
   final Map<String, LockedExtension> extensions;
+
+  /// Only packages actually inserted by Kiln, with their installed YAML values.
+  /// Missing metadata in older locks never implies ownership.
+  final Map<String, Object?> ownedDependencies;
+  final Map<String, Object?> ownedDevDependencies;
+  /// Previous generate setting: `present` plus `value`, only when Kiln changed it.
+  final Map<String, Object?> ownedFlutterGenerate;
 
   bool get isEmpty => extensions.isEmpty;
 
@@ -127,17 +155,27 @@ final class Lockfile {
     return Lockfile(
       core: core,
       extensions: <String, LockedExtension>{...extensions, id: extension},
+      ownedDependencies: ownedDependencies,
+      ownedDevDependencies: ownedDevDependencies,
+      ownedFlutterGenerate: ownedFlutterGenerate,
     );
   }
 
   Lockfile withoutExtension(String id) {
     final copy = <String, LockedExtension>{...extensions}..remove(id);
-    return Lockfile(core: core, extensions: copy);
+    return Lockfile(core: core, extensions: copy,
+      ownedDependencies: ownedDependencies,
+      ownedDevDependencies: ownedDevDependencies,
+      ownedFlutterGenerate: ownedFlutterGenerate,
+    );
   }
 
   Map<String, Object?> toJson() => <String, Object?>{
     'lock_version': 2,
     'core': core,
+    if (ownedDependencies.isNotEmpty) 'owned_dependencies': ownedDependencies,
+    if (ownedDevDependencies.isNotEmpty) 'owned_dev_dependencies': ownedDevDependencies,
+    if (ownedFlutterGenerate.isNotEmpty) 'owned_flutter_generate': ownedFlutterGenerate,
     'extensions': <String, Object?>{
       for (final entry in extensions.entries) entry.key: entry.value.toJson(),
     },

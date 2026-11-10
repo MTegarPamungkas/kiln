@@ -20,8 +20,7 @@ extension ThemeContextX on BuildContext {
 
   /// Corner radius scale, derived from the base radius when unavailable.
   AppRadius get radii =>
-      Theme.of(this).extension<AppRadius>() ??
-      AppRadius.fromCornerRadius(14);
+      Theme.of(this).extension<AppRadius>() ?? AppRadius.fromCornerRadius(14);
 
   /// Success, warning, and info colors for the active brightness.
   SemanticColors get semantic =>

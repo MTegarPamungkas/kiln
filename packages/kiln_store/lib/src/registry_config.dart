@@ -66,7 +66,12 @@ final class RegistryConfig {
   late final Uri? _mirrorBase;
 
   /// URI of the main `index.json`.
-  Uri get indexUri => resolve('index.json');
+  Uri get indexUri => _base.path.endsWith('.json')
+      ? _base.normalizePath()
+      : resolve('index.json').normalizePath();
+
+  /// Stable cache identity includes the complete index URI, not just its host.
+  String get identity => indexUri.replace(fragment: '').toString();
 
   /// URI of the mirror `index.json`, or `null` when no mirror is configured.
   Uri? get mirrorIndexUri =>

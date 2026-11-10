@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_initializing_formals
+
 import 'package:kiln_core/kiln_core.dart';
 
 import 'neon_auth_gateway.dart';
@@ -18,7 +20,9 @@ import 'neon_token_provider.dart';
 ///
 /// Auth goes through Neon Auth (Better Auth); database access goes through the
 /// Data API (PostgREST) with the signed-in user's JWT (or an anonymous JWT when
-/// signed out); files go through Object Storage (S3-compatible). Factories can
+/// signed out); files use a custom presigning backend with a user-only JWT.
+/// The module owns its session token providers; injected factory resources
+/// remain the factory owner's responsibility. Factories can
 /// swap the HTTP gateways for in-memory fakes in tests. An optional
 /// [changeSignal] carries out-of-band change hints so `RemoteDatabase.watch`
 /// refreshes on push instead of only on the polling interval.
@@ -29,7 +33,9 @@ final class NeonModule extends KilnModule {
     NeonChangeSignal? changeSignal,
     PostgrestGateway Function(NeonConfig config, NeonTokenProvider? tokenProvider)?
     gatewayFactory,
-    NeonStorageGateway Function(NeonStorageConfig config)? storageGatewayFactory,
+    NeonStorageGateway Function(
+      NeonStorageConfig config, NeonSessionTokenProvider tokenProvider,
+    )? storageGatewayFactory,
     NeonAuthGateway Function(String authUrl)? authGatewayFactory,
   }) : _config = config ?? NeonConfig.defaults,
        _storageConfig = storageConfig ?? NeonStorageConfig.defaults,
@@ -38,7 +44,9 @@ final class NeonModule extends KilnModule {
            ((config, tokenProvider) =>
                HttpNeonGateway(config: config, tokenProvider: tokenProvider)),
        _storageGatewayFactory = storageGatewayFactory ??
-           ((config) => S3NeonStorageGateway(config: config)),
+           ((config, tokenProvider) => PresignedNeonStorageGateway(
+             config: config, tokenProvider: tokenProvider,
+           )),
        _authGatewayFactory = authGatewayFactory ??
            ((authUrl) => BetterAuthGateway(authUrl: authUrl));
 
@@ -47,8 +55,12 @@ final class NeonModule extends KilnModule {
   final NeonChangeSignal? _changeSignal;
   final PostgrestGateway Function(NeonConfig config, NeonTokenProvider? tokenProvider)
   _gatewayFactory;
-  final NeonStorageGateway Function(NeonStorageConfig config)
-  _storageGatewayFactory;
+  final NeonStorageGateway Function(
+    NeonStorageConfig config, NeonSessionTokenProvider tokenProvider,
+  ) _storageGatewayFactory;
+
+  NeonSessionTokenProvider? _databaseTokens;
+  NeonSessionTokenProvider? _storageTokens;
   final NeonAuthGateway Function(String authUrl) _authGatewayFactory;
 
   PostgrestGateway? _gateway;
@@ -94,9 +106,13 @@ final class NeonModule extends KilnModule {
       auth: authGateway,
       fallback: _fallbackTokenProvider(),
     );
+    _databaseTokens = tokenProvider;
+    // Storage never inherits the database's anonymous/static fallback.
+    final storageTokens = NeonSessionTokenProvider(auth: authGateway);
+    _storageTokens = storageTokens;
     final gateway = _gatewayFactory(_config, tokenProvider);
     _gateway = gateway;
-    final storageGateway = _storageGatewayFactory(_storageConfig);
+    final storageGateway = _storageGatewayFactory(_storageConfig, storageTokens);
     _storageGateway = storageGateway;
     final mapper = const NeonQueryMapper();
     final database = NeonRemoteDatabase(
@@ -154,9 +170,13 @@ final class NeonModule extends KilnModule {
     if (gateway is HttpNeonGateway) {
       gateway.close();
     }
-    if (storageGateway is S3NeonStorageGateway) {
+    if (storageGateway is PresignedNeonStorageGateway) {
       storageGateway.close();
     }
+    _databaseTokens?.close();
+    _storageTokens?.close();
+    _databaseTokens = null;
+    _storageTokens = null;
     if (authGateway is BetterAuthGateway) {
       authGateway.close();
     }

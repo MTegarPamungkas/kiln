@@ -75,7 +75,7 @@ final class SupabaseFileStorage implements FileStorage {
     if (lifetime <= Duration.zero) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Masa berlaku tautan harus lebih dari nol.',
+        message: 'The link lifetime must be greater than zero.',
         kind: FailureKind.validation,
       );
     }
@@ -95,14 +95,14 @@ final class SupabaseFileStorage implements FileStorage {
     if (path.trim().isEmpty || path.startsWith('/') || path.contains('..')) {
       throw Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Path berkas "$path" tidak valid.',
+        message: 'The file path "$path" is not valid.',
         kind: FailureKind.validation,
       );
     }
     if (!_pathPattern.hasMatch(path)) {
       throw Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Path berkas hanya boleh berisi huruf, angka, dan pemisah yang didukung.',
+        message: 'The file path may only contain letters, digits, and supported separators.',
         kind: FailureKind.validation,
       );
     }

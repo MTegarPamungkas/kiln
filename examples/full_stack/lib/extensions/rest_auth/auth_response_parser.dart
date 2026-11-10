@@ -34,7 +34,7 @@ final class AuthResponseParser {
     if (accessToken == null || accessToken.isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Respons autentikasi tidak memuat access token.',
+        message: 'The authentication response did not include an access token.',
         kind: FailureKind.authentication,
       );
     }

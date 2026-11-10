@@ -9,10 +9,23 @@ import 'package:{{app_name}}/extensions/notifications/reminder_scheduler.dart';
 import 'package:{{app_name}}/extensions/notifications/timezone_resolver.dart';
 
 void main() {
+  test('module disposes its tap hub and gateway', () async {
+    final registry = GetItRegistry();
+    final module = NotificationsModule();
+    module.register(registry);
+    final done = expectLater(
+      registry.read<Notifications>().taps,
+      emitsDone,
+    );
+
+    await module.dispose();
+    await done;
+  });
+
   test('module registers the Notifications contract and config', () {
     final registry = GetItRegistry();
 
-    const NotificationsModule().register(registry);
+    NotificationsModule().register(registry);
 
     expect(registry.read<Notifications>(), isA<DeviceNotifications>());
     expect(registry.read<NotificationsConfig>(), isA<NotificationsConfig>());

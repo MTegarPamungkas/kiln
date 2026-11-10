@@ -14,11 +14,8 @@ void main() {
         'api_key': 'demo-token',
         'auth_url': 'https://demo.neonauth.test/neondb/auth',
         'schema': 'app',
-        's3_endpoint': 'https://demo.storage.c-us-east-2.aws.neon.tech',
+        'storage_signing_url': 'https://demo.example.test/storage/sign',
         's3_bucket': 'media',
-        's3_region': 'us-east-2',
-        's3_access_key_id': 'token-id',
-        's3_secret_access_key': 's3-secret',
       },
     );
 
@@ -37,7 +34,6 @@ void main() {
         'lib/extensions/neon/neon_remote_database.dart',
         'lib/extensions/neon/neon_support.dart',
         'lib/extensions/neon/neon_module.dart',
-        'lib/extensions/neon/neon_s3_signer.dart',
         'lib/extensions/neon/neon_storage_config.dart',
         'lib/extensions/neon/neon_storage_gateway.dart',
         'lib/extensions/neon/neon_file_storage.dart',
@@ -52,7 +48,6 @@ void main() {
         'test/extensions/neon/neon_auth_repository_test.dart',
         'test/extensions/neon/neon_gateway_test.dart',
         'test/extensions/neon/neon_token_provider_test.dart',
-        'test/extensions/neon/neon_s3_signer_test.dart',
         'test/extensions/neon/neon_storage_config_test.dart',
         'test/extensions/neon/neon_storage_gateway_test.dart',
         'test/extensions/neon/neon_file_storage_test.dart',
@@ -78,12 +73,11 @@ void main() {
     final storageSource = String.fromCharCodes(storageConfig.bytes);
     expect(
       storageSource,
-      contains("endpoint: 'https://demo.storage.c-us-east-2.aws.neon.tech'"),
+      contains("signingUrl: 'https://demo.example.test/storage/sign'"),
     );
     expect(storageSource, contains("bucket: 'media'"));
-    expect(storageSource, contains("region: 'us-east-2'"));
-    expect(storageSource, contains("accessKeyId: 'token-id'"));
-    expect(storageSource, contains("secretAccessKey: 's3-secret'"));
+    expect(storageSource, isNot(contains('accessKeyId')));
+    expect(storageSource, isNot(contains('secretAccessKey')));
     expect(storageSource, isNot(contains('&quot;')));
 
     final module = files.firstWhere(

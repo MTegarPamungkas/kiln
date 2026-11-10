@@ -5,9 +5,8 @@
 import 'package:kiln_core/kiln_core.dart';
 
 import 'appwrite/appwrite_module.dart';
+import 'l10n/l10n_module.dart';
 
 List<KilnModule> kilnModules() {
-  return <KilnModule>[
-  AppwriteModule(),
-  ];
+  return <KilnModule>[AppwriteModule(), L10nModule()];
 }

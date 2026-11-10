@@ -328,7 +328,8 @@ final class SdkSupabaseGateway implements SupabaseGateway {
         if (email == null || email.isEmpty) {
           throw const Failure(
             code: FailureCode.authSessionExpired,
-            message: 'Tidak ada sesi aktif untuk mengirim verifikasi email.',
+            message:
+                'There is no active session to send an email verification.',
             kind: FailureKind.session,
           );
         }
@@ -385,7 +386,8 @@ final class SdkSupabaseGateway implements SupabaseGateway {
     if (mapped == null) {
       throw const Failure(
         code: FailureCode.authSessionExpired,
-        message: 'Sesi Supabase tidak tersedia setelah operasi auth.',
+        message:
+            'The Supabase session is unavailable after the auth operation.',
         kind: FailureKind.session,
       );
     }
@@ -442,7 +444,7 @@ final class SdkSupabaseGateway implements SupabaseGateway {
       'phone_change' => OtpType.phoneChange,
       _ => throw Failure(
         code: FailureCode.validationUnsupportedValue,
-        message: 'Jenis OTP "$type" belum didukung.',
+        message: 'The OTP type "$type" is not supported yet.',
         kind: FailureKind.validation,
       ),
     };

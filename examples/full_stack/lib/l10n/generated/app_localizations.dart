@@ -332,6 +332,12 @@ abstract class AppLocalizations {
   /// **'This feature is not available yet.'**
   String get failureUnavailable;
 
+  /// No description provided for @failureUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is not supported on this device.'**
+  String get failureUnsupported;
+
   /// No description provided for @failureUnexpected.
   ///
   /// In en, this message translates to:

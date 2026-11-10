@@ -10,7 +10,7 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
-  String get appTitle => 'Kiln App';
+  String get appTitle => 'Aplikasi Kiln';
 
   @override
   String get readyTitle => 'Aplikasi siap';
@@ -148,6 +148,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get failureUnavailable => 'Fitur ini belum tersedia.';
+
+  @override
+  String get failureUnsupported => 'Fitur ini tidak didukung di perangkat ini.';
 
   @override
   String get failureUnexpected => 'Terjadi kesalahan tak terduga. Coba lagi.';

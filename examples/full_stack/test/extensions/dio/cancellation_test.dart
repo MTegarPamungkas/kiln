@@ -12,7 +12,8 @@ final class _Probe extends StatefulWidget {
   State<_Probe> createState() => _ProbeState();
 }
 
-final class _ProbeState extends State<_Probe> with HttpCancelTokenOwner<_Probe> {
+final class _ProbeState extends State<_Probe>
+    with HttpCancelTokenOwner<_Probe> {
   @override
   void initState() {
     super.initState();

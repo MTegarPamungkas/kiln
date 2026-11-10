@@ -47,10 +47,7 @@ void main() {
 
     test('formats currency with the locale symbol', () {
       final rupiah = indonesian.formatCurrency(1250000, decimalDigits: 0);
-      final dollars = english.formatCurrency(
-        1234.5,
-        currencyCode: 'USD',
-      );
+      final dollars = english.formatCurrency(1234.5, currencyCode: 'USD');
 
       expect(rupiah, contains('Rp'));
       expect(rupiah, contains('1.250.000'));

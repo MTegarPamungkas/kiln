@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_localizations_config.dart';
-import '../core/l10n/app_strings.dart';
+import '../core/l10n/core_copy.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_theme_config.dart';
+
 import 'app_wrappers.dart';
 import 'registry_scope.dart';
 
 /// Builds MaterialApp from the registry seams and applies app wrappers.
 class AppShell extends StatelessWidget {
-  const AppShell({super.key});
+  const AppShell({this.home, super.key});
+
+  /// Root page supplied by the minimal template.
+  final Widget? home;
 
   @override
   Widget build(BuildContext context) {
     final registry = RegistryScope.of(context);
     final themeConfig = registry.readOrNull<AppThemeConfig>();
     final localizations = registry.readOrNull<AppLocalizationsConfig>();
+    final copy = registry.read<CoreCopy>();
     final router = registry.readOrNull<RouterConfig<Object>>();
+
+    final resolvedHome = home ?? const SizedBox.shrink();
+
     final wrappers = appWrappers(registry);
     final supportedLocales =
-        localizations?.supportedLocales ?? AppLocalizationsConfig.defaultLocales;
+        localizations?.supportedLocales ??
+        AppLocalizationsConfig.defaultLocales;
 
     Widget buildApp(ThemeMode mode, Locale? locale) {
       final theme = themeConfig?.light ?? AppTheme.light;
@@ -28,7 +37,7 @@ class AppShell extends StatelessWidget {
       Widget app;
       if (router != null) {
         app = MaterialApp.router(
-          title: AppStrings.appTitle,
+          onGenerateTitle: copy.appTitle,
           theme: theme,
           darkTheme: darkTheme,
           themeMode: mode,
@@ -39,14 +48,14 @@ class AppShell extends StatelessWidget {
         );
       } else {
         app = MaterialApp(
-          title: AppStrings.appTitle,
+          onGenerateTitle: copy.appTitle,
           theme: theme,
           darkTheme: darkTheme,
           themeMode: mode,
           locale: locale,
           localizationsDelegates: localizations?.delegates,
           supportedLocales: supportedLocales,
-          home: const StarterPage(),
+          home: resolvedHome,
         );
       }
 
@@ -70,113 +79,6 @@ class AppShell extends StatelessWidget {
       builder: (context, _) => buildApp(
         themeConfig?.currentMode ?? ThemeMode.system,
         localizations?.currentLocale,
-      ),
-    );
-  }
-}
-
-/// Landing page used until a navigation or feature extension is installed.
-class StarterPage extends StatelessWidget {
-  const StarterPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              colors.surface,
-              colors.primaryContainer.withValues(alpha: 0.35),
-              colors.surface,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 640),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: colors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colors.primary.withValues(alpha: 0.25),
-                            blurRadius: 24,
-                            offset: const Offset(0, 12),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.local_fire_department_rounded,
-                        color: colors.onPrimary,
-                        size: 34,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    Text(
-                      AppStrings.readyTitle,
-                      key: const Key('kiln-starter-title'),
-                      style: theme.textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -1,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      AppStrings.readyBody,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: colors.surfaceContainerHighest.withValues(
-                          alpha: 0.55,
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: colors.outlineVariant),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.terminal_rounded,
-                            color: colors.primary,
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Text(
-                              AppStrings.starterHint,
-                              style: theme.textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -1,13 +1,20 @@
 import 'package:kiln_core/kiln_core.dart';
 
-/// Adds the bearer token to requests that do not set Authorization.
+import 'auth_request_policy.dart';
+
+/// Adds bearer tokens only to eligible backend requests.
 final class AuthMiddleware implements HttpMiddleware {
-  const AuthMiddleware(this.tokens);
+  const AuthMiddleware(this.tokens, {required this.policy});
 
   final TokenProvider tokens;
+  final AuthRequestPolicy policy;
 
   @override
   Future<HttpResponse> handle(HttpRequest request, HttpHandler next) async {
+    request = policy.resolve(request);
+    if (!policy.allows(request)) {
+      return next(request);
+    }
     final hasAuthorization = request.headers.keys.any(
       (key) => key.toLowerCase() == 'authorization',
     );

@@ -9,7 +9,11 @@ import 'reconnect_trigger.dart';
 
 /// Registers the NetworkMonitor and optional offline guard.
 final class ConnectivityModule extends KilnModule {
-  const ConnectivityModule();
+  ConnectivityModule({ConnectivityGateway Function()? gatewayFactory})
+    : _gatewayFactory = gatewayFactory ?? ConnectivityPlusGateway.new;
+
+  final ConnectivityGateway Function() _gatewayFactory;
+  DeviceNetworkMonitor? _monitor;
 
   @override
   String get id => 'connectivity';
@@ -23,13 +27,14 @@ final class ConnectivityModule extends KilnModule {
   @override
   void register(Registry registry) {
     const config = ConnectivityConfig.defaults;
-    final gateway = ConnectivityPlusGateway();
+    final gateway = _gatewayFactory();
     final monitor = DeviceNetworkMonitor(
       gateway: gateway,
       config: config,
       reconnectTrigger: registry.readOrNull<ReconnectTrigger>(),
       client: registry.readOrNull<HttpClient>(),
     );
+    _monitor = monitor;
     final support = ConnectivitySupport(gateway: gateway);
     registry
       ..registerSingleton<ConnectivityConfig>(config)
@@ -46,6 +51,13 @@ final class ConnectivityModule extends KilnModule {
   @override
   Future<SupportInfo> support(Registry registry) {
     return registry.read<ConnectivitySupport>().check();
+  }
+
+  @override
+  Future<void> dispose() async {
+    final monitor = _monitor;
+    _monitor = null;
+    await monitor?.dispose();
   }
 
   @override

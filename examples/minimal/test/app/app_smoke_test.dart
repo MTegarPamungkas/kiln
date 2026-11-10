@@ -1,15 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_testing/kiln_testing.dart';
-import 'package:minimal/app/app.dart';
-import 'package:minimal/core/l10n/app_strings.dart';
+import 'package:minimal/core/l10n/core_copy.dart';
+
+import 'support/app_fixture.dart';
+import 'support/test_core_copy.dart';
 
 void main() {
-  testWidgets('KilnApp renders the starter page', (tester) async {
+  testWidgets('KilnApp renders the application root', (tester) async {
     final registry = createTestRegistry();
+    registry.registerSingleton<CoreCopy>(const TestCoreCopy());
 
-    await tester.pumpWidget(KilnApp(registry: registry));
+    await tester.pumpWidget(buildTestApp(registry));
     await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.readyTitle), findsOneWidget);
+    expect(find.text('Test App'), findsOneWidget);
   });
 }

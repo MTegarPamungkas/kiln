@@ -13,10 +13,7 @@ class UserAgentInterceptor implements HttpMiddleware {
     }
     return next(
       request.copyWith(
-        headers: <String, String>{
-          ...request.headers,
-          'User-Agent': userAgent,
-        },
+        headers: <String, String>{...request.headers, 'User-Agent': userAgent},
       ),
     );
   }

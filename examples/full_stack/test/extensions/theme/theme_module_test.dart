@@ -7,6 +7,7 @@ import 'package:full_stack/extensions/theme/theme_config.dart';
 import 'package:full_stack/extensions/theme/theme_mode_controller.dart';
 import 'package:full_stack/extensions/theme/theme_mode_store.dart';
 import 'package:full_stack/extensions/theme/theme_module.dart';
+import 'package:full_stack/extensions/theme/theme_support.dart';
 
 void main() {
   test('registers the theme seams without storage', () {
@@ -19,6 +20,7 @@ void main() {
     final config = registry.read<ThemeConfig>();
 
     expect(config.cornerRadius, 14);
+    expect(registry.read<ThemeSupport>(), isA<ThemeSupport>());
     expect(appTheme.mode, ThemeMode.system);
     expect(appTheme.currentMode, ThemeMode.system);
     expect(appTheme.modeListenable, same(controller.modeListenable));

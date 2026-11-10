@@ -13,6 +13,7 @@ import 'supabase_realtime_gateway.dart';
 import 'supabase_remote_database.dart';
 import 'supabase_session_bridge.dart';
 import 'supabase_storage_gateway.dart';
+import 'supabase_support.dart';
 import 'supabase_token_provider.dart';
 
 /// Registers Supabase auth, social_auth, remote_database, and file_storage.
@@ -77,9 +78,11 @@ final class SupabaseModule extends KilnModule {
       gateway: gateway,
       deepLinks: registry.readOrNull<DeepLinks>(),
     );
+    final support = SupabaseSupport(config: config, probe: provider.load);
 
     registry
       ..registerSingleton<SupabaseConfig>(config)
+      ..registerSingleton<SupabaseSupport>(support)
       ..registerSingleton<SupabaseClientProvider>(provider)
       ..registerSingleton<SupabaseGateway>(gateway)
       ..registerSingleton<SupabaseQueryMapper>(mapper)
@@ -99,10 +102,50 @@ final class SupabaseModule extends KilnModule {
   }
 
   @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<SupabaseSupport>().check();
+  }
+
+  @override
   Future<void> ready(Registry registry) async {
-    await registry.read<SupabaseClientProvider>().load();
-    await registry.read<SupabaseAuthRepository>().restore();
+    final supportRegistry = registry.readOrNull<SupportRegistry>();
+    try {
+      await registry.read<SupabaseClientProvider>().load();
+    } on Object catch (error) {
+      supportRegistry?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Supabase client could not start: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
+      return;
+    }
+    try {
+      await registry.read<SupabaseAuthRepository>().restore();
+    } on Object catch (error) {
+      supportRegistry?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Supabase session restore failed: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
+    }
     registry.read<SupabaseSessionBridge>().start();
-    await registry.read<SupabaseLinkHandler>().start();
+    try {
+      await registry.read<SupabaseLinkHandler>().start();
+    } on Object catch (error) {
+      supportRegistry?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Supabase link handling could not start: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
+    }
   }
 }

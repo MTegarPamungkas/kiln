@@ -12,7 +12,9 @@ void main() {
 
   setUp(() {
     temp = Directory.systemTemp.createTempSync('kiln_store_cache_');
-    cache = LocalCache(Directory(p.join(temp.path, 'cache')));
+    cache = LocalCache(Directory(p.join(temp.path, 'cache')),
+      registry: RegistryConfig(url: 'https://example.com/registry'),
+    );
   });
 
   tearDown(() {
@@ -29,7 +31,7 @@ void main() {
           cache.archiveFile('demo_ext', '1.0.0').path,
           from: cache.root.path,
         ),
-        p.join('archives', 'demo_ext-1.0.0.tgz'),
+        p.join('archives', '${sha256Hex(utf8.encode(jsonEncode(['demo_ext', '1.0.0'])))}.tgz'),
       );
     });
 

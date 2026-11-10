@@ -1,3 +1,4 @@
+import 'checksum_verifier.dart';
 import 'kiln_store_exception.dart';
 import 'local_cache.dart';
 import 'registry_client.dart';
@@ -23,6 +24,7 @@ final class OfflineMode {
   /// Online fetches and caches a fresh index, falling back to the cached copy
   /// when the network fails.
   Future<RegistryIndex> index() async {
+    _validateCache();
     if (offline) {
       return _cachedIndex();
     }
@@ -39,44 +41,55 @@ final class OfflineMode {
     }
   }
 
-  /// Returns the archive for [id] at [version], cache first.
-  ///
-  /// When missing, resolves the registry entry, downloads and verifies it, and
-  /// stores it in the cache before returning it.
-  Future<List<int>> archive(String id, String version) async {
-    final cached = await cache.readArchive(id, version);
+  /// Returns bytes verified against the exact metadata selected by the caller.
+  /// No second online index lookup may silently replace that selection.
+  /// Offline use additionally requires matching metadata cached for this registry.
+  Future<List<int>> archive(String id, RegistryVersion version) async {
+    _validateCache();
+    if (offline) {
+      final trusted = (await _cachedIndex()).find(id)?.findVersion(version.version);
+      if (trusted == null ||
+          trusted.sha256.toLowerCase() != version.sha256.toLowerCase() ||
+          trusted.url != version.url) {
+        throw const KilnStoreException(
+          'No matching selected version metadata is cached for this registry.',
+          code: 'store.offline_missing',
+        );
+      }
+    }
+    final cached = await cache.readArchive(id, version.version);
     if (cached != null) {
-      return cached;
-    }
-    final index = await this.index();
-    final extension = index.find(id);
-    if (extension == null) {
-      throw KilnStoreException(
-        'Extension "$id" is not present in the registry.',
-        code: 'store.extension_not_found',
-      );
-    }
-    final entry = extension.findVersion(version);
-    if (entry == null) {
-      throw KilnStoreException(
-        'Version "$version" of extension "$id" is not present in the registry.',
-        code: 'store.version_not_found',
-      );
+      try {
+        const ChecksumVerifier().verify(cached, version.sha256);
+        return cached;
+      } on KilnStoreException {
+        if (offline) rethrow;
+        // Refresh only from the selected URL and SHA, never a new index lookup.
+      }
     }
     if (offline) {
       throw KilnStoreException(
-        'Archive $id $version is not available in the offline cache.',
+        'Archive $id ${version.version} is not available in the offline cache.',
         code: 'store.offline_missing',
         suggestion: 'Install it once while online to cache the archive.',
       );
     }
     final bytes = await client.downloadArchive(
       id,
-      entry,
+      version,
       indexUri: client.config.indexUri,
     );
-    cache.writeArchive(id, version, bytes);
+    const ChecksumVerifier().verify(bytes, version.sha256);
+    cache.writeArchive(id, version.version, bytes);
     return bytes;
+  }
+
+  void _validateCache() {
+    if (cache.registryIdentity != client.config.identity) {
+      throw const KilnStoreException(
+        'Cache belongs to a different registry.', code: 'store.invalid_config',
+      );
+    }
   }
 
   Future<RegistryIndex> _cachedIndex() async {

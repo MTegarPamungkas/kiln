@@ -1,5 +1,5 @@
-const String kilnVersion = '0.1.0';
-const String kilnCoreVersion = '0.1.0';
+const String kilnVersion = '0.1.1';
+const String kilnCoreVersion = '0.1.1';
 
 /// The public repository a project resolves `kiln_core` from.
 ///

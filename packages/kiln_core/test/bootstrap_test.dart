@@ -57,6 +57,23 @@ final class _TrackedModule extends KilnModule {
   }
 }
 
+final class _FailingRegisterModule extends KilnModule {
+  _FailingRegisterModule({required this.events});
+
+  final List<String> events;
+
+  @override
+  String get id => 'broken-register';
+
+  @override
+  void register(Registry registry) => throw StateError('register failed');
+
+  @override
+  void dispose() {
+    events.add('dispose:$id');
+  }
+}
+
 void main() {
   group('KilnBootstrap', () {
     test('skips modules that do not support the current platform', () async {
@@ -219,6 +236,58 @@ void main() {
       );
 
       expect(events, isEmpty);
+    });
+
+    test('lifecycle shutdown disposes modules in reverse order', () async {
+      final events = <String>[];
+      final registry = await KilnBootstrap.run(
+        modules: [
+          _TrackedModule('first', provides: const {'a'}, events: events),
+          _TrackedModule('second', requires: const {'a'}, events: events),
+        ],
+      );
+
+      await registry.read<LifecycleController>().dispose();
+
+      expect(events, [
+        'register:first',
+        'ready:first',
+        'register:second',
+        'ready:second',
+        'dispose:second',
+        'dispose:first',
+      ]);
+    });
+
+    test('lifecycle shutdown is idempotent', () async {
+      final events = <String>[];
+      final registry = await KilnBootstrap.run(
+        modules: [_TrackedModule('once', events: events)],
+      );
+      final lifecycle = registry.read<LifecycleController>();
+
+      await Future.wait([lifecycle.dispose(), lifecycle.dispose()]);
+      await lifecycle.dispose();
+
+      expect(events.where((event) => event == 'dispose:once'), hasLength(1));
+      expect(
+        () => lifecycle.addDisposeCallback(() {}),
+        throwsStateError,
+      );
+    });
+
+    test('a module that fails to register is still disposed', () async {
+      final events = <String>[];
+      final registry = KilnBootstrap.run(
+        modules: [
+          _TrackedModule('ok', provides: const {'a'}, events: events),
+          _FailingRegisterModule(events: events),
+        ],
+      );
+
+      await expectLater(registry, throwsStateError);
+      expect(events, containsAll(<String>['register:ok', 'dispose:ok']));
+      expect(events, contains('dispose:broken-register'));
     });
 
     test('uses the injected clock', () async {

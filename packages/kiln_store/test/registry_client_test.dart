@@ -19,7 +19,9 @@ void main() {
 
   setUp(() {
     temp = Directory.systemTemp.createTempSync('kiln_store_client_');
-    cache = LocalCache(Directory(p.join(temp.path, 'cache')));
+    cache = LocalCache(Directory(p.join(temp.path, 'cache')),
+      registry: RegistryConfig(url: 'https://example.com/registry'),
+    );
   });
 
   tearDown(() {

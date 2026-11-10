@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../core/l10n/app_strings.dart';
+import '../core/l10n/core_copy.dart';
 import '../core/theme/app_theme.dart';
+import 'registry_scope.dart';
 
 /// Full application shown when bootstrap fails before the first frame.
 class KilnBootstrapFailureApp extends StatelessWidget {
@@ -19,7 +20,6 @@ class KilnBootstrapFailureApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: AppStrings.appTitle,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
@@ -48,6 +48,7 @@ class KilnErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final copy = RegistryScope.maybeReadOrNull<CoreCopy>(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -72,20 +73,23 @@ class KilnErrorScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    AppStrings.errorTitle,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  if (copy != null) ...[
+                    Text(
+                      copy.errorTitle(context),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppStrings.errorBody,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    const SizedBox(height: 8),
+                    Text(
+                      copy.errorBody(context),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                  ] else
+                    const SizedBox(height: 20),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -98,12 +102,12 @@ class KilnErrorScreen extends StatelessWidget {
                       style: theme.textTheme.bodySmall,
                     ),
                   ),
-                  if (onRetry != null) ...[
+                  if (onRetry != null && copy != null) ...[
                     const SizedBox(height: 24),
                     FilledButton.icon(
                       onPressed: onRetry,
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text(AppStrings.retry),
+                      label: Text(copy.retry(context)),
                     ),
                   ],
                 ],

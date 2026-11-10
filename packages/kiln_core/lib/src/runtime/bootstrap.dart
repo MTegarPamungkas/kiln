@@ -44,34 +44,37 @@ abstract final class KilnBootstrap {
     registry.registerSingleton<Lifecycle>(lifecycle);
     registry.registerSingleton<Clock>(clock ?? const SystemClock());
     registry.registerSingleton<SupportRegistry>(support);
-
-    for (final module in modules) {
-      if (!module.supportsPlatform(activePlatform)) {
-        support.record(
-          module.id,
-          SupportInfo.unsupported(
-            SupportState.unsupportedPlatform,
-            message: '${module.id} is not supported on $activePlatform.',
-            details: <String, Object?>{
-              'platform': activePlatform,
-              'supported_platforms': module.platforms.toList(growable: false),
-            },
-          ),
-        );
-      }
-    }
-
-    final ordered = ModuleGraph(
-      modules
-          .where((module) => module.supportsPlatform(activePlatform))
-          .toList(growable: false),
-    ).resolve(availableCapabilities: capabilities);
-    final registered = <KilnModule>[];
+    lifecycle
+      ..addDisposeCallback(support.dispose)
+      ..addDisposeCallback(slots.dispose)
+      ..addDisposeCallback(consent.dispose)
+      ..addDisposeCallback(session.dispose);
 
     try {
+      for (final module in modules) {
+        if (!module.supportsPlatform(activePlatform)) {
+          support.record(
+            module.id,
+            SupportInfo.unsupported(
+              SupportState.unsupportedPlatform,
+              message: '${module.id} is not supported on $activePlatform.',
+              details: <String, Object?>{
+                'platform': activePlatform,
+                'supported_platforms': module.platforms.toList(growable: false),
+              },
+            ),
+          );
+        }
+      }
+
+      final ordered = ModuleGraph(
+        modules
+            .where((module) => module.supportsPlatform(activePlatform))
+            .toList(growable: false),
+      ).resolve(availableCapabilities: capabilities);
       for (final module in ordered) {
+        lifecycle.addDisposeCallback(module.dispose);
         module.register(registry);
-        registered.add(module);
         final info = await _probeSupport(module, registry, supportTimeout);
         support.record(module.id, info);
         if (info.isSupported) {
@@ -83,22 +86,16 @@ abstract final class KilnBootstrap {
       await lifecycle.onReady();
       return registry;
     } catch (error, stackTrace) {
-      for (final module in registered.reversed) {
-        try {
-          await Future<void>.sync(module.dispose);
-        } catch (_) {
-          // A failing dispose must not hide the original initialization error.
-        }
+      try {
+        await lifecycle.dispose();
+      } catch (_) {
+        // Cleanup must not hide the original initialization error.
       }
-      await lifecycle.dispose();
-      await session.dispose();
-      await consent.dispose();
-      await slots.dispose();
-      await support.dispose();
-      if (onError != null) {
-        onError(error, stackTrace);
+      try {
+        onError?.call(error, stackTrace);
+      } finally {
+        Error.throwWithStackTrace(error, stackTrace);
       }
-      rethrow;
     }
   }
 

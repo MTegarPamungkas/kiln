@@ -2,9 +2,14 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
+import 'package:yaml/yaml.dart';
+import 'package:yaml_edit/yaml_edit.dart';
 
 import '../kiln_exception.dart';
 import '../manifest/extension_manifest.dart';
+import '../migrator/migration.dart';
+import '../migrator/migration_actions.dart';
+import '../migrator/migration_runner.dart';
 import '../renderer/brick_renderer.dart';
 import '../renderer/collision_policy.dart';
 import '../renderer/hook_policy.dart';
@@ -20,6 +25,7 @@ import 'ownership/file_ownership.dart';
 import 'ownership/patch_journal.dart';
 import 'pubspec_reader.dart';
 import 'pubspec_writer.dart';
+import 'transaction/root_path.dart';
 import 'transaction/transaction.dart';
 import 'verification/dry_run_reporter.dart';
 import 'verification/verifier.dart';
@@ -120,7 +126,7 @@ final class _PlannedFile {
   final String owner;
 }
 
-/// Applies extensions to a project through a reversible transaction.
+/// Applies extensions to a project through a reversible activeTransaction.
 final class ExtensionInstaller {
   ExtensionInstaller({
     required this.projectRoot,
@@ -146,6 +152,7 @@ final class ExtensionInstaller {
     Map<String, Map<String, Object?>> answers =
         const <String, Map<String, Object?>>{},
     InstallOptions options = const InstallOptions(),
+    Transaction? transaction,
     Set<String> hostCapabilities = const <String>{},
     Set<String> hostSlots = const <String>{'app.wrappers'},
   }) async {
@@ -201,7 +208,7 @@ final class ExtensionInstaller {
       final filesForLock = <String, String>{};
 
       void planFile(String relative, List<int> bytes) {
-        final target = File(p.join(projectRoot.path, relative));
+        final target = File(RootPath(projectRoot).resolve(relative));
         final exists = target.existsSync();
         final currentHash = exists ? ownership.hashFile(target) : null;
         final ownedHash = lockfile.extensions[manifest.id]?.files[relative];
@@ -246,7 +253,7 @@ final class ExtensionInstaller {
       }
 
       for (final file in rendered) {
-        planFile(_posix(file.relativePath), file.bytes);
+        planFile(file.relativePath, file.bytes);
       }
 
       // Documentation travels with the code, so an installed app carries its
@@ -279,6 +286,8 @@ final class ExtensionInstaller {
         version: manifest.version,
         source: extension.source,
         dependencies: manifest.dependencies.keys.toList(growable: false),
+        devDependencies: manifest.devDependencies.keys.toList(growable: false),
+        flutterGenerate: _wantsFlutterGenerate(manifest),
         files: filesForLock,
         patches: native.patches
             .map((patch) => patch.id)
@@ -290,7 +299,7 @@ final class ExtensionInstaller {
     }
 
     for (final entry in nativeFiles.changes.entries) {
-      final target = File(p.join(projectRoot.path, entry.key));
+      final target = File(RootPath(projectRoot).resolve(entry.key));
       if (entry.value == null) {
         if (target.existsSync()) {
           _recordChange(changes, entry.key, FileChangeKind.delete);
@@ -327,16 +336,30 @@ final class ExtensionInstaller {
         entry.value,
       );
     }
+    var ownedGenerate = lockfile.ownedFlutterGenerate;
     if (plan.added.any(
       (extension) => _wantsFlutterGenerate(extension.manifest),
     )) {
+      final root = loadYaml(pubspecSource);
+      final flutter = root is Map ? root['flutter'] : null;
+      if (flutter is! Map || flutter['generate'] != true) {
+        ownedGenerate = <String, Object?>{
+          'present': flutter is Map && flutter.containsKey('generate'),
+          'value': flutter is Map ? flutter['generate'] : null,
+        };
+      }
       editedPubspec = pubspecWriter.editedWithFlutterGenerate(editedPubspec);
     }
     if (editedPubspec != pubspecSource) {
       _recordChange(changes, 'pubspec.yaml', FileChangeKind.overwrite);
     }
 
-    final newLockfile = Lockfile(core: lockfile.core, extensions: newEntries);
+    final newLockfile = Lockfile(
+      core: lockfile.core, extensions: newEntries,
+      ownedDependencies: {...lockfile.ownedDependencies, ...dependencies},
+      ownedDevDependencies: {...lockfile.ownedDevDependencies, ...devDependencies},
+      ownedFlutterGenerate: ownedGenerate,
+    );
     final codegen = const ExtensionsCodegen();
     final codegenFile = codegen.fileIn(projectRoot);
     final codegenSource = codegen.build(newEntries);
@@ -366,6 +389,20 @@ final class ExtensionInstaller {
       );
     }
 
+    // Rendered output must not compete with native/configuration writers, nor
+    // claim transaction metadata or a parent of another output file.
+    for (final path in plannedFiles.keys) {
+      if (nativeFiles.changes.containsKey(path) ||
+          const {'pubspec.yaml', 'kiln.yaml', 'kiln.lock.yaml', ExtensionsCodegen.relativePath}.contains(path) ||
+          path.startsWith('.kiln/') ||
+          plannedFiles.keys.any((other) => other != path && other.startsWith('$path/'))) {
+        _recordChange(changes, path, FileChangeKind.conflict);
+        warnings.add('Multiple output owners for "$path"');
+      }
+    }
+    for (final change in changes) {
+      RootPath(projectRoot).resolve(change.path);
+    }
     final report = DryRunReport(
       files: List<FileChange>.unmodifiable(changes),
       patches: List<String>.unmodifiable(patchIds),
@@ -394,27 +431,27 @@ final class ExtensionInstaller {
       );
     }
 
-    final transaction = Transaction.begin(projectRoot);
+    final activeTransaction = transaction ?? Transaction.begin(projectRoot);
     try {
       for (final entry in plannedFiles.entries) {
-        transaction.writeFile(entry.key, entry.value.bytes);
+        activeTransaction.writeFile(entry.key, entry.value.bytes);
       }
       for (final entry in nativeFiles.changes.entries) {
         final content = entry.value;
         if (content == null) {
-          transaction.deleteFile(entry.key);
+          activeTransaction.deleteFile(entry.key);
         } else {
-          transaction.writeText(entry.key, content);
+          activeTransaction.writeText(entry.key, content);
         }
       }
       if (editedPubspec != pubspecSource) {
-        transaction.writeText('pubspec.yaml', editedPubspec);
+        activeTransaction.writeText('pubspec.yaml', editedPubspec);
       }
-      transaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
-      transaction.writeText('kiln.lock.yaml', lockSource);
-      transaction.commit();
+      activeTransaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
+      activeTransaction.writeText('kiln.lock.yaml', lockSource);
+      if (transaction == null) activeTransaction.commit();
     } catch (_) {
-      transaction.rollback();
+      if (transaction == null) activeTransaction.rollback();
       rethrow;
     }
 
@@ -438,6 +475,7 @@ final class ExtensionInstaller {
   Future<RemoveResult> remove({
     required String id,
     RemoveOptions options = const RemoveOptions(),
+    Transaction? transaction,
     Map<String, Object?> answers = const <String, Object?>{},
   }) async {
     final lockStore = LockfileStore(projectRoot);
@@ -480,7 +518,7 @@ final class ExtensionInstaller {
     final deleted = <String>[];
     final skipped = <String>[];
     for (final entry in locked.files.entries) {
-      final target = File(p.join(projectRoot.path, entry.key));
+      final target = File(RootPath(projectRoot).resolve(entry.key));
       if (!target.existsSync()) {
         skipped.add(entry.key);
         _recordChange(changes, entry.key, FileChangeKind.skip);
@@ -541,7 +579,7 @@ final class ExtensionInstaller {
       files: nativeFiles,
     );
     for (final entry in nativeFiles.changes.entries) {
-      final target = File(p.join(projectRoot.path, entry.key));
+      final target = File(RootPath(projectRoot).resolve(entry.key));
       if (entry.value == null) {
         if (target.existsSync()) {
           _recordChange(changes, entry.key, FileChangeKind.delete);
@@ -555,38 +593,61 @@ final class ExtensionInstaller {
       }
     }
 
-    final removedDependencies = <String>[
-      for (final dependency in locked.dependencies)
-        if (!lockfile.extensions.entries.any(
-          (entry) =>
-              entry.key != id && entry.value.dependencies.contains(dependency),
-        ))
-          dependency,
-    ];
+    final remaining = {...lockfile.extensions}..remove(id);
+    final removedDependencies = <String>[];
     final pubspecFile = File(p.join(projectRoot.path, 'pubspec.yaml'));
     final pubspecSource = pubspecFile.existsSync()
         ? pubspecFile.readAsStringSync()
         : '';
     var editedPubspec = pubspecSource;
     final pubspecWriter = PubspecWriter(pubspecFile);
-    for (final dependency in removedDependencies) {
-      editedPubspec = pubspecWriter.editedWithoutDependency(
-        editedPubspec,
-        dependency,
-      );
+    final pubspec = PubspecReader(pubspecFile).read();
+    final ownedDependencies = {...lockfile.ownedDependencies};
+    final ownedDevDependencies = {...lockfile.ownedDevDependencies};
+
+    void removeUnneeded(Map<String, Object?> owned, {required bool dev}) {
+      final current = dev ? pubspec.devDependencies : pubspec.dependencies;
+      for (final entry in owned.entries.toList()) {
+        final needed = remaining.values.any((extension) =>
+            (dev ? extension.devDependencies : extension.dependencies)
+                ?.contains(entry.key) ?? true);
+        if (needed) continue;
+        // A constraint changed by the user is no longer ours to delete.
+        if (current.containsKey(entry.key) &&
+            const DeepCollectionEquality().equals(current[entry.key], entry.value)) {
+          editedPubspec = dev
+              ? pubspecWriter.editedWithoutDevDependency(editedPubspec, entry.key)
+              : pubspecWriter.editedWithoutDependency(editedPubspec, entry.key);
+          removedDependencies.add(entry.key);
+        }
+        owned.remove(entry.key);
+      }
     }
-    final newLockfile = lockfile.withoutExtension(id);
-    final remainingNeedsGenerate = available.any(
-      (extension) =>
-          newLockfile.extensions.containsKey(extension.id) &&
-          _wantsFlutterGenerate(extension.manifest),
+
+    removeUnneeded(ownedDependencies, dev: false);
+    removeUnneeded(ownedDevDependencies, dev: true);
+    var ownedGenerate = lockfile.ownedFlutterGenerate;
+    if (ownedGenerate.isNotEmpty &&
+        !remaining.values.any((extension) => extension.flutterGenerate != false)) {
+      final editor = YamlEditor(editedPubspec);
+      final root = loadYaml(editedPubspec);
+      final flutter = root is Map ? root['flutter'] : null;
+      if (flutter is Map && flutter['generate'] == true) {
+        if (ownedGenerate['present'] == true) {
+          editor.update(['flutter', 'generate'], ownedGenerate['value']);
+        } else {
+          editor.remove(['flutter', 'generate']);
+        }
+        editedPubspec = editor.toString();
+      }
+      ownedGenerate = const <String, Object?>{};
+    }
+    final newLockfile = Lockfile(
+      core: lockfile.core, extensions: remaining,
+      ownedDependencies: ownedDependencies,
+      ownedDevDependencies: ownedDevDependencies,
+      ownedFlutterGenerate: ownedGenerate,
     );
-    if (!remainingNeedsGenerate) {
-      editedPubspec = pubspecWriter.editedWithFlutterGenerate(
-        editedPubspec,
-        generate: false,
-      );
-    }
     if (editedPubspec != pubspecSource) {
       _recordChange(changes, 'pubspec.yaml', FileChangeKind.overwrite);
     }
@@ -626,28 +687,28 @@ final class ExtensionInstaller {
       );
     }
 
-    final transaction = Transaction.begin(projectRoot);
+    final activeTransaction = transaction ?? Transaction.begin(projectRoot);
     try {
       for (final entry in nativeFiles.changes.entries) {
         final content = entry.value;
         if (content == null) {
-          transaction.deleteFile(entry.key);
+          activeTransaction.deleteFile(entry.key);
         } else {
-          transaction.writeText(entry.key, content);
+          activeTransaction.writeText(entry.key, content);
         }
       }
       for (final path in deleted) {
-        transaction.deleteFile(path);
+        activeTransaction.deleteFile(path);
       }
       if (editedPubspec != pubspecSource) {
-        transaction.writeText('pubspec.yaml', editedPubspec);
+        activeTransaction.writeText('pubspec.yaml', editedPubspec);
       }
-      transaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
-      transaction.writeText('kiln.lock.yaml', lockSource);
-      transaction.commit();
+      activeTransaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
+      activeTransaction.writeText('kiln.lock.yaml', lockSource);
+      if (transaction == null) activeTransaction.commit();
       _removeEmptiedDirectories(deleted);
     } catch (_) {
-      transaction.rollback();
+      if (transaction == null) activeTransaction.rollback();
       rethrow;
     }
 
@@ -665,6 +726,150 @@ final class ExtensionInstaller {
       warnings: List<String>.unmodifiable(warnings),
       verification: verification,
     );
+  }
+
+  /// Stage the entire upgrade before touching the project, then publish its
+  /// managed-file delta in one transaction. Verification is inside that same
+  /// transaction. The staging transaction is never committed to project history.
+  Future<InstallResult> upgrade({
+    required String id,
+    required Map<String, Object?> project,
+    Map<String, Object?> answers = const <String, Object?>{},
+    Map<String, Object?> previousAnswers = const <String, Object?>{},
+    List<Migration> migrations = const <Migration>[],
+    InstallOptions options = const InstallOptions(),
+    bool force = false,
+    Set<String> hostCapabilities = const <String>{},
+    Set<String> hostSlots = const <String>{'app.wrappers'},
+  }) async {
+    final before = LockfileStore(projectRoot).read();
+    final locked = before.extensions[id];
+    if (locked == null) {
+      throw KilnException('Extension "$id" is not installed', code: 'upgrade.not_installed');
+    }
+    const MigrationRunner().validate(projectRoot: projectRoot, migrations: migrations);
+    final removal = await remove(
+      id: id, answers: previousAnswers,
+      options: const RemoveOptions(dryRun: true, force: true),
+    );
+    if (!force) {
+      for (final entry in locked.files.entries) {
+        final file = File(RootPath(projectRoot).resolve(entry.key));
+        if (file.existsSync() &&
+            (entry.value.isEmpty || const FileOwnership().hashFile(file) != entry.value)) {
+          throw KilnException('Upgrade would replace edited file "${entry.key}"',
+              code: 'upgrade.conflict', suggestion: 'Use --force to replace edited files.');
+        }
+      }
+    }
+    final stage = await Directory.systemTemp.createTemp('kiln_upgrade_');
+    try {
+      _copyForUpgrade(projectRoot, stage);
+      final stagedTransaction = Transaction.begin(stage);
+      final staged = ExtensionInstaller(
+        projectRoot: stage, available: available, renderer: renderer,
+        nativeSetup: nativeSetup, verifier: verifier,
+        collisionResolver: collisionResolver, hookPolicy: hookPolicy,
+      );
+      // Guard migration destinations too: a rename must not clobber a new user
+      // file merely because the migration runs before rendered-file planning.
+      for (final migration in migrations) {
+        for (final action in migration.actions) {
+          if (action is RenameFileAction && !force) {
+            final target = File(RootPath(stage).resolve(action.to));
+            if (target.existsSync() && !locked.files.containsKey(action.to)) {
+              throw KilnException('Migration would overwrite "${action.to}"', code: 'upgrade.conflict');
+            }
+          }
+        }
+      }
+      const MigrationRunner().run(
+        projectRoot: stage, migrations: migrations, transaction: stagedTransaction,
+      );
+      await staged.remove(
+        id: id, answers: previousAnswers, transaction: stagedTransaction,
+        options: const RemoveOptions(force: true),
+      );
+      final result = await staged.add(
+        requested: [id], project: project, answers: {id: answers},
+        hostCapabilities: hostCapabilities, hostSlots: hostSlots,
+        transaction: stagedTransaction,
+        options: InstallOptions(
+          verify: false, collisionPolicy: force ? CollisionPolicy.overwrite : CollisionPolicy.ask,
+          runHooks: options.runHooks, approveHooks: options.approveHooks,
+        ),
+      );
+      if (result.hasConflicts) return result;
+      final config = File(RootPath(stage).resolve('kiln.yaml'));
+      if (config.existsSync()) {
+        final editor = YamlEditor(config.readAsStringSync());
+        final root = editor.parseAt([]);
+        if (root is! YamlMap) {
+          throw const KilnException('kiln.yaml must be a map', code: 'upgrade.config_invalid');
+        }
+        if (!root.containsKey('extensions')) editor.update(['extensions'], <String, Object?>{});
+        editor.update(['extensions', id], answers);
+        stagedTransaction.writeText('kiln.yaml', editor.toString());
+      }
+      final paths = stagedTransaction.journal.operations.map((op) => op.path).toSet();
+      for (final path in paths) {
+        RootPath(projectRoot).resolve(path);
+        RootPath(stage).resolve(path);
+      }
+      if (options.dryRun) return result;
+      final transaction = Transaction.begin(projectRoot);
+      VerificationResult? verification;
+      try {
+        // Include unchanged managed files and pub's lock in the verifier snapshot.
+        for (final path in {
+          ...paths, 'pubspec.lock',
+          for (final extension in before.extensions.values) ...extension.files.keys,
+        }) {
+          transaction.capture(path);
+        }
+        for (final path in paths) {
+          final file = File(RootPath(stage).resolve(path));
+          if (file.existsSync()) {
+            transaction.writeFile(path, file.readAsBytesSync());
+          } else {
+            transaction.deleteFile(path);
+          }
+        }
+        verification = options.verify ? await verifier.verify(projectRoot) : null;
+        if (verification != null && !verification.isSuccess) {
+          transaction.rollback();
+        } else {
+          transaction.commit();
+          _removeEmptiedDirectories(removal.deletedFiles);
+        }
+      } catch (_) {
+        transaction.rollback();
+        rethrow;
+      }
+      return InstallResult(
+        plan: result.plan, changes: result.changes, patches: result.patches,
+        dependencies: result.dependencies, devDependencies: result.devDependencies,
+        manualSteps: result.manualSteps, warnings: result.warnings,
+        verification: verification, lockfile: result.lockfile,
+      );
+    } finally {
+      await stage.delete(recursive: true);
+    }
+  }
+
+  void _copyForUpgrade(Directory source, Directory destination, [String prefix = '']) {
+    for (final entity in source.listSync(followLinks: false)) {
+      final relative = '$prefix${p.basename(entity.path)}';
+      if (const {'.git', '.dart_tool', 'build', '.kiln/backups', '.kiln/journal'}.contains(relative)) continue;
+      RootPath(projectRoot).resolve(relative);
+      final target = p.join(destination.path, p.basename(entity.path));
+      if (entity is Directory) {
+        final directory = Directory(target)..createSync();
+        _copyForUpgrade(entity, directory, '$relative/');
+      } else if (entity is File) {
+        entity.copySync(target);
+      }
+    }
   }
 
   /// Deletes directories that [deletedPaths] emptied, bottom-up.
@@ -691,7 +896,7 @@ final class ExtensionInstaller {
             .compareTo(p.posix.split(left).length),
       );
     for (final relative in deepestFirst) {
-      final directory = Directory(p.join(projectRoot.path, relative));
+      final directory = Directory(RootPath(projectRoot).resolve(relative));
       if (!directory.existsSync()) {
         continue;
       }

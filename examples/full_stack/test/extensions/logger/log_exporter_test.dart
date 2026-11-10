@@ -8,7 +8,9 @@ import 'package:full_stack/extensions/logger/memory_log_sink.dart';
 
 void main() {
   test('merges memory and file logs in redacted form', () async {
-    final directory = await Directory.systemTemp.createTemp('kiln_logger_export_');
+    final directory = await Directory.systemTemp.createTemp(
+      'kiln_logger_export_',
+    );
     addTearDown(() async {
       if (directory.existsSync()) {
         await directory.delete(recursive: true);
@@ -33,11 +35,7 @@ void main() {
     );
     await file.flush();
 
-    final exporter = LogExporter(
-      memory: memory,
-      file: file,
-      clock: clock,
-    );
+    final exporter = LogExporter(memory: memory, file: file, clock: clock);
     final report = await exporter.export();
 
     expect(report, contains('generated: 2026-02-03T04:05:06.000Z'));

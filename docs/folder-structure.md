@@ -37,6 +37,7 @@ kiln/
 │  ├─ getting-started.md                     # guide to installing Kiln and creating a first app
 │  ├─ concepts/                              # explanations of the core Kiln concepts
 │  │  ├─ contracts-and-capabilities.md       # contracts in kiln_core and the capabilities provided by extensions
+│  │  ├─ contract-behavior.md                # specified outcomes for missing records, pagination, filters, logout, and support
 │  │  ├─ slots.md                            # slots as the integration points between extensions
 │  │  ├─ lockfile-and-ownership.md           # contents of kiln.lock.yaml and file ownership by extensions
 │  │  ├─ transactions-and-rollback.md        # install transactions and how the journal reverts them
@@ -151,7 +152,7 @@ kiln/
 │  ├─ backend_swap/                          # proves the backend can be swapped without changing app code
 │  │  ├─ README.md                           # explains the backend swap scenario and how to compare both variants
 │  │  ├─ with_appwrite/                      # project variant with the Appwrite backend
-│  │  └─ with_supabase/                      # project variant with the Supabase backend; only kiln.yaml and lib/extensions differ
+│  │  └─ with_supabase/                      # project variant with the Supabase backend; only backend config, pubspec, and lib/extensions differ
 │  └─ custom_extension/                      # kiln ext new output: a complete community extension example
 ├─ registry/                                 # extension index and version metadata, produced by tool/build_registry.dart
 │  ├─ index.json                             # extension list: id, latest version, and tier
@@ -1385,9 +1386,8 @@ extensions/neon/
       │  ├─ neon_query_mapper.dart              # maps RemoteQuery to PostgREST and validates identifiers
       │  ├─ neon_failure_mapper.dart            # maps NeonApiException/status to Failure(remote_database.*)
       │  ├─ neon_remote_database.dart           # RemoteDatabase over PostgREST, with a polling watch
-      │  ├─ neon_s3_signer.dart                 # AWS SigV4 request signing and presigned URLs for Object Storage
-      │  ├─ neon_storage_config.dart            # Object Storage config: endpoint, bucket, region, keys, signedUrlLifetime
-      │  ├─ neon_storage_gateway.dart           # NeonStorageGateway interface + S3NeonStorageGateway (package:http)
+      │  ├─ neon_storage_config.dart            # Object Storage config: JWT-authenticated signing URL, bucket, signedUrlLifetime
+      │  ├─ neon_storage_gateway.dart           # NeonStorageGateway interface + PresignedNeonStorageGateway (user JWT to a signing backend)
       │  ├─ neon_file_storage.dart              # FileStorage over NeonStorageGateway (path validation, progress, signed url)
       │  ├─ neon_support.dart                   # config validation and optional reachability probe (db + storage)
       │  └─ neon_module.dart                     # registers config, gateways, AuthRepository, RemoteDatabase, and FileStorage
@@ -1402,9 +1402,8 @@ extensions/neon/
          ├─ neon_support_test.dart               # supported/notConfigured/unavailable states
          ├─ neon_auth_repository_test.dart       # sign-in/up/out and controller state
          ├─ neon_token_provider_test.dart        # static + anonymous token fetch/cache/expiry
-         ├─ neon_s3_signer_test.dart             # matches the official AWS SigV4 conformance vectors
-         ├─ neon_storage_config_test.dart        # Object Storage validate() and path-style objectUri
-         ├─ neon_storage_gateway_test.dart       # S3NeonStorageGateway PUT/GET/DELETE with a MockClient
+         ├─ neon_storage_config_test.dart        # signing URL, bucket, and lifetime validation
+         ├─ neon_storage_gateway_test.dart       # presigning flow, origin isolation, and malformed responses
          ├─ neon_file_storage_test.dart          # upload/download/url/delete round-trip on the fake gateway
          └─ neon_module_test.dart                # registration wiring for auth, database, and storage
 ```

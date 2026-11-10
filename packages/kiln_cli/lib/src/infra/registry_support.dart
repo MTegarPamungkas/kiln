@@ -35,12 +35,16 @@ final class RegistrySupport {
     final offline =
         (projectRegistry['offline'] as bool?) ??
         context.globalConfig.offline;
+    final config = RegistryConfig(
+      url: url, mirror: mirror, ref: projectRegistry['ref'] as String? ?? 'main',
+    );
     final cache = LocalCache(
       Directory(p.join(Paths.globalCache(context.home), 'registry')),
+      registry: config,
     );
     return RegistrySupport._(
       client: RegistryClient(
-        config: RegistryConfig(url: url, mirror: mirror),
+        config: config,
         cache: cache,
       ),
       cache: cache,
@@ -58,14 +62,13 @@ final class RegistrySupport {
 
   Future<RegistryPackage> fetch(
     String id,
-    RegistryVersion version, {
-    Uri? indexUri,
-  }) async {
+    RegistryVersion version,
+  ) async {
     final bytes = await OfflineMode(
       client: client,
       cache: cache,
       offline: offline,
-    ).archive(id, version.version);
+    ).archive(id, version);
     final directory = await Directory.systemTemp.createTemp('kiln_registry_');
     try {
       ArchiveUnpacker().extract(bytes, directory);

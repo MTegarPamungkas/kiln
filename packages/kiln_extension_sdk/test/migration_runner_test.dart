@@ -69,6 +69,103 @@ project:
       expect(result.messages, ['Migration complete']);
     });
 
+    test('rejects traversal and absolute paths before any change', () async {
+      final sibling = File('${project.parent.path}/kiln-outside.txt')
+        ..writeAsStringSync('do not touch');
+      final unsafe = <String>[
+        '../kiln-outside.txt',
+        'lib/../../kiln-outside.txt',
+        '/etc/passwd',
+        'C:/Windows/System32/drivers/etc/hosts',
+        r'lib\escape.dart',
+        'lib/./escape.dart',
+      ];
+      try {
+        for (final path in unsafe) {
+          const firstAction = DeleteFileAction('lib/delete.dart');
+          final migration = Migration(
+            version: 1,
+            from: '0.1.0',
+            to: '0.2.0',
+            actions: [firstAction, DeleteFileAction(path)],
+          );
+          expect(
+            () => const MigrationRunner().run(
+              projectRoot: project,
+              migrations: [migration],
+            ),
+            throwsA(isA<KilnException>().having((e) => e.code, 'code', 'path.unsafe')),
+            reason: path,
+          );
+          expect(
+            File('${project.path}/lib/delete.dart').existsSync(),
+            isTrue,
+            reason: 'validation must happen before the first action: $path',
+          );
+          expect(sibling.existsSync(), isTrue);
+        }
+      } finally {
+        await sibling.delete();
+      }
+    });
+
+    test('rejects a rename destination outside the project', () async {
+      final sibling = File('${project.parent.path}/kiln-rename.txt')
+        ..writeAsStringSync('do not touch');
+      try {
+        const migration = Migration(
+          version: 1,
+          from: '0.1.0',
+          to: '0.2.0',
+          actions: [
+            RenameFileAction(
+              from: 'lib/old.dart',
+              to: '../kiln-rename.txt',
+            ),
+          ],
+        );
+        expect(
+          () => const MigrationRunner().run(
+            projectRoot: project,
+            migrations: const [migration],
+          ),
+          throwsA(isA<KilnException>()),
+        );
+        expect(File('${project.path}/lib/old.dart').existsSync(), isTrue);
+        expect(sibling.readAsStringSync(), 'do not touch');
+      } finally {
+        await sibling.delete();
+      }
+    });
+
+    test('rejects a path that traverses an existing symlink', () async {
+      final outside = await Directory.systemTemp.createTemp('kiln_outside_');
+      final link = Link('${project.path}/lib/link');
+      try {
+        try {
+          await link.create(outside.path);
+        } on FileSystemException {
+          return; // Creating symlinks may require elevated rights.
+        }
+        final migration = Migration(
+          version: 1,
+          from: '0.1.0',
+          to: '0.2.0',
+          actions: [DeleteFileAction('lib/link/${File(outside.path).uri.pathSegments.last}')],
+        );
+        expect(
+          () => const MigrationRunner().run(
+            projectRoot: project,
+            migrations: [migration],
+          ),
+          throwsA(isA<KilnException>()),
+        );
+      } finally {
+        if (link.existsSync()) link.deleteSync();
+        await outside.delete(recursive: true);
+      }
+    });
+
     test('rolls back when an action fails', () {
       const migration = Migration(
         version: 1,

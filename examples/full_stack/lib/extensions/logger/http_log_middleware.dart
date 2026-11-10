@@ -53,11 +53,7 @@ final class HttpLogMiddleware implements HttpMiddleware {
         '(${elapsed.inMilliseconds} ms)',
         error: error,
         stackTrace: stackTrace,
-        data: _context(
-          request: request,
-          url: url,
-          elapsed: elapsed,
-        ),
+        data: _context(request: request, url: url, elapsed: elapsed),
       );
       rethrow;
     }

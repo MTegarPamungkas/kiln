@@ -2,10 +2,7 @@ import 'package:kiln_core/kiln_core.dart';
 
 /// Gives one extension a private prefix inside a shared SecureStorage.
 final class NamespacedSecureStorage implements SecureStorage {
-  NamespacedSecureStorage({
-    required this.inner,
-    required this.namespace,
-  });
+  NamespacedSecureStorage({required this.inner, required this.namespace});
 
   final SecureStorage inner;
   final String namespace;
@@ -16,8 +13,7 @@ final class NamespacedSecureStorage implements SecureStorage {
   Future<String?> read(String key) => inner.read(_key(key));
 
   @override
-  Future<void> write(String key, String value) =>
-      inner.write(_key(key), value);
+  Future<void> write(String key, String value) => inner.write(_key(key), value);
 
   @override
   Future<void> delete(String key) => inner.delete(_key(key));

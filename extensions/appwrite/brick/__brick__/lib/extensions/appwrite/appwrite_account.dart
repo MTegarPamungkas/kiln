@@ -125,12 +125,26 @@ final class SdkAppwriteAccount implements AppwriteAccount {
   final Client? client;
 
   static const _sessionCookieKey = 'kiln.appwrite.session.cookie';
+  Client get _transport => client ?? account.client;
+  String get _signedOutKey =>
+      'kiln.appwrite.signedOut.${_transport.endPoint}.${_transport.config['project']}';
+  bool _locallySignedOut = false;
+
+  Future<bool> _isSignedOut() async => _locallySignedOut ||
+      (await SharedPreferences.getInstance()).getBool(_signedOutKey) == true;
+
+  Future<void> _allowSession() async {
+    await (await SharedPreferences.getInstance()).remove(_signedOutKey);
+    _locallySignedOut = false;
+  }
 
   @override
   Future<AppwriteAccountUser?> currentUser() async {
+    if (await _isSignedOut()) return null;
     await _restoreCookie();
     try {
-      return _fromUser(await account.get());
+      final user = await account.get();
+      return await _isSignedOut() ? null : _fromUser(user);
     } on AppwriteException catch (error) {
       if (error.code == 401) {
         await _clearCookie();
@@ -147,6 +161,7 @@ final class SdkAppwriteAccount implements AppwriteAccount {
   }) async {
     final session = await _createSession(email: email, password: password);
     final user = await account.get();
+    await _allowSession();
     return AppwriteAuthResult(
       user: _fromUser(user),
       session: session,
@@ -253,15 +268,43 @@ final class SdkAppwriteAccount implements AppwriteAccount {
 
   @override
   Future<void> signOut() async {
+    Object? cleanupError;
+    _locallySignedOut = true;
     try {
       await account.deleteSessions(current: true);
-    } on AppwriteException catch (error) {
-      if (error.code != 401) {
-        rethrow;
+    } on Object {
+      // Revocation is best-effort; local logout must work offline.
+    } finally {
+      for (final shared in {_transport, account.client}) {
+        shared
+          ..setSession('')
+          ..setCookie('')
+          ..setJWT('')
+          ..setBearer('');
+      }
+      try {
+        await Future.wait<void>([
+          _rememberSignOut(),
+          _clearCookie(),
+        ]);
+      } on Object catch (error) {
+        cleanupError = error;
       }
     }
-    client?.setSession('');
-    await _clearCookie();
+    if (cleanupError != null) {
+      throw Failure(
+        code: FailureCode.unavailable,
+        message: 'Local Appwrite session cleanup could not be completed.',
+        kind: FailureKind.authentication,
+        cause: cleanupError,
+        details: const <String, Object?>{'localCleanupFailed': true},
+      );
+    }
+  }
+
+  Future<void> _rememberSignOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_signedOutKey, true);
   }
 
   @override
@@ -269,7 +312,9 @@ final class SdkAppwriteAccount implements AppwriteAccount {
     required SocialProvider provider,
     required String successUrl,
     String? failureUrl,
-  }) {
+  }) async {
+    // A new sign-in attempt overrides an earlier local logout marker.
+    await _allowSession();
     return account.createOAuth2Session(
       provider: _oauthProvider(provider),
       success: successUrl,

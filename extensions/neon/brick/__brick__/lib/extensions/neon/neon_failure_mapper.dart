@@ -30,8 +30,8 @@ Failure mapNeonError(
       message: error.message,
       kind: FailureKind.database,
       details: <String, Object?>{
-        if (status != null) 'statusCode': status,
-        if (error.code != null) 'code': error.code,
+        'statusCode': ?status,
+        'code': ?error.code,
       },
     );
   }

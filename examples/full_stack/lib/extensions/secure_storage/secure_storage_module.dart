@@ -5,6 +5,7 @@ import 'first_run_wipe.dart';
 import 'keystore_secure_storage.dart';
 import 'secure_storage_config.dart';
 import 'secure_storage_gateway.dart';
+import 'secure_storage_support.dart';
 
 /// Registers the Keychain/Keystore SecureStorage.
 final class SecureStorageModule extends KilnModule {
@@ -19,13 +20,18 @@ final class SecureStorageModule extends KilnModule {
   @override
   void register(Registry registry) {
     const config = SecureStorageConfig.defaults;
-    final storage = KeystoreSecureStorage(
-      gateway: FlutterSecureStorageGateway(config: config),
-      config: config,
-    );
+    final gateway = FlutterSecureStorageGateway(config: config);
+    final storage = KeystoreSecureStorage(gateway: gateway, config: config);
+    final support = SecureStorageSupport(gateway: gateway);
     registry
       ..registerSingleton<SecureStorageConfig>(config)
+      ..registerSingleton<SecureStorageSupport>(support)
       ..registerSingleton<SecureStorage>(storage);
+  }
+
+  @override
+  Future<SupportInfo> support(Registry registry) {
+    return registry.read<SecureStorageSupport>().check();
   }
 
   @override
@@ -34,9 +40,20 @@ final class SecureStorageModule extends KilnModule {
     if (markerStorage == null) {
       return;
     }
-    await FirstRunWipe(
-      gateway: FlutterSecureStorageGateway(),
-      storage: markerStorage,
-    ).run(isIOS: defaultTargetPlatform == TargetPlatform.iOS);
+    try {
+      await FirstRunWipe(
+        gateway: FlutterSecureStorageGateway(),
+        storage: markerStorage,
+      ).run(isIOS: defaultTargetPlatform == TargetPlatform.iOS);
+    } on Object catch (error) {
+      registry.readOrNull<SupportRegistry>()?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Secure storage could not be prepared: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
+    }
   }
 }

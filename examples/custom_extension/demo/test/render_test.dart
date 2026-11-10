@@ -5,9 +5,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('brick renders without errors', () async {
-    final harness = ExtensionTestHarness(
-      extensionRoot: Directory.current,
-    );
+    final harness = ExtensionTestHarness(extensionRoot: Directory.current);
 
     final files = await harness.render();
 

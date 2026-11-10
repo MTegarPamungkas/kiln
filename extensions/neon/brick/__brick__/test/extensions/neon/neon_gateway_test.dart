@@ -101,11 +101,53 @@ void main() {
 
     final params = seen!.url.queryParameters;
     expect(params['done'], 'eq.true');
-    expect(params['tag'], 'in("a","b")');
+    expect(params['tag'], 'in.("a","b")');
     expect(params['archived_at'], 'is.null');
     expect(params['order'], 'title.desc');
     expect(params['limit'], '10');
     expect(params['offset'], '5');
+  });
+
+  test('HTTP query preserves every same-column AND range filter', () async {
+    http.Request? seen;
+    final gateway = gatewayReturning(200, '[]', onRec: (r) => seen = r);
+    await gateway.select('tasks', query: const PostgrestQuery(filters: [
+      PostgrestFilter('score', PostgrestOperator.greaterThanOrEqual, 10),
+      PostgrestFilter('score', PostgrestOperator.lessThan, 20),
+      PostgrestFilter('score', PostgrestOperator.notEquals, 15),
+    ]));
+    expect(seen!.url.queryParametersAll['score'], ['gte.10', 'lt.20', 'neq.15']);
+  });
+
+  test('HTTP list grammar escapes strings without changing their values', () async {
+    http.Request? seen;
+    final gateway = gatewayReturning(200, '[]', onRec: (r) => seen = r);
+    await gateway.select('tasks', query: const PostgrestQuery(filters: [
+      PostgrestFilter('number', PostgrestOperator.inList, [1, -2, 3.5, true]),
+      PostgrestFilter('text', PostgrestOperator.notInList,
+        ['a,b', 'a"b', r'a\b', 'null', '', '(x)', 'a&b', 'a%b']),
+      PostgrestFilter('missing', PostgrestOperator.isNull),
+      PostgrestFilter('present', PostgrestOperator.isNotNull),
+    ]));
+    final params = seen!.url.queryParameters;
+    expect(params['number'], 'in.(1,-2,3.5,true)');
+    expect(params['text'], r'not.in.("a,b","a\"b","a\\b","null","","(x)","a&b","a%b")');
+    expect(params['missing'], 'is.null');
+    expect(params['present'], 'not.is.null');
+  });
+
+  test('null and malformed list filters fail before HTTP', () async {
+    var requests = 0;
+    final gateway = gatewayReturning(200, '[]', onRec: (_) => requests++);
+    for (final operator in [PostgrestOperator.inList, PostgrestOperator.notInList]) {
+      for (final value in <Object?>[null, [], [1, null], [double.nan], [{'x': 1}], 'a']) {
+        await expectLater(gateway.select('tasks', query: PostgrestQuery(filters: [
+          PostgrestFilter('tag', operator, value),
+        ])), throwsA(isA<Failure>().having((f) => f.code, 'code',
+          FailureCode.validationUnsupportedValue)));
+      }
+    }
+    expect(requests, 0);
   });
 
   test('updateById patches the row and returns it', () async {
@@ -166,7 +208,7 @@ void main() {
     );
   });
 
-  test('closing the gateway releases a wrapped anonymous fallback client', () {
+  test('closing the gateway leaves injected providers with their owner', () {
     final anonymousClient = RecordingClient();
     final gateway = HttpNeonGateway(
       config: config.copyWith(apiKey: '', authUrl: 'https://auth.test/db/auth'),
@@ -185,7 +227,8 @@ void main() {
 
     gateway.close();
 
-    expect(anonymousClient.closeCalls, 1);
+    expect(anonymousClient.closeCalls, 0);
+    anonymousClient.close();
   });
 }
 

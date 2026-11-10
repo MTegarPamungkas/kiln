@@ -344,6 +344,47 @@ final class _Notifications implements Notifications {
 }
 
 void main() {
+  group('Gate missing capabilities', () {
+    final gate = Gate(GetItRegistry());
+    final operations = <String, Future<Result<dynamic>> Function()>{
+      'signOut': gate.signOut,
+      'clearCache': gate.clearCache,
+      'resetAnalytics': gate.resetAnalytics,
+      'fetchRemoteConfig': gate.fetchRemoteConfig,
+      'sendEmailVerification': gate.sendEmailVerification,
+      'reloadUser': gate.reloadUser,
+      'requestNotificationPermission': gate.requestNotificationPermission,
+      'cancelAllNotifications': gate.cancelAllNotifications,
+      'readAllSecure': gate.readAllSecure,
+      'clearSecure': gate.clearSecure,
+      'socialSignOut': gate.socialSignOut,
+      'storageKeys': gate.storageKeys,
+      'clearValues': gate.clearValues,
+      'locationServiceEnabled': gate.locationServiceEnabled,
+      'readValue': () => gate.readValue('key'),
+      'requestPermission': () => gate.requestPermission(PermissionKind.camera),
+      'signIn': () => gate.signIn(email: 'user@example.invalid', password: 'test'),
+      'remoteRead': () => gate.remoteRead('items', '1'),
+    };
+    for (final operation in operations.entries) {
+      test('${operation.key} returns Err instead of throwing', () async {
+        final result = await operation.value();
+        expect(result.isErr, isTrue);
+        expect(result.failureOrNull?.code, FailureCode.configurationMissing);
+        expect(result.failureOrNull?.kind, FailureKind.configuration);
+        expect(result.failureOrNull?.details['contract'], isA<String>());
+      });
+    }
+
+    test('lookup failures from a lazy factory remain inside the guard', () async {
+      final registry = GetItRegistry()
+        ..registerLazySingleton<Storage>(() => throw StateError('factory'));
+      final result = await Gate(registry).clearValues();
+      expect(result.isErr, isTrue);
+      expect(result.failureOrNull?.cause, isA<StateError>());
+    });
+  });
+
   group('Gate', () {
     late GetItRegistry registry;
     late _Permissions permissions;

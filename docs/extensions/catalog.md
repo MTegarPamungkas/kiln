@@ -6,12 +6,12 @@ This catalog is generated from extension manifests by
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.1.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
+| `appwrite` | Appwrite | 0.1.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `biometric` | Biometric | 0.1.0 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.2.0 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
 | `codegen` | Codegen | 0.1.0 | codegen | official | `codegen` |
-| `connectivity` | Connectivity | 0.1.0 | connectivity | official | `connectivity` |
+| `connectivity` | Connectivity | 0.1.1 | connectivity | official | `connectivity` |
 | `crash_report` | Crash Report | 0.1.0 | crash | official | `crash_reporter` |
 | `deep_link` | Deep links | 0.1.0 | deep_link | official | `deep_links` |
 | `dio` | Dio HTTP client | 0.1.0 | network | official | `http_client`, `http_pipeline` |
@@ -20,17 +20,17 @@ This catalog is generated from extension manifests by
 | `flavors` | Flavors | 0.1.0 | flavor | official | `flavor` |
 | `geolocation` | Geolocation | 0.1.0 | location | official | `location` |
 | `go_router` | GoRouter | 0.1.0 | navigation | official | `navigation` |
-| `http_cache` | HTTP cache | 0.1.0 | network | official | `http_cache` |
+| `http_cache` | HTTP cache | 0.1.1 | network | official | `http_cache` |
 | `http_retry` | HTTP retry | 0.1.0 | network | official |  |
 | `image_picker` | Image picker | 0.1.0 | media | official | `media` |
 | `l10n` | Localization | 0.1.0 | l10n | official | `l10n` |
 | `local_db` | Local database | 0.1.0 | database | official | `local_db` |
 | `logger` | Logger | 0.1.0 | logging | official | `logger` |
-| `neon` | Neon | 0.1.0 | database | official | `auth`, `remote_database`, `file_storage` |
-| `notifications` | Notifications | 0.1.0 | notifications | official | `notifications` |
+| `neon` | Neon | 0.1.1 | database | official | `auth`, `remote_database`, `file_storage` |
+| `notifications` | Notifications | 0.1.1 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.0 | config | official | `remote_config` |
-| `rest_auth` | REST auth | 0.1.0 | auth | official | `auth` |
+| `rest_auth` | REST auth | 0.1.1 | auth | official | `auth` |
 | `riverpod` | Riverpod state management | 0.2.0 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.0 | storage | official | `secure_storage` |
 | `share` | Share | 0.1.0 | share | official | `share` |
@@ -221,8 +221,8 @@ Structured application logging with redaction, rotating files, and crash breadcr
 Neon Auth (Better Auth), Lakebase Postgres database (Data API / PostgREST), and Object Storage (S3-compatible) for Kiln, read through the Gate.
 
 - Provides: `auth`, `remote_database`, `file_storage`
-- Prompts: data_api_url, api_key, auth_url, schema, s3_endpoint, s3_bucket, s3_region, s3_access_key_id, s3_secret_access_key
-- Dependencies: `http: ^1.6.0`, `crypto: ^3.0.8`
+- Prompts: data_api_url, api_key, auth_url, schema, storage_signing_url, s3_bucket
+- Dependencies: `http: ^1.6.0`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## notifications

@@ -17,7 +17,7 @@ void main() {
 
     expect(key, contains('get'));
     expect(key, contains('page=1'));
-    expect(key, contains('accept=application/json'));
+    expect(key, contains('"accept":"application/json"'));
   });
 
   test('different Vary values produce different keys', () {
@@ -40,6 +40,24 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('normalizes configured header names and distinguishes absent values', () {
+    const custom = CacheKeyBuilder(varyHeaders: {'Accept-Language'});
+    expect(custom.build(_request(uri, headers: {'Accept-Language': 'en'})),
+        isNot(custom.build(_request(uri, headers: {'accept-language': 'fr'}))));
+    expect(custom.build(_request(uri)),
+        isNot(custom.build(_request(uri, headers: {'accept-language': ''}))));
+  });
+
+  test('header delimiters cannot collide with another variant', () {
+    final first = builder.build(_request(uri, headers: {
+      'accept': 'a|accept-encoding=b', 'accept-encoding': 'c',
+    }));
+    final second = builder.build(_request(uri, headers: {
+      'accept': 'a', 'accept-encoding': 'b|accept-encoding=c',
+    }));
+    expect(first, isNot(second));
   });
 
   test('prefixFor returns the path', () {

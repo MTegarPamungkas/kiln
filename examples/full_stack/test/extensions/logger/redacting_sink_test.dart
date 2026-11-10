@@ -9,8 +9,7 @@ void main() {
   test('redacts the message, data, and error text', () {
     final sink = _RecordingSink();
     final redacting = RedactingSink(sink);
-    const jwt =
-        'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0In0.signature';
+    const jwt = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0In0.signature';
 
     redacting.write(
       LogRecord(

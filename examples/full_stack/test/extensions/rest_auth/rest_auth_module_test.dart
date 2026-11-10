@@ -4,6 +4,7 @@ import 'package:kiln_testing/kiln_testing.dart';
 import 'package:full_stack/extensions/rest_auth/rest_auth.dart';
 import 'package:full_stack/extensions/rest_auth/rest_auth_config.dart';
 import 'package:full_stack/extensions/rest_auth/rest_auth_module.dart';
+import 'package:full_stack/extensions/rest_auth/rest_auth_support.dart';
 
 import 'test_support.dart';
 
@@ -19,6 +20,7 @@ void main() {
 
     expect(registry.read<AuthRepository>(), isA<RestAuth>());
     expect(registry.read<RestAuthConfig>(), isA<RestAuthConfig>());
+    expect(registry.read<RestAuthSupport>(), isA<RestAuthSupport>());
     expect(registry.read<TokenProvider>(), isA<TokenProvider>());
     expect(registry.read<AccountManagement>(), isA<AccountManagement>());
     expect(registry.read<HttpPipeline>().middleware, hasLength(2));

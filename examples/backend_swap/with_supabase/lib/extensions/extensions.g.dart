@@ -4,10 +4,9 @@
 
 import 'package:kiln_core/kiln_core.dart';
 
+import 'l10n/l10n_module.dart';
 import 'supabase/supabase_module.dart';
 
 List<KilnModule> kilnModules() {
-  return <KilnModule>[
-  SupabaseModule(),
-  ];
+  return <KilnModule>[L10nModule(), SupabaseModule()];
 }

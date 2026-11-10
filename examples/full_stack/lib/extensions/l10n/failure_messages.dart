@@ -37,8 +37,9 @@ final class L10nFailureMessages implements FailureMessages {
       'auth.provider_disabled' => l10n.failureAuth,
       'auth.session_expired' => l10n.failureAuthExpired,
       'auth.email_not_verified' => l10n.failureAuthEmail,
-      'auth.cancelled' || 'media.cancelled' || 'cancelled' =>
-        l10n.failureCancelled,
+      'auth.cancelled' ||
+      'media.cancelled' ||
+      'cancelled' => l10n.failureCancelled,
       'permission.denied' ||
       'permission.restricted' ||
       'media.permission_denied' => l10n.failurePermission,
@@ -71,6 +72,8 @@ final class L10nFailureMessages implements FailureMessages {
       'media.unavailable' || 'media.invalid' => l10n.failureMedia,
       'cache.unavailable' || 'cache.invalid_entry' => l10n.failureCache,
       'session.expired' => l10n.failureSession,
+      'support.unsupported_platform' ||
+      'support.unsupported_device' => l10n.failureUnsupported,
       'unavailable' => l10n.failureUnavailable,
       _ => l10n.failureUnexpected,
     };

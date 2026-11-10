@@ -1,6 +1,6 @@
 id: http_cache
 name: HTTP cache
-version: 0.1.0
+version: 0.1.1
 description: Caches HTTP responses with TTL, ETag, and invalidation.
 category: network
 tier: official

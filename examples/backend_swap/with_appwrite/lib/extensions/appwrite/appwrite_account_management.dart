@@ -17,8 +17,10 @@ final class AppwriteAccountManagement implements AccountManagement {
   }) : isEmailVerified = emailVerified,
        _failures = failureMapper;
 
-  static const String defaultRecoveryRedirectUrl = 'kiln://auth/recovery';
-  static const String defaultVerificationRedirectUrl = 'kiln://auth/verify';
+  static const String defaultRecoveryRedirectUrl =
+      'appwrite-callback-kiln_demo://auth/recovery';
+  static const String defaultVerificationRedirectUrl =
+      'appwrite-callback-kiln_demo://auth/verify';
 
   final AppwriteAccount account;
 

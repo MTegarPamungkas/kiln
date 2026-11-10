@@ -41,6 +41,28 @@ final class FakeAppwriteAccount implements AppwriteAccount {
     _current = user;
   }
 
+  /// When set, [createOAuth2Session] delivers this user as if the provider
+  /// callback had completed, so the social flow resolves to a session.
+  AppwriteAccountUser? oauthUser;
+  SocialProvider? lastOAuthProvider;
+  String? lastOAuthSuccessUrl;
+
+  @override
+  Future<void> createOAuth2Session({
+    required SocialProvider provider,
+    required String successUrl,
+    String? failureUrl,
+  }) async {
+    _throwIfConfigured();
+    lastOAuthProvider = provider;
+    lastOAuthSuccessUrl = successUrl;
+    calls.add('oauth:${provider.name}');
+    final user = oauthUser;
+    if (user != null) {
+      _current = user;
+    }
+  }
+
   @override
   Future<AppwriteAccountUser?> currentUser() async {
     _throwIfConfigured();

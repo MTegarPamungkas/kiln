@@ -23,10 +23,7 @@ void main() {
   test('keeps signed-out visitors on sign-in', () {
     expect(
       guard.redirect(
-        const RouteGuardContext(
-          location: '/sign-in',
-          isAuthenticated: false,
-        ),
+        const RouteGuardContext(location: '/sign-in', isAuthenticated: false),
       ),
       isNull,
     );

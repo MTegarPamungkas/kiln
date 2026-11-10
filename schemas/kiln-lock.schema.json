@@ -8,6 +8,13 @@
   "properties": {
     "lock_version": { "type": "integer", "const": 2 },
     "core": { "type": "string" },
+    "owned_dependencies": { "type": "object", "description": "Packages inserted by Kiln mapped to their installed YAML value; absent means no known ownership." },
+    "owned_dev_dependencies": { "type": "object" },
+    "owned_flutter_generate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["present", "value"],
+      "properties": { "present": { "type": "boolean" }, "value": {} }
+    },
     "extensions": {
       "type": "object",
       "additionalProperties": {
@@ -18,6 +25,8 @@
           "version": { "type": "string" },
           "source": { "enum": ["bundled", "store"] },
           "dependencies": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "dev_dependencies": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "flutter_generate": { "type": "boolean" },
           "files": {
             "type": "object",
             "additionalProperties": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }

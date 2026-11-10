@@ -59,8 +59,9 @@ final class AppwriteAuth implements AuthRepository {
     } on Object catch (error, stackTrace) {
       failure = error;
       failureStack = stackTrace;
+    } finally {
+      bridge.clear();
     }
-    bridge.clear();
     if (failure != null) {
       throw _failures.map(
         failure,

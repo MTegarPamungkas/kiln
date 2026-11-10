@@ -6,7 +6,9 @@ import 'package:full_stack/extensions/logger/file_log_sink.dart';
 
 void main() {
   test('writes records and rotates files', () async {
-    final directory = await Directory.systemTemp.createTemp('kiln_logger_file_');
+    final directory = await Directory.systemTemp.createTemp(
+      'kiln_logger_file_',
+    );
     addTearDown(() async {
       if (directory.existsSync()) {
         await directory.delete(recursive: true);
@@ -32,9 +34,7 @@ void main() {
     }
     await sink.flush();
 
-    final current = File(
-      '${directory.path}${Platform.pathSeparator}app.log',
-    );
+    final current = File('${directory.path}${Platform.pathSeparator}app.log');
     expect(await current.exists(), isTrue);
     expect(await current.length(), greaterThan(0));
     expect(
@@ -42,10 +42,9 @@ void main() {
       isTrue,
       reason: 'the current file should rotate once it is full',
     );
-    final files = directory
-        .listSync()
-        .whereType<File>()
-        .toList(growable: false);
+    final files = directory.listSync().whereType<File>().toList(
+      growable: false,
+    );
     expect(files.length, lessThanOrEqualTo(3));
 
     final content = await sink.read();
@@ -54,7 +53,9 @@ void main() {
   });
 
   test('uses a custom file name', () async {
-    final directory = await Directory.systemTemp.createTemp('kiln_logger_name_');
+    final directory = await Directory.systemTemp.createTemp(
+      'kiln_logger_name_',
+    );
     addTearDown(() async {
       if (directory.existsSync()) {
         await directory.delete(recursive: true);
@@ -74,9 +75,7 @@ void main() {
     );
     await sink.flush();
 
-    final file = File(
-      '${directory.path}${Platform.pathSeparator}debug.txt',
-    );
+    final file = File('${directory.path}${Platform.pathSeparator}debug.txt');
     expect(await file.exists(), isTrue);
     expect(await file.readAsString(), contains('[DEBUG] named'));
   });

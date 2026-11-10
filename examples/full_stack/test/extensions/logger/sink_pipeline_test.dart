@@ -11,11 +11,7 @@ void main() {
     final failures = <String>[];
     final memory = MemoryLogSink();
     final pipeline = SinkPipeline(
-      <LogSink>[
-        _ThrowingSink(),
-        _ThrowingSink(asynchronous: true),
-        memory,
-      ],
+      <LogSink>[_ThrowingSink(), _ThrowingSink(asynchronous: true), memory],
       onFailure: (message, error, stackTrace) {
         failures.add('$message $error');
       },
@@ -26,7 +22,10 @@ void main() {
 
     expect(memory.records, hasLength(1));
     expect(failures, hasLength(2));
-    expect(failures.every((failure) => failure.contains('_ThrowingSink')), isTrue);
+    expect(
+      failures.every((failure) => failure.contains('_ThrowingSink')),
+      isTrue,
+    );
     expect(failures.any((failure) => failure.contains('sync boom')), isTrue);
     expect(failures.any((failure) => failure.contains('async boom')), isTrue);
   });

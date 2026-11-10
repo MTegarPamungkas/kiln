@@ -11,10 +11,7 @@ void main() {
   });
 
   test('reads a route from a JSON payload', () {
-    expect(
-      mapper.mapPayload('{"route":"/orders/42","id":42}'),
-      '/orders/42',
-    );
+    expect(mapper.mapPayload('{"route":"/orders/42","id":42}'), '/orders/42');
   });
 
   test('ignores empty, malformed, and non-route payloads', () {

@@ -28,7 +28,7 @@ void main() {
     await deepLinks.dispose();
   });
 
-  test('start memproses tautan awal dengan kode PKCE', () async {
+  test('start processes the initial link with a PKCE code', () async {
     deepLinks.initialLink = Uri.parse('kiln-auth://auth-callback?code=abc123');
 
     await handler.start();
@@ -39,7 +39,7 @@ void main() {
     expect(handler.isAttached, isTrue);
   });
 
-  test('tautan masuk dengan token_hash diverifikasi lewat OTP', () async {
+  test('a sign-in link with token_hash is verified through OTP', () async {
     await handler.start();
 
     deepLinks.emit(
@@ -52,7 +52,7 @@ void main() {
     expect(sessions, hasLength(1));
   });
 
-  test('parameter di fragment juga dibaca', () async {
+  test('parameters in the fragment are also read', () async {
     await handler.start();
 
     deepLinks.emit(Uri.parse('kiln-auth://auth-callback#code=fragment-code'));
@@ -61,7 +61,7 @@ void main() {
     expect(gateway.exchangedCodes, ['fragment-code']);
   });
 
-  test('tautan tanpa parameter auth diabaikan', () async {
+  test('a link with no auth parameters is ignored', () async {
     await handler.start();
 
     deepLinks.emit(Uri.parse('kiln-auth://auth-callback?foo=bar'));
@@ -72,7 +72,7 @@ void main() {
     expect(sessions, isEmpty);
   });
 
-  test('error dari Supabase dilaporkan lewat stream failures', () async {
+  test('Supabase errors are reported through the failures stream', () async {
     await handler.start();
     final failures = <Failure>[];
     final subscription = handler.failures.listen(failures.add);
@@ -92,7 +92,7 @@ void main() {
     await subscription.cancel();
   });
 
-  test('dispose berhenti mendengarkan tautan baru', () async {
+  test('dispose stops listening for new links', () async {
     await handler.start();
     await handler.dispose();
 
@@ -103,7 +103,7 @@ void main() {
     expect(gateway.exchangedCodes, isEmpty);
   });
 
-  test('tanpa DeepLinks handler tidak memasang langganan', () async {
+  test('without DeepLinks the handler attaches no subscription', () async {
     final detached = SupabaseLinkHandler(gateway: gateway);
 
     await detached.start();

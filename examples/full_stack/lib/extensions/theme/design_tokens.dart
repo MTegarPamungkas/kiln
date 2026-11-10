@@ -92,12 +92,7 @@ final class AppRadius extends ThemeExtension<AppRadius> {
   /// Derives a radius scale from one base value.
   static AppRadius fromCornerRadius(double value) {
     final base = value < 0 ? 0.0 : value;
-    return AppRadius(
-      sm: base * 0.6,
-      md: base,
-      lg: base * 1.4,
-      xl: base * 2,
-    );
+    return AppRadius(sm: base * 0.6, md: base, lg: base * 1.4, xl: base * 2);
   }
 
   final double sm;

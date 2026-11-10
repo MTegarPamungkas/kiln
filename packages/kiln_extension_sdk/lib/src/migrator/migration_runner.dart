@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:yaml_edit/yaml_edit.dart';
 
 import '../installer/pubspec_writer.dart';
+import '../installer/transaction/root_path.dart';
 import '../installer/transaction/transaction.dart';
 import 'migration.dart';
 import 'migration_actions.dart';
@@ -23,31 +24,58 @@ final class MigrationRunner {
   MigrationResult run({
     required Directory projectRoot,
     required List<Migration> migrations,
+    Transaction? transaction,
   }) {
+    validate(projectRoot: projectRoot, migrations: migrations);
     final applied = <String>[];
     final messages = <String>[];
-    final transaction = Transaction.begin(projectRoot);
+    final activeTransaction = transaction ?? Transaction.begin(projectRoot);
     try {
       for (final migration in migrations) {
         for (final action in migration.actions) {
           _apply(
             action: action,
             projectRoot: projectRoot,
-            transaction: transaction,
+            transaction: activeTransaction,
             messages: messages,
           );
         }
         applied.add('${migration.from} -> ${migration.to}');
       }
-      transaction.commit();
+      if (transaction == null) activeTransaction.commit();
     } catch (_) {
-      transaction.rollback();
+      if (transaction == null) activeTransaction.rollback();
       rethrow;
     }
     return MigrationResult(
       applied: List<String>.unmodifiable(applied),
       messages: List<String>.unmodifiable(messages),
     );
+  }
+
+  /// Validate every action, including paths in later migrations, up front.
+  void validate({
+    required Directory projectRoot,
+    required List<Migration> migrations,
+  }) {
+    final paths = RootPath(projectRoot);
+    for (final migration in migrations) {
+      for (final action in migration.actions) {
+        switch (action) {
+          case RenameFileAction():
+            paths.resolve(action.from);
+            paths.resolve(action.to);
+          case DeleteFileAction():
+            paths.resolve(action.path);
+          case ReplaceDependencyAction():
+            paths.resolve('pubspec.yaml');
+          case UpdateConfigAction():
+            paths.resolve('kiln.yaml');
+          case MessageAction():
+            break;
+        }
+      }
+    }
   }
 
   void _apply({

@@ -4,10 +4,8 @@ import 'retry_settings.dart';
 
 /// Exponential backoff with an optional jitter factor.
 final class Backoff {
-  Backoff({
-    this.settings = HttpRetrySettings.defaults,
-    Random? random,
-  }) : _random = random ?? Random();
+  Backoff({this.settings = HttpRetrySettings.defaults, Random? random})
+    : _random = random ?? Random();
 
   final HttpRetrySettings settings;
   final Random _random;

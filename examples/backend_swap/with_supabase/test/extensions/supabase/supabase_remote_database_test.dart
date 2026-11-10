@@ -19,7 +19,7 @@ void main() {
     database = SupabaseRemoteDatabase(postgrest: postgrest, realtime: realtime);
   });
 
-  test('create, read, update, dan delete berjalan bolak balik', () async {
+  test('create, read, update, and delete round-trip', () async {
     final created = await database.create('users', <String, Object?>{
       'name': 'Tegar',
     });
@@ -38,7 +38,7 @@ void main() {
     expect(await database.read('users', id), isNull);
   });
 
-  test('create menolak tabel yang tidak mengembalikan id', () async {
+  test('create rejects a table that returns no id', () async {
     final withoutId = _IdlessPostgrestGateway();
 
     final failing = SupabaseRemoteDatabase(
@@ -58,7 +58,7 @@ void main() {
     );
   });
 
-  test('query memakai filter, urutan, dan limit hasil pemetaan', () async {
+  test('query uses the mapped filter, order, and limit', () async {
     await database.create('tasks', <String, Object?>{
       'title': 'one',
       'done': false,
@@ -91,7 +91,7 @@ void main() {
     expect(postgrest.lastQuery?.orderBy.single.ascending, isTrue);
   });
 
-  test('update dan delete dokumen yang tidak ada menjadi notFound', () async {
+  test('updating and deleting a missing document becomes notFound', () async {
     await expectLater(
       database.update('users', 'missing', <String, Object?>{'name': 'x'}),
       throwsA(
@@ -114,7 +114,7 @@ void main() {
     );
   });
 
-  test('watch mengirim dokumen saat ini lalu perubahan realtime', () async {
+  test('watch emits the current document then realtime changes', () async {
     final created = await database.create('users', <String, Object?>{
       'name': 'First',
     });
@@ -135,7 +135,7 @@ void main() {
     expect(realtime.activeSubscriptions, 0);
   });
 
-  test('watch mengirim null saat dokumen dihapus', () async {
+  test('watch emits null when the document is deleted', () async {
     final created = await database.create('users', <String, Object?>{
       'name': 'Gone',
     });
@@ -152,7 +152,7 @@ void main() {
     await subscription.cancel();
   });
 
-  test('nama tabel tidak valid ditolak sebelum request', () async {
+  test('an invalid table name is rejected before the request', () async {
     await expectLater(
       database.read('users; drop table', 'id-1'),
       throwsA(
@@ -165,7 +165,7 @@ void main() {
     );
   });
 
-  test('error PostgREST dipetakan ke Failure database', () async {
+  test('a PostgREST error maps to a database Failure', () async {
     postgrest.failure = const PostgrestException(
       message: 'relation "users" does not exist',
       code: '42P01',

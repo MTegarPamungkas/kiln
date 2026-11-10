@@ -31,8 +31,8 @@ void main() {
     NeonModule(
       config: testConfig(),
       storageConfig: testStorageConfig(),
-      gatewayFactory: (_, __) => FakePostgrestGateway(),
-      storageGatewayFactory: (_) => FakeNeonStorageGateway(),
+      gatewayFactory: (_, _) => FakePostgrestGateway(),
+      storageGatewayFactory: (_, _) => FakeNeonStorageGateway(),
       authGatewayFactory: (_) => FakeNeonAuthGateway(),
     ).register(registry);
 
@@ -58,7 +58,7 @@ void main() {
         .register(registry);
 
     expect(registry.read<PostgrestGateway>(), isA<HttpNeonGateway>());
-    expect(registry.read<NeonStorageGateway>(), isA<S3NeonStorageGateway>());
+    expect(registry.read<NeonStorageGateway>(), isA<PresignedNeonStorageGateway>());
     expect(registry.read<NeonAuthGateway>(), isA<BetterAuthGateway>());
     expect(registry.isRegistered<NeonChangeSignal>(), isFalse);
   });
@@ -70,8 +70,8 @@ void main() {
       config: testConfig(),
       storageConfig: testStorageConfig(),
       changeSignal: signal,
-      gatewayFactory: (_, __) => FakePostgrestGateway(),
-      storageGatewayFactory: (_) => FakeNeonStorageGateway(),
+      gatewayFactory: (_, _) => FakePostgrestGateway(),
+      storageGatewayFactory: (_, _) => FakeNeonStorageGateway(),
       authGatewayFactory: (_) => FakeNeonAuthGateway(),
     ).register(registry);
 

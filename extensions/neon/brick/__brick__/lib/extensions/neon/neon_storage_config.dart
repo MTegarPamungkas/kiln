@@ -1,124 +1,74 @@
-// ignore_for_file: prefer_initializing_formals
-
 import 'package:kiln_core/kiln_core.dart';
 
-import 'neon_s3_signer.dart';
-
-/// Typed configuration for Neon Object Storage (S3-compatible).
-///
-/// [endpoint] is the branch storage host, for example
-/// `https://{branch}.storage.c-{region}.aws.neon.tech`. Requests use path-style
-/// addressing: `endpoint/bucket/key`. [accessKeyId] is a Neon token id and
-/// [secretAccessKey] is the matching S3 secret; both are shipped to the client
-/// in this direct-from-app setup, so scope them to one bucket with least
-/// privilege.
+/// Public configuration for a custom, JWT-authenticated presigning backend.
+/// S3 credentials belong exclusively on that backend, never in the app.
 final class NeonStorageConfig {
   const NeonStorageConfig({
-    required this.endpoint,
+    required this.signingUrl,
     required this.bucket,
-    required this.region,
-    required this.accessKeyId,
-    required this.secretAccessKey,
-    this.signedUrlLifetime = const Duration(hours: 1),
+    this.signedUrlLifetime = const Duration(minutes: 5),
   });
 
-  /// Values rendered from the extension prompts.
   static const NeonStorageConfig defaults = NeonStorageConfig(
-    endpoint: '{{{s3_endpoint}}}',
+    signingUrl: '{{{storage_signing_url}}}',
     bucket: '{{{s3_bucket}}}',
-    region: '{{{s3_region}}}',
-    accessKeyId: '{{{s3_access_key_id}}}',
-    secretAccessKey: '{{{s3_secret_access_key}}}',
   );
 
+  static const maxSignedUrlLifetime = Duration(minutes: 15);
   static final RegExp _bucketPattern = RegExp(r'^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$');
 
-  final String endpoint;
+  final String signingUrl;
   final String bucket;
-  final String region;
-  final String accessKeyId;
-  final String secretAccessKey;
-
-  /// Default lifetime of the link returned by `FileStorage.url`.
   final Duration signedUrlLifetime;
 
-  bool get isInsecureTransport => Uri.tryParse(endpoint)?.isScheme('http') ?? false;
+  bool get isInsecureTransport => Uri.tryParse(signingUrl)?.isScheme('http') ?? false;
 
-  /// The base endpoint with any trailing slash removed.
-  String get normalizedEndpoint =>
-      endpoint.endsWith('/') ? endpoint.substring(0, endpoint.length - 1) : endpoint;
-
-  /// Path-style URL for [key] (`endpoint/bucket/key`).
-  Uri objectUri(String key) {
-    final encoded = NeonS3Signer.encodeObjectPath(key);
-    return Uri.parse('$normalizedEndpoint/$bucket/$encoded');
-  }
-
-  /// Validates the configuration. The secret never appears in a message.
   Failure? validate() {
-    final uri = Uri.tryParse(endpoint);
+    final uri = Uri.tryParse(signingUrl);
+    final local = uri != null &&
+        const {'localhost', '127.0.0.1', '::1', '[::1]'}.contains(uri.host);
     if (uri == null ||
+        !uri.hasAuthority ||
         uri.host.isEmpty ||
-        !(uri.isScheme('http') || uri.isScheme('https'))) {
+        uri.userInfo.isNotEmpty ||
+        uri.hasFragment ||
+        uri.hasQuery ||
+        !(uri.isScheme('https') || (uri.isScheme('http') && local))) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'The Neon Object Storage endpoint must be a complete http or https address.',
+        message: 'The storage signing URL must be HTTPS (HTTP loopback is allowed for development), without credentials, query, or fragment.',
         kind: FailureKind.configuration,
       );
     }
     if (!_bucketPattern.hasMatch(bucket)) {
-      return Failure(
-        code: FailureCode.configurationInvalid,
-        message: 'Bucket "$bucket" is not a valid S3 bucket name.',
-        kind: FailureKind.configuration,
-      );
-    }
-    if (region.trim().isEmpty) {
-      return const Failure(
-        code: FailureCode.configurationMissing,
-        message: 'The Neon Object Storage region is not set.',
-        kind: FailureKind.configuration,
-      );
-    }
-    if (accessKeyId.trim().isEmpty) {
-      return const Failure(
-        code: FailureCode.configurationMissing,
-        message: 'The Neon Object Storage access key id is not set.',
-        kind: FailureKind.configuration,
-      );
-    }
-    if (secretAccessKey.trim().isEmpty) {
-      return const Failure(
-        code: FailureCode.configurationMissing,
-        message: 'The Neon Object Storage secret access key is not set.',
-        kind: FailureKind.configuration,
-      );
-    }
-    if (signedUrlLifetime <= Duration.zero) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'The signed URL lifetime must be greater than zero.',
+        message: 'The storage bucket name is invalid.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (!isValidLifetime(signedUrlLifetime)) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'The signed URL lifetime must be whole seconds between 1 and 900.',
         kind: FailureKind.configuration,
       );
     }
     return null;
   }
 
+  static bool isValidLifetime(Duration value) =>
+      value >= const Duration(seconds: 1) &&
+      value <= maxSignedUrlLifetime &&
+      value.inMicroseconds % Duration.microsecondsPerSecond == 0;
+
   NeonStorageConfig copyWith({
-    String? endpoint,
+    String? signingUrl,
     String? bucket,
-    String? region,
-    String? accessKeyId,
-    String? secretAccessKey,
     Duration? signedUrlLifetime,
-  }) {
-    return NeonStorageConfig(
-      endpoint: endpoint ?? this.endpoint,
-      bucket: bucket ?? this.bucket,
-      region: region ?? this.region,
-      accessKeyId: accessKeyId ?? this.accessKeyId,
-      secretAccessKey: secretAccessKey ?? this.secretAccessKey,
-      signedUrlLifetime: signedUrlLifetime ?? this.signedUrlLifetime,
-    );
-  }
+  }) => NeonStorageConfig(
+    signingUrl: signingUrl ?? this.signingUrl,
+    bucket: bucket ?? this.bucket,
+    signedUrlLifetime: signedUrlLifetime ?? this.signedUrlLifetime,
+  );
 }

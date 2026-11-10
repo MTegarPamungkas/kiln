@@ -25,7 +25,7 @@ void main() {
     await controller.dispose();
   });
 
-  test('start mengisi SessionController dari sesi repository', () async {
+  test('start fills SessionController from the repository session', () async {
     gateway.initialSession = const SupabaseSession(
       userId: 'user-9',
       email: 'stored@kiln.dev',
@@ -41,14 +41,14 @@ void main() {
     expect(controller.session?.email, 'stored@kiln.dev');
   });
 
-  test('start tanpa sesi menandai unauthenticated', () {
+  test('start without a session marks unauthenticated', () {
     bridge.start();
 
     expect(controller.status, SessionStatus.unauthenticated);
     expect(controller.session, isNull);
   });
 
-  test('perubahan sesi diteruskan ke SessionController', () async {
+  test('session changes are forwarded to SessionController', () async {
     bridge.start();
     final statuses = <SessionStatus>[];
     final subscription = controller.changes.listen(statuses.add);
@@ -66,7 +66,7 @@ void main() {
     await subscription.cancel();
   });
 
-  test('dispose berhenti meneruskan perubahan', () async {
+  test('dispose stops forwarding changes', () async {
     bridge.start();
     await bridge.dispose();
 

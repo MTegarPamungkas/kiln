@@ -10,9 +10,7 @@ void main() {
 
     sink.write(_record(LogLevel.info, 'info'));
     sink.write(_record(LogLevel.warning, 'warn', data: const {'order': 42}));
-    sink.write(
-      _record(LogLevel.error, 'error', error: StateError('boom')),
-    );
+    sink.write(_record(LogLevel.error, 'error', error: StateError('boom')));
 
     expect(reporter.breadcrumbs, hasLength(2));
     expect(reporter.breadcrumbs.first.message, 'warn');

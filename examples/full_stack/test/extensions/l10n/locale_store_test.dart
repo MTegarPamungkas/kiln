@@ -18,9 +18,7 @@ void main() {
       await store.save(const Locale('en'));
 
       expect(await store.readOrNull(), const Locale('en'));
-      expect(storage.snapshot, <String, String>{
-        LocaleStore.defaultKey: 'en',
-      });
+      expect(storage.snapshot, <String, String>{LocaleStore.defaultKey: 'en'});
     });
 
     test('round-trips a regional locale', () async {

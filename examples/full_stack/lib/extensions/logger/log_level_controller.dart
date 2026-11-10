@@ -4,13 +4,17 @@ import 'package:kiln_core/kiln_core.dart';
 ///
 /// Only non-production flavors may change the level. In production
 /// [setLevel] throws a documented [Failure] so a stray debug call cannot turn
-/// verbose logging on in a shipped build.
+/// verbose logging on in a shipped build, and a production controller never
+/// starts more verbose than [LogLevel.warning] in the first place.
 final class LogLevelController {
   LogLevelController({
     required LogLevel initialLevel,
     required this.flavor,
     this.onChanged,
-  }) : _level = initialLevel;
+  }) : _level =
+           flavor.isProduction && initialLevel.index < LogLevel.warning.index
+           ? LogLevel.warning
+           : initialLevel;
 
   final AppFlavor flavor;
 

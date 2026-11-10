@@ -150,9 +150,8 @@ final class NeonRemoteDatabase implements RemoteDatabase {
         );
         if (initial) {
           timer?.cancel();
-          controller
-            ..addError(failure, stackTrace)
-            ..close();
+          controller.addError(failure, stackTrace);
+          unawaited(controller.close());
         } else {
           controller.addError(failure, stackTrace);
         }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import 'journal.dart';
+import 'root_path.dart';
 import 'snapshot.dart';
 
 /// Restores files from a journal and its snapshots.
@@ -12,8 +13,16 @@ final class Rollback {
   /// Reverses [journal] in place and removes the journal and its backups.
   void run(Journal journal) {
     final snapshots = SnapshotStore(journal.projectRoot, journal.id);
+    // Validate the complete journal before restoring or deleting anything.
+    RootPath.validateId(journal.id);
+    journal.file;
+    snapshots.directory;
+    for (final operation in journal.operations) {
+      RootPath(journal.projectRoot).resolve(operation.path);
+      snapshots.backupFile(operation.path);
+    }
     for (final operation in journal.operations.reversed) {
-      final target = File(p.join(journal.projectRoot.path, operation.path));
+      final target = File(RootPath(journal.projectRoot).resolve(operation.path));
       switch (operation.type) {
         case JournalOperationType.write:
           if (operation.existed) {
@@ -31,7 +40,7 @@ final class Rollback {
 
   /// The newest completed transaction, if one can be rolled back.
   Journal? latestCommitted(Directory projectRoot) {
-    final backups = Directory(p.join(projectRoot.path, '.kiln', 'backups'));
+    final backups = Directory(RootPath(projectRoot).resolve('.kiln/backups'));
     if (!backups.existsSync()) {
       return null;
     }

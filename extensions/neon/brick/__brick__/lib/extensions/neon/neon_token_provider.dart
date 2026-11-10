@@ -80,6 +80,7 @@ final class NeonAnonymousTokenProvider implements DisposableNeonTokenProvider {
     return token;
   }
 
+  @override
   void close() => _client.close();
 
   static String _origin(String url) {

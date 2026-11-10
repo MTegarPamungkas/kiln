@@ -27,9 +27,7 @@ void main() {
     final response = await pipeline.execute(
       HttpRequest(
         method: HttpMethod.post,
-        uri: Uri.parse(
-          'https://user:pass@api.example.com/users?token=abc',
-        ),
+        uri: Uri.parse('https://user:pass@api.example.com/users?token=abc'),
         headers: const <String, String>{
           'Authorization': 'Bearer super-secret',
           'Content-Type': 'application/json',
@@ -59,9 +57,7 @@ void main() {
 
   test('4xx responses log a warning and 5xx an error', () async {
     final memory = MemoryLogSink();
-    final logger = PipelineLogger(
-      pipeline: SinkPipeline(<LogSink>[memory]),
-    );
+    final logger = PipelineLogger(pipeline: SinkPipeline(<LogSink>[memory]));
     var status = 404;
     final client = FakeHttpClient(
       onRequest: (request) async => HttpResponse(statusCode: status),
@@ -85,9 +81,7 @@ void main() {
       kind: FailureKind.network,
     );
     final memory = MemoryLogSink();
-    final logger = PipelineLogger(
-      pipeline: SinkPipeline(<LogSink>[memory]),
-    );
+    final logger = PipelineLogger(pipeline: SinkPipeline(<LogSink>[memory]));
     final middleware = HttpLogMiddleware(logger: logger);
     final client = FakeHttpClient(failure: failure);
 

@@ -1,6 +1,7 @@
 import 'package:kiln_core/kiln_core.dart';
 
 import 'auth_middleware.dart';
+import 'auth_request_policy.dart';
 import 'rest_account_management.dart';
 import 'rest_auth.dart';
 import 'rest_auth_config.dart';
@@ -55,12 +56,14 @@ final class RestAuthModule extends KilnModule {
 
     final pipeline = registry.readOrNull<HttpPipeline>();
     if (pipeline != null) {
+      const policy = AuthRequestPolicy(config);
       pipeline
-        ..use(AuthMiddleware(auth.tokenProvider), priority: 10)
+        ..use(AuthMiddleware(auth.tokenProvider, policy: policy), priority: 10)
         ..use(
           UnauthorizedHandler(
+            policy: policy,
             refresh: auth.refreshAccessToken,
-            signOut: auth.signOut,
+            signOut: auth.clearSession,
           ),
           priority: 11,
         );

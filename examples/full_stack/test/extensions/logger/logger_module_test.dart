@@ -5,6 +5,7 @@ import 'package:full_stack/extensions/logger/file_log_sink.dart';
 import 'package:full_stack/extensions/logger/http_log_middleware.dart';
 import 'package:full_stack/extensions/logger/logger_config.dart';
 import 'package:full_stack/extensions/logger/logger_module.dart';
+import 'package:full_stack/extensions/logger/logger_support.dart';
 import 'package:full_stack/extensions/logger/log_level_controller.dart';
 import 'package:full_stack/extensions/logger/memory_log_sink.dart';
 import 'package:full_stack/extensions/logger/sink_pipeline.dart';
@@ -22,6 +23,7 @@ void main() {
     module.register(registry);
 
     expect(registry.read<LoggerConfig>(), isA<LoggerConfig>());
+    expect(registry.read<LoggerSupport>(), isA<LoggerSupport>());
     expect(registry.read<LogLevelController>().flavor, AppFlavor.development);
     expect(registry.read<MemoryLogSink>(), isA<MemoryLogSink>());
     expect(registry.read<AppLogger>(), isA<PipelineLogger>());

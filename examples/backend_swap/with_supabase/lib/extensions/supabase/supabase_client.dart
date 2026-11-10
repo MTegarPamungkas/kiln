@@ -28,7 +28,7 @@ final class SupabaseClientProvider {
     if (client == null) {
       throw const Failure(
         code: FailureCode.configurationMissing,
-        message: 'Klien Supabase belum disiapkan. Panggil SupabaseClientProvider.load().',
+        message: 'The Supabase client is not ready. Call SupabaseClientProvider.load().',
         kind: FailureKind.configuration,
       );
     }

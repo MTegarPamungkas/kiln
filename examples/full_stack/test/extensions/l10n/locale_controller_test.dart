@@ -76,19 +76,22 @@ void main() {
       expect(controller.locale, isNull);
     });
 
-    test('persists the selection and clears it when following system', () async {
-      final storage = InMemoryStorage();
-      final store = LocaleStore(storage);
-      final controller = LocaleController(store: store);
-      addTearDown(controller.dispose);
+    test(
+      'persists the selection and clears it when following system',
+      () async {
+        final storage = InMemoryStorage();
+        final store = LocaleStore(storage);
+        final controller = LocaleController(store: store);
+        addTearDown(controller.dispose);
 
-      await controller.setLocale(const Locale('en'));
-      expect(await store.readOrNull(), const Locale('en'));
+        await controller.setLocale(const Locale('en'));
+        expect(await store.readOrNull(), const Locale('en'));
 
-      await controller.followSystem();
-      expect(await store.readOrNull(), isNull);
-      expect(storage.snapshot, isEmpty);
-    });
+        await controller.followSystem();
+        expect(await store.readOrNull(), isNull);
+        expect(storage.snapshot, isEmpty);
+      },
+    );
 
     test('works without storage', () async {
       final controller = LocaleController(

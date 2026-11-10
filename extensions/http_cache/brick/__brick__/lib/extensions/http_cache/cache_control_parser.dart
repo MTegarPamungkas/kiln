@@ -3,18 +3,22 @@ final class CacheControl {
   const CacheControl({
     this.noStore = false,
     this.noCache = false,
+    this.isPrivate = false,
     this.mustRevalidate = false,
     this.immutable = false,
     this.maxAge,
     this.staleWhileRevalidate,
+    this.staleIfError,
   });
 
   final bool noStore;
   final bool noCache;
+  final bool isPrivate;
   final bool mustRevalidate;
   final bool immutable;
   final Duration? maxAge;
   final Duration? staleWhileRevalidate;
+  final Duration? staleIfError;
 }
 
 /// Parses the Cache-Control response header.
@@ -27,10 +31,12 @@ final class CacheControlParser {
     }
     var noStore = false;
     var noCache = false;
+    var isPrivate = false;
     var mustRevalidate = false;
     var immutable = false;
     Duration? maxAge;
     Duration? staleWhileRevalidate;
+    Duration? staleIfError;
 
     for (final rawDirective in header.split(',')) {
       final directive = rawDirective.trim().toLowerCase();
@@ -43,12 +49,14 @@ final class CacheControlParser {
           : directive.substring(0, separator).trim();
       final value = separator < 0
           ? null
-          : directive.substring(separator + 1).trim();
+          : directive.substring(separator + 1).trim().replaceAll('"', '');
       switch (name) {
         case 'no-store':
           noStore = true;
         case 'no-cache':
           noCache = true;
+        case 'private':
+          isPrivate = true;
         case 'must-revalidate':
           mustRevalidate = true;
         case 'immutable':
@@ -57,6 +65,11 @@ final class CacheControlParser {
           final seconds = int.tryParse(value ?? '');
           if (seconds != null && seconds >= 0) {
             maxAge = Duration(seconds: seconds);
+          }
+        case 'stale-if-error':
+          final seconds = int.tryParse(value ?? '');
+          if (seconds != null && seconds >= 0) {
+            staleIfError = Duration(seconds: seconds);
           }
         case 'stale-while-revalidate':
           final seconds = int.tryParse(value ?? '');
@@ -69,6 +82,8 @@ final class CacheControlParser {
     return CacheControl(
       noStore: noStore,
       noCache: noCache,
+      isPrivate: isPrivate,
+      staleIfError: staleIfError,
       mustRevalidate: mustRevalidate,
       immutable: immutable,
       maxAge: maxAge,

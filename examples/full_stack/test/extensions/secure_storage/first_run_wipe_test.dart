@@ -6,8 +6,7 @@ import 'test_support.dart';
 
 void main() {
   test('wipes Keychain leftovers only on the first iOS run', () async {
-    final gateway = FakeSecureStorageGateway()
-      ..values['old.key'] = 'old';
+    final gateway = FakeSecureStorageGateway()..values['old.key'] = 'old';
     final storage = InMemoryStorage();
     final wipe = FirstRunWipe(gateway: gateway, storage: storage);
 

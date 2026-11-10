@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   kiln_core:
     path: ../../../packages/kiln_core
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.3
   supabase_flutter: ^2.18.3
 
 dev_dependencies:
@@ -60,8 +63,8 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  generate: true
   uses-material-design: true
-dependency_overrides: {kiln_core: {path: ../../../packages/kiln_core}}
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -93,3 +96,7 @@ dependency_overrides: {kiln_core: {path: ../../../packages/kiln_core}}
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+dependency_overrides:
+  kiln_core:
+    path: '../../../packages/kiln_core'

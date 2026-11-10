@@ -16,9 +16,7 @@ void main() {
         final request = HttpRequest(
           method: HttpMethod.values.byName(options.method.toLowerCase()),
           uri: Uri.parse(options.uri.toString()),
-          headers: options.headers.map(
-            (key, value) => MapEntry(key, '$value'),
-          ),
+          headers: options.headers.map((key, value) => MapEntry(key, '$value')),
           body: options.data,
         );
         final response = await responder(request);

@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 
 import 'journal.dart';
 import 'rollback.dart';
+import 'root_path.dart';
 import 'snapshot.dart';
 
 /// Applies file operations with a journal and pre-change snapshots.
@@ -29,12 +30,22 @@ final class Transaction {
   final Journal journal;
   final SnapshotStore snapshots;
 
+  /// Capture a file before a verifier or another external managed-file writer.
+  void capture(String relativePath) {
+    final target = File(RootPath(projectRoot).resolve(relativePath));
+    final existed = target.existsSync();
+    if (existed) snapshots.backup(relativePath);
+    journal.add(JournalOperation(
+      type: JournalOperationType.write, path: relativePath, existed: existed,
+    ));
+  }
+
   void writeText(String relativePath, String content) {
     writeFile(relativePath, utf8.encode(content));
   }
 
   void writeFile(String relativePath, List<int> bytes) {
-    final target = File(p.join(projectRoot.path, relativePath));
+    final target = File(RootPath(projectRoot).resolve(relativePath));
     final existed = target.existsSync();
     if (existed) {
       snapshots.backup(relativePath);
@@ -51,7 +62,8 @@ final class Transaction {
   }
 
   void renameFile(String fromPath, String toPath) {
-    final source = File(p.join(projectRoot.path, fromPath));
+    final source = File(RootPath(projectRoot).resolve(fromPath));
+    RootPath(projectRoot).resolve(toPath);
     if (!source.existsSync()) {
       return;
     }
@@ -60,7 +72,7 @@ final class Transaction {
   }
 
   void deleteFile(String relativePath) {
-    final target = File(p.join(projectRoot.path, relativePath));
+    final target = File(RootPath(projectRoot).resolve(relativePath));
     if (!target.existsSync()) {
       return;
     }

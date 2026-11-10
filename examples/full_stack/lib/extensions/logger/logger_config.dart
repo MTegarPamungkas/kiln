@@ -59,6 +59,25 @@ final class LoggerConfig {
     }
     return productionLevel;
   }
+
+  /// Returns null when valid, or a configuration [Failure] otherwise.
+  Failure? validate() {
+    if (memoryCapacity < 1) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Logger memoryCapacity must be at least one.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (maxFileBytes < 1 || maxFiles < 1) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Logger file limits must be positive.',
+        kind: FailureKind.configuration,
+      );
+    }
+    return null;
+  }
 }
 
 /// Kind of sink the module may wire into the pipeline.

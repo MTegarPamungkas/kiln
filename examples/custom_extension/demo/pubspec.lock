@@ -199,14 +199,14 @@ packages:
       path: "../../../packages/kiln_core"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   kiln_extension_sdk:
     dependency: "direct dev"
     description:
       path: "../../../packages/kiln_extension_sdk"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   lints:
     dependency: "direct dev"
     description:

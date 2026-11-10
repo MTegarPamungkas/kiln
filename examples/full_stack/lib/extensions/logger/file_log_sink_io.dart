@@ -11,6 +11,16 @@ import 'log_sink.dart';
 /// File logging is available on every platform with `dart:io`.
 const bool fileLogSinkSupported = true;
 
+/// Checks that the application documents directory is reachable.
+Future<bool> probeFileLogSink() async {
+  try {
+    await getApplicationDocumentsDirectory();
+    return true;
+  } on Object {
+    return false;
+  }
+}
+
 /// Writes formatted records to a rotating file.
 ///
 /// Files live in [directoryPath] when supplied, otherwise in a `logs` folder
@@ -123,9 +133,7 @@ final class FileLogSink implements LogSink {
       directory = Directory(path);
     } else {
       final documents = await getApplicationDocumentsDirectory();
-      directory = Directory(
-        '${documents.path}${Platform.pathSeparator}logs',
-      );
+      directory = Directory('${documents.path}${Platform.pathSeparator}logs');
     }
     await directory.create(recursive: true);
     final current = File(_pathIn(directory, fileName));

@@ -48,15 +48,15 @@ void main() {
 
   test('AppRadius clamps negative bases and is a ThemeExtension', () {
     final theme = ThemeData(
-      extensions: <ThemeExtension<dynamic>>[
-        AppRadius.fromCornerRadius(-4),
-      ],
+      extensions: <ThemeExtension<dynamic>>[AppRadius.fromCornerRadius(-4)],
     );
 
     expect(theme.extension<AppRadius>()?.md, 0);
     expect(AppRadius.fromCornerRadius(10).copyWith(lg: 30).lg, 30);
     expect(
-      AppRadius.fromCornerRadius(10).lerp(AppRadius.fromCornerRadius(20), 0.5).md,
+      AppRadius.fromCornerRadius(10)
+          .lerp(AppRadius.fromCornerRadius(20), 0.5)
+          .md,
       15,
     );
   });

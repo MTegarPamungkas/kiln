@@ -74,19 +74,22 @@ void main() {
     await bloc.close();
   });
 
-  test('removing an unknown id keeps the list and reports the failure', () async {
-    final bloc = _buildBloc(NotesRepositoryImpl(InMemoryNotesDatasource()));
-    await _until(() => !bloc.state.isLoading);
+  test(
+    'removing an unknown id keeps the list and reports the failure',
+    () async {
+      final bloc = _buildBloc(NotesRepositoryImpl(InMemoryNotesDatasource()));
+      await _until(() => !bloc.state.isLoading);
 
-    bloc.add(const NoteRemoved('missing'));
-    await _until(() => bloc.state.hasProblem);
+      bloc.add(const NoteRemoved('missing'));
+      await _until(() => bloc.state.hasProblem);
 
-    expect(bloc.state.problem?.code, FailureCode.databaseNotFound);
-    expect(bloc.state.notes, hasLength(2));
+      expect(bloc.state.problem?.code, FailureCode.databaseNotFound);
+      expect(bloc.state.notes, hasLength(2));
 
-    bloc.add(const NoteRemoved('1'));
-    await _until(() => bloc.state.notes.length == 1);
-    expect(bloc.state.notes.single.body, 'Wire a real datasource');
-    await bloc.close();
-  });
+      bloc.add(const NoteRemoved('1'));
+      await _until(() => bloc.state.notes.length == 1);
+      expect(bloc.state.notes.single.body, 'Wire a real datasource');
+      await bloc.close();
+    },
+  );
 }

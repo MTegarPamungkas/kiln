@@ -5,11 +5,9 @@ import 'env_schema.dart';
 
 /// [Env] backed by compiled `--dart-define` values.
 final class BuildEnv implements Env {
-  BuildEnv({
-    EnvSchema? schema,
-    Map<String, String>? values,
-  }) : schema = schema ?? EnvSchema.defaults,
-       _values = values ?? BuildEnvValues.values;
+  BuildEnv({EnvSchema? schema, Map<String, String>? values})
+    : schema = schema ?? EnvSchema.defaults,
+      _values = values ?? BuildEnvValues.values;
 
   final EnvSchema schema;
   final Map<String, String> _values;
@@ -32,7 +30,8 @@ final class BuildEnv implements Env {
   Map<String, String> get values {
     return <String, String>{
       for (final key in schema.keys)
-        if (_values[key.name] != null) key.name: _values[key.name]!,
+        if (_values[key.name]?.isNotEmpty ?? false)
+          key.name: _values[key.name]!,
     };
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_initializing_formals
+
 import 'package:kiln_core/kiln_core.dart';
 
 import 'neon_auth_gateway.dart';

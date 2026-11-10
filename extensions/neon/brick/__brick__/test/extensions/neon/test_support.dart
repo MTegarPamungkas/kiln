@@ -195,11 +195,8 @@ NeonConfig testConfig({Duration watchInterval = const Duration(milliseconds: 5)}
 /// Object Storage configuration used by the fake gateway (no network).
 NeonStorageConfig testStorageConfig() {
   return const NeonStorageConfig(
-    endpoint: 'https://demo.storage.c-us-east-2.aws.neon.tech',
+    signingUrl: 'https://signing.example.test/storage/sign',
     bucket: 'files',
-    region: 'us-east-2',
-    accessKeyId: 'token-id',
-    secretAccessKey: 's3-secret',
   );
 }
 

@@ -570,4 +570,111 @@ void main() {
       );
     });
   });
+
+  group('ExtensionInstaller dependency ownership', () {
+    late Directory project;
+
+    setUp(() async {
+      project = await copyProjectFixture('fresh_app');
+    });
+
+    tearDown(() async {
+      await project.delete(recursive: true);
+    });
+
+    test('remove keeps a dependency the user already had', () async {
+      final pubspec = File('${project.path}/pubspec.yaml');
+      pubspec.writeAsStringSync(
+        pubspec.readAsStringSync().replaceFirst(
+          'dependencies:',
+          'dependencies:\n  demo_pkg: ^0.9.0',
+        ),
+      );
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+      );
+
+      await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+      expect(pubspec.readAsStringSync(), contains('demo_pkg: ^0.9.0'));
+
+      final result = await installer.remove(id: 'demo');
+
+      expect(result.removedDependencies, isNot(contains('demo_pkg')));
+      expect(pubspec.readAsStringSync(), contains('demo_pkg: ^0.9.0'));
+      expect(LockfileStore(project).read().ownedDependencies, isEmpty);
+    });
+
+    test('remove keeps a dependency whose constraint the user edited', () async {
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+      );
+      await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+      final pubspec = File('${project.path}/pubspec.yaml');
+      pubspec.writeAsStringSync(
+        pubspec.readAsStringSync().replaceFirst(
+          'demo_pkg: ^1.0.0',
+          'demo_pkg: ^1.5.0',
+        ),
+      );
+
+      final result = await installer.remove(id: 'demo');
+
+      expect(result.removedDependencies, isNot(contains('demo_pkg')));
+      expect(pubspec.readAsStringSync(), contains('demo_pkg: ^1.5.0'));
+    });
+
+    test('remove deletes a dependency only when Kiln added it unchanged', () async {
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+      );
+      await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+      final pubspec = File('${project.path}/pubspec.yaml');
+      expect(pubspec.readAsStringSync(), contains('demo_pkg: ^1.0.0'));
+
+      final result = await installer.remove(id: 'demo');
+
+      expect(result.removedDependencies, contains('demo_pkg'));
+      expect(pubspec.readAsStringSync(), isNot(contains('demo_pkg')));
+    });
+
+    test('dev dependencies follow the same provenance rule', () async {
+      final extension = makeExtension(
+        id: 'demo',
+        provides: const ['demo'],
+        devDependencies: const {'demo_dev': '^2.0.0'},
+        bundle: bundleFromFixture('tiny_brick'),
+      );
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [extension],
+      );
+      await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        options: const InstallOptions(verify: false),
+      );
+      final pubspec = File('${project.path}/pubspec.yaml');
+      expect(pubspec.readAsStringSync(), contains('demo_dev: ^2.0.0'));
+
+      final result = await installer.remove(id: 'demo');
+
+      expect(result.removedDependencies, contains('demo_dev'));
+      expect(pubspec.readAsStringSync(), isNot(contains('demo_dev')));
+    });
+  });
 }

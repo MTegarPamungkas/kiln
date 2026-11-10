@@ -19,9 +19,7 @@ Directory findRepoRoot() {
 
 void main() {
   test('rendered output passes flutter analyze', () async {
-    final harness = ExtensionTestHarness(
-      extensionRoot: Directory.current,
-    );
+    final harness = ExtensionTestHarness(extensionRoot: Directory.current);
     final files = await harness.render(
       project: const {'name': 'demo_analyze'},
       answers: const {'app_name': 'demo_analyze'},

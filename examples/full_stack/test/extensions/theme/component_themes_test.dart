@@ -69,7 +69,10 @@ void main() {
     expect(theme.snackBarTheme.backgroundColor, colors.inverseSurface);
     expect(theme.snackBarTheme.shape, isA<RoundedRectangleBorder>());
     expect(theme.navigationBarTheme.height, 68);
-    expect(theme.navigationBarTheme.backgroundColor, colors.surfaceContainerLow);
+    expect(
+      theme.navigationBarTheme.backgroundColor,
+      colors.surfaceContainerLow,
+    );
     expect(theme.navigationBarTheme.indicatorColor, colors.secondaryContainer);
   });
 

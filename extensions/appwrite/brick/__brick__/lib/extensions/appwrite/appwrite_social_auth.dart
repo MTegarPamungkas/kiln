@@ -1,5 +1,7 @@
 import 'dart:async';
 
+// ignore_for_file: prefer_initializing_formals
+
 import 'package:kiln_core/kiln_core.dart';
 
 import 'appwrite_account.dart';

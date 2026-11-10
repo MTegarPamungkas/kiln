@@ -14,7 +14,13 @@ import 'registry_index.dart';
 final class RegistryClient {
   RegistryClient({required this.config, http.Client? httpClient, this.cache})
     : _http = httpClient ?? http.Client(),
-      _ownsHttpClient = httpClient == null;
+      _ownsHttpClient = httpClient == null {
+    if (cache != null && cache!.registryIdentity != config.identity) {
+      throw const KilnStoreException(
+        'Cache belongs to a different registry.', code: 'store.invalid_config',
+      );
+    }
+  }
 
   final RegistryConfig config;
   final LocalCache? cache;

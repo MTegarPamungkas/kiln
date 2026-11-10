@@ -24,9 +24,7 @@ void main() {
   test('runGuarded converts a throw into an Err', () async {
     final bloc = _TestBloc();
 
-    final result = await bloc.runGuarded<int>(
-      () => throw StateError('boom'),
-    );
+    final result = await bloc.runGuarded<int>(() => throw StateError('boom'));
 
     expect(result, isA<Err<int>>());
     expect(result.failureOrNull, isA<Failure>());

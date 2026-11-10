@@ -62,7 +62,7 @@ final class RestAccountManagement implements AccountManagement {
     if (path.isEmpty) {
       throw const Failure(
         code: FailureCode.configurationMissing,
-        message: 'Endpoint ini belum dikonfigurasi.',
+        message: 'This endpoint is not configured.',
         kind: FailureKind.configuration,
       );
     }

@@ -10,7 +10,8 @@ class DioClient implements HttpClient {
     Dio? dio,
     DioConfig config = DioConfig.defaults,
     HttpPipeline? pipeline,
-  }) : _dio = dio ??
+  }) : _dio =
+           dio ??
            Dio(
              BaseOptions(
                baseUrl: config.baseUrl,
@@ -19,9 +20,11 @@ class DioClient implements HttpClient {
                headers: config.defaultHeaders,
              ),
            ),
+       _config = config,
        _pipeline = pipeline ?? HttpPipeline();
 
   final Dio _dio;
+  final DioConfig _config;
   final HttpPipeline _pipeline;
 
   /// Transport access for helpers in this extension (multipart and download).
@@ -48,28 +51,72 @@ class DioClient implements HttpClient {
   Future<HttpResponse> _send(HttpRequest request) async {
     request.cancelToken?.throwIfCancelled();
     final startedAt = DateTime.now();
-    final response = await _dio.fetch<Object?>(
-      RequestOptions(
-        path: request.resolvedUri.toString(),
-        method: request.method.name.toUpperCase(),
-        headers: <String, dynamic>{
-          ..._dio.options.headers,
-          ...request.headers,
-        },
-        data: request.body,
-      ),
-    );
+    final authorized = _withApiKey(request);
+    final uri = _resolveUri(authorized.resolvedUri);
+    try {
+      final response = await _dio.fetch<Object?>(
+        RequestOptions(
+          path: uri.toString(),
+          method: authorized.method.name.toUpperCase(),
+          headers: <String, dynamic>{
+            ..._dio.options.headers,
+            ...authorized.headers,
+          },
+          data: authorized.body,
+        ),
+      );
 
-    return HttpResponse(
-      statusCode: response.statusCode ?? 0,
-      data: response.data,
-      headers: <String, List<String>>{
-        for (final entry in response.headers.map.entries)
-          entry.key: entry.value,
-      },
-      requestUri: request.resolvedUri,
-      duration: DateTime.now().difference(startedAt),
-    );
+      return HttpResponse(
+        statusCode: response.statusCode ?? 0,
+        data: response.data,
+        headers: <String, List<String>>{
+          for (final entry in response.headers.map.entries)
+            entry.key: entry.value,
+        },
+        requestUri: uri,
+        duration: DateTime.now().difference(startedAt),
+      );
+    } on DioException catch (error) {
+      // Middleware must see the shared Failure so retry policies can react.
+      throw mapDioException(error);
+    }
+  }
+
+  Uri _resolveUri(Uri uri) {
+    if (uri.hasScheme) {
+      return uri;
+    }
+    final baseUrl = _dio.options.baseUrl;
+    if (baseUrl.isEmpty) {
+      return uri;
+    }
+    final base = baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
+    final relative = uri.toString().replaceFirst(RegExp(r'^/+'), '');
+    return Uri.parse('$base$relative');
+  }
+
+  HttpRequest _withApiKey(HttpRequest request) {
+    final key = _config.apiKey;
+    if (!_config.hasApiKey) {
+      return request;
+    }
+    if (_config.apiKeyHeader.isNotEmpty) {
+      return request.copyWith(
+        headers: <String, String>{
+          ...request.headers,
+          _config.apiKeyHeader: '${_config.apiKeyPrefix}$key',
+        },
+      );
+    }
+    if (_config.apiKeyQueryParameter.isNotEmpty) {
+      return request.copyWith(
+        queryParameters: <String, Object?>{
+          ...?request.queryParameters,
+          _config.apiKeyQueryParameter: key,
+        },
+      );
+    }
+    return request;
   }
 
   @override

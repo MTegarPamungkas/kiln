@@ -1,13 +1,18 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:full_stack/core/error/failure_presenter.dart';
 import 'package:full_stack/core/l10n/app_localizations_config.dart';
+import 'package:full_stack/core/l10n/core_copy.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import 'failure_messages.dart';
 import 'l10n_config.dart';
+import 'l10n_support.dart';
 import 'locale_controller.dart';
 import 'locale_formatters.dart';
 import 'locale_store.dart';
+import 'localized_core_copy.dart';
 
 /// Registers ARB-backed localizations, locale control, and failure messages.
 final class L10nModule extends KilnModule {
@@ -30,13 +35,18 @@ final class L10nModule extends KilnModule {
     final controller = LocaleController(config: config, store: store);
     final messages = L10nFailureMessages(
       config: config,
-      resolveLocale: () => controller.locale,
+      resolveLocale: () =>
+          controller.locale ?? PlatformDispatcher.instance.locale,
     );
 
     registry
       ..registerSingleton<L10nConfig>(config)
+      ..registerSingleton<L10nSupport>(
+        L10nSupport(config: config, persisted: store != null),
+      )
       ..registerSingleton<LocaleController>(controller)
       ..registerSingleton<FailureMessages>(messages)
+      ..registerSingleton<CoreCopy>(const LocalizedCoreCopy())
       ..registerSingleton<AppLocalizationsConfig>(
         AppLocalizationsConfig(
           delegates: AppLocalizations.localizationsDelegates,
@@ -49,6 +59,11 @@ final class L10nModule extends KilnModule {
     if (store != null) {
       registry.registerSingleton<LocaleStore>(store);
     }
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<L10nSupport>().info;
   }
 
   @override

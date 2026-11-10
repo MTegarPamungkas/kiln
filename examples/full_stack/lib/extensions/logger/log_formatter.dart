@@ -69,10 +69,7 @@ final class LogFormatter {
   }
 
   Object? _jsonSafe(Object? value) {
-    if (value == null ||
-        value is String ||
-        value is num ||
-        value is bool) {
+    if (value == null || value is String || value is num || value is bool) {
       return value;
     }
     if (value is DateTime) {
@@ -80,7 +77,8 @@ final class LogFormatter {
     }
     if (value is Map) {
       return <String, Object?>{
-        for (final entry in value.entries) '${entry.key}': _jsonSafe(entry.value),
+        for (final entry in value.entries)
+          '${entry.key}': _jsonSafe(entry.value),
       };
     }
     if (value is Iterable) {

@@ -31,6 +31,14 @@ final class AppwriteConfig {
 
   Uri get endpointUri => Uri.parse(endpoint);
 
+  /// Whether the endpoint uses cleartext http, as self-hosted Appwrite often does.
+  bool get isInsecureTransport =>
+      Uri.tryParse(endpoint)?.isScheme('http') ?? false;
+
+  /// Callback URL scheme Appwrite always accepts for OAuth redirects. The SDK
+  /// reads the session secret from the deep link that reopens the app here.
+  String get oAuthSuccessUrl => 'appwrite-callback-$projectId://';
+
   /// Rejects values the Appwrite client cannot be built from.
   void validate() {
     final uri = Uri.tryParse(endpoint);

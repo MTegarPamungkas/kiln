@@ -58,10 +58,14 @@ final class RestTokenStore {
     final refreshToken = tokens.refreshToken;
     if (refreshToken != null && refreshToken.isNotEmpty) {
       await storage.write(_refreshKey, refreshToken);
+    } else {
+      await storage.delete(_refreshKey);
     }
     final expiresAt = tokens.expiresAt;
     if (expiresAt != null) {
       await storage.write(_expiresKey, expiresAt.toUtc().toIso8601String());
+    } else {
+      await storage.delete(_expiresKey);
     }
   }
 
@@ -90,9 +94,11 @@ final class RestTokenStore {
   }
 
   Future<void> clear() async {
-    await storage.delete(_accessKey);
-    await storage.delete(_refreshKey);
-    await storage.delete(_expiresKey);
-    await storage.delete(_userKey);
+    await Future.wait(<Future<void>>[
+      storage.delete(_accessKey),
+      storage.delete(_refreshKey),
+      storage.delete(_expiresKey),
+      storage.delete(_userKey),
+    ]);
   }
 }

@@ -39,7 +39,7 @@ final class SupabaseRemoteDatabase implements RemoteDatabase {
     if (!row.containsKey('id')) {
       throw const Failure(
         code: FailureCode.remoteDatabaseQueryFailed,
-        message: 'Tabel tujuan tidak mengembalikan kolom id.',
+        message: 'The target table did not return an id column.',
         kind: FailureKind.database,
       );
     }
@@ -174,14 +174,14 @@ final class SupabaseRemoteDatabase implements RemoteDatabase {
   }
 
   void _validateCollection(String collection) {
-    _mapper.validateIdentifier(collection, label: 'tabel');
+    _mapper.validateIdentifier(collection, label: 'table');
   }
 
   void _validateId(String id) {
     if (id.trim().isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Id dokumen tidak boleh kosong.',
+        message: 'The document id cannot be empty.',
         kind: FailureKind.validation,
       );
     }
@@ -190,7 +190,7 @@ final class SupabaseRemoteDatabase implements RemoteDatabase {
   Failure _notFound(String collection, String id) {
     return Failure(
       code: FailureCode.remoteDatabaseNotFound,
-      message: 'Dokumen "$id" tidak ada di "$collection".',
+      message: 'Document "$id" does not exist in "$collection".',
       kind: FailureKind.database,
       details: <String, Object?>{'collection': collection, 'id': id},
     );

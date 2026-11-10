@@ -30,7 +30,7 @@ final class SupabaseAccountManagement implements AccountManagement {
     if (!_looksLikeEmail(value)) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Alamat email tidak valid.',
+        message: 'The email address is not valid.',
         kind: FailureKind.validation,
       );
     }
@@ -58,7 +58,7 @@ final class SupabaseAccountManagement implements AccountManagement {
     if (value.isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Nama tampilan tidak boleh kosong.',
+        message: 'The display name cannot be empty.',
         kind: FailureKind.validation,
       );
     }
@@ -73,14 +73,12 @@ final class SupabaseAccountManagement implements AccountManagement {
     if (value != null && value.isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'URL foto tidak boleh berupa teks kosong; pakai null untuk menghapus.',
+        message: 'The photo URL cannot be empty text; use null to clear it.',
         kind: FailureKind.validation,
       );
     }
     await _call(
-      () => _gateway.updateUser(
-        data: <String, Object?>{'avatar_url': value},
-      ),
+      () => _gateway.updateUser(data: <String, Object?>{'avatar_url': value}),
     );
   }
 

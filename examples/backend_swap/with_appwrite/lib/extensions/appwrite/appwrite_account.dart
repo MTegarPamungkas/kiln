@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart' as models;
+import 'package:http/http.dart' as http;
+import 'package:kiln_core/kiln_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// User fields the extension needs, independent of the Appwrite models.
 final class AppwriteAccountUser {
@@ -84,6 +90,16 @@ abstract interface class AppwriteAccount {
 
   Future<void> signOut();
 
+  /// Starts an Appwrite OAuth2 session for [provider].
+  ///
+  /// Launches the provider flow in the browser; on native the resulting session
+  /// is delivered through the [successUrl] deep link and captured by the SDK.
+  Future<void> createOAuth2Session({
+    required SocialProvider provider,
+    required String successUrl,
+    String? failureUrl,
+  });
+
   Future<void> sendPasswordResetEmail(
     String email, {
     required String redirectUrl,
@@ -101,16 +117,38 @@ abstract interface class AppwriteAccount {
 
 /// [AppwriteAccount] on top of the Appwrite `Account` service.
 final class SdkAppwriteAccount implements AppwriteAccount {
-  SdkAppwriteAccount({required this.account});
+  SdkAppwriteAccount({required this.account, this.client});
 
   final Account account;
 
+  /// Shared client that must carry the session header for follow-up calls.
+  final Client? client;
+
+  static const _sessionCookieKey = 'kiln.appwrite.session.cookie';
+  Client get _transport => client ?? account.client;
+  String get _signedOutKey =>
+      'kiln.appwrite.signedOut.${_transport.endPoint}.${_transport.config['project']}';
+  bool _locallySignedOut = false;
+
+  Future<bool> _isSignedOut() async =>
+      _locallySignedOut ||
+      (await SharedPreferences.getInstance()).getBool(_signedOutKey) == true;
+
+  Future<void> _allowSession() async {
+    await (await SharedPreferences.getInstance()).remove(_signedOutKey);
+    _locallySignedOut = false;
+  }
+
   @override
   Future<AppwriteAccountUser?> currentUser() async {
+    if (await _isSignedOut()) return null;
+    await _restoreCookie();
     try {
-      return _fromUser(await account.get());
+      final user = await account.get();
+      return await _isSignedOut() ? null : _fromUser(user);
     } on AppwriteException catch (error) {
       if (error.code == 401) {
+        await _clearCookie();
         return null;
       }
       rethrow;
@@ -122,15 +160,93 @@ final class SdkAppwriteAccount implements AppwriteAccount {
     required String email,
     required String password,
   }) async {
-    final session = await account.createEmailPasswordSession(
-      email: email,
-      password: password,
-    );
+    final session = await _createSession(email: email, password: password);
     final user = await account.get();
-    return AppwriteAuthResult(
-      user: _fromUser(user),
-      session: _fromSession(session),
+    await _allowSession();
+    return AppwriteAuthResult(user: _fromUser(user), session: session);
+  }
+
+  /// Creates an email session and forwards its cookie as a session header.
+  ///
+  /// The Flutter SDK persists cookies asynchronously and its cookie jar does
+  /// not survive plain-HTTP endpoints reliably, so the encoded session cookie
+  /// is attached explicitly. The server accepts the same value through
+  /// `X-Appwrite-Session` for SSR clients.
+  Future<AppwriteAccountSession> _createSession({
+    required String email,
+    required String password,
+  }) async {
+    final shared = client;
+    final project = shared?.config['project'] ?? '';
+    if (shared == null || project.isEmpty) {
+      final session = await account.createEmailPasswordSession(
+        email: email,
+        password: password,
+      );
+      return _fromSession(session);
+    }
+
+    final response = await http.post(
+      Uri.parse('${shared.endPoint}/account/sessions/email'),
+      headers: <String, String>{
+        'X-Appwrite-Project': project,
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, String>{'email': email, 'password': password}),
     );
+    if (response.statusCode != 201) {
+      throw AppwriteException(
+        _responseMessage(response.body),
+        response.statusCode,
+      );
+    }
+
+    final cookie = _sessionCookie(response.headers['set-cookie'], project);
+    if (cookie == null) {
+      throw AppwriteException(
+        'Session cookie missing from the login response.',
+        500,
+      );
+    }
+    shared.setSession(cookie);
+    await _persistCookie(cookie);
+
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    return AppwriteAccountSession(
+      id: (json[r'$id'] as String?) ?? '',
+      userId: (json['userId'] as String?) ?? '',
+      expiresAt: DateTime.tryParse((json['expire'] as String?) ?? ''),
+    );
+  }
+
+  String? _sessionCookie(String? setCookie, String project) {
+    if (setCookie == null) {
+      return null;
+    }
+    final name = 'a_session_$project';
+    for (final part in setCookie.split(RegExp(r',(?=[^ ])'))) {
+      final cookie = part.trim();
+      if (!cookie.startsWith('$name=')) {
+        continue;
+      }
+      final value = cookie.substring(name.length + 1).split(';').first;
+      if (value.isNotEmpty) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  String _responseMessage(String body) {
+    try {
+      final json = jsonDecode(body);
+      if (json is Map<String, dynamic> && json['message'] is String) {
+        return json['message'] as String;
+      }
+    } on FormatException {
+      // Fall through to the raw body.
+    }
+    return body.isEmpty ? 'Login failed.' : body;
   }
 
   @override
@@ -150,13 +266,86 @@ final class SdkAppwriteAccount implements AppwriteAccount {
 
   @override
   Future<void> signOut() async {
+    Object? cleanupError;
+    _locallySignedOut = true;
     try {
       await account.deleteSessions(current: true);
-    } on AppwriteException catch (error) {
-      if (error.code != 401) {
-        rethrow;
+    } on Object {
+      // Revocation is best-effort; local logout must work offline.
+    } finally {
+      for (final shared in {_transport, account.client}) {
+        shared
+          ..setSession('')
+          ..setCookie('')
+          ..setJWT('')
+          ..setBearer('');
+      }
+      try {
+        await Future.wait<void>([_rememberSignOut(), _clearCookie()]);
+      } on Object catch (error) {
+        cleanupError = error;
       }
     }
+    if (cleanupError != null) {
+      throw Failure(
+        code: FailureCode.unavailable,
+        message: 'Local Appwrite session cleanup could not be completed.',
+        kind: FailureKind.authentication,
+        cause: cleanupError,
+        details: const <String, Object?>{'localCleanupFailed': true},
+      );
+    }
+  }
+
+  Future<void> _rememberSignOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_signedOutKey, true);
+  }
+
+  @override
+  Future<void> createOAuth2Session({
+    required SocialProvider provider,
+    required String successUrl,
+    String? failureUrl,
+  }) async {
+    // A new sign-in attempt overrides an earlier local logout marker.
+    await _allowSession();
+    return account.createOAuth2Session(
+      provider: _oauthProvider(provider),
+      success: successUrl,
+      failure: failureUrl,
+    );
+  }
+
+  static OAuthProvider _oauthProvider(SocialProvider provider) =>
+      switch (provider) {
+        SocialProvider.google => OAuthProvider.google,
+        SocialProvider.apple => OAuthProvider.apple,
+      };
+
+  Future<void> _persistCookie(String cookie) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_sessionCookieKey, cookie);
+  }
+
+  Future<void> _restoreCookie() async {
+    final shared = client;
+    if (shared == null) {
+      return;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    final cookie = prefs.getString(_sessionCookieKey) ?? '';
+    if (cookie.isNotEmpty) {
+      shared.setSession(cookie);
+    }
+  }
+
+  Future<void> _clearCookie() async {
+    if (client == null) {
+      return;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_sessionCookieKey);
   }
 
   @override

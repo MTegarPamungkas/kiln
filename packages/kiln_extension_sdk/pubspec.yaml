@@ -1,6 +1,6 @@
 name: kiln_extension_sdk
 description: Manifest parsing, resolution, rendering, installation, and migration for Kiln extensions.
-version: 0.1.0
+version: 0.1.1
 publish_to: none
 
 environment:

@@ -4,58 +4,45 @@ import 'package:kiln_core/kiln_core.dart';
 Failure mapRestResponse(HttpResponse response) {
   final message = _message(response.data);
   final status = response.statusCode;
-  if (status == 400 || status == 422) {
-    return Failure(
-      code: FailureCode.validationInvalidInput,
-      message: message ?? 'Data yang dikirim tidak valid.',
-      kind: FailureKind.validation,
-      details: <String, Object?>{'status': status},
-    );
-  }
   if (status == 401) {
     return Failure(
       code: FailureCode.authSessionExpired,
-      message: message ?? 'Sesi berakhir. Silakan masuk kembali.',
+      message: message ?? 'The session expired. Please sign in again.',
       kind: FailureKind.authentication,
       details: <String, Object?>{'status': status},
     );
   }
-  if (status == 403) {
+  if (status == 400 || status == 422) {
     return Failure(
-      code: FailureCode.authUnauthorized,
-      message: message ?? 'Akses ditolak.',
-      kind: FailureKind.authorization,
-      details: <String, Object?>{'status': status},
-    );
-  }
-  if (status == 404) {
-    return Failure(
-      code: FailureCode.unavailable,
-      message: message ?? 'Endpoint tidak ditemukan.',
-      kind: FailureKind.unavailable,
+      code: FailureCode.validationInvalidInput,
+      message: message ?? 'The submitted data is not valid.',
+      kind: FailureKind.validation,
       details: <String, Object?>{'status': status},
     );
   }
   if (status == 409) {
     return Failure(
       code: FailureCode.validationInvalidInput,
-      message: message ?? 'Data sudah dipakai.',
+      message: message ?? 'The data has already been used.',
       kind: FailureKind.validation,
       details: <String, Object?>{'status': status},
     );
   }
-  if (status == 429 || status >= 500) {
-    return Failure(
-      code: FailureCode.networkServer,
-      message: message ?? 'Server sedang sibuk.',
-      kind: FailureKind.network,
-      isRetryable: true,
+  if (status == 403 || status == 404 || status == 429 || status >= 500) {
+    final fallback = switch (status) {
+      403 => 'Akses ditolak.',
+      404 => 'The endpoint was not found.',
+      _ => 'Server sedang sibuk.',
+    };
+    return mapHttpStatusToFailure(
+      status,
+      message: message ?? fallback,
       details: <String, Object?>{'status': status},
     );
   }
   return Failure(
     code: FailureCode.unexpected,
-    message: message ?? 'Permintaan gagal (status $status).',
+    message: message ?? 'The request failed (status $status).',
     kind: FailureKind.unknown,
     details: <String, Object?>{'status': status},
   );
@@ -66,7 +53,7 @@ Failure mapCredentialResponse(HttpResponse response) {
   if (response.statusCode == 401) {
     return Failure(
       code: FailureCode.authInvalidCredentials,
-      message: _message(response.data) ?? 'Email atau kata sandi salah.',
+      message: _message(response.data) ?? 'The email or password is incorrect.',
       kind: FailureKind.authentication,
       details: <String, Object?>{'status': response.statusCode},
     );

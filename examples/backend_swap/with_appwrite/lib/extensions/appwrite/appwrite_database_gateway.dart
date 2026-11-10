@@ -31,10 +31,7 @@ abstract interface class AppwriteDatabaseGateway {
 /// Appwrite 1.8 renamed documents in collections to rows in tables; the
 /// [RemoteDatabase] collection argument is used as the table id.
 final class SdkAppwriteDatabaseGateway implements AppwriteDatabaseGateway {
-  SdkAppwriteDatabaseGateway({
-    required this.tables,
-    required this.databaseId,
-  });
+  SdkAppwriteDatabaseGateway({required this.tables, required this.databaseId});
 
   final TablesDB tables;
   final String databaseId;

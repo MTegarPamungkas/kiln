@@ -8,8 +8,10 @@ Two Kiln apps with the same feature code and different backend extensions:
 | `with_supabase` | `supabase` | auth, social auth, remote database, file storage |
 
 Everything under `lib/features/notes/` is byte-for-byte identical in both apps,
-as is `lib/main.dart`. Only `lib/extensions/` differs. That is the point of the
-example: swapping the backend never touches feature code.
+as are `lib/main.dart`, `lib/app/`, and `lib/core/`. The backend, its
+dependencies (`pubspec.yaml`), and the extension answers in `kiln.yaml` differ.
+That is the point of the example: swapping the backend never touches feature
+code.
 
 The feature follows the same clean-architecture folders that the `bloc` and
 `riverpod` extensions install (see `ARCHITECTURE.md` in a state-enabled app),

@@ -11,9 +11,11 @@ import 'appwrite_file_storage.dart';
 import 'appwrite_remote_database.dart';
 import 'appwrite_realtime_gateway.dart';
 import 'appwrite_session_bridge.dart';
+import 'appwrite_social_auth.dart';
 import 'appwrite_storage_gateway.dart';
+import 'appwrite_support.dart';
 
-/// Registers AuthRepository, RemoteDatabase, and FileStorage for Appwrite.
+/// Registers AuthRepository, SocialAuth, RemoteDatabase, and FileStorage for Appwrite.
 final class AppwriteModule extends KilnModule {
   AppwriteModule({
     this.config = AppwriteConfig.defaults,
@@ -32,6 +34,7 @@ final class AppwriteModule extends KilnModule {
 
   AppwriteSessionBridge? _bridge;
   AppwriteRealtimeGateway? _realtime;
+  AppwriteAuth? _auth;
 
   @override
   String get id => 'appwrite';
@@ -39,21 +42,32 @@ final class AppwriteModule extends KilnModule {
   @override
   Set<String> get provides => const <String>{
     'auth',
+    'social_auth',
     'remote_database',
     'file_storage',
   };
 
   @override
   void register(Registry registry) {
+    final support = AppwriteSupport(config: config);
     final client = clientFactory.create(config: config, flavor: flavor);
-    final account = SdkAppwriteAccount(account: appwrite.Account(client));
+    final account = SdkAppwriteAccount(
+      account: appwrite.Account(client),
+      client: client,
+    );
     final tokens = AppwriteTokenProvider(account: account);
     final bridge = AppwriteSessionBridge(
       controller: registry.readOrNull<SessionController>(),
       tokenProvider: tokens,
     );
     final auth = AppwriteAuth(account: account, bridge: bridge);
+    _auth = auth;
     final accountManagement = AppwriteAccountManagement(account: account);
+    final social = AppwriteSocialAuth(
+      account: account,
+      config: config,
+      bridge: bridge,
+    );
 
     final databaseGateway = SdkAppwriteDatabaseGateway(
       tables: appwrite.TablesDB(client),
@@ -82,11 +96,35 @@ final class AppwriteModule extends KilnModule {
 
     registry
       ..registerSingleton<AppwriteConfig>(config)
+      ..registerSingleton<AppwriteSupport>(support)
       ..registerSingleton<AuthRepository>(auth)
+      ..registerSingleton<AppwriteSocialAuth>(social)
+      ..registerSingleton<SocialAuth>(social)
       ..registerSingleton<AccountManagement>(accountManagement)
       ..registerSingleton<RemoteDatabase>(database)
       ..registerSingleton<FileStorage>(storage)
       ..registerSingleton<TokenProvider>(tokens);
+  }
+
+  @override
+  SupportInfo support(Registry registry) {
+    return registry.read<AppwriteSupport>().info;
+  }
+
+  @override
+  Future<void> ready(Registry registry) async {
+    try {
+      await _auth?.restoreSession();
+    } on Object catch (error) {
+      registry.readOrNull<SupportRegistry>()?.record(
+        id,
+        SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Appwrite session restore failed: $error',
+          details: <String, Object?>{'error': '$error'},
+        ),
+      );
+    }
   }
 
   @override

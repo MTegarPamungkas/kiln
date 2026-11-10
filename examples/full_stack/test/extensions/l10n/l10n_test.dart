@@ -4,9 +4,7 @@ import 'package:full_stack/l10n/generated/app_localizations.dart';
 
 void main() {
   test('generated localizations load ARB messages per locale', () async {
-    final indonesian = await AppLocalizations.delegate.load(
-      const Locale('id'),
-    );
+    final indonesian = await AppLocalizations.delegate.load(const Locale('id'));
     final english = await AppLocalizations.delegate.load(const Locale('en'));
 
     expect(indonesian.readyTitle, 'Aplikasi siap');

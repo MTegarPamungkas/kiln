@@ -66,7 +66,7 @@ final class SupabaseLinkHandler {
     if (error != null && error.isNotEmpty) {
       throw Failure(
         code: FailureCode.authUnauthorized,
-        message: 'Callback Supabase gagal: $error',
+        message: 'The Supabase callback failed: $error',
         kind: FailureKind.authentication,
         details: <String, Object?>{
           if (parameters['error_code'] != null)

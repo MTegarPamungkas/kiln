@@ -32,10 +32,7 @@ void main() {
     expect(decoded['level'], 'error');
     expect(decoded['message'], 'request failed');
     expect(decoded['error'], contains('boom'));
-    expect(decoded['data'], <String, Object?>{
-      'url': '/users',
-      'attempt': 2,
-    });
+    expect(decoded['data'], <String, Object?>{'url': '/users', 'attempt': 2});
     expect(formatter.formatJson(record), isNot(contains('\n')));
   });
 

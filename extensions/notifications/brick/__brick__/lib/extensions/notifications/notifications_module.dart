@@ -12,7 +12,9 @@ import 'timezone_resolver.dart';
 
 /// Registers Notifications, its channels, and the timezone resolver.
 final class NotificationsModule extends KilnModule {
-  const NotificationsModule();
+  NotificationsModule();
+
+  DeviceNotifications? _notifications;
 
   @override
   String get id => 'notifications';
@@ -48,6 +50,7 @@ final class NotificationsModule extends KilnModule {
       permissionFlow: permissionFlow,
     );
 
+    _notifications = notifications;
     registry
       ..registerSingleton<NotificationsConfig>(config)
       ..registerSingleton<NotificationChannels>(channels)
@@ -62,6 +65,13 @@ final class NotificationsModule extends KilnModule {
   @override
   Future<SupportInfo> support(Registry registry) {
     return registry.read<NotificationSupport>().check();
+  }
+
+  @override
+  Future<void> dispose() async {
+    final notifications = _notifications;
+    _notifications = null;
+    await notifications?.dispose();
   }
 
   @override

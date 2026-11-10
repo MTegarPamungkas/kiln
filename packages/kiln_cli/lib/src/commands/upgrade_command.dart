@@ -40,7 +40,7 @@ final class UpgradeCommand extends KilnCommand {
       projectConfig: project.config,
     );
     if (support == null) {
-      return _planBundled(project);
+      return _runBundled(project);
     }
 
     final index = await support.index();
@@ -58,11 +58,7 @@ final class UpgradeCommand extends KilnCommand {
       );
       if (version != null) {
         candidates.add(
-          _Upgrade(
-            id: entry.key,
-            from: entry.value.version,
-            version: version,
-          ),
+          _Upgrade(id: entry.key, from: entry.value.version, version: version),
         );
       }
     }
@@ -88,7 +84,9 @@ final class UpgradeCommand extends KilnCommand {
 
     if (candidates.isEmpty) {
       if (argResults!['json'] != true) {
-        logger.info('All extensions are already at the latest registry version.');
+        logger.info(
+          'All extensions are already at the latest registry version.',
+        );
       }
       return ExitCodes.success;
     }
@@ -104,7 +102,11 @@ final class UpgradeCommand extends KilnCommand {
 
     final failures = <String>[];
     for (final candidate in candidates) {
-      final applied = await _upgrade(project, support, candidate);
+      final applied = await _upgrade(
+        ProjectContext.load(project.root),
+        support,
+        candidate,
+      );
       if (!applied) {
         failures.add(candidate.id);
       }
@@ -122,125 +124,41 @@ final class UpgradeCommand extends KilnCommand {
     _Upgrade candidate,
   ) async {
     final package = await support.fetch(candidate.id, candidate.version);
-    final available = package.available;
     try {
-      final hooks = Directory(
-        p.join(package.directory.path, 'brick', 'hooks'),
-      ).existsSync();
-      final decision = const TrustPolicy().evaluate(
-        available.manifest,
-        hasHooks: hooks,
-      );
-      if (!decision.allowed) {
-        logger.warn('${candidate.id}: ${decision.reason}');
-        return false;
-      }
-      if (decision.requiresConfirmation &&
-          !prompter
-              .withAssumeYes(argResults!['yes'] == true)
-              .confirm(
-                '${candidate.id}: ${decision.reason}',
-                defaultValue: false,
-              )) {
-        logger.warn('${candidate.id}: skipped.');
-        return false;
-      }
-
-      final installer = ExtensionInstaller(
-        projectRoot: project.root,
-        // Installed extensions must stay resolvable while the candidate is
-        // validated; otherwise every other installed id looks unknown.
-        available: <AvailableExtension>[
-          ...extensionCatalog.where((entry) => entry.id != available.id),
-          available,
-        ],
-      );
-      final dryRemove = await installer.remove(
-        id: candidate.id,
-        answers:
-            project.extensionAnswers[candidate.id] ?? const <String, Object?>{},
-        options: const RemoveOptions(dryRun: true, force: false),
-      );
-      if (dryRemove.skippedFiles.isNotEmpty) {
-        logger.warn(
-          '${candidate.id}: files were edited by the user; upgrade skipped.',
-        );
-        return false;
-      }
-
-      MigrationResult? migration;
+      final available = package.available;
       final migrations = const MigrationLoader().load(package.directory);
       final selected = const MigrationLoader().select(
         migrations: migrations,
         installed: candidate.from,
         target: candidate.version.version,
       );
-      if (selected.isNotEmpty) {
-        migration = const MigrationRunner().run(
-          projectRoot: project.root,
-          migrations: selected,
-        );
-      }
-
-      await installer.remove(
+      return await _applyUpgrade(
+        project: project,
         id: candidate.id,
-        answers:
-            project.extensionAnswers[candidate.id] ?? const <String, Object?>{},
-        options: RemoveOptions(force: argResults!['force'] == true),
+        from: candidate.from,
+        to: candidate.version.version,
+        available: available,
+        // Installed extensions must stay resolvable while the candidate is
+        // validated; otherwise every other installed id looks unknown.
+        availableCatalog: <AvailableExtension>[
+          ...extensionCatalog.where((entry) => entry.id != available.id),
+          available,
+        ],
+        migrations: selected,
+        hasHooks: Directory(p.join(package.directory.path, 'brick', 'hooks'))
+            .existsSync(),
       );
-      final answers = answerForExtension(
-        available,
-        saved: project.extensionAnswers[candidate.id] ??
-            const <String, Object?>{},
-        provided: parseAnswerOptions(
-          (argResults!['answer'] as List<String>).cast<String>(),
-        ),
-        prompter: prompter.withAssumeYes(argResults!['yes'] == true),
-      );
-      final result = await installer.add(
-        requested: <String>[candidate.id],
-        project: project.projectForTemplates,
-        answers: <String, Map<String, Object?>>{candidate.id: answers},
-        options: InstallOptions(
-          verify: argResults!['no-verify'] != true,
-          collisionPolicy: CollisionPolicy.overwrite,
-          runHooks: argResults!['run-hooks'] == true,
-          approveHooks:
-              argResults!['yes'] == true && argResults!['run-hooks'] == true,
-        ),
-        hostCapabilities: const <String>{'app_basic'},
-      );
-      if (result.hasConflicts) {
-        logger.warn('${candidate.id}: file conflict after upgrade.');
-        return false;
-      }
-      project.updateExtensionAnswers(candidate.id, answers);
-      logger.success(
-        '${candidate.id} ${candidate.from} -> ${candidate.version.version}',
-      );
-      for (final message in migration?.messages ?? const <String>[]) {
-        logger.info('  $message');
-      }
-      if (result.verification != null && !result.verification!.isSuccess) {
-        logger.warn('${candidate.id}: verification failed.');
-        return false;
-      }
-      return true;
     } finally {
       await package.dispose();
     }
   }
 
-  int _planBundled(ProjectContext project) {
-    final versions = <String, String>{
-      for (final entry in project.lockfile.extensions.entries)
-        entry.key: entry.value.version,
-    };
-    final candidates = UpgradePlanner(available: extensionCatalog).plan(
-      installedVersions: versions,
-      all: argResults!['all'] != false,
-    );
-    if (argResults!['json'] == true) {
+  Future<int> _runBundled(ProjectContext project) async {
+    final candidates = _bundledCandidates(project);
+    final json = argResults!['json'] == true;
+    final dryRun = argResults!['dry-run'] == true;
+
+    if (json) {
       JsonReporter(logger.raw).write(<String, Object?>{
         'upgrades': candidates
             .map(
@@ -251,31 +169,162 @@ final class UpgradeCommand extends KilnCommand {
               },
             )
             .toList(),
+        'dry_run': dryRun,
       });
-      return ExitCodes.success;
+      if (dryRun) {
+        return ExitCodes.success;
+      }
     }
+
     if (candidates.isEmpty) {
-      logger.info('All extensions are already at the latest catalog version.');
+      if (!json) {
+        logger.info(
+          'All extensions are already at the latest catalog version.',
+        );
+      }
       return ExitCodes.success;
     }
-    logger.info('Upgrades available:');
-    for (final candidate in candidates) {
-      logger.info('  ${candidate.id} ${candidate.from} -> ${candidate.to}');
+    if (dryRun) {
+      logger.info('Upgrades available:');
+      for (final candidate in candidates) {
+        logger.info('  ${candidate.id} ${candidate.from} -> ${candidate.to}');
+      }
+      return ExitCodes.success;
     }
-    logger.info(
-      'Configure a registry with kiln config --registry=<path|url> '
-      'to run upgrades.',
-    );
+
+    final failures = <String>[];
+    for (final candidate in candidates) {
+      final applied = await _upgradeBundled(
+        ProjectContext.load(project.root),
+        candidate,
+      );
+      if (!applied) {
+        failures.add(candidate.id);
+      }
+    }
+    if (failures.isNotEmpty) {
+      logger.error('Upgrade failed for: ${failures.join(', ')}');
+      return ExitCodes.conflict;
+    }
     return ExitCodes.success;
+  }
+
+  List<UpgradeCandidate> _bundledCandidates(ProjectContext project) {
+    final versions = <String, String>{
+      for (final entry in project.lockfile.extensions.entries)
+        entry.key: entry.value.version,
+    };
+    final candidates = UpgradePlanner(available: extensionCatalog)
+        .plan(installedVersions: versions, all: argResults!['all'] != false);
+    final Version core;
+    try {
+      core = Version.parse(project.lockfile.core);
+    } on FormatException {
+      return candidates;
+    }
+    return candidates
+        .where(
+          (candidate) => candidate.available.manifest.compatibility
+              .problems(kilnVersion: core.toString())
+              .isEmpty,
+        )
+        .toList(growable: false);
+  }
+
+  Future<bool> _upgradeBundled(
+    ProjectContext project,
+    UpgradeCandidate candidate,
+  ) {
+    // Bundled Dart catalogs do not embed migration files. Every bundled
+    // extension currently ships without migrations; a registry upgrade still
+    // loads migrations from the downloaded archive.
+    return _applyUpgrade(
+      project: project,
+      id: candidate.id,
+      from: candidate.from,
+      to: candidate.to,
+      available: candidate.available,
+      availableCatalog: extensionCatalog,
+      migrations: const <Migration>[],
+      hasHooks: candidate.available.bundle.hooks.isNotEmpty,
+    );
+  }
+
+  Future<bool> _applyUpgrade({
+    required ProjectContext project,
+    required String id,
+    required String from,
+    required String to,
+    required AvailableExtension available,
+    required List<AvailableExtension> availableCatalog,
+    required List<Migration> migrations,
+    required bool hasHooks,
+  }) async {
+    final decision = const TrustPolicy().evaluate(
+      available.manifest,
+      hasHooks: hasHooks,
+    );
+    if (!decision.allowed) {
+      logger.warn('$id: ${decision.reason}');
+      return false;
+    }
+    if (decision.requiresConfirmation &&
+        !prompter
+            .withAssumeYes(argResults!['yes'] == true)
+            .confirm('$id: ${decision.reason}', defaultValue: false)) {
+      logger.warn('$id: skipped.');
+      return false;
+    }
+
+    // Resolve required answers before migrations or any installed-file writes.
+    final answers = answerForExtension(
+      available,
+      saved: project.extensionAnswers[id] ?? const <String, Object?>{},
+      provided: parseAnswerOptions(
+        (argResults!['answer'] as List<String>).cast<String>(),
+      ),
+      prompter: prompter.withAssumeYes(argResults!['yes'] == true),
+    );
+    final installer = ExtensionInstaller(
+      projectRoot: project.root,
+      available: availableCatalog,
+    );
+    final result = await installer.upgrade(
+      id: id,
+      project: project.projectForTemplates,
+      answers: answers,
+      previousAnswers:
+          project.extensionAnswers[id] ?? const <String, Object?>{},
+      migrations: migrations,
+      force: argResults!['force'] == true,
+      options: InstallOptions(
+        verify: argResults!['no-verify'] != true,
+        runHooks: argResults!['run-hooks'] == true,
+        approveHooks:
+            argResults!['yes'] == true && argResults!['run-hooks'] == true,
+      ),
+      hostCapabilities: const <String>{'app_basic'},
+    );
+    if (result.hasConflicts) {
+      logger.warn('$id: file conflict after upgrade.');
+      return false;
+    }
+    if (!result.success) {
+      logger.warn('$id: verification failed; upgrade rolled back.');
+      return false;
+    }
+    logger.success('$id $from -> $to');
+    for (final migration in migrations) {
+      for (final action in migration.actions.whereType<MessageAction>()) {
+        logger.info('  ${action.text}');
+      }
+    }
+    return true;
   }
 }
 
 final class _Upgrade {
-  const _Upgrade({
-    required this.id,
-    required this.from,
-    required this.version,
-  });
+  const _Upgrade({required this.id, required this.from, required this.version});
 
   final String id;
   final String from;

@@ -23,10 +23,7 @@ void main() {
   });
 
   test('high contrast variants keep the brightness', () {
-    expect(
-      ColorSchemes.lightHighContrast(seed).brightness,
-      Brightness.light,
-    );
+    expect(ColorSchemes.lightHighContrast(seed).brightness, Brightness.light);
     expect(ColorSchemes.darkHighContrast(seed).brightness, Brightness.dark);
     expect(
       ColorSchemes.lightHighContrast(seed).primary,

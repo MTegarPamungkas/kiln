@@ -12,10 +12,7 @@ final class SecureTokenStore implements TokenProvider {
   final String accessTokenKey;
   final String refreshTokenKey;
 
-  Future<void> save({
-    required String accessToken,
-    String? refreshToken,
-  }) async {
+  Future<void> save({required String accessToken, String? refreshToken}) async {
     await storage.write(accessTokenKey, accessToken);
     if (refreshToken != null) {
       await storage.write(refreshTokenKey, refreshToken);

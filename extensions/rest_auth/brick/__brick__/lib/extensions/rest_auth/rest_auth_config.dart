@@ -35,6 +35,10 @@ final class RestAuthConfig {
 
   Uri endpoint(String path) {
     final base = baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
+    final uri = Uri.parse(path);
+    if (uri.hasScheme || uri.hasAuthority) {
+      return Uri.parse(base).resolveUri(uri);
+    }
     final relative = path.startsWith('/') ? path.substring(1) : path;
     return Uri.parse(base).resolve(relative);
   }

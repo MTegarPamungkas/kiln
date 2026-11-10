@@ -12,10 +12,7 @@ void installGlobalErrorHandlers(Registry registry) {
       error: details.exception,
       stackTrace: details.stack,
     );
-    crashReporter?.captureError(
-      details.exception,
-      stackTrace: details.stack,
-    );
+    crashReporter?.captureError(details.exception, stackTrace: details.stack);
     FlutterError.presentError(details);
   };
 

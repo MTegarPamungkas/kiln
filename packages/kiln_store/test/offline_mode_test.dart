@@ -20,8 +20,8 @@ void main() {
 
   setUp(() {
     temp = Directory.systemTemp.createTempSync('kiln_store_offline_');
-    cache = LocalCache(Directory(p.join(temp.path, 'cache')));
     config = RegistryConfig(url: 'https://example.com/registry');
+    cache = LocalCache(Directory(p.join(temp.path, 'cache')), registry: config);
   });
 
   tearDown(() {
@@ -137,91 +137,59 @@ void main() {
   });
 
   group('OfflineMode.archive', () {
-    test('returns a cached archive without touching the network', () async {
+    final selected = RegistryIndex.parse(fixtureIndex).find('demo_ext')!.findVersion('1.0.0')!;
+    Matcher errorCode(String code) => throwsA(isA<KilnStoreException>().having((e) => e.code, 'code', code));
+
+    test('verified offline hit requires matching cached metadata', () async {
+      cache.writeIndex(RegistryIndex.parse(fixtureIndex));
       cache.writeArchive('demo_ext', '1.0.0', validArchive);
-      final mode = OfflineMode(
-        client: clientThatMustNotBeUsed(),
-        cache: cache,
-        offline: true,
-      );
-
-      expect(await mode.archive('demo_ext', '1.0.0'), validArchive);
+      final mode = OfflineMode(client: clientThatMustNotBeUsed(), cache: cache, offline: true);
+      expect(await mode.archive('demo_ext', selected), validArchive);
+      cache.archiveFile('demo_ext', '1.0.0').writeAsBytesSync([1, 2, 3]);
+      await expectLater(mode.archive('demo_ext', selected), errorCode('store.checksum_mismatch'));
     });
 
-    test('downloads and caches an archive when missing', () async {
-      final requested = <Uri>[];
-      final client = RegistryClient(
-        config: config,
-        httpClient: MockClient((request) async {
-          requested.add(request.url);
-          if (request.url.path.endsWith('index.json')) {
-            return http.Response(fixtureIndex, 200);
-          }
-          return http.Response.bytes(validArchive, 200);
-        }),
-        cache: cache,
-      );
-      final mode = OfflineMode(client: client, cache: cache);
+    test('archive alone is not trusted offline metadata', () async {
+      cache.writeArchive('demo_ext', '1.0.0', validArchive);
+      final mode = OfflineMode(client: clientThatMustNotBeUsed(), cache: cache, offline: true);
+      await expectLater(mode.archive('demo_ext', selected), errorCode('store.offline_missing'));
+      cache.writeIndex(RegistryIndex.parse(fixtureIndex));
+      final changed = RegistryVersion(version: selected.version, url: selected.url, sha256: 'a' * 64);
+      await expectLater(mode.archive('demo_ext', changed), errorCode('store.offline_missing'));
+    });
 
-      final bytes = await mode.archive('demo_ext', '1.0.0');
+    test('offline refuses missing archive and unknown metadata', () async {
+      cache.writeIndex(RegistryIndex.parse(fixtureIndex));
+      final mode = OfflineMode(client: clientThatMustNotBeUsed(), cache: cache, offline: true);
+      await expectLater(mode.archive('demo_ext', selected), errorCode('store.offline_missing'));
+      await expectLater(mode.archive('missing', selected), errorCode('store.offline_missing'));
+    });
 
-      expect(bytes, validArchive);
-      expect(await cache.readArchive('demo_ext', '1.0.0'), validArchive);
-      expect(
-        requested.map((uri) => uri.path),
-        containsAll(<String>['/registry/index.json', '/registry/valid.tgz']),
-      );
+    for (final corrupt in [false, true]) {
+      test('online download (corrupt=$corrupt) pins selected URL and SHA without lookup', () async {
+        if (corrupt) cache.writeArchive('demo_ext', '1.0.0', [9]);
+        final requested = <Uri>[];
+        final client = RegistryClient(config: config, cache: cache,
+          httpClient: MockClient((request) async {
+            requested.add(request.url);
+            if (request.url.path.endsWith('index.json')) fail('Selected metadata must not be looked up again');
+            return http.Response.bytes(validArchive, 200);
+          }),
+        );
+        final mode = OfflineMode(client: client, cache: cache);
+        expect(await mode.archive('demo_ext', selected), validArchive);
+        expect(await cache.readArchive('demo_ext', '1.0.0'), validArchive);
+        expect(requested.map((uri) => uri.path), ['/registry/valid.tgz']);
+        client.close();
+      });
+    }
+
+    test('online cache hit cannot substitute a different selected checksum', () async {
+      cache.writeArchive('demo_ext', '1.0.0', validArchive);
+      final changed = RegistryVersion(version: selected.version, url: selected.url, sha256: 'a' * 64);
+      final client = RegistryClient(config: config, httpClient: MockClient((_) async => http.Response.bytes(validArchive, 200)));
+      await expectLater(OfflineMode(client: client, cache: cache).archive('demo_ext', changed), errorCode('store.checksum_mismatch'));
       client.close();
-    });
-
-    test('offline refuses an archive missing from the cache', () async {
-      cache.writeIndex(RegistryIndex.parse(fixtureIndex));
-      final mode = OfflineMode(
-        client: clientThatMustNotBeUsed(),
-        cache: cache,
-        offline: true,
-      );
-
-      expect(
-        () => mode.archive('demo_ext', '1.0.0'),
-        throwsA(
-          isA<KilnStoreException>().having(
-            (error) => error.code,
-            'code',
-            'store.offline_missing',
-          ),
-        ),
-      );
-    });
-
-    test('throws for unknown extensions and versions', () async {
-      cache.writeIndex(RegistryIndex.parse(fixtureIndex));
-      final mode = OfflineMode(
-        client: clientThatMustNotBeUsed(),
-        cache: cache,
-        offline: true,
-      );
-
-      expect(
-        () => mode.archive('missing', '1.0.0'),
-        throwsA(
-          isA<KilnStoreException>().having(
-            (error) => error.code,
-            'code',
-            'store.extension_not_found',
-          ),
-        ),
-      );
-      expect(
-        () => mode.archive('demo_ext', '9.9.9'),
-        throwsA(
-          isA<KilnStoreException>().having(
-            (error) => error.code,
-            'code',
-            'store.version_not_found',
-          ),
-        ),
-      );
     });
   });
 }

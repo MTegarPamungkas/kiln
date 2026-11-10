@@ -10,7 +10,10 @@ void main() {
     expect(config.projectId, 'kiln_demo');
     expect(config.databaseId, 'kiln');
     expect(config.bucketId, 'kiln_files');
-    expect(config.endpointUri.host, 'cloud.appwrite.io');
+    expect(
+      config.endpointUri.host,
+      Uri.parse('https://cloud.appwrite.io/v1').host,
+    );
   });
 
   test('an incomplete configuration fails before the client is built', () {
@@ -40,6 +43,18 @@ void main() {
           FailureCode.configurationInvalid,
         ),
       ),
+    );
+  });
+
+  test('flags cleartext http endpoints as insecure', () {
+    expect(
+      const AppwriteConfig(endpoint: 'https://appwrite.test/v1')
+          .isInsecureTransport,
+      isFalse,
+    );
+    expect(
+      const AppwriteConfig(endpoint: 'http://10.0.2.2/v1').isInsecureTransport,
+      isTrue,
     );
   });
 }

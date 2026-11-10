@@ -47,8 +47,20 @@ final class Gate {
   final Registry registry;
 
   /// Reads a registered service by its contract type.
-  T use<T extends Object>({String? instanceName}) =>
-      registry.read<T>(instanceName: instanceName);
+  T use<T extends Object>({String? instanceName}) {
+    if (!has<T>(instanceName: instanceName)) {
+      throw Failure(
+        code: FailureCode.configurationMissing,
+        message: 'The $T contract is not registered.',
+        kind: FailureKind.configuration,
+        details: <String, Object?>{
+          'contract': '$T',
+          'instance_name': ?instanceName,
+        },
+      );
+    }
+    return registry.read<T>(instanceName: instanceName);
+  }
 
   /// Whether a contract is registered, so callers can probe optional
   /// capabilities before reading them.
@@ -166,7 +178,7 @@ final class Gate {
         auth.signUp(email: email, password: password, displayName: displayName),
   );
 
-  Future<Result<void>> signOut() => call<void>(auth.signOut);
+  Future<Result<void>> signOut() => call<void>(() => auth.signOut());
 
   // Remote database
   Future<Result<Map<String, Object?>>> remoteCreate(
@@ -279,7 +291,7 @@ final class Gate {
   Future<Result<void>> invalidateCache(String prefix, {String? tag}) =>
       call<void>(() => cache.invalidate(prefix, tag: tag));
 
-  Future<Result<void>> clearCache() => call<void>(cache.clear);
+  Future<Result<void>> clearCache() => call<void>(() => cache.clear());
 
   // File storage
   Future<Result<StoredFile>> uploadFile(
@@ -315,20 +327,20 @@ final class Gate {
     Map<String, Object?> traits = const <String, Object?>{},
   }) => call<void>(() => analytics.identify(userId, traits: traits));
 
-  Future<Result<void>> resetAnalytics() => call<void>(analytics.reset);
+  Future<Result<void>> resetAnalytics() => call<void>(() => analytics.reset());
 
   // Remote config
   Future<Result<void>> fetchRemoteConfig() =>
-      call<void>(remoteConfig.fetchAndActivate);
+      call<void>(() => remoteConfig.fetchAndActivate());
 
   // Account management
   Future<Result<void>> sendPasswordReset(String email) =>
       call<void>(() => account.sendPasswordResetEmail(email));
 
   Future<Result<void>> sendEmailVerification() =>
-      call<void>(account.sendEmailVerification);
+      call<void>(() => account.sendEmailVerification());
 
-  Future<Result<void>> reloadUser() => call<void>(account.reloadUser);
+  Future<Result<void>> reloadUser() => call<void>(() => account.reloadUser());
 
   Future<Result<void>> updateDisplayName(String displayName) =>
       call<void>(() => account.updateDisplayName(displayName));
@@ -372,7 +384,7 @@ final class Gate {
 
   // Notifications
   Future<Result<bool>> requestNotificationPermission() =>
-      call(notifications.requestPermission);
+      call(() => notifications.requestPermission());
 
   Future<Result<void>> showNotification(NotificationMessage message) =>
       call<void>(() => notifications.show(message));
@@ -386,7 +398,7 @@ final class Gate {
       call<void>(() => notifications.cancel(id));
 
   Future<Result<void>> cancelAllNotifications() =>
-      call<void>(notifications.cancelAll);
+      call<void>(() => notifications.cancelAll());
 
   // Secure storage
   Future<Result<String?>> readSecure(String key) =>
@@ -399,9 +411,9 @@ final class Gate {
       call<void>(() => secureStorage.delete(key));
 
   Future<Result<Map<String, String>>> readAllSecure() =>
-      call(secureStorage.readAll);
+      call(() => secureStorage.readAll());
 
-  Future<Result<void>> clearSecure() => call<void>(secureStorage.clear);
+  Future<Result<void>> clearSecure() => call<void>(() => secureStorage.clear());
 
   // Share & social auth
   Future<Result<ShareOutcome>> shareContent(
@@ -412,7 +424,7 @@ final class Gate {
   Future<Result<SocialCredential?>> socialSignIn(SocialProvider provider) =>
       call(() => socialAuth.signIn(provider));
 
-  Future<Result<void>> socialSignOut() => call<void>(socialAuth.signOut);
+  Future<Result<void>> socialSignOut() => call<void>(() => socialAuth.signOut());
 
   // Storage
   Future<Result<String?>> readValue(String key) =>
@@ -427,9 +439,9 @@ final class Gate {
   Future<Result<bool>> hasValue(String key) =>
       call(() => storage.containsKey(key));
 
-  Future<Result<Set<String>>> storageKeys() => call(storage.keys);
+  Future<Result<Set<String>>> storageKeys() => call(() => storage.keys());
 
-  Future<Result<void>> clearValues() => call<void>(storage.clear);
+  Future<Result<void>> clearValues() => call<void>(() => storage.clear());
 
   // Location
   Future<Result<GeoPosition>> currentLocation({
@@ -438,5 +450,5 @@ final class Gate {
 
   /// Whether the platform location service is currently enabled.
   Future<Result<bool>> locationServiceEnabled() =>
-      call(location.isServiceEnabled);
+      call(() => location.isServiceEnabled());
 }

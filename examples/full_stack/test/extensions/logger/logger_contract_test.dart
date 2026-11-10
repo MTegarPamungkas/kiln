@@ -9,9 +9,7 @@ void main() {
     description: 'PipelineLogger',
     create: () {
       final memory = MemoryLogSink(capacity: 16);
-      final logger = PipelineLogger(
-        pipeline: SinkPipeline(<LogSink>[memory]),
-      );
+      final logger = PipelineLogger(pipeline: SinkPipeline(<LogSink>[memory]));
       return _LoggerHarness(logger, memory);
     },
   );

@@ -24,11 +24,8 @@ final class NotesState {
   /// A fresh snapshot from the repository; the stream is the source of truth.
   NotesState loaded(List<Note> notes) => NotesState(notes: notes);
 
-  NotesState withProblem(Failure? failure) => NotesState(
-    notes: notes,
-    isLoading: false,
-    problem: failure,
-  );
+  NotesState withProblem(Failure? failure) =>
+      NotesState(notes: notes, isLoading: false, problem: failure);
 
   @override
   bool operator ==(Object other) =>
@@ -38,11 +35,7 @@ final class NotesState {
       _sameNotes(other.notes, notes);
 
   @override
-  int get hashCode => Object.hash(
-    Object.hashAll(notes),
-    isLoading,
-    problem,
-  );
+  int get hashCode => Object.hash(Object.hashAll(notes), isLoading, problem);
 
   @override
   String toString() =>

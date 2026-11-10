@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
+import 'root_path.dart';
 
 /// State of an installation transaction.
 enum JournalStatus { running, committed }
@@ -63,8 +63,10 @@ final class Journal {
   final List<JournalOperation> operations;
   JournalStatus status;
 
-  File get file =>
-      File(p.join(projectRoot.path, '.kiln', 'journal', '$id.json'));
+  File get file {
+    RootPath.validateId(id);
+    return File(RootPath(projectRoot).resolve('.kiln/journal/$id.json'));
+  }
 
   void add(JournalOperation operation) {
     operations.add(operation);
@@ -135,7 +137,7 @@ final class Journal {
   }
 
   static Journal? latest(Directory projectRoot, {JournalStatus? status}) {
-    final directory = Directory(p.join(projectRoot.path, '.kiln', 'journal'));
+    final directory = Directory(RootPath(projectRoot).resolve('.kiln/journal'));
     if (!directory.existsSync()) {
       return null;
     }

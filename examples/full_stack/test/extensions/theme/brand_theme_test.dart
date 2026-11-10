@@ -13,8 +13,14 @@ void main() {
     expect(brand.light.brightness, Brightness.light);
     expect(brand.dark.brightness, Brightness.dark);
     expect(brand.light.useMaterial3, isTrue);
-    expect(brand.light.colorScheme.primary, isNot(brand.dark.colorScheme.primary));
-    expect(brand.light.scaffoldBackgroundColor, brand.light.colorScheme.surface);
+    expect(
+      brand.light.colorScheme.primary,
+      isNot(brand.dark.colorScheme.primary),
+    );
+    expect(
+      brand.light.scaffoldBackgroundColor,
+      brand.light.colorScheme.surface,
+    );
     expect(brand.dark.scaffoldBackgroundColor, brand.dark.colorScheme.surface);
   });
 
@@ -58,7 +64,10 @@ void main() {
     final teal = BrandTheme(ThemeConfig.defaults);
     final blue = BrandTheme(const ThemeConfig(seedColor: Color(0xFF1D4ED8)));
 
-    expect(blue.light.colorScheme.primary, isNot(teal.light.colorScheme.primary));
+    expect(
+      blue.light.colorScheme.primary,
+      isNot(teal.light.colorScheme.primary),
+    );
   });
 
   test('high contrast themes keep the requested brightness', () {

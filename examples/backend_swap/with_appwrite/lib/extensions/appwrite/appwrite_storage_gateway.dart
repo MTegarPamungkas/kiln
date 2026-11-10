@@ -82,10 +82,7 @@ final class SdkAppwriteStorageGateway implements AppwriteStorageGateway {
 
   @override
   Future<void> delete(String path) async {
-    await storage.deleteFile(
-      bucketId: config.bucketId,
-      fileId: _fileId(path),
-    );
+    await storage.deleteFile(bucketId: config.bucketId, fileId: _fileId(path));
   }
 
   Uri _viewUrl(String path) {

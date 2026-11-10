@@ -19,11 +19,18 @@ class RegistryScope extends InheritedWidget {
     return scope.registry;
   }
 
+  /// Returns the registry when a [RegistryScope] is present.
+  static Registry? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<RegistryScope>()?.registry;
+
   static T read<T extends Object>(BuildContext context) =>
       of(context).read<T>();
 
   static T? readOrNull<T extends Object>(BuildContext context) =>
       of(context).readOrNull<T>();
+
+  static T? maybeReadOrNull<T extends Object>(BuildContext context) =>
+      maybeOf(context)?.readOrNull<T>();
 
   @override
   bool updateShouldNotify(RegistryScope oldWidget) =>

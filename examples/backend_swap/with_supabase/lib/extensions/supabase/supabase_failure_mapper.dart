@@ -29,7 +29,7 @@ Failure mapSupabaseError(
   if (error is TimeoutException) {
     return Failure(
       code: FailureCode.networkTimeout,
-      message: 'Permintaan ke Supabase melewati batas waktu.',
+      message: 'The request to Supabase timed out.',
       kind: FailureKind.network,
       cause: error,
       stackTrace: stackTrace,
@@ -225,7 +225,7 @@ Failure? _networkFailure(Object error, StackTrace? stackTrace) {
             text.contains('failed host lookup')
         ? FailureCode.networkUnreachable
         : FailureCode.networkUnknown,
-    message: 'Koneksi ke Supabase gagal.',
+    message: 'The connection to Supabase failed.',
     kind: FailureKind.network,
     cause: error,
     stackTrace: stackTrace,

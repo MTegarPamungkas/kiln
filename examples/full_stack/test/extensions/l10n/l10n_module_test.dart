@@ -1,14 +1,19 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
 import 'package:full_stack/core/error/failure_presenter.dart';
 import 'package:full_stack/core/l10n/app_localizations_config.dart';
+import 'package:full_stack/core/l10n/core_copy.dart';
 import 'package:full_stack/extensions/l10n/failure_messages.dart';
 import 'package:full_stack/extensions/l10n/l10n_config.dart';
 import 'package:full_stack/extensions/l10n/l10n_module.dart';
+import 'package:full_stack/extensions/l10n/l10n_support.dart';
 import 'package:full_stack/extensions/l10n/locale_controller.dart';
 import 'package:full_stack/extensions/l10n/locale_store.dart';
+import 'package:full_stack/extensions/l10n/localized_core_copy.dart';
 import 'package:full_stack/l10n/generated/app_localizations.dart';
 
 void main() {
@@ -28,6 +33,8 @@ void main() {
     expect(app.localeListenable, same(controller.localeListenable));
     expect(app.delegates, contains(AppLocalizations.delegate));
     expect(registry.read<FailureMessages>(), isA<L10nFailureMessages>());
+    expect(registry.read<L10nSupport>(), isA<L10nSupport>());
+    expect(registry.read<CoreCopy>(), isA<LocalizedCoreCopy>());
   });
 
   test('registers LocaleStore when Storage is available', () {
@@ -51,12 +58,26 @@ void main() {
     expect(app.locale, isNull);
     expect(app.currentLocale, const Locale('en'));
     expect(
-      registry
-          .read<FailureMessages>()
-          .messageFor(
-            const Failure(code: FailureCode.networkOffline, message: 'off'),
-          ),
+      registry.read<FailureMessages>().messageFor(
+        const Failure(code: FailureCode.networkOffline, message: 'off'),
+      ),
       lookupAppLocalizations(const Locale('en')).failureNetworkOffline,
+    );
+  });
+
+  test('failure messages follow the platform locale by default', () {
+    final registry = GetItRegistry();
+    const L10nModule().register(registry);
+
+    final expected = lookupAppLocalizations(
+      L10nConfig.defaults.resolve(PlatformDispatcher.instance.locale),
+    );
+
+    expect(
+      registry.read<FailureMessages>().messageFor(
+        const Failure(code: FailureCode.networkOffline, message: 'off'),
+      ),
+      expected.failureNetworkOffline,
     );
   });
 

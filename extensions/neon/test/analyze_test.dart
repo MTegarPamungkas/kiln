@@ -24,11 +24,8 @@ void main() {
             'api_key': 'demo-token',
             'auth_url': 'https://demo.neonauth.test/neondb/auth',
             'schema': 'public',
-            's3_endpoint': 'https://demo.storage.c-us-east-2.aws.neon.tech',
+            'storage_signing_url': 'https://demo.example.test/storage/sign',
             's3_bucket': 'files',
-            's3_region': 'us-east-2',
-            's3_access_key_id': 'token-id',
-            's3_secret_access_key': 's3-secret',
           },
         );
         for (final file in files) {
@@ -58,7 +55,6 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.6.0
-  crypto: ^3.0.8
   kiln_core: $coreDependency
 dev_dependencies:
   flutter_test:

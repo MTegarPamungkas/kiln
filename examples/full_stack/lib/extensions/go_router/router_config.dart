@@ -10,10 +10,18 @@ final class AppRouterConfig {
     this.debugLogDiagnostics = false,
     this.errorBuilder,
     this.observers = const <NavigatorObserver>[],
+    this.enableAuthRedirect = false,
   });
 
   /// Location shown when the platform does not provide one.
   final String initialLocation;
+
+  /// Whether signed-out visitors are redirected to `/sign-in`.
+  ///
+  /// Auth policy belongs to the application. Enable this when the app wants a
+  /// login wall; public pages can then keep `false` and guard specific routes
+  /// with their own `RouteGuard`.
+  final bool enableAuthRedirect;
 
   /// Prints go_router diagnostics for every navigation decision.
   ///
@@ -21,8 +29,8 @@ final class AppRouterConfig {
   /// instead of hard coding it.
   final bool debugLogDiagnostics;
 
-  /// Replaces the default not found page when the application needs its own
-  /// error screen.
+  /// Renders unmatched locations. The application supplies this builder; the
+  /// extension does not ship an error screen.
   final GoRouterWidgetBuilder? errorBuilder;
 
   /// Extra navigator observers, for example a custom analytics tracker.

@@ -13,7 +13,7 @@ void main() {
         .single;
   }
 
-  test('query null menjadi query PostgREST kosong', () {
+  test('a null query becomes an empty PostgREST query', () {
     final query = mapper.toPostgrest(null);
 
     expect(query.filters, isEmpty);
@@ -22,7 +22,7 @@ void main() {
     expect(query.offset, 0);
   });
 
-  test('setiap operator dipetakan ke operator PostgREST yang setara', () {
+  test('every operator maps to its PostgREST equivalent', () {
     final expected = <RemoteFilterOperator, PostgrestOperator>{
       RemoteFilterOperator.equals: PostgrestOperator.equals,
       RemoteFilterOperator.notEquals: PostgrestOperator.notEquals,
@@ -52,7 +52,7 @@ void main() {
     }
   });
 
-  test('nilai DateTime dinormalkan ke ISO-8601 UTC', () {
+  test('DateTime values are normalized to ISO-8601 UTC', () {
     final filter = mapFilter(
       RemoteFilter(
         'created_at',
@@ -64,7 +64,7 @@ void main() {
     expect(filter.value, '2030-01-02T03:04:05.000Z');
   });
 
-  test('urutan, limit, dan offset dipetakan apa adanya', () {
+  test('order, limit, and offset map as-is', () {
     final query = mapper.toPostgrest(
       const RemoteQuery(
         orderBy: <RemoteOrder>[
@@ -82,7 +82,7 @@ void main() {
     expect(query.offset, 50);
   });
 
-  test('operator in dan not in butuh daftar tidak kosong', () {
+  test('in and not-in operators need a non-empty list', () {
     for (final operator in <RemoteFilterOperator>[
       RemoteFilterOperator.inList,
       RemoteFilterOperator.notInList,
@@ -112,7 +112,7 @@ void main() {
     }
   });
 
-  test('perbandingan dengan null ditolak', () {
+  test('comparison with null is rejected', () {
     expect(
       () => mapper.toPostgrest(
         const RemoteQuery(
@@ -131,7 +131,7 @@ void main() {
     );
   });
 
-  test('isNull tidak boleh membawa nilai', () {
+  test('isNull must not carry a value', () {
     expect(
       () => mapper.toPostgrest(
         const RemoteQuery(
@@ -144,7 +144,7 @@ void main() {
     );
   });
 
-  test('nama kolom dan tabel tidak valid ditolak', () {
+  test('invalid column and table names are rejected', () {
     expect(
       () => mapper.toPostgrest(
         const RemoteQuery(
@@ -164,7 +164,7 @@ void main() {
     expect(() => mapper.validateIdentifier('users;'), throwsA(isA<Failure>()));
   });
 
-  test('limit nol dan offset negatif ditolak', () {
+  test('a zero limit and negative offset are rejected', () {
     expect(
       () => mapper.toPostgrest(const RemoteQuery(limit: 0)),
       throwsA(isA<Failure>()),

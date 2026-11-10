@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
+import 'root_path.dart';
 
 /// Stores pre-change copies under `.kiln/backups/<transaction id>/`.
 final class SnapshotStore {
@@ -9,11 +9,18 @@ final class SnapshotStore {
   final Directory projectRoot;
   final String transactionId;
 
-  Directory get directory =>
-      Directory(p.join(projectRoot.path, '.kiln', 'backups', transactionId));
+  Directory get directory {
+    RootPath.validateId(transactionId);
+    return Directory(RootPath(projectRoot).resolve('.kiln/backups/$transactionId'));
+  }
 
-  File backupFile(String relativePath) =>
-      File(p.join(directory.path, relativePath));
+  File backupFile(String relativePath) {
+    RootPath.validateId(transactionId);
+    RootPath(projectRoot).resolve(relativePath);
+    return File(RootPath(projectRoot).resolve(
+      '.kiln/backups/$transactionId/$relativePath',
+    ));
+  }
 
   bool hasBackup(String relativePath) => backupFile(relativePath).existsSync();
 
@@ -21,7 +28,7 @@ final class SnapshotStore {
     if (hasBackup(relativePath)) {
       return;
     }
-    final source = File(p.join(projectRoot.path, relativePath));
+    final source = File(RootPath(projectRoot).resolve(relativePath));
     if (!source.existsSync()) {
       return;
     }
@@ -35,7 +42,7 @@ final class SnapshotStore {
     if (!backup.existsSync()) {
       return;
     }
-    final target = File(p.join(projectRoot.path, relativePath));
+    final target = File(RootPath(projectRoot).resolve(relativePath));
     target.parent.createSync(recursive: true);
     target.writeAsBytesSync(backup.readAsBytesSync());
   }

@@ -18,13 +18,12 @@ Page<Object?> buildRoutePage({
     transitionDuration: _durationFor(target),
     reverseTransitionDuration: _durationFor(target),
     child: child,
-    transitionsBuilder:
-        (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child,
-        ) => _transitionFor(target, animation, child),
+    transitionsBuilder: (
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+    ) => _transitionFor(target, animation, child),
   );
 }
 
@@ -47,10 +46,7 @@ Widget _transitionFor(
   Animation<double> animation,
   Widget child,
 ) {
-  final curved = CurvedAnimation(
-    parent: animation,
-    curve: Curves.easeOutCubic,
-  );
+  final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
   switch (platform) {
     case TargetPlatform.iOS:
     case TargetPlatform.macOS:

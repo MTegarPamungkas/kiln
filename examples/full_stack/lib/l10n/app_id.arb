@@ -1,6 +1,6 @@
 {
   "@@locale": "id",
-  "appTitle": "Kiln App",
+  "appTitle": "Aplikasi Kiln",
   "readyTitle": "Aplikasi siap",
   "readyBody": "Kerangka Kiln berjalan. Mulai bangun fitur di folder lib/features.",
   "starterHint": "Tambahkan extension lewat kiln add, lalu jalankan kiln doctor.",
@@ -55,5 +55,6 @@
   "failureSession": "Sesi berakhir. Silakan masuk kembali.",
   "failureCancelled": "Tindakan dibatalkan.",
   "failureUnavailable": "Fitur ini belum tersedia.",
+  "failureUnsupported": "Fitur ini tidak didukung di perangkat ini.",
   "failureUnexpected": "Terjadi kesalahan tak terduga. Coba lagi."
 }

@@ -14,8 +14,6 @@ final class DemoModule extends KilnModule {
 
   @override
   void register(Registry registry) {
-    registry.registerSingleton<DemoConfig>(
-      DemoConfig.defaults,
-    );
+    registry.registerSingleton<DemoConfig>(DemoConfig.defaults);
   }
 }

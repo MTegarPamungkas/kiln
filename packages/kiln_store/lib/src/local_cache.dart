@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import 'checksum_verifier.dart';
+import 'registry_config.dart';
 import 'registry_index.dart';
 
 /// On-disk cache for the registry index and downloaded archives.
@@ -12,14 +15,18 @@ import 'registry_index.dart';
 /// <root>/archives/<id>-<version>.tgz
 /// ```
 final class LocalCache {
-  LocalCache(this.root);
+  LocalCache(Directory cacheRoot, {required RegistryConfig registry})
+    : registryIdentity = registry.identity,
+      root = Directory(p.join(cacheRoot.path, sha256Hex(utf8.encode(registry.identity))));
 
+  final String registryIdentity;
   final Directory root;
 
   File get indexFile => File(p.join(root.path, 'index.json'));
 
-  File archiveFile(String id, String version) =>
-      File(p.join(root.path, 'archives', '$id-$version.tgz'));
+  File archiveFile(String id, String version) => File(p.join(
+    root.path, 'archives', '${sha256Hex(utf8.encode(jsonEncode([id, version])))}.tgz',
+  ));
 
   /// Reads the cached index, or `null` when the cache is empty.
   Future<RegistryIndex?> readIndex() async {

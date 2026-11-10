@@ -12,7 +12,9 @@ final class StaleWhileRevalidate {
     required Clock clock,
     required bool enabled,
   }) {
-    if (!enabled || control.staleWhileRevalidate == null) {
+    if (!enabled || control.noCache || control.mustRevalidate ||
+        control.noStore || control.isPrivate ||
+        control.staleWhileRevalidate == null) {
       return false;
     }
     final now = clock.now().toUtc();

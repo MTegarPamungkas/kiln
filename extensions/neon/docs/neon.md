@@ -137,23 +137,29 @@ before.
 ## 6. Object Storage
 
 Neon Object Storage is S3-compatible and available only in the supported
-regions. To use `FileStorage`:
+regions. The app never holds an S3 key: a small signing backend you own scopes
+each operation to the signed-in user.
 
 1. Enable Object Storage on the project and create the bucket named in the
    `s3_bucket` prompt.
-2. Issue a Neon token and note its **token id** (the `s3_access_key_id` prompt,
-   the S3 access key id) and **S3 secret** (the `s3_secret_access_key` prompt,
-   sent to the client here — scope it to this bucket).
-3. Set `s3_endpoint` to the branch storage host and `s3_region` to the SigV4
-   region. The host looks like
-   `https://<branch-id>.storage.c-2.<region>.aws.neon.tech` — a cluster segment
-   such as `c-2` sits **before** the region — so copy the exact value from the
-   console or a presigned URL instead of assembling it. The `s3_region` is the
-   region in that host (for example `ap-southeast-1`), and is the value Neon
-   expects in the SigV4 credential scope.
+2. Deploy an HTTPS signing endpoint and set `storage_signing_url` to it. It
+   receives `POST` JSON:
 
-The connector signs every request with AWS Signature Version 4 using path-style
-addressing (`endpoint/bucket/key`) and returns presigned links from `url`.
+   ```json
+   {"operation": "upload", "bucket": "files", "key": "avatars/user-1.png",
+    "contentType": "image/png", "metadata": {}, "expiresIn": 300}
+   ```
+
+   with `Authorization: Bearer <Neon Auth JWT>`. The backend must verify that
+   JWT, enforce per-user object ownership, keep the S3 credentials server-side,
+   and answer `{"url": "<short-lived presigned URL>", "headers": {…}}`. Keep
+   `expiresIn` at or below 900 seconds.
+
+The connector calls the signing endpoint for `upload`, `download`, and
+`delete`, then uses the returned URL and headers. The bearer token is sent only
+to the signing backend, never to the object host, and redirects are disabled on
+both legs. `FileStorage.url` asks for a download URL, so it fails when the
+backend requires extra headers that a bare URL cannot carry.
 
 ```dart
 final stored = await gate.uploadFile(

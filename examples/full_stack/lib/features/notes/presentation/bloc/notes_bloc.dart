@@ -32,16 +32,12 @@ final class NotesBloc extends BaseBloc<NotesEvent, NotesState> {
   final ToggleNote toggleNote;
   final RemoveNote removeNote;
 
-  Future<void> _onStarted(
-    NotesStarted event,
-    Emitter<NotesState> emitter,
-  ) {
+  Future<void> _onStarted(NotesStarted event, Emitter<NotesState> emitter) {
     return emitter.forEach<List<Note>>(
       watchNotes(),
       onData: (notes) => state.loaded(notes),
-      onError: (error, stackTrace) => state.withProblem(
-        Failure.from(error, stackTrace: stackTrace),
-      ),
+      onError: (error, stackTrace) =>
+          state.withProblem(Failure.from(error, stackTrace: stackTrace)),
     );
   }
 
@@ -60,10 +56,6 @@ final class NotesBloc extends BaseBloc<NotesEvent, NotesState> {
     NoteRemoved event,
     Emitter<NotesState> emitter,
   ) async {
-    reportResult(
-      await removeNote(event.noteId),
-      emitter,
-      state.withProblem,
-    );
+    reportResult(await removeNote(event.noteId), emitter, state.withProblem);
   }
 }

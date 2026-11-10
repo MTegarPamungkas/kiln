@@ -11,16 +11,16 @@ BuildEnv _env(Map<String, String> values) {
 void main() {
   test('parses URIs', () {
     expect(
-      _env(<String, String>{
-        'api_base_url': 'https://api.kiln.dev/v1',
-      }).uri('api_base_url').toString(),
+      _env(<String, String>{'api_base_url': 'https://api.kiln.dev/v1'})
+          .uri('api_base_url')
+          .toString(),
       'https://api.kiln.dev/v1',
     );
     expect(_env(const <String, String>{}).uri('api_base_url'), isNull);
     expect(
-      () => _env(<String, String>{'api_base_url': 'not a uri'}).uri(
-        'api_base_url',
-      ),
+      () =>
+          _env(<String, String>{'api_base_url': 'not a uri'})
+              .uri('api_base_url'),
       throwsA(isA<Failure>()),
     );
   });
@@ -33,10 +33,7 @@ void main() {
 
     expect(env.boolValue('enable_debug_tools'), isFalse);
     expect(env.duration('feature_flags'), const Duration(seconds: 45));
-    expect(
-      () => env.boolValue('feature_flags'),
-      throwsA(isA<Failure>()),
-    );
+    expect(() => env.boolValue('feature_flags'), throwsA(isA<Failure>()));
   });
 
   test('parses enum values', () {

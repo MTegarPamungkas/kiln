@@ -1,3 +1,5 @@
+import 'package:kiln_core/kiln_core.dart';
+
 /// Typed retry settings for the application.
 final class HttpRetrySettings {
   const HttpRetrySettings({
@@ -20,4 +22,31 @@ final class HttpRetrySettings {
   final Duration maxDelay;
   final bool jitter;
   final Set<int> retryableStatusCodes;
+
+  /// Returns null when valid, or a configuration [Failure] otherwise.
+  Failure? validate() {
+    if (maxAttempts < 1) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Retry maxAttempts must be at least one.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (initialDelay.isNegative || maxDelay.isNegative) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Retry delays cannot be negative.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (maxDelay < initialDelay) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message:
+            'Retry maxDelay must be greater than or equal to initialDelay.',
+        kind: FailureKind.configuration,
+      );
+    }
+    return null;
+  }
 }

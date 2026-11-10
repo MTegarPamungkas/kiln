@@ -77,6 +77,11 @@ Contracts throw `Failure` with a stable `FailureCode`. Feature code can convert
 it into `Result<T>` with `Result.guard`. `kiln_core` also ships `Result` as a
 helper, not as a second contract.
 
+The observable outcomes are specified in
+[concepts/contract-behavior.md](concepts/contract-behavior.md): missing records,
+pagination, combined filters, logout failure, and unsupported backends. A
+provider that disagrees fails its `kiln_testing` contract suite.
+
 ## Dependencies
 
 All dependencies use a caret to the newest release that the current toolchain

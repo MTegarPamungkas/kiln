@@ -3,7 +3,10 @@ import 'package:kiln_core/kiln_core.dart';
 /// Typed configuration for the Supabase extension.
 ///
 /// `url`, `anonKey`, and `schema` come from the `extension.yaml` prompts; the
-/// remaining values use safe defaults and can be changed in one place.
+/// remaining values use safe defaults and can be changed in one place. A local
+/// or self-hosted stack may use a plain `http` URL (see
+/// `docs/supabase-setup.md`); `supabase_flutter` accepts it, and Android needs
+/// a cleartext rule for the development host.
 final class SupabaseConfig {
   const SupabaseConfig({
     required this.url,
@@ -66,6 +69,9 @@ final class SupabaseConfig {
   /// Callback URL as a [Uri], or null when it cannot be parsed.
   Uri? get redirectUri => Uri.tryParse(authRedirectUrl);
 
+  /// Whether the project URL uses plain `http` instead of `https`.
+  bool get isInsecureTransport => Uri.tryParse(url)?.isScheme('http') ?? false;
+
   /// Validates the configuration before the client is created.
   ///
   /// Returns null when valid, or a [Failure] with a message safe to show to
@@ -77,22 +83,21 @@ final class SupabaseConfig {
         !(uri.isScheme('http') || uri.isScheme('https'))) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message:
-            'URL Supabase harus berupa alamat http atau https yang lengkap.',
+        message: 'The Supabase URL must be a complete http or https address.',
         kind: FailureKind.configuration,
       );
     }
     if (anonKey.trim().isEmpty) {
       return const Failure(
         code: FailureCode.configurationMissing,
-        message: 'Anon key Supabase belum diisi.',
+        message: 'The Supabase anon key is not set.',
         kind: FailureKind.configuration,
       );
     }
     if (!_schemaPattern.hasMatch(schema)) {
       return Failure(
         code: FailureCode.configurationInvalid,
-        message: 'Schema "$schema" bukan identifier PostgREST yang valid.',
+        message: 'Schema "$schema" is not a valid PostgREST identifier.',
         kind: FailureKind.configuration,
       );
     }
@@ -100,14 +105,14 @@ final class SupabaseConfig {
     if (redirect == null || !redirect.hasScheme) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'authRedirectUrl harus berupa URI dengan scheme, misalnya kiln-auth://auth-callback.',
+        message: 'authRedirectUrl must be a URI with a scheme, for example kiln-auth://auth-callback.',
         kind: FailureKind.configuration,
       );
     }
     if (signedUrlLifetime <= Duration.zero) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'Masa berlaku signed URL harus lebih dari nol.',
+        message: 'The signed URL lifetime must be greater than zero.',
         kind: FailureKind.configuration,
       );
     }

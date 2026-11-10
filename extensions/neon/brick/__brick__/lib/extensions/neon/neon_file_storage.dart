@@ -3,6 +3,7 @@
 import 'package:kiln_core/kiln_core.dart';
 
 import 'neon_failure_mapper.dart';
+import 'neon_storage_config.dart';
 import 'neon_storage_gateway.dart';
 
 /// [FileStorage] implementation on top of Neon Object Storage.
@@ -13,7 +14,7 @@ import 'neon_storage_gateway.dart';
 final class NeonFileStorage implements FileStorage {
   NeonFileStorage({
     required NeonStorageGateway gateway,
-    this.signedUrlLifetime = const Duration(hours: 1),
+    this.signedUrlLifetime = const Duration(minutes: 5),
   }) : _gateway = gateway;
 
   final NeonStorageGateway _gateway;
@@ -108,10 +109,10 @@ final class NeonFileStorage implements FileStorage {
   }
 
   Duration _requireLifetime(Duration lifetime) {
-    if (lifetime <= Duration.zero) {
+    if (!NeonStorageConfig.isValidLifetime(lifetime)) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'The link lifetime must be greater than zero.',
+        message: 'The link lifetime must be whole seconds between 1 and 900.',
         kind: FailureKind.validation,
       );
     }

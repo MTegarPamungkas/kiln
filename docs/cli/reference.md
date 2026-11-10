@@ -12,7 +12,7 @@
 | `kiln info <extension>` | Full manifest of a single extension |
 | `kiln graph` | Requires graph, `text`/`mermaid` format |
 | `kiln doctor` | Check hashes, codegen, journal, dependencies, manifest and platform compatibility, the feature layer rules, and how `kiln_core` resolves |
-| `kiln upgrade` | Upgrade extensions from the registry; validates the candidate against installed extensions |
+| `kiln upgrade` | Upgrade extensions from the registry, or from the bundled catalog when no registry is configured |
 | `kiln rollback` | Undo the last/interrupted transaction |
 | `kiln config` | Registry, mirror, offline mode |
 | `kiln cache` | Inspect/clear the cache |
@@ -26,8 +26,8 @@
 - `--verbose` / `--quiet`
 - `--json` on commands that support machine-readable output.
 - `--yes` for non-interactive mode.
-- `--dry-run` on `add`/`remove`/`repair`.
-- `--answer name=value` on `add`/`create`/`repair`.
+- `--dry-run` on `add`/`remove`/`repair`/`upgrade`.
+- `--answer name=value` on `add`/`create`/`repair`/`upgrade`.
 
 ## Runtime support
 
@@ -67,8 +67,11 @@ kiln ext publish extensions/connectivity --registry="$(pwd)/registry"
 
 - `store install` downloads the archive, verifies its SHA-256, checks the trust
   policy, then installs it through the installer transaction.
-- `upgrade` picks a compatible registry version, runs the selected migrations,
-  then replaces the extension.
+- `upgrade` picks a compatible version from the registry, or from the bundled
+  catalog when no registry is configured. It resolves required prompts before
+  touching the project, runs the selected migrations for registry upgrades, then
+  publishes the replacement through one transaction. Bundled Dart catalogs do
+  not embed migration files; every bundled extension currently ships none.
 - `ext publish` and `tool/registry.dart` write `index.json` plus
   `archives/<id>-<version>.tgz` to the local registry.
 - `kiln cache clean` deletes the cached index and archives; offline mode uses

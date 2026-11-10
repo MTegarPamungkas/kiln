@@ -63,19 +63,20 @@ final class SupabaseQueryMapper {
       throw Failure(
         code: FailureCode.validationInvalidInput,
         message:
-            'Nama $label "$value" hanya boleh berisi huruf, angka, dan garis bawah.',
+            'The $label "$value" may only contain letters, digits, and underscores.',
         kind: FailureKind.validation,
       );
     }
   }
 
   PostgrestFilter _filter(RemoteFilter filter) {
-    validateIdentifier(filter.field, label: 'kolom');
+    validateIdentifier(filter.field, label: 'column');
     final operator = _operators[filter.operator];
     if (operator == null) {
       throw Failure(
         code: FailureCode.validationUnsupportedValue,
-        message: 'Operator ${filter.operator.name} belum didukung PostgREST.',
+        message:
+            'Operator ${filter.operator.name} is not supported by PostgREST yet.',
         kind: FailureKind.validation,
         details: <String, Object?>{'field': filter.field},
       );
@@ -92,7 +93,7 @@ final class SupabaseQueryMapper {
           throw Failure(
             code: FailureCode.validationUnsupportedValue,
             message:
-                'Filter ${filter.operator.name} pada "${filter.field}" tidak memakai nilai.',
+                'Filter ${filter.operator.name} on "${filter.field}" takes no value.',
             kind: FailureKind.validation,
           );
         }
@@ -103,7 +104,7 @@ final class SupabaseQueryMapper {
           throw Failure(
             code: FailureCode.validationUnsupportedValue,
             message:
-                'Filter ${filter.operator.name} pada "${filter.field}" butuh daftar nilai yang tidak kosong.',
+                'Filter ${filter.operator.name} on "${filter.field}" needs a non-empty list of values.',
             kind: FailureKind.validation,
           );
         }
@@ -112,7 +113,7 @@ final class SupabaseQueryMapper {
           throw Failure(
             code: FailureCode.validationUnsupportedValue,
             message:
-                'Filter ${filter.operator.name} pada "${filter.field}" tidak menerima nilai null.',
+                'Filter ${filter.operator.name} on "${filter.field}" does not accept null values.',
             kind: FailureKind.validation,
           );
         }
@@ -121,7 +122,7 @@ final class SupabaseQueryMapper {
         if (value == null) {
           throw Failure(
             code: FailureCode.validationUnsupportedValue,
-            message: 'Filter contains pada "${filter.field}" butuh nilai.',
+            message: 'The contains filter on "${filter.field}" needs a value.',
             kind: FailureKind.validation,
           );
         }
@@ -137,7 +138,7 @@ final class SupabaseQueryMapper {
           throw Failure(
             code: FailureCode.validationUnsupportedValue,
             message:
-                'Filter ${filter.operator.name} pada "${filter.field}" butuh angka, teks, atau tanggal.',
+                'Filter ${filter.operator.name} on "${filter.field}" needs a number, text, or date.',
             kind: FailureKind.validation,
           );
         }
@@ -148,7 +149,7 @@ final class SupabaseQueryMapper {
           throw Failure(
             code: FailureCode.validationUnsupportedValue,
             message:
-                'Filter ${filter.operator.name} pada "${filter.field}" butuh nilai; pakai isNull untuk null.',
+                'Filter ${filter.operator.name} on "${filter.field}" needs a value; use isNull for null.',
             kind: FailureKind.validation,
           );
         }
@@ -168,7 +169,7 @@ final class SupabaseQueryMapper {
   }
 
   PostgrestOrder _order(RemoteOrder order) {
-    validateIdentifier(order.field, label: 'kolom');
+    validateIdentifier(order.field, label: 'column');
     return PostgrestOrder(
       order.field,
       ascending: order.direction == RemoteSortDirection.ascending,
@@ -182,7 +183,7 @@ final class SupabaseQueryMapper {
     if (limit <= 0) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Batas jumlah baris harus lebih dari nol.',
+        message: 'The row limit must be greater than zero.',
         kind: FailureKind.validation,
       );
     }
@@ -193,7 +194,7 @@ final class SupabaseQueryMapper {
     if (offset < 0) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Offset tidak boleh negatif.',
+        message: 'The offset cannot be negative.',
         kind: FailureKind.validation,
       );
     }

@@ -1,10 +1,7 @@
 import 'package:kiln_core/kiln_core.dart';
 
 /// Converts errors from the underlying package into [Failure].
-Failure mapDemoError(
-  Object error, {
-  StackTrace? stackTrace,
-}) {
+Failure mapDemoError(Object error, {StackTrace? stackTrace}) {
   if (error is Failure) {
     return error;
   }

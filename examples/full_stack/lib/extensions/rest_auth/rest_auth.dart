@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:kiln_core/kiln_core.dart';
 
 import 'auth_response_parser.dart';
+import 'auth_request_policy.dart';
 import 'jwt_expiry.dart';
 import 'rest_auth_config.dart';
 import 'rest_auth_failure_mapper.dart';
@@ -116,7 +117,15 @@ final class RestAuth implements AuthRepository {
     } on Object {
       // Signing out must succeed offline.
     } finally {
+      await clearSession();
+    }
+  }
+
+  /// Clears local credentials without making another HTTP request.
+  Future<void> clearSession() async {
+    try {
       await tokenProvider.clear();
+    } finally {
       _emit(null);
     }
   }
@@ -133,7 +142,7 @@ final class RestAuth implements AuthRepository {
     if (user == null) {
       throw const Failure(
         code: FailureCode.unexpected,
-        message: 'Respons profil pengguna tidak valid.',
+        message: 'The user profile response is not valid.',
         kind: FailureKind.authentication,
       );
     }
@@ -142,7 +151,7 @@ final class RestAuth implements AuthRepository {
     if (session == null) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Profil pengguna tidak memuat id.',
+        message: 'The user profile did not include an id.',
         kind: FailureKind.authentication,
       );
     }
@@ -165,11 +174,17 @@ final class RestAuth implements AuthRepository {
     if (path.isEmpty) {
       throw const Failure(
         code: FailureCode.configurationMissing,
-        message: 'Endpoint REST belum dikonfigurasi.',
+        message: 'The REST endpoint is not configured.',
         kind: FailureKind.configuration,
       );
     }
-    final token = authenticated ? await tokenProvider.accessToken() : null;
+    final endpoint = _backendEndpoint(path);
+    final isLogout = path == config.logoutPath;
+    final token = !authenticated
+        ? null
+        : isLogout
+        ? (await store.read())?.accessToken
+        : await tokenProvider.accessToken();
     final headers = <String, String>{
       'Accept': 'application/json',
       if (body != null) 'Content-Type': 'application/json',
@@ -178,7 +193,7 @@ final class RestAuth implements AuthRepository {
     final response = await client.send(
       HttpRequest(
         method: method,
-        uri: config.endpoint(path),
+        uri: endpoint,
         headers: headers,
         body: body == null ? null : jsonEncode(body),
       ),
@@ -198,11 +213,12 @@ final class RestAuth implements AuthRepository {
     if (body == null) {
       throw const Failure(
         code: FailureCode.unexpected,
-        message: 'Respons autentikasi tidak valid.',
+        message: 'The authentication response is not valid.',
         kind: FailureKind.authentication,
       );
     }
     final parsed = parser.parse(body);
+    await tokenProvider.clear();
     await store.save(parsed.tokens);
     var user = parsed.user;
     final hasUserId =
@@ -228,7 +244,7 @@ final class RestAuth implements AuthRepository {
     if (session == null) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'Respons autentikasi tidak memuat id pengguna.',
+        message: 'The authentication response did not include a user id.',
         kind: FailureKind.authentication,
       );
     }
@@ -285,7 +301,7 @@ final class RestAuth implements AuthRepository {
     final response = await client.send(
       HttpRequest(
         method: HttpMethod.post,
-        uri: config.endpoint(config.refreshPath),
+        uri: _backendEndpoint(config.refreshPath),
         headers: const <String, String>{
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -294,13 +310,16 @@ final class RestAuth implements AuthRepository {
       ),
     );
     if (!response.isSuccessful) {
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        await clearSession();
+      }
       throw mapRestResponse(response);
     }
     final body = _bodyMap(response.data);
     if (body == null) {
       throw const Failure(
         code: FailureCode.unexpected,
-        message: 'Respons refresh tidak valid.',
+        message: 'The refresh response is not valid.',
         kind: FailureKind.authentication,
       );
     }
@@ -308,6 +327,18 @@ final class RestAuth implements AuthRepository {
     return parsed.tokens.refreshToken == null
         ? parsed.tokens.copyWith(refreshToken: refreshToken)
         : parsed.tokens;
+  }
+
+  Uri _backendEndpoint(String path) {
+    final endpoint = config.endpoint(path);
+    if (path.isEmpty || !AuthRequestPolicy(config).isBackend(endpoint)) {
+      throw const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'REST auth endpoints must use the configured backend origin.',
+        kind: FailureKind.configuration,
+      );
+    }
+    return endpoint;
   }
 
   void _emit(AuthSession? session) {

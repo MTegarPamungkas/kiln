@@ -152,5 +152,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failureUnavailable => 'This feature is not available yet.';
 
   @override
+  String get failureUnsupported =>
+      'This feature is not supported on this device.';
+
+  @override
   String get failureUnexpected => 'An unexpected error occurred. Try again.';
 }

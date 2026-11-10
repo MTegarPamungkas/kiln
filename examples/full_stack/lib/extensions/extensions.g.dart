@@ -17,15 +17,15 @@ import 'theme/theme_module.dart';
 
 List<KilnModule> kilnModules() {
   return <KilnModule>[
-  BlocModule(),
-  DioModule(),
-  EnvModule(),
-  GoRouterModule(),
-  HttpRetryModule(),
-  L10nModule(),
-  LoggerModule(),
-  RestAuthModule(),
-  SecureStorageModule(),
-  ThemeModule(),
+    BlocModule(),
+    DioModule(),
+    EnvModule(),
+    GoRouterModule(),
+    HttpRetryModule(),
+    L10nModule(),
+    LoggerModule(),
+    RestAuthModule(),
+    SecureStorageModule(),
+    ThemeModule(),
   ];
 }

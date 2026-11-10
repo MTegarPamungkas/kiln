@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
 
 final RegExp _rgbPattern = RegExp(r'^[0-9a-fA-F]{6}$');
 final RegExp _argbPattern = RegExp(r'^[0-9a-fA-F]{8}$');
@@ -8,10 +9,7 @@ final RegExp _argbPattern = RegExp(r'^[0-9a-fA-F]{8}$');
 /// The installer writes the prompt value as a string so a typo cannot break
 /// the generated project. Input that is not a hex color falls back to Kiln
 /// teal.
-Color themeSeedColor(
-  String value, {
-  Color fallback = const Color(0xFF0F766E),
-}) {
+Color themeSeedColor(String value, {Color fallback = const Color(0xFF0F766E)}) {
   final hex = value.trim().replaceFirst(RegExp('^#'), '');
   final isRgb = _rgbPattern.hasMatch(hex);
   final isArgb = _argbPattern.hasMatch(hex);
@@ -85,5 +83,17 @@ final class ThemeConfig {
       cornerRadius: cornerRadius ?? this.cornerRadius,
       density: density ?? this.density,
     );
+  }
+
+  /// Returns null when valid, or a configuration [Failure] otherwise.
+  Failure? validate() {
+    if (cornerRadius < 0) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Theme cornerRadius cannot be negative.',
+        kind: FailureKind.configuration,
+      );
+    }
+    return null;
   }
 }

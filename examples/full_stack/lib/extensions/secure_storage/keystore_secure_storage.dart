@@ -43,7 +43,11 @@ final class KeystoreSecureStorage implements SecureStorage {
     try {
       await gateway.delete(_key(key));
     } catch (error, stackTrace) {
-      throw mapSecureStorageError(error, stackTrace: stackTrace);
+      throw mapSecureStorageError(
+        error,
+        stackTrace: stackTrace,
+        code: FailureCode.secureStorageWriteFailed,
+      );
     }
   }
 

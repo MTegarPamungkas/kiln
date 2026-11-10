@@ -10,35 +10,7 @@ Failure mapDioException(DioException error) {
 
   final statusCode = error.response?.statusCode;
   if (statusCode != null) {
-    if (statusCode == 401 || statusCode == 403) {
-      return Failure(
-        code: FailureCode.authUnauthorized,
-        message: 'The request was not authorized',
-        kind: FailureKind.authorization,
-        cause: error,
-        stackTrace: error.stackTrace,
-        details: {'statusCode': statusCode},
-      );
-    }
-    if (statusCode >= 500) {
-      return Failure(
-        code: FailureCode.networkServer,
-        message: 'The server could not complete the request',
-        kind: FailureKind.network,
-        cause: error,
-        stackTrace: error.stackTrace,
-        details: {'statusCode': statusCode},
-        isRetryable: true,
-      );
-    }
-    return Failure(
-      code: FailureCode.validationInvalidInput,
-      message: 'The request was rejected with status $statusCode',
-      kind: FailureKind.validation,
-      cause: error,
-      stackTrace: error.stackTrace,
-      details: {'statusCode': statusCode},
-    );
+    return _mapResponse(error, statusCode);
   }
 
   return switch (error.type) {
@@ -91,4 +63,51 @@ Failure mapDioException(DioException error) {
       stackTrace: error.stackTrace,
     ),
   };
+}
+
+Failure _mapResponse(DioException error, int statusCode) {
+  final serverMessage = _serverMessage(error.response?.data);
+  final retryAfter = _retryAfter(error.response?.headers);
+  return mapHttpStatusToFailure(
+    statusCode,
+    message: serverMessage,
+    cause: error,
+    stackTrace: error.stackTrace,
+    details: <String, Object?>{
+      'serverMessage': ?serverMessage,
+      'retryAfterSeconds': ?retryAfter,
+    },
+  );
+}
+
+/// Reads a short, human-readable message without exposing the raw body.
+String? _serverMessage(Object? data) {
+  String? candidate;
+  if (data is Map) {
+    for (final key in <String>['message', 'error', 'detail']) {
+      final value = data[key];
+      if (value is String && value.trim().isNotEmpty) {
+        candidate = value;
+        break;
+      }
+    }
+  } else if (data is String) {
+    candidate = data;
+  }
+  if (candidate == null) {
+    return null;
+  }
+  final trimmed = candidate.trim();
+  if (trimmed.isEmpty) {
+    return null;
+  }
+  return trimmed.length <= 300 ? trimmed : '${trimmed.substring(0, 300)}…';
+}
+
+int? _retryAfter(Headers? headers) {
+  final raw = headers?.value('retry-after');
+  if (raw == null) {
+    return null;
+  }
+  return int.tryParse(raw.trim());
 }

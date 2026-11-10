@@ -22,10 +22,7 @@ void main() {
     expect(config.levelFor(AppFlavor.development), LogLevel.trace);
     expect(config.levelFor(AppFlavor.staging), LogLevel.debug);
     expect(config.levelFor(AppFlavor.production), LogLevel.warning);
-    expect(
-      config.levelFor(const AppFlavor('qa')),
-      config.productionLevel,
-    );
+    expect(config.levelFor(const AppFlavor('qa')), config.productionLevel);
   });
 
   test('active sinks drive the convenience getters', () {

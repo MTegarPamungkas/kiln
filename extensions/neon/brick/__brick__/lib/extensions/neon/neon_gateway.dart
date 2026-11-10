@@ -107,11 +107,16 @@ final class HttpNeonGateway implements PostgrestGateway {
     NeonTokenProvider? tokenProvider,
   }) : _config = config,
        _client = client ?? http.Client(),
-       _tokenProvider = tokenProvider ?? _providerFor(config);
+       _tokenProvider = tokenProvider ?? _providerFor(config),
+       _ownsClient = client == null,
+       _ownsTokenProvider = tokenProvider == null;
 
   final NeonConfig _config;
   final http.Client _client;
   final NeonTokenProvider? _tokenProvider;
+  final bool _ownsClient;
+  final bool _ownsTokenProvider;
+  bool _closed = false;
 
   static NeonTokenProvider? _providerFor(NeonConfig config) {
     if (config.apiKey.trim().isNotEmpty) {
@@ -209,22 +214,27 @@ final class HttpNeonGateway implements PostgrestGateway {
     return rows.isNotEmpty;
   }
 
-  /// Releases the underlying HTTP client. The gateway is unusable afterwards.
+  /// Closes owned resources only; injected clients/providers remain caller-owned.
   void close() {
+    if (_closed) return;
+    _closed = true;
     final provider = _tokenProvider;
-    if (provider is DisposableNeonTokenProvider) {
+    if (_ownsTokenProvider && provider is DisposableNeonTokenProvider) {
       provider.close();
     }
-    _client.close();
+    if (_ownsClient) _client.close();
   }
 
   Uri _resource(String table) => Uri.parse('${_config.dataApiUrl}/$table');
 
-  Map<String, String> _queryParams(PostgrestQuery? query) {
-    final params = <String, String>{'select': '*'};
+  Map<String, Object> _queryParams(PostgrestQuery? query) {
+    final params = <String, Object>{'select': '*'};
+    final filters = <String, List<String>>{};
     for (final filter in query?.filters ?? const <PostgrestFilter>[]) {
-      params[filter.column] = _filterValue(filter);
+      filters.putIfAbsent(filter.column, () => <String>[]).add(_filterValue(filter));
     }
+    // Repeated query keys are ANDed by PostgREST, including same-column ranges.
+    params.addAll(filters);
     final order = query?.orderBy ?? const <PostgrestOrder>[];
     if (order.isNotEmpty) {
       params['order'] = order
@@ -258,9 +268,9 @@ final class HttpNeonGateway implements PostgrestGateway {
       case PostgrestOperator.lessThanOrEqual:
         return 'lte.$value';
       case PostgrestOperator.inList:
-        return 'in${_csv(value)}';
+        return 'in.${_csv(value)}';
       case PostgrestOperator.notInList:
-        return 'not.in${_csv(value)}';
+        return 'not.in.${_csv(value)}';
       case PostgrestOperator.contains:
         return 'cs.$value';
       case PostgrestOperator.isNull:
@@ -271,20 +281,24 @@ final class HttpNeonGateway implements PostgrestGateway {
   }
 
   String _csv(Object? value) {
-    final items = value is Iterable
-        ? value.map<String>(_quote)
-        : <String>[_quote(value)];
-    return '(${items.join(',')})';
+    if (value is! Iterable || value.isEmpty) throw _invalidList();
+    return '(${value.map<String>(_quote).join(',')})';
   }
 
-  /// PostgREST needs string values inside `in(...)` quoted; numbers and
-  /// booleans stay bare.
+  /// Null elements are unsupported (use isNull / isNotNull instead).
+  /// Strings, including the literal text "null", are always quoted; escape
+  /// backslashes before quotes, then let Uri perform URL encoding exactly once.
   String _quote(Object? value) {
-    if (value is num || value is bool) {
-      return '$value';
-    }
-    return '"${'$value'.replaceAll('"', r'\"')}"';
+    if (value is bool || (value is num && value.isFinite)) return '$value';
+    if (value is! String) throw _invalidList();
+    return '"${value.replaceAll(r'\', r'\\').replaceAll('"', r'\"')}"';
   }
+
+  Failure _invalidList() => const Failure(
+    code: FailureCode.validationUnsupportedValue,
+    message: 'List filters require a non-empty list of strings, finite numbers, or booleans; null is not supported.',
+    kind: FailureKind.validation,
+  );
 
   List<Map<String, Object?>> _rows(http.Response response, FailureCode fallback) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
