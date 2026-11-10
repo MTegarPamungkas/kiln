@@ -46,6 +46,19 @@ tests; those that own a contract also ship a `kiln_testing` contract suite.
 See [getting-started.md](docs/getting-started.md) and
 [roadmap.md](docs/roadmap.md).
 
+## Documentation site
+
+A Vite + React documentation site lives in [`website/`](website/README.md). It
+generates pages from `docs/`, every `extension.yaml`, and each extension's
+README/topic docs, so the site follows the repository instead of drifting from
+it.
+
+```bash
+cd website
+npm install
+npm run dev
+```
+
 ## The Gate
 
 Every capability is reachable through one facade that returns a `Result`:
