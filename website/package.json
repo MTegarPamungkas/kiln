@@ -9,7 +9,7 @@
     "dev": "npm run content && vite",
     "build": "npm run content && vite build",
     "preview": "vite preview",
-    "build:pages": "npm run content && vite build --base=/kiln/ && node scripts/copy-404.mjs",
+    "build:pages": "npm run content && vite build --base=/ && node scripts/copy-404.mjs",
     "deploy": "npm run build:pages && node scripts/deploy-pages.mjs"
   },
   "dependencies": {
