@@ -10,9 +10,19 @@ Kiln documentation, grouped by what you are trying to do.
   and the Gate fit together.
 - [Roadmap](roadmap.md) — what is built and what is still planned.
 
+## API reference
+
+- [Core runtime](reference/core-runtime.md) — bootstrap, registry, modules, lifecycle, support, slots, session, privacy.
+- [Gate](reference/gate.md) — every typed verb and the one-call Result rule.
+- [Contracts](reference/contracts.md) — all 23 public contracts and their methods.
+- [Failure codes](reference/failure-codes.md) — stable codes, kinds, cancellation, retry.
+- [Testing](reference/testing.md) — test registry, fakes, contract suites, widget harness.
+- [Packages](reference/packages.md) — what each workspace package owns.
+
 ## Concepts
 
 - [Contracts and capabilities](concepts/contracts-and-capabilities.md)
+- [Contract behavior](concepts/contract-behavior.md)
 - [Compatibility](concepts/compatibility.md)
 - [Security model](concepts/security-model.md)
 - [Slots](concepts/slots.md)
@@ -42,6 +52,7 @@ Kiln documentation, grouped by what you are trying to do.
 
 - [CLI command reference](cli/reference.md)
 - [Target repository layout](folder-structure.md)
+- [Workspace packages](reference/packages.md)
 
 ## Architecture decision records
 

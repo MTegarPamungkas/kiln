@@ -44,6 +44,13 @@ kiln/
 │  │  ├─ native-patches.md                   # patching of native platform files by extensions
 │  │  ├─ compatibility.md                    # version compatibility rules for Kiln, extensions, and packages
 │  │  └─ security-model.md                   # security model: hooks, trust tiers, and checksums
+│  ├─ reference/                             # API reference for the public surface
+│  │  ├─ core-runtime.md                     # bootstrap, registry, lifecycle, support, slots, session, privacy
+│  │  ├─ gate.md                             # one-call Result facade and every typed verb
+│  │  ├─ contracts.md                        # all public contracts and their methods
+│  │  ├─ failure-codes.md                    # stable failure codes, kinds, retry, cancellation
+│  │  ├─ testing.md                          # test registry, fakes, contract suites, widget harness
+│  │  └─ packages.md                         # workspace package map and dependency direction
 │  ├─ cli/                                   # documentation for the kiln CLI commands
 │  │  └─ reference.md                        # reference for kiln commands, flags, and usage examples
 │  ├─ extensions/                            # extension documentation: catalog, how to write, test, and publish

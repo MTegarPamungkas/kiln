@@ -4,6 +4,17 @@ const DOC_SECTIONS = [
     sources: ['docs/getting-started.md', 'docs/architecture.md', 'docs/roadmap.md'],
   },
   {
+    label: 'API reference',
+    sources: [
+      'docs/reference/core-runtime.md',
+      'docs/reference/gate.md',
+      'docs/reference/contracts.md',
+      'docs/reference/failure-codes.md',
+      'docs/reference/testing.md',
+      'docs/reference/packages.md',
+    ],
+  },
+  {
     label: 'Concepts',
     sources: [
       'docs/concepts/contracts-and-capabilities.md',
@@ -50,6 +61,17 @@ const DOC_SECTIONS = [
   {
     label: 'Reference',
     sources: ['docs/cli/reference.md', 'docs/folder-structure.md'],
+  },
+  {
+    label: 'Packages',
+    sources: [
+      'packages/kiln_core/README.md',
+      'packages/kiln_extension_sdk/README.md',
+      'packages/kiln_cli/README.md',
+      'packages/kiln_store/README.md',
+      'packages/kiln_testing/README.md',
+      'packages/kiln_lints/README.md',
+    ],
   },
   {
     label: 'Project',

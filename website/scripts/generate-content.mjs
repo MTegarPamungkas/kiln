@@ -63,6 +63,7 @@ const sectionFor = (relative) => {
   if (relative === 'docs/getting-started.md') return 'Overview';
   if (relative === 'docs/architecture.md') return 'Overview';
   if (relative === 'docs/roadmap.md') return 'Overview';
+  if (relative.startsWith('docs/reference/')) return 'API reference';
   if (relative.startsWith('docs/concepts/')) return 'Concepts';
   if (relative.startsWith('docs/guides/')) return 'Guides';
   if (relative.startsWith('docs/extensions/')) return 'Build extensions';
@@ -129,6 +130,13 @@ const extraDocs = [
     route: '/docs/code-of-conduct',
     section: 'Project',
   },
+  ...['kiln_core', 'kiln_extension_sdk', 'kiln_cli', 'kiln_store', 'kiln_testing', 'kiln_lints'].map(
+    (packageName) => ({
+      source: `packages/${packageName}/README.md`,
+      route: `/docs/packages/${packageName}`,
+      section: 'Packages',
+    }),
+  ),
 ].filter((entry) => exists(entry.source));
 
 for (const entry of extraDocs) {

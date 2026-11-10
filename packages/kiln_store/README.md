@@ -45,7 +45,7 @@ path is resolved, so a single configuration can follow a branch or tag.
 ## Fetching the index and archives
 
 ```dart
-final cache = LocalCache(Directory(cacheDir));
+final cache = LocalCache(Directory(cacheDir), registry: config);
 final client = RegistryClient(config: config, cache: cache);
 final index = await client.fetchIndex();
 
@@ -120,20 +120,24 @@ and special files with the code `store.unsafe_archive`. Archives that are not
 ```dart
 final mode = OfflineMode(client: client, cache: cache, offline: true);
 final index = await mode.index();
-final bytes = await mode.archive('dio', '0.2.0');
+final version = index.find('dio')!.findVersion('0.2.0')!;
+final bytes = await mode.archive('dio', version);
 ```
 
 Offline mode never touches the network: the index is read from the cache or a
-`store.offline_missing` error is thrown, and an archive that is not cached also
-throws `store.offline_missing` (after confirming the id/version exists in the
-index). In online mode, a failure to fetch the index falls back to the cache
-when one is available.
+`store.offline_missing` error is thrown. An archive is only trusted when the
+cached index contains matching metadata (same version, URL, and SHA-256). In
+online mode, a cache hit is still verified against the caller-selected SHA-256;
+a corrupt cache entry is downloaded again from the selected URL. A failure to
+fetch the index falls back to the cache when one is available.
 
-Cache layout:
+`LocalCache` is namespaced by `RegistryConfig.identity`, so two registries cannot
+share archives. Archive filenames are hashed from the id and version.
 
 ```text
-<cache>/index.json
-<cache>/archives/<id>-<version>.tgz
+<cacheRoot>/<sha256(registry identity)>/
+  index.json
+  archives/<sha256([id, version])>.tgz
 ```
 
 ## Publish

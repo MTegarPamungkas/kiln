@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import {
   BookMarked,
+  BookOpen,
   Boxes,
   Compass,
   Landmark,
   Layers3,
+  Package,
   Rocket,
   Settings2,
   ShieldCheck,
@@ -18,22 +20,26 @@ import { usePageTitle } from '../lib/use-page-title';
 
 const SECTION_ICONS = {
   Overview: Rocket,
+  'API reference': BookOpen,
   Concepts: Layers3,
   Guides: Compass,
   Examples: Boxes,
   'Build extensions': Wrench,
   Reference: Terminal,
+  Packages: Package,
   Project: ShieldCheck,
   'Architecture decisions': Landmark,
 };
 
 const SECTION_COPY = {
   Overview: 'Create a project, understand the runtime, and see what is shipping.',
+  'API reference': 'Contracts, Gate verbs, failure codes, runtime, and testing APIs.',
   Concepts: 'Contracts, capabilities, behavior, security, slots, and transactions.',
   Guides: 'Step-by-step recipes for backends, offline, flavors, and migrations.',
   Examples: 'Generated apps you can run, read, and copy from.',
   'Build extensions': 'Manifest, brick, tests, trust, publishing, and the catalog.',
   Reference: 'CLI commands, flags, and the target repository layout.',
+  Packages: 'The six workspace packages and what each one owns.',
   Project: 'Contributing, security policy, and community expectations.',
   'Architecture decisions': 'The decisions that shaped Kiln, with their tradeoffs.',
 };
