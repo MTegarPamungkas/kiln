@@ -57,6 +57,8 @@ class _KilnAppState extends State<KilnApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_expiry.dispose());
+    // The lifecycle owns every module, the registry support, and the session.
+    unawaited(_lifecycle.dispose());
     super.dispose();
   }
 
