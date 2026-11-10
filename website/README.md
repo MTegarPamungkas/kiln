@@ -38,8 +38,11 @@ Netlify/Cloudflare Pages style hosts.
 npm run deploy
 ```
 
-`build:pages` builds with `--base=/kiln/`, copies `index.html` to `404.html` for
-deep links, and `gh-pages` pushes the `dist/` folder to the `gh-pages` branch.
+`build:pages` builds with `--base=/kiln/` and copies `index.html` to `404.html`
+for deep links. `deploy` publishes only `dist/` through a temporary Git repo to
+the `gh-pages` branch, so a local checkout with long Windows paths is never
+cloned. It force-updates the deployment branch, which is intentional.
+
 The repository Pages source is the `gh-pages` branch at `/`. The published URL
 for this repository is `https://mtegarpamungkas.github.io/kiln/`.
 
