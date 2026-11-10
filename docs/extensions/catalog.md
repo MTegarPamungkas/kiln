@@ -14,7 +14,7 @@ This catalog is generated from extension manifests by
 | `connectivity` | Connectivity | 0.1.1 | connectivity | official | `connectivity` |
 | `crash_report` | Crash Report | 0.1.0 | crash | official | `crash_reporter` |
 | `deep_link` | Deep links | 0.1.0 | deep_link | official | `deep_links` |
-| `dio` | Dio HTTP client | 0.1.0 | network | official | `http_client`, `http_pipeline` |
+| `dio` | Dio HTTP client | 0.1.1 | network | official | `http_client`, `http_pipeline` |
 | `env` | Environment | 0.1.0 | config | official | `env` |
 | `firebase` | Firebase | 0.1.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `flavors` | Flavors | 0.1.0 | flavor | official | `flavor` |

@@ -19,6 +19,8 @@ automatically.
 ## Gate
 
 ```dart
+import 'package:my_app/extensions/permission/gate_permission.dart';
+
 final status = await gate.permissionStatus(PermissionKind.camera);
 final result = await gate.requestPermission(PermissionKind.camera); // Result<PermissionStatus>
 final group = await gate.ensurePermissions(

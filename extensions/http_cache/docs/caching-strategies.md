@@ -11,5 +11,8 @@ Defaults:
 - Mutation requests invalidate entries with the same path prefix.
 - At most 100 entries; the oldest entries are evicted first.
 
-For personal data, the backend should send `Cache-Control: private, no-store`
-or the app should avoid caching those endpoints.
+Authenticated requests already bypass the cache, so a shared cache cannot leak
+one account's response to another. Backends should still send
+`Cache-Control: private, no-store` on sensitive endpoints as defence-in-depth.
+For the full safety rules, see
+[security and revalidation](security-and-revalidation.md).

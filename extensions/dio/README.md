@@ -31,7 +31,11 @@ flutter run --dart-define=KILN_API_KEY=secret
 ```
 
 Use `api_key_query=key` instead of a header when the API expects the key in the
-query string. `api_key_prefix` supports values such as `Bearer `.
+query string. `api_key_prefix` supports values such as `Bearer `. The key is
+only sent to requests whose resolved URL matches the `base_url` scheme, host,
+and port; third-party URLs never receive it. See
+[docs/cancellation-and-uploads.md](docs/cancellation-and-uploads.md) for
+cancellation, multipart, and download helpers.
 
 ## Gate
 

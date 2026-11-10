@@ -99,6 +99,7 @@ export default function ExtensionPage() {
         <a href="#configuration"><Settings2 size={14} /> Configuration</a>
         <a href="#integration"><Layers3 size={14} /> Integration</a>
         <a href="#usage"><Puzzle size={14} /> Gate usage</a>
+        {extension.gate ? <a href="#extension-gate"><Puzzle size={14} /> Gate API</a> : null}
         {extension.docs.length ? <a href="#docs"><Box size={14} /> Docs</a> : null}
       </nav>
 
@@ -271,6 +272,45 @@ export default function ExtensionPage() {
           </p>
         ) : null}
       </section>
+
+      {extension.gate ? (
+        <section id="extension-gate" className="doc-section">
+          <h2>Extension-specific gate</h2>
+          <p>
+            This extension adds typed verbs to <code>Gate</code>. Import its gate
+            file once in the application code that uses it; replace{' '}
+            <code>my_app</code> with the project package name.
+          </p>
+          <pre><code>{`import '${extension.gate.importPath}';`}</code></pre>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Returns</th>
+                </tr>
+              </thead>
+              <tbody>
+                {extension.gate.methods.map((method) => (
+                  <tr key={`${method.name}-${method.returns}`}>
+                    <td>
+                      <code>
+                        {method.name}
+                        {method.getter ? ' (getter)' : '()'}
+                      </code>
+                    </td>
+                    <td><code>{method.returns}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="muted">
+            These verbs follow the same rule as the core Gate: they return
+            <code>Result</code> and never own UI.
+          </p>
+        </section>
+      ) : null}
 
       {extension.docs.length ? (
         <section id="docs" className="doc-section">

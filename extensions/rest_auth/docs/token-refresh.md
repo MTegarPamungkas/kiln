@@ -27,10 +27,13 @@ final token = await auth.tokenProvider.accessToken();
 
 1. Calls `refreshAccessToken()`.
 2. If a new token exists, retries the request once with the new Bearer.
-3. If the refresh fails or the second request is still 401, calls `signOut()`.
+3. If the refresh fails or the second request is still 401, calls
+   `clearSession()`.
 
-`signOut()` deletes the tokens and marks the session as ended, so navigation
-guards can direct the user to the sign-in page.
+`clearSession()` deletes local tokens, cached user state, and marks the session
+as ended without making another network request, so navigation guards can send
+the user to the sign-in page. The public `signOut()` first attempts the logout
+endpoint and always clears local state afterwards.
 
 ## Failures
 

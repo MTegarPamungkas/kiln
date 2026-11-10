@@ -31,6 +31,8 @@ before the service exists.
 ## Usage
 
 ```dart
+import 'package:my_app/extensions/remote_config/gate_remote_config.dart';
+
 final gate = ...; // your Gate
 
 // Sync feature checks over the active snapshot.

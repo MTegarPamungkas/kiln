@@ -51,7 +51,8 @@ class DioClient implements HttpClient {
   Future<HttpResponse> _send(HttpRequest request) async {
     request.cancelToken?.throwIfCancelled();
     final startedAt = DateTime.now();
-    final authorized = _withApiKey(request);
+    final target = _resolveUri(request.resolvedUri);
+    final authorized = _withApiKey(request, target);
     final uri = _resolveUri(authorized.resolvedUri);
     try {
       final response = await _dio.fetch<Object?>(
@@ -95,9 +96,9 @@ class DioClient implements HttpClient {
     return Uri.parse('$base$relative');
   }
 
-  HttpRequest _withApiKey(HttpRequest request) {
+  HttpRequest _withApiKey(HttpRequest request, Uri target) {
     final key = _config.apiKey;
-    if (!_config.hasApiKey) {
+    if (!_config.hasApiKey || !_isBackend(target)) {
       return request;
     }
     if (_config.apiKeyHeader.isNotEmpty) {
@@ -117,6 +118,16 @@ class DioClient implements HttpClient {
       );
     }
     return request;
+  }
+
+  bool _isBackend(Uri uri) {
+    final base = Uri.tryParse(_dio.options.baseUrl);
+    return base != null &&
+        base.host.isNotEmpty &&
+        (base.isScheme('http') || base.isScheme('https')) &&
+        uri.scheme == base.scheme &&
+        uri.host == base.host &&
+        uri.port == base.port;
   }
 
   @override

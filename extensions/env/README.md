@@ -16,6 +16,8 @@ The keys available today are `api_base_url`, `api_key`, `feature_flags`, and
 ## Gate
 
 ```dart
+import 'package:my_app/extensions/env/gate_env.dart';
+
 final apiKey = gate.env.read('API_KEY');  // String?
 final all = gate.env.values;              // Map<String, String>
 

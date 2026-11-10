@@ -153,6 +153,26 @@ for (const entry of extraDocs) {
   });
 }
 
+
+function parseGate(source, id) {
+  const className = source.match(/extension\s+(\w+)\s+on\s+Gate/)?.[1] ?? null;
+  const methods = [];
+  const methodPattern = /^\s{2}([A-Za-z][\w<>?, ]*(?:<[^()\n]+>)?)\s+([a-zA-Z_]\w*)\s*\(/gm;
+  for (const match of source.matchAll(methodPattern)) {
+    methods.push({ returns: match[1].trim(), name: match[2] });
+  }
+  const getterPattern = /^\s{2}([A-Za-z][\w<>?]+)\s+get\s+([a-zA-Z_]\w*)/gm;
+  for (const match of source.matchAll(getterPattern)) {
+    methods.push({ returns: match[1].trim(), name: match[2], getter: true });
+  }
+  if (!methods.length) return null;
+  return {
+    importPath: 'package:my_app/extensions/' + id + '/gate_' + id + '.dart',
+    className,
+    methods,
+  };
+}
+
 const extensionDirs = fs
   .readdirSync(path.join(root, 'extensions'), { withFileTypes: true })
   .filter(
@@ -317,6 +337,9 @@ const extensions = extensionDirs.map((id) => {
     route: `/extensions/${id}`,
     installCommand: '',
     gateExample: '',
+    gate: exists(`extensions/${id}/brick/__brick__/lib/extensions/${id}/gate_${id}.dart`)
+      ? parseGate(read(`extensions/${id}/brick/__brick__/lib/extensions/${id}/gate_${id}.dart`), id)
+      : null,
   };
   extension.installCommand = installCommandFor(extension);
   extension.gateExample = gateExampleFor(extension);

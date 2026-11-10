@@ -40,7 +40,13 @@ When `http_pipeline` is available, the module adds two middleware:
 
 | Priority | Middleware | Responsibility |
 | --- | --- | --- |
-| 10 | `AuthMiddleware` | Adds `Authorization: Bearer` |
-| 11 | `UnauthorizedHandler` | Refresh, retry once, signOut if rejected |
+| 10 | `AuthMiddleware` | Adds `Authorization: Bearer` to eligible backend requests |
+| 11 | `UnauthorizedHandler` | Refresh, retry once, clear the session if rejected |
+
+Both middleware are scoped to the configured backend origin. They do not attach
+the token to third-party URLs and do not react to a 401 from another origin.
+The credential endpoints (`login`, `register`, `refresh`, `logout`) are excluded
+from bearer injection and 401 recovery, so a refresh cannot recursively wait on
+itself and a bad login cannot trigger a logout loop.
 
 See [token-refresh.md](token-refresh.md) for details of the refresh flow.

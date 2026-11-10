@@ -28,6 +28,8 @@ not be logged.
 ## Gate
 
 ```dart
+import 'package:my_app/extensions/logger/gate_logger.dart';
+
 gate.logger.info('User signed in', data: {'id': userId});
 gate.logger.error('Upload failed', error: err);
 

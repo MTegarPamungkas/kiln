@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T12:39:08.671343Z",
+  "generated_at": "2026-11-10T15:35:49.837749Z",
   "extensions": [
     {
       "id": "analytics",
@@ -50,7 +50,7 @@
         {
           "version": "0.1.1",
           "url": "archives/appwrite-0.1.1.tgz",
-          "sha256": "1cb116ca5d35c6b4cae39d314b2f4a64a61b476f8a858d05fb90550ce82b3d1c",
+          "sha256": "3bf88b90d3d10c7fe7419ac72db6f2a62ecceb202228203eb243d8c6c996b94b",
           "provides": [
             "auth",
             "social_auth",
@@ -109,7 +109,7 @@
         {
           "version": "0.2.0",
           "url": "archives/bloc-0.2.0.tgz",
-          "sha256": "5a1c72dfb40d6af8547c27eb1d2e0cc38d4e362e194d5d8cbbf6019b1aba7ad2",
+          "sha256": "13b093fecd0904bd12ebd173797fe8d44e6a42cb38ade739d6d24de1aefcbd31",
           "provides": [
             "state_bloc"
           ],
@@ -131,7 +131,7 @@
         {
           "version": "0.1.0",
           "url": "archives/calendar-0.1.0.tgz",
-          "sha256": "7936e42d77e2beddccf80ca3391bae75a205562e1c6ae6a029a1543e0aee2a70",
+          "sha256": "e0d9a00623b838427f6271c43b25a08f13019c6e0f4794e4e707dc6032bffd7f",
           "provides": [
             "calendar"
           ],
@@ -187,7 +187,7 @@
         {
           "version": "0.1.1",
           "url": "archives/connectivity-0.1.1.tgz",
-          "sha256": "3198a448dea96a95646ab3e9a7edcb437804e64d23abc3ff8e438e0208be3fa6",
+          "sha256": "d6956691373fd7395e335df3e95ff85a6b284756ec5654ab39af8ceff91fde3d",
           "provides": [
             "connectivity"
           ],
@@ -209,7 +209,7 @@
         {
           "version": "0.1.0",
           "url": "archives/crash_report-0.1.0.tgz",
-          "sha256": "42aa4acd57b4e2ab919e153dc91d5dc791c7d223b1f32726891b79717da78ab4",
+          "sha256": "7161cebc1dae56a0de23e75d8eb25134d127869b6f291072c654d2554377c11f",
           "provides": [
             "crash_reporter"
           ],
@@ -231,7 +231,7 @@
         {
           "version": "0.1.0",
           "url": "archives/deep_link-0.1.0.tgz",
-          "sha256": "610f75997ad2617cddfa40f0f53914e2ceb0c0fcdd7de29544699b3ec2264c41",
+          "sha256": "966a42062100b80eaed69f6230c1da603ee2d1f5d193bc0df49b50185a429362",
           "provides": [
             "deep_links"
           ],
@@ -247,13 +247,26 @@
       "name": "Dio HTTP client",
       "description": "HTTP client and middleware pipeline built on dio.",
       "category": "network",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/dio-0.1.0.tgz",
           "sha256": "1046eea342effe6982cb35d3751fd5f8514888cd10c1ffec676646e61b9eb3a9",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/dio-0.1.1.tgz",
+          "sha256": "33b2b68445e56de3775c68aaebcba7f79d69be6d3dcc6f9bac9e7cdb6ae9b1b1",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -276,7 +289,7 @@
         {
           "version": "0.1.0",
           "url": "archives/env-0.1.0.tgz",
-          "sha256": "39751bdd7ded3b62f7cbe717e172c3f0f1c98c6909be0a5afe4d0d5813e184db",
+          "sha256": "9723634565c6c708f8ae7031df1cc79c800471a31610007a76bd53a808ae994b",
           "provides": [
             "env"
           ],
@@ -346,7 +359,7 @@
         {
           "version": "0.1.0",
           "url": "archives/geolocation-0.1.0.tgz",
-          "sha256": "dd75bbffa7ae0fb7fba251792b10f2ebc739c68b9b9a9f8839f795ef537471d5",
+          "sha256": "192d8ef3c262d4a34ec6853e797ecb7d2598ea314211aee7fba73a83e4e02ad5",
           "provides": [
             "location"
           ],
@@ -406,7 +419,7 @@
         {
           "version": "0.1.1",
           "url": "archives/http_cache-0.1.1.tgz",
-          "sha256": "11720ec3bef579b26f1d82ad01cc66f16841f5fcafdfbfa5e8e1c3abcbb8160c",
+          "sha256": "49875963ba16758a3b17c2e602857bb15a61b8053abf6f61112c797b8a50b989",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -432,7 +445,7 @@
         {
           "version": "0.1.0",
           "url": "archives/http_retry-0.1.0.tgz",
-          "sha256": "86644356935b50564340d613587038b8b494006f6c34011dbd594333c2057244",
+          "sha256": "712ed0ebc76e8e16ed872082f5b6cf24c0f57217ac2c00fcea98ae56629bec92",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -521,7 +534,7 @@
         {
           "version": "0.1.0",
           "url": "archives/logger-0.1.0.tgz",
-          "sha256": "3d2540e7adce578548fef7667b35c14c0ae7f1bcdce86de1141516d56c27749f",
+          "sha256": "0f8b4987ce28128ed927f43d7c622eb127eb82f72c3d3096d6db9e4bf0cab581",
           "provides": [
             "logger"
           ],
@@ -557,7 +570,7 @@
         {
           "version": "0.1.1",
           "url": "archives/neon-0.1.1.tgz",
-          "sha256": "2054d66cc0d0b1f5d7a8672ec3dcdb35bc8b98d5e08e50a6681c46899fb9e556",
+          "sha256": "d31770e2a7d5f03a9bfaf9470ea12621aae3d9afacbf2548d957bc6ed5f29769",
           "provides": [
             "auth",
             "remote_database",
@@ -615,7 +628,7 @@
         {
           "version": "0.1.0",
           "url": "archives/permission-0.1.0.tgz",
-          "sha256": "cae30b6a8a9bf3e18e3318b36b5719e8476ad03ee56973c2b87f21853b315edc",
+          "sha256": "cca4e3a9200e2b200f716d8949a9894c4bcc11ce5b7b98e06eaad59c89cf38ef",
           "provides": [
             "permission"
           ],
@@ -637,7 +650,7 @@
         {
           "version": "0.1.0",
           "url": "archives/remote_config-0.1.0.tgz",
-          "sha256": "9b74531a237f40839dc841ee442c7bb4fa20e572ebdaba8efc49e43bbaf62ecd",
+          "sha256": "482ad214f374845eb3392273e57fdaef57f99e903193956c291ff15b75e0ce93",
           "provides": [
             "remote_config"
           ],
@@ -675,7 +688,7 @@
         {
           "version": "0.1.1",
           "url": "archives/rest_auth-0.1.1.tgz",
-          "sha256": "d1af1eeb7f9d34b63b82521df53db44b77fb1193ce536e578b487020616af3db",
+          "sha256": "33b665896800f7dcdfacd48986324e5bb8b58d83ab1d6cfd389696991669ef9d",
           "requires": [
             "http_client",
             "secure_storage"
@@ -713,7 +726,7 @@
         {
           "version": "0.2.0",
           "url": "archives/riverpod-0.2.0.tgz",
-          "sha256": "6815eedf56889c33f43483f2dcddd0c1fa2ea48f9b4df16faa41c0af14a41a1d",
+          "sha256": "b51afd6587fe5f441732da551774f6f326864c0f3dbca0d401277f3fa5d4e297",
           "provides": [
             "state_riverpod"
           ],
@@ -735,7 +748,7 @@
         {
           "version": "0.1.0",
           "url": "archives/secure_storage-0.1.0.tgz",
-          "sha256": "80fcfed0809caf238968443e5b49a9375c04c10e18de9c49f487090f32c99d69",
+          "sha256": "0e58b8dd312e24fd92d987c1d91601ed19c9e5e8bb48cf16a551832900a139a8",
           "provides": [
             "secure_storage"
           ],
@@ -757,7 +770,7 @@
         {
           "version": "0.1.0",
           "url": "archives/share-0.1.0.tgz",
-          "sha256": "10e9382829206519ffa0e264a9238be8bd6ed7867ffe57ae041bc452109ba686",
+          "sha256": "a91152a326f2b239cfa9cbb859d7b38000e876372c12f4ce1d799a97c96682c8",
           "provides": [
             "share"
           ],
@@ -779,7 +792,7 @@
         {
           "version": "0.1.0",
           "url": "archives/social_login-0.1.0.tgz",
-          "sha256": "27752c95d184b1145271a13c2bf98b25dc53d1d4ce346169b33cbd5fcd67b9eb",
+          "sha256": "0a6d4b4825e94b12836627872ce770c65b321323ea9b34a350b92c5b860ae8a0",
           "requires": [
             "social_auth"
           ],
@@ -804,7 +817,7 @@
         {
           "version": "0.1.0",
           "url": "archives/storage-0.1.0.tgz",
-          "sha256": "31603a3eee3a94109fbd51f5cc754a0b364a831e3c2f7fad359971e737d81056",
+          "sha256": "efc0cdfb7dbbb55a78c07cdcd149779f3efbc4d2d7c259c5744e0dd13f851320",
           "provides": [
             "storage"
           ],

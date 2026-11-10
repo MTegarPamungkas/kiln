@@ -94,6 +94,8 @@ Further guides:
 ## Gate
 
 ```dart
+import 'package:my_app/extensions/deep_link/gate_deep_link.dart';
+
 final initial = gate.deepLinks.initialLink;   // Uri?
 gate.deepLinks.links.listen((uri) { ... });   // Stream<Uri>
 

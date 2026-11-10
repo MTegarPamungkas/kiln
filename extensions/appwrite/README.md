@@ -63,7 +63,9 @@ final stored = await storage.upload(
 
 Query mapping, document permissions, and behavior differences are covered in
 [docs/collections-and-permissions.md](docs/collections-and-permissions.md) and
-[docs/backend-swap-notes.md](docs/backend-swap-notes.md).
+[docs/backend-swap-notes.md](docs/backend-swap-notes.md). Offline logout and
+session cleanup are covered in
+[docs/logout-and-session-cleanup.md](docs/logout-and-session-cleanup.md).
 
 ## Gate
 

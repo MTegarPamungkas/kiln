@@ -7,8 +7,9 @@ Auth, remote database, and object storage for [Neon](https://neon.tech) apps.
   Auth)**.
 - **`RemoteDatabase`** — CRUD and `watch` over the **Data API** (PostgREST), with optional push-triggered refresh via a `NeonChangeSignal`.
   (PostgREST).
-- **`FileStorage`** — upload/download/signed URLs over **Object Storage**
-  (S3-compatible, SigV4-signed).
+- **`FileStorage`** — upload/download/signed URLs over **Object Storage**,
+  through an application-owned presigning backend that keeps the S3 credentials
+  server-side.
 
 The SDK owns no UI; every call goes through the Gate and returns a `Result`.
 `social_auth` is intentionally not provided — Better Auth social login is a
@@ -22,7 +23,7 @@ kiln add neon
 ```
 
 Prompts: the Data API URL, an optional bearer token, the Neon Auth base URL,
-the Postgres schema, and the Object Storage endpoint/bucket/region/keys.
+the Postgres schema, the storage signing URL, and the Object Storage bucket.
 
 ## Quick start: anonymous database access
 
@@ -93,16 +94,22 @@ never holds the Realtime secret.
 final stored = await gate.uploadFile(
   FileUpload(path: 'avatars/user-1.png', bytes: bytes, contentType: 'image/png'),
 );
-stored.url; // presigned link returned with the upload
-final link = await gate.files.url('avatars/user-1.png'); // or mint a fresh one
+final link = await gate.files.url('avatars/user-1.png');
 ```
+
+The app never holds an S3 key. `storage_signing_url` points to a backend you
+deploy; it receives the signed-in user's Neon Auth JWT and returns
+`{url, headers?}` for one scoped upload/download/delete. The signing endpoint
+must verify the JWT and per-user object ownership, keep the S3 credentials
+server-side, and issue URLs valid for at most 900 seconds. See
+[docs/neon.md](docs/neon.md#6-object-storage) for the request/response contract.
 
 ## Setup checklist
 
 1. In the Neon Console, enable the **Data API** and **Neon Auth**; note the
    Data API URL (`…/rest/v1`) and the Auth base URL (`…/auth`).
-2. Enable **Object Storage**, create a bucket, and issue a Neon credential
-   (token id → access key id, S3 secret → secret key) scoped to that bucket.
+2. Enable **Object Storage** and create the bucket named in the prompt. Keep the
+   S3 access key and secret on your signing backend, never in the app.
 3. Run the GRANT block above for any table the app touches, then
    `neon data-api refresh-schema`.
 4. For per-user data, grant the `authenticated` role and add row-level security
@@ -110,7 +117,8 @@ final link = await gate.files.url('avatars/user-1.png'); // or mint a fresh one
 
 ## Security note
 
-The Data API token (or the anonymous JWT) and the Object Storage keys are
-shipped to the client. Enforce authorization with Postgres **row-level
-security** and scope the storage token to a single bucket — never embed a
-service-role key. Review Neon's Data API and Object Storage guidance first.
+The Data API token or anonymous JWT is a client credential; enforce
+authorization with Postgres **row-level security**. Never embed a service-role
+key. Object Storage uses a user-JWT presigning backend, so the app never carries
+an S3 credential. Review Neon's Data API and Object Storage guidance before
+pointing an app at a production project.

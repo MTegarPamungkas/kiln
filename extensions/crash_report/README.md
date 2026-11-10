@@ -35,6 +35,8 @@ you have a Sentry project.
 the contract as single-call `Result` verbs:
 
 ```dart
+import 'package:my_app/extensions/crash_report/gate_crash_report.dart';
+
 // From kiln_core:
 await gate.reportError(error, stackTrace: stackTrace, context: {'screen': 'home'});
 await gate.reportMessage('Checkout failed');
