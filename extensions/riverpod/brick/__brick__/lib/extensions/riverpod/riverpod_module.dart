@@ -15,16 +15,22 @@ final class RiverpodModule extends KilnModule {
   Set<String> get provides => const <String>{'state_riverpod'};
 
   @override
+  Set<String> get optionalRequires => const <String>{'logger'};
+
+  @override
   void register(Registry registry) {
     var slots = registry.readOrNull<SlotRegistry>();
     if (slots == null) {
       slots = SlotRegistry();
       registry.registerSingleton<SlotRegistry>(slots);
     }
+    final logger = registry.readOrNull<AppLogger>();
     slots
         .open<AppWrapper>(SlotNames.appWrappers)
         .add(buildRiverpodAppWrapper(registry), priority: 0, owner: 'riverpod');
-    registry.registerSingleton<RiverpodSupport>(const RiverpodSupport());
+    registry.registerSingleton<RiverpodSupport>(
+      RiverpodSupport(observerAttached: logger != null),
+    );
   }
 
   @override

@@ -6,6 +6,10 @@ import 'package:{{app_name}}/extensions/riverpod/riverpod_module.dart';
 import 'package:{{app_name}}/extensions/riverpod/riverpod_support.dart';
 
 void main() {
+  test('declares the optional dependency that determines readiness', () {
+    expect(const RiverpodModule().optionalRequires, contains('logger'));
+  });
+
   test('module registers the app wrapper', () {
     final registry = createTestRegistry();
 

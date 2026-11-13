@@ -17,6 +17,9 @@ final class FlavorsModule extends KilnModule {
   Set<String> get provides => const <String>{'flavor'};
 
   @override
+  Set<String> get optionalRequires => const <String>{'logger'};
+
+  @override
   void register(Registry registry) {
     final flavor = registry.readOrNull<AppFlavor>();
     registry

@@ -30,6 +30,13 @@ final class _FakeGateway implements ConnectivityGateway {
 }
 
 void main() {
+  test('declares the optional dependency that determines readiness', () {
+    expect(
+      ConnectivityModule().optionalRequires,
+      contains('http_client'),
+    );
+  });
+
   test('module stops its owned monitor on dispose', () async {
     final gateway = _FakeGateway();
     final registry = GetItRegistry();

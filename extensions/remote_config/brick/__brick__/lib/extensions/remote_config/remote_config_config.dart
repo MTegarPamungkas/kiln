@@ -7,7 +7,7 @@ import 'package:kiln_core/kiln_core.dart';
 /// before a config service exists.
 final class RemoteConfigConfig {
   RemoteConfigConfig({
-    this.endpoint = '{{endpoint}}',
+    this.endpoint = '{{{endpoint}}}',
     this.fetchInterval = const Duration(minutes: 15),
     this.requestTimeout = const Duration(seconds: 10),
     Set<AppFlavor>? enabledFlavors,
@@ -69,7 +69,8 @@ final class RemoteConfigConfig {
           uri.host.isEmpty) {
         throw Failure(
           code: FailureCode.configurationInvalid,
-          message: 'Remote config endpoint "$endpoint" is not an absolute HTTP URL.',
+          message:
+              'Remote config endpoint "$endpoint" is not an absolute HTTP URL.',
           kind: FailureKind.configuration,
           details: <String, Object?>{'endpoint': endpoint},
         );
@@ -85,8 +86,7 @@ final class RemoteConfigConfig {
     if (!noopWhenEndpointEmpty && !hasEndpoint) {
       throw const Failure(
         code: FailureCode.configurationMissing,
-        message:
-            'A remote config endpoint is required when the empty-endpoint noop is off.',
+        message: 'A remote config endpoint is required when the empty-endpoint noop is off.',
         kind: FailureKind.configuration,
       );
     }
@@ -104,7 +104,8 @@ final class RemoteConfigConfig {
       fetchInterval: fetchInterval ?? this.fetchInterval,
       requestTimeout: requestTimeout ?? this.requestTimeout,
       enabledFlavors: enabledFlavors ?? this.enabledFlavors,
-      noopWhenEndpointEmpty: noopWhenEndpointEmpty ?? this.noopWhenEndpointEmpty,
+      noopWhenEndpointEmpty:
+          noopWhenEndpointEmpty ?? this.noopWhenEndpointEmpty,
     );
   }
 

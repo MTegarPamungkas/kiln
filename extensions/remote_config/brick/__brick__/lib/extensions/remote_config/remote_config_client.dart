@@ -15,14 +15,12 @@ import 'remote_config_gateway.dart';
 final class RemoteConfigClient implements RemoteConfig {
   RemoteConfigClient({
     required this.config,
-    required RemoteConfigGateway gateway,
-    RemoteConfigFailureMapper failureMapper =
-        const RemoteConfigFailureMapper(),
-  }) : _gateway = gateway,
-       _mapper = failureMapper;
+    required this.gateway,
+    RemoteConfigFailureMapper failureMapper = const RemoteConfigFailureMapper(),
+  }) : _mapper = failureMapper;
 
   final RemoteConfigConfig config;
-  final RemoteConfigGateway _gateway;
+  final RemoteConfigGateway gateway;
   final RemoteConfigFailureMapper _mapper;
 
   final Map<String, Object?> _defaults = <String, Object?>{};
@@ -36,7 +34,7 @@ final class RemoteConfigClient implements RemoteConfig {
       return;
     }
     try {
-      final values = await _gateway.load(
+      final values = await gateway.load(
         config.endpoint,
         timeout: config.requestTimeout,
       );
@@ -132,6 +130,6 @@ final class RemoteConfigClient implements RemoteConfig {
     if (!_changes.isClosed) {
       await _changes.close();
     }
-    await _gateway.close();
+    await gateway.close();
   }
 }

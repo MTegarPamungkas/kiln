@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- The module orders itself after the logger, so the Bloc observer is
+  attached when both extensions are installed.
+
 ## 0.2.0
 
 - Breaking: the brick no longer ships Cubit scaffolding. `base_cubit.dart`,

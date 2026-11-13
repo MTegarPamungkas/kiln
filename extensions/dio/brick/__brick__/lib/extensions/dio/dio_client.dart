@@ -64,6 +64,11 @@ class DioClient implements HttpClient {
             ...authorized.headers,
           },
           data: authorized.body,
+          // 304 is a successful revalidation result for cache middleware, not
+          // a transport error.
+          validateStatus: (status) =>
+              status != null &&
+              ((status >= 200 && status < 300) || status == 304),
         ),
       );
 

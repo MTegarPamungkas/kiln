@@ -141,6 +141,22 @@ void main() {
     expect(captured?.uri.queryParameters['key'], isNull);
   });
 
+  test('returns 304 so cache middleware can revalidate', () async {
+    final dio = Dio();
+    dio.httpClientAdapter = DioTestAdapter(
+      (_) async => ResponseBody.fromString('', 304),
+    );
+    final client = DioClient(dio: dio);
+
+    final response = await client.get(
+      Uri.parse('https://api.kiln.dev/users'),
+      headers: const <String, String>{'If-None-Match': 'W/"v1"'},
+    );
+
+    expect(response.statusCode, 304);
+    expect(response.isSuccessful, isFalse);
+  });
+
   test('maps adapter failures to Failure', () async {
     final dio = Dio();
     dio.httpClientAdapter = DioTestAdapter(

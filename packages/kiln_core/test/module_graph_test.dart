@@ -38,10 +38,7 @@ void main() {
     );
 
     test('orders optional providers first when they are installed', () {
-      final consumer = _TestModule(
-        'consumer',
-        optionalRequires: const {'db'},
-      );
+      final consumer = _TestModule('consumer', optionalRequires: const {'db'});
       final provider = _TestModule('provider', provides: const {'db'});
       final graph = ModuleGraph([consumer, provider]);
 
@@ -59,7 +56,8 @@ void main() {
       expect(graph.resolve().single.id, 'consumer');
     });
 
-    test('keeps input order for independent modules', () {      final graph = ModuleGraph([
+    test('keeps input order for independent modules', () {
+      final graph = ModuleGraph([
         _TestModule('a'),
         _TestModule('b'),
         _TestModule('c'),
@@ -158,6 +156,26 @@ void main() {
             isNotEmpty,
           ),
         ),
+      );
+    });
+
+    test('tolerates mutually optional dependencies', () {
+      final logger = _TestModule(
+        'logger',
+        provides: const {'logger'},
+        optionalRequires: const {'crash_reporter'},
+      );
+      final crash = _TestModule(
+        'crash_report',
+        provides: const {'crash_reporter'},
+        optionalRequires: const {'logger'},
+      );
+
+      final ordered = ModuleGraph([crash, logger]).resolve();
+
+      expect(
+        ordered.map((module) => module.id),
+        containsAll(<String>['logger', 'crash_report']),
       );
     });
   });

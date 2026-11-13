@@ -1,10 +1,11 @@
 id: remote_config
 name: Remote Config
-version: 0.1.0
+version: 0.1.1
 description: Feature flags and remote configuration fetched from any JSON HTTP endpoint, read through the Gate.
 category: config
 tier: official
-exclusive: true
+# Complements build-time env values instead of replacing them.
+exclusive: false
 provides:
   - remote_config
 optional_requires:

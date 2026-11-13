@@ -64,4 +64,33 @@ void main() {
     },
     timeout: const Timeout(Duration(minutes: 3)),
   );
+
+  test(
+    'remote_config renders an endpoint without HTML escaping',
+    () async {
+      final harness = ExtensionTestHarness(extensionRoot: Directory.current);
+
+      final files = await harness.render(
+        project: const {'name': 'remote_config_app'},
+        answers: const <String, Object?>{
+          'endpoint': 'https://config.example.dev/flags.json',
+        },
+      );
+      final source = String.fromCharCodes(
+        files
+            .firstWhere(
+              (file) =>
+                  file.relativePath.endsWith('remote_config_config.dart'),
+            )
+            .bytes,
+      );
+
+      expect(
+        source,
+        contains("endpoint = 'https://config.example.dev/flags.json'"),
+      );
+      expect(source, isNot(contains('&#x2F;')));
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
 }

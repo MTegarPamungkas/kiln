@@ -144,6 +144,7 @@
       "properties": {
         "permissions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "url_scheme_prompt": { "type": "string" },
         "app_links": {
           "type": "object",
           "additionalProperties": false,
@@ -182,7 +183,8 @@
         "podfile_permissions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "associated_domains": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "entitlements": { "type": "object", "additionalProperties": true },
-        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "url_scheme_prompt": { "type": "string" }
       }
     },
     "macos": {
@@ -190,7 +192,8 @@
       "additionalProperties": false,
       "properties": {
         "entitlements": { "type": "object", "additionalProperties": true },
-        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        "url_schemes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "url_scheme_prompt": { "type": "string" }
       }
     },
     "web": {

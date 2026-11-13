@@ -18,6 +18,9 @@ final class ThemeModule extends KilnModule {
   Set<String> get provides => const <String>{'theme'};
 
   @override
+  Set<String> get optionalRequires => const <String>{'storage'};
+
+  @override
   void register(Registry registry) {
     final config = ThemeConfig.defaults;
     final brand = BrandTheme(config);

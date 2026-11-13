@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T15:35:49.837749Z",
+  "generated_at": "2026-11-10T19:00:06.191459Z",
   "extensions": [
     {
       "id": "analytics",
@@ -69,13 +69,25 @@
       "name": "Biometric",
       "description": "Biometric authentication, app lock state, and protected storage.",
       "category": "security",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/biometric-0.1.0.tgz",
           "sha256": "75ace96da70b3b63d65631b108439ab8e8c154be3713f11f4fdb487b880ddd79",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/biometric-0.1.1.tgz",
+          "sha256": "59a189f8eca2b3753b9aa0042a665a72305cdb7675f173ec635f2bad0517a67a",
           "provides": [
             "biometric"
           ],
@@ -91,7 +103,7 @@
       "name": "Bloc state management",
       "description": "State management with Bloc on a clean architecture feature layout.",
       "category": "state",
-      "latest": "0.2.0",
+      "latest": "0.2.1",
       "tier": "official",
       "versions": [
         {
@@ -110,6 +122,18 @@
           "version": "0.2.0",
           "url": "archives/bloc-0.2.0.tgz",
           "sha256": "13b093fecd0904bd12ebd173797fe8d44e6a42cb38ade739d6d24de1aefcbd31",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/bloc-0.2.1.tgz",
+          "sha256": "7f05b5724f3583b94846fab2234557aa663c0b4756e31610cb60f4c499b6b64b",
           "provides": [
             "state_bloc"
           ],
@@ -169,7 +193,7 @@
       "name": "Connectivity",
       "description": "Network status monitoring and an offline guard middleware.",
       "category": "connectivity",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -188,6 +212,18 @@
           "version": "0.1.1",
           "url": "archives/connectivity-0.1.1.tgz",
           "sha256": "d6956691373fd7395e335df3e95ff85a6b284756ec5654ab39af8ceff91fde3d",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/connectivity-0.1.2.tgz",
+          "sha256": "0a70bd2351b59c2a9d37a4cf67b72a4396ca5516c0982aefaf1e9e80f250ba79",
           "provides": [
             "connectivity"
           ],
@@ -225,13 +261,25 @@
       "name": "Deep links",
       "description": "Incoming deep links with allowlisting, normalization, and deduplication.",
       "category": "deep_link",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/deep_link-0.1.0.tgz",
           "sha256": "966a42062100b80eaed69f6230c1da603ee2d1f5d193bc0df49b50185a429362",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/deep_link-0.1.1.tgz",
+          "sha256": "96d14f4a66a3d572cc81146416a157196fd38cdfd463ac16d531069513f2b00d",
           "provides": [
             "deep_links"
           ],
@@ -247,7 +295,7 @@
       "name": "Dio HTTP client",
       "description": "HTTP client and middleware pipeline built on dio.",
       "category": "network",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -267,6 +315,19 @@
           "version": "0.1.1",
           "url": "archives/dio-0.1.1.tgz",
           "sha256": "33b2b68445e56de3775c68aaebcba7f79d69be6d3dcc6f9bac9e7cdb6ae9b1b1",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/dio-0.1.2.tgz",
+          "sha256": "0b6bcb818000930441e8936da088e572016ad68d9f9de1ba2637635e8a97ff8d",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -331,13 +392,25 @@
       "name": "Flavors",
       "description": "Dart-level app flavors, entry points, and launch configurations.",
       "category": "flavor",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/flavors-0.1.0.tgz",
           "sha256": "e9987de5cae0dcdded9fb461ce1c5bc009d5762c30335bc503507fa8d11d2009",
+          "provides": [
+            "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/flavors-0.1.1.tgz",
+          "sha256": "f141bf8dea042bb95b844f02097a8dbfde063868451a683cd0a9ecc963658498",
           "provides": [
             "flavor"
           ],
@@ -644,13 +717,25 @@
       "name": "Remote Config",
       "description": "Feature flags and remote configuration fetched from any JSON HTTP endpoint, read through the Gate.",
       "category": "config",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/remote_config-0.1.0.tgz",
           "sha256": "482ad214f374845eb3392273e57fdaef57f99e903193956c291ff15b75e0ce93",
+          "provides": [
+            "remote_config"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/remote_config-0.1.1.tgz",
+          "sha256": "311a2165973600933f0ddf20c5a174bd173084d602aa0850fc8b91f69dba938b",
           "provides": [
             "remote_config"
           ],
@@ -708,7 +793,7 @@
       "name": "Riverpod state management",
       "description": "State management with Riverpod providers and notifiers on a clean architecture feature layout.",
       "category": "state",
-      "latest": "0.2.0",
+      "latest": "0.2.1",
       "tier": "official",
       "versions": [
         {
@@ -727,6 +812,18 @@
           "version": "0.2.0",
           "url": "archives/riverpod-0.2.0.tgz",
           "sha256": "b51afd6587fe5f441732da551774f6f326864c0f3dbca0d401277f3fa5d4e297",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/riverpod-0.2.1.tgz",
+          "sha256": "4f7c3520cb6628beeb3482d0f447de4f41c1a28d1a27c382c73c6f1cf0358f76",
           "provides": [
             "state_riverpod"
           ],
@@ -858,13 +955,25 @@
       "name": "Theme",
       "description": "Brand color, typography, design tokens, and light or dark mode for Kiln apps.",
       "category": "theme",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/theme-0.1.0.tgz",
           "sha256": "cca2a63d740f545d0b9ba1aa764a188309b31b9bd6abce32c848b0a05909d320",
+          "provides": [
+            "theme"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/theme-0.1.1.tgz",
+          "sha256": "d7f9a0e9da26f546305ecc89c50be5b5341cee7c0c21a56c13bc00164aa9fe87",
           "provides": [
             "theme"
           ],

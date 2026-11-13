@@ -56,13 +56,17 @@ final class ModuleGraph {
       }
       state[module.id] = 1;
       stack.add(module.id);
-      final capabilities = <String>{
-        ...module.requires,
-        ...module.optionalRequires,
-      };
-      for (final capability in capabilities) {
+      for (final capability in module.requires) {
         final provider = providers[capability];
         if (provider != null) {
+          visit(provider);
+        }
+      }
+      for (final capability in module.optionalRequires) {
+        final provider = providers[capability];
+        // Optional edges only order modules; a provider already on the stack
+        // would turn an optional preference into a dependency cycle.
+        if (provider != null && state[provider.id] != 1) {
           visit(provider);
         }
       }

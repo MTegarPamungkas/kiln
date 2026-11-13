@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- The module orders itself after the logger and reports whether the
+  provider observer is attached.
+
 ## 0.2.0
 
 - New `lib/features/notes/` sample feature in clean-architecture form:

@@ -10,6 +10,10 @@ import 'package:{{app_name}}/extensions/theme/theme_module.dart';
 import 'package:{{app_name}}/extensions/theme/theme_support.dart';
 
 void main() {
+  test('declares the optional dependency that determines readiness', () {
+    expect(const ThemeModule().optionalRequires, contains('storage'));
+  });
+
   test('registers the theme seams without storage', () {
     final registry = GetItRegistry();
 

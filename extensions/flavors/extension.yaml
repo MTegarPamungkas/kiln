@@ -1,6 +1,6 @@
 id: flavors
 name: Flavors
-version: 0.1.0
+version: 0.1.1
 description: Dart-level app flavors, entry points, and launch configurations.
 category: flavor
 tier: official

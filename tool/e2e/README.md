@@ -1,5 +1,10 @@
 # End-to-end extension run
 
+> The maintained end-to-end apps now live in
+> [`examples/e2e`](../../examples/e2e): two generated apps, a real REST backend,
+> and 28 automated probes for `bloc` and `riverpod`. This template remains a
+> minimal copy-in probe screen.
+
 `e2e_page.dart.tmpl` is the screen used to exercise every Kiln extension on a
 real device. It is not part of any package: copy it into a generated app, then
 run that app on a phone or emulator.
@@ -13,7 +18,7 @@ deep_link,dio,env,flavors,geolocation,go_router,http_cache,http_retry,\
 image_picker,l10n,local_db,logger,notifications,permission,rest_auth,\
 secure_storage,share,storage,theme \
   --answer codegen.generators=json_serializable,freezed \
-  --answer deep_link.scheme=kilnapp \
+  --answer deep_link.scheme=kiln \
   --answer dio.base_url=https://jsonplaceholder.typicode.com \
   --answer rest_auth.base_url=https://jsonplaceholder.typicode.com \
   --yes
@@ -27,8 +32,8 @@ Twenty-six extensions is the widest set that installs together:
   only one state provider can be installed.
 - `social_login` cannot be installed: it `requires: social_auth`, which only the
   excluded backends provide.
-- `remote_config` collides with `env`, both are exclusive members of the
-  `config` category.
+- `remote_config` can be added to this set; it is no longer exclusive with
+  `env`. This template does not include a remote-config probe.
 
 ## Copy the screen in
 

@@ -1,6 +1,6 @@
 id: biometric
 name: Biometric
-version: 0.1.0
+version: 0.1.1
 description: Biometric authentication, app lock state, and protected storage.
 category: security
 tier: official

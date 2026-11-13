@@ -1,6 +1,6 @@
 id: theme
 name: Theme
-version: 0.1.0
+version: 0.1.1
 description: Brand color, typography, design tokens, and light or dark mode for Kiln apps.
 category: theme
 tier: official

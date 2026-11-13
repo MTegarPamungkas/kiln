@@ -45,6 +45,7 @@ final class NativeSetup {
       platforms: setup.platforms,
       projectRoot: projectRoot,
       extensionId: manifest.id,
+      answers: answers,
       patches: patches,
     );
     for (final conditional in setup.conditionals) {
@@ -59,6 +60,7 @@ final class NativeSetup {
         platforms: setup.platforms,
         projectRoot: projectRoot,
         extensionId: manifest.id,
+        answers: answers,
         patches: patches,
       );
     }
@@ -81,6 +83,7 @@ final class NativeSetup {
     required List<String> platforms,
     required Directory projectRoot,
     required String extensionId,
+    required Map<String, Object?> answers,
     required List<Patch> patches,
   }) {
     bool supports(String platform) =>
@@ -91,7 +94,11 @@ final class NativeSetup {
       for (final permission in android.permissions) {
         patches.add(AndroidPermissionPatch(permission));
       }
-      for (final scheme in android.urlSchemes) {
+      for (final scheme in _resolvedSchemes(
+        android.urlSchemes,
+        android.urlSchemePrompt,
+        answers,
+      )) {
         patches.add(AndroidUrlSchemePatch(scheme));
       }
       for (final host in android.appLinkHosts) {
@@ -125,7 +132,12 @@ final class NativeSetup {
       for (final entry in ios.plist.entries) {
         patches.add(IosPlistKeyPatch(entry.key, entry.value));
       }
-      for (final scheme in ios.urlSchemes) {
+      final iosSchemes = _resolvedSchemes(
+        ios.urlSchemes,
+        ios.urlSchemePrompt,
+        answers,
+      );
+      for (final scheme in iosSchemes) {
         patches.add(IosUrlSchemePatch(scheme));
       }
       for (final permission in ios.podfilePermissions) {
@@ -137,7 +149,7 @@ final class NativeSetup {
       for (final domain in ios.associatedDomains) {
         patches.add(IosAssociatedDomainPatch(domain));
       }
-      if (ios.urlSchemes.isNotEmpty) {
+      if (iosSchemes.isNotEmpty) {
         patches.add(const IosAppDelegatePatch());
       }
     }
@@ -147,7 +159,11 @@ final class NativeSetup {
       for (final entry in macos.entitlements.entries) {
         patches.add(MacosEntitlementPatch(entry.key, entry.value));
       }
-      for (final scheme in macos.urlSchemes) {
+      for (final scheme in _resolvedSchemes(
+        macos.urlSchemes,
+        macos.urlSchemePrompt,
+        answers,
+      )) {
         patches.add(MacosUrlSchemePatch(scheme));
       }
     }
@@ -183,4 +199,35 @@ final class NativeSetup {
     }
     return NativeSetupResult(patches: patches, changes: projectFiles.changes);
   }
+}
+
+List<String> _resolvedSchemes(
+  List<String> configured,
+  String? prompt,
+  Map<String, Object?> answers,
+) {
+  if (prompt == null) {
+    return configured;
+  }
+  final value = answers[prompt];
+  final values = switch (value) {
+    String() => <String>[value],
+    Iterable<Object?>() => value.map((item) => '$item').toList(growable: false),
+    _ => const <String>[],
+  };
+  final schemes = <String>[
+    for (final value in values)
+      if (_normalizeScheme(value) case final scheme when scheme.isNotEmpty)
+        scheme,
+  ];
+  return schemes.isEmpty ? configured : schemes;
+}
+
+String _normalizeScheme(String value) {
+  var scheme = value.trim().toLowerCase();
+  final separator = scheme.indexOf('://');
+  if (separator >= 0) {
+    scheme = scheme.substring(0, separator);
+  }
+  return scheme.replaceAll(':', '');
 }

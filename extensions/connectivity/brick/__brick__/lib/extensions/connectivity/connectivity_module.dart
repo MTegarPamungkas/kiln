@@ -22,7 +22,10 @@ final class ConnectivityModule extends KilnModule {
   Set<String> get provides => const <String>{'connectivity'};
 
   @override
-  Set<String> get optionalRequires => const <String>{'http_pipeline'};
+  Set<String> get optionalRequires => const <String>{
+    'http_client',
+    'http_pipeline',
+  };
 
   @override
   void register(Registry registry) {

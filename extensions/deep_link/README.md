@@ -75,10 +75,10 @@ does not happen twice.
 
 ## Important limits
 
-- Native uses `url_schemes: [kiln]` and the static host `kiln.dev` in
-  `extension.yaml`. If the `scheme` or `hosts` prompts are changed, update the
-  `android` and `ios` sections of the manifest and reinstall so that the intent
-  filter and associated domain change as well.
+- The native custom scheme follows the `scheme` prompt through
+  `url_scheme_prompt`, on Android, iOS, and macOS. The host lists in
+  `extension.yaml` are still static; update `android.app_links.hosts` and
+  `ios.associated_domains` when the `hosts` prompt changes, then reinstall.
 - Only the configured custom scheme and `https` are accepted; `http` is
   rejected.
 - If `hosts` is empty, every `https` link is rejected and only the custom scheme

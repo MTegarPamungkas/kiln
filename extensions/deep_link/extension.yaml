@@ -1,6 +1,6 @@
 id: deep_link
 name: Deep links
-version: 0.1.0
+version: 0.1.1
 description: Incoming deep links with allowlisting, normalization, and deduplication.
 category: deep_link
 tier: official
@@ -13,7 +13,7 @@ prompts:
   - name: scheme
     type: string
     label: URI scheme that opens the app
-    description: Custom scheme without the "://" separator. Android and iOS platform setup stay on kiln; update extension.yaml after changing the scheme.
+    description: Custom scheme without the "://" separator. The installer uses this answer for the native Android, iOS, and macOS registration.
     default: kiln
     required: true
   - name: hosts
@@ -47,6 +47,7 @@ platforms:
 android:
   url_schemes:
     - kiln
+  url_scheme_prompt: scheme
   app_links:
     hosts:
       - kiln.dev
@@ -54,14 +55,16 @@ android:
 ios:
   url_schemes:
     - kiln
+  url_scheme_prompt: scheme
   associated_domains:
     - applinks:kiln.dev
 macos:
   url_schemes:
     - kiln
+  url_scheme_prompt: scheme
 manual_steps:
   - id: deep_link_platform_scheme
-    description: Android, iOS, and macOS platform setup registers the kiln scheme. Update android.url_schemes, ios.url_schemes, and macos.url_schemes in extension.yaml, then reinstall, when the scheme prompt changes.
+    description: Android, iOS, and macOS platform setup registers the answered scheme through url_scheme_prompt.
   - id: deep_link_universal_links
     description: Publish assetlinks.json on every Android host and apple-app-site-association on every iOS host as described in the deep_link extension docs.
 compatibility:

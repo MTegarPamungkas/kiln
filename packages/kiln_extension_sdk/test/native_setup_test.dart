@@ -91,6 +91,45 @@ void main() {
       );
     });
 
+    test('uses the prompt answer for native url schemes', () {
+      final prompted = makeExtension(
+        id: 'demo',
+        platformSetup: const PlatformSetup(
+          android: AndroidSetup(
+            urlSchemes: ['kiln'],
+            urlSchemePrompt: 'scheme',
+          ),
+          ios: IosSetup(urlSchemes: ['kiln'], urlSchemePrompt: 'scheme'),
+          macos: MacosSetup(urlSchemes: ['kiln'], urlSchemePrompt: 'scheme'),
+        ),
+      );
+
+      final result = const NativeSetup().plan(
+        projectRoot: project,
+        manifest: prompted.manifest,
+        answers: const <String, Object?>{'scheme': 'kilnapp'},
+      );
+      final ids = result.patches.map((patch) => patch.id);
+
+      expect(
+        ids,
+        containsAll(<String>[
+          'android.url_scheme.kilnapp',
+          'ios.url_scheme.kilnapp',
+          'macos.url_scheme.kilnapp',
+        ]),
+      );
+      expect(ids, isNot(contains('android.url_scheme.kiln')));
+      expect(
+        result.changes[kAndroidManifestPath],
+        contains('android:scheme="kilnapp"'),
+      );
+      expect(
+        result.changes[kAndroidManifestPath],
+        isNot(contains('android:scheme="kiln"')),
+      );
+    });
+
     test('revert restores the touched files', () {
       const setup = NativeSetup();
       final applied = setup.plan(

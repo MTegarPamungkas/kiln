@@ -40,6 +40,7 @@ platforms: [android, ios, web]
 android:
   permissions: [android.permission.INTERNET]
   url_schemes: [kiln]
+  url_scheme_prompt: scheme
   app_links:
     hosts: [kiln.dev]
     path_prefixes: [/profile]
@@ -58,10 +59,12 @@ ios:
   entitlements:
     com.apple.developer.applesignin: [Default]
   url_schemes: [kiln]
+  url_scheme_prompt: scheme
 macos:
   entitlements:
     com.apple.security.network.client: true
   url_schemes: [kiln]
+  url_scheme_prompt: scheme
 web:
   index_html: true
 conditional:
@@ -116,4 +119,5 @@ kiln ext validate extensions/http_retry
 The validator rejects non-snake_case ids, invalid semver, duplicate
 capabilities, prompts without enum/multi options, `requires` on the extension's
 own capability, duplicate slots, and invalid or duplicated Android permissions,
-URL schemes, App Link hosts/path prefixes, and receivers.
+URL schemes (optionally driven by a prompt through `url_scheme_prompt`), App
+Link hosts/path prefixes, and receivers.

@@ -24,6 +24,9 @@ final class BiometricModule extends KilnModule {
   Set<String> get provides => const <String>{'biometric'};
 
   @override
+  Set<String> get optionalRequires => const <String>{'secure_storage'};
+
+  @override
   void register(Registry registry) {
     const config = BiometricConfig.defaults;
     final clock = registry.readOrNull<Clock>() ?? const SystemClock();

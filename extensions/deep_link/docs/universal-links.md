@@ -77,6 +77,7 @@ created by the manifest patch.
 1. The host uses HTTPS with a valid certificate.
 2. Both verification files are reachable without redirects.
 3. `package_name` / `appIDs` match the installed application.
-4. The custom scheme and host in `extension.yaml` match the prompt answers.
+4. The custom scheme follows the `scheme` answer through `url_scheme_prompt`;
+   the host in `extension.yaml` matches the `hosts` answer.
 5. `hosts` in `DeepLinkConfig` matches the verified host.
 6. Test with [testing-links.md](testing-links.md) before release.

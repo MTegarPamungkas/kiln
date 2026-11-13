@@ -6,6 +6,10 @@ import 'package:{{app_name}}/extensions/bloc/bloc_module.dart';
 import 'package:{{app_name}}/extensions/bloc/bloc_support.dart';
 
 void main() {
+  test('declares the optional dependency that determines readiness', () {
+    expect(const BlocModule().optionalRequires, contains('logger'));
+  });
+
   test('module registers the app wrapper', () {
     final registry = createTestRegistry();
 

@@ -39,6 +39,7 @@ final class AndroidSetup {
   const AndroidSetup({
     this.permissions = const <String>[],
     this.urlSchemes = const <String>[],
+    this.urlSchemePrompt,
     this.appLinkHosts = const <String>[],
     this.appLinkPathPrefixes = const <String>[],
     this.receivers = const <AndroidReceiverSetup>[],
@@ -50,6 +51,10 @@ final class AndroidSetup {
 
   final List<String> permissions;
   final List<String> urlSchemes;
+
+  /// Prompt whose answer overrides [urlSchemes] for native registration.
+  final String? urlSchemePrompt;
+
   final List<String> appLinkHosts;
   final List<String> appLinkPathPrefixes;
   final List<AndroidReceiverSetup> receivers;
@@ -61,6 +66,7 @@ final class AndroidSetup {
   bool get isEmpty =>
       permissions.isEmpty &&
       urlSchemes.isEmpty &&
+      urlSchemePrompt == null &&
       appLinkHosts.isEmpty &&
       receivers.isEmpty &&
       allowBackup == null &&
@@ -73,6 +79,7 @@ final class AndroidSetup {
     return AndroidSetup(
       permissions: _stringList(map['permissions']),
       urlSchemes: _stringList(map['url_schemes']),
+      urlSchemePrompt: _nonEmptyString(map['url_scheme_prompt']),
       appLinkHosts: _stringList(appLinks['hosts']),
       appLinkPathPrefixes: _stringList(appLinks['path_prefixes']),
       receivers: _receiverList(map['receivers']),
@@ -87,6 +94,7 @@ final class AndroidSetup {
     return <String, Object?>{
       if (permissions.isNotEmpty) 'permissions': permissions,
       if (urlSchemes.isNotEmpty) 'url_schemes': urlSchemes,
+      if (urlSchemePrompt != null) 'url_scheme_prompt': urlSchemePrompt,
       if (appLinkHosts.isNotEmpty)
         'app_links': <String, Object?>{
           'hosts': appLinkHosts,
@@ -113,6 +121,7 @@ final class IosSetup {
     this.associatedDomains = const <String>[],
     this.entitlements = const <String, Object?>{},
     this.urlSchemes = const <String>[],
+    this.urlSchemePrompt,
   });
 
   final Map<String, Object?> plist;
@@ -121,12 +130,16 @@ final class IosSetup {
   final Map<String, Object?> entitlements;
   final List<String> urlSchemes;
 
+  /// Prompt whose answer overrides [urlSchemes] for native registration.
+  final String? urlSchemePrompt;
+
   bool get isEmpty =>
       plist.isEmpty &&
       podfilePermissions.isEmpty &&
       associatedDomains.isEmpty &&
       entitlements.isEmpty &&
-      urlSchemes.isEmpty;
+      urlSchemes.isEmpty &&
+      urlSchemePrompt == null;
 
   static IosSetup fromMap(Map<String, Object?> map) {
     return IosSetup(
@@ -135,6 +148,7 @@ final class IosSetup {
       associatedDomains: _stringList(map['associated_domains']),
       entitlements: _asMap(map['entitlements']),
       urlSchemes: _stringList(map['url_schemes']),
+      urlSchemePrompt: _nonEmptyString(map['url_scheme_prompt']),
     );
   }
 
@@ -146,6 +160,7 @@ final class IosSetup {
       if (associatedDomains.isNotEmpty) 'associated_domains': associatedDomains,
       if (entitlements.isNotEmpty) 'entitlements': entitlements,
       if (urlSchemes.isNotEmpty) 'url_schemes': urlSchemes,
+      if (urlSchemePrompt != null) 'url_scheme_prompt': urlSchemePrompt,
     };
   }
 }
@@ -155,17 +170,23 @@ final class MacosSetup {
   const MacosSetup({
     this.entitlements = const <String, Object?>{},
     this.urlSchemes = const <String>[],
+    this.urlSchemePrompt,
   });
 
   final Map<String, Object?> entitlements;
   final List<String> urlSchemes;
 
-  bool get isEmpty => entitlements.isEmpty && urlSchemes.isEmpty;
+  /// Prompt whose answer overrides [urlSchemes] for native registration.
+  final String? urlSchemePrompt;
+
+  bool get isEmpty =>
+      entitlements.isEmpty && urlSchemes.isEmpty && urlSchemePrompt == null;
 
   static MacosSetup fromMap(Map<String, Object?> map) {
     return MacosSetup(
       entitlements: _asMap(map['entitlements']),
       urlSchemes: _stringList(map['url_schemes']),
+      urlSchemePrompt: _nonEmptyString(map['url_scheme_prompt']),
     );
   }
 
@@ -173,6 +194,7 @@ final class MacosSetup {
     return <String, Object?>{
       if (entitlements.isNotEmpty) 'entitlements': entitlements,
       if (urlSchemes.isNotEmpty) 'url_schemes': urlSchemes,
+      if (urlSchemePrompt != null) 'url_scheme_prompt': urlSchemePrompt,
     };
   }
 }
@@ -360,4 +382,12 @@ int? _asInt(Object? value) {
     return value;
   }
   return value == null ? null : int.tryParse('$value');
+}
+
+String? _nonEmptyString(Object? value) {
+  if (value is! String) {
+    return null;
+  }
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? null : trimmed;
 }

@@ -39,10 +39,10 @@ void main() {
       lockfile = File(p.join(project.path, 'kiln.lock.yaml'));
       final source = lockfile.readAsStringSync();
       final old = source.replaceFirst(
+        '  connectivity:\n    version: "0.1.2"',
         '  connectivity:\n    version: "0.1.1"',
-        '  connectivity:\n    version: "0.1.0"',
       );
-      expect(old, isNot(source), reason: 'the fixture must look like 0.1.0');
+      expect(old, isNot(source), reason: 'the fixture must look like 0.1.1');
       lockfile.writeAsStringSync(old);
       // A user edit forces the upgrade to pass --force, proving the generated
       // file is replaced rather than left behind.
@@ -66,12 +66,12 @@ void main() {
       ]);
 
       expect(code, ExitCodes.success, reason: captured.err.join('\n'));
-      expect(captured.out.join('\n'), contains('connectivity 0.1.0 -> 0.1.1'));
+      expect(captured.out.join('\n'), contains('connectivity 0.1.1 -> 0.1.2'));
       expect(captured.out.join('\n'), isNot(contains('Configure a registry')));
       expect(module.readAsStringSync(), isNot(contains('legacy connectivity')));
       expect(module.readAsStringSync(), contains('ConnectivityModule'));
-      expect(lockfile.readAsStringSync(), contains('version: "0.1.1"'));
-      expect(lockfile.readAsStringSync(), isNot(contains('version: "0.1.0"')));
+      expect(lockfile.readAsStringSync(), contains('version: "0.1.2"'));
+      expect(lockfile.readAsStringSync(), isNot(contains('version: "0.1.1"')));
     });
 
     test('a dry run lists the bundled upgrade without writing', () async {
@@ -85,9 +85,9 @@ void main() {
       ]);
 
       expect(code, ExitCodes.success, reason: captured.err.join('\n'));
-      expect(captured.out.join('\n'), contains('connectivity 0.1.0 -> 0.1.1'));
+      expect(captured.out.join('\n'), contains('connectivity 0.1.1 -> 0.1.2'));
       expect(module.readAsStringSync(), '// legacy connectivity\n');
-      expect(lockfile.readAsStringSync(), contains('version: "0.1.0"'));
+      expect(lockfile.readAsStringSync(), contains('version: "0.1.1"'));
     });
   });
 }

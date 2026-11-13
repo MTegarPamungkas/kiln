@@ -13,7 +13,7 @@ void main() {
     expect(const ManifestValidator().validate(manifest), isEmpty);
     expect(manifest.id, 'remote_config');
     expect(manifest.category, 'config');
-    expect(manifest.exclusive, isTrue);
+    expect(manifest.exclusive, isFalse);
     expect(manifest.provides, <String>['remote_config']);
     expect(manifest.optionalRequires, <String>['flavor']);
     expect(manifest.dependencies, containsPair('http', '^1.6.0'));

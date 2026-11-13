@@ -334,6 +334,27 @@ void main() {
       expect(generated.readAsStringSync(), original);
       expect(arb.readAsStringSync(), '$arbSource\n');
       expect(codegen.readAsStringSync(), codegenSource);
+      expect(
+        File(
+          p.join(target.path, 'lib', 'extensions', 'l10n', 'README.md'),
+        ).existsSync(),
+        isTrue,
+        reason: 'repair must keep the extension README',
+      );
+      expect(
+        File(
+          p.join(
+            target.path,
+            'lib',
+            'extensions',
+            'l10n',
+            'docs',
+            'l10n.md',
+          ),
+        ).existsSync(),
+        isTrue,
+        reason: 'repair must keep extension docs',
+      );
     });
 
     test('rejects an invalid application name', () async {

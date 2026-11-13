@@ -94,10 +94,20 @@ final class RepairCommand extends KilnCommand {
         bundle: available.bundle,
         vars: vars,
       );
+      final renderedWithDocs = <RenderedFile>[
+        ...rendered,
+        for (final entry in available.docs.entries)
+          RenderedFile(
+            relativePath:
+                'lib/extensions/${available.id}/'
+                '${entry.key.replaceAll('\\', '/')}',
+            bytes: entry.value,
+          ),
+      ];
       final renderedPaths = <String>{};
       final nextFiles = <String, String>{...locked.files};
 
-      for (final file in rendered) {
+      for (final file in renderedWithDocs) {
         final relative = file.relativePath;
         renderedPaths.add(relative);
         final target = File(p.join(project.root.path, relative));

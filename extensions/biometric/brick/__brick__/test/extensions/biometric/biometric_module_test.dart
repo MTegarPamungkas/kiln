@@ -10,6 +10,13 @@ import 'package:{{app_name}}/extensions/biometric/biometric_module.dart';
 import 'package:{{app_name}}/extensions/biometric/biometric_protected_storage.dart';
 
 void main() {
+  test('declares the optional dependency that determines readiness', () {
+    expect(
+      const BiometricModule().optionalRequires,
+      contains('secure_storage'),
+    );
+  });
+
   test('module registers biometrics and the lock without injecting UI', () {
     final registry = GetItRegistry()
       ..registerSingleton<SlotRegistry>(SlotRegistry())
@@ -26,10 +33,7 @@ void main() {
       registry.read<BiometricProtectedStorage>(),
       isA<BiometricProtectedStorage>(),
     );
-    expect(
-      registry.read<SlotRegistry>().has(SlotNames.appWrappers),
-      isFalse,
-    );
+    expect(registry.read<SlotRegistry>().has(SlotNames.appWrappers), isFalse);
   });
 
   test('module skips protected storage without SecureStorage', () {
