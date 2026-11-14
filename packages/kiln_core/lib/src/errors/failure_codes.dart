@@ -74,6 +74,8 @@ final class FailureCode {
   static const functionsNotFound = FailureCode('functions.not_found');
   static const functionsUnavailable = FailureCode('functions.unavailable');
 
+  static const pushTargetsNotFound = FailureCode('push_targets.not_found');
+
   static const notificationsPermissionDenied = FailureCode(
     'notifications.permission_denied',
   );

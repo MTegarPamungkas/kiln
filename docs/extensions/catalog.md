@@ -6,7 +6,7 @@ This catalog is generated from extension manifests by
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.2.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management` |
+| `appwrite` | Appwrite | 0.3.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets` |
 | `biometric` | Biometric | 0.1.1 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.2.1 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
@@ -52,7 +52,7 @@ PostHog product analytics with consent gating and PII scrubbing.
 
 Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.
 
-- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`
+- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`
 - Prompts: endpoint, project_id, database_id, bucket_id
 - Dependencies: `appwrite: ^28.2.0`, `http: ^1.6.0`, `shared_preferences: ^2.3.0`
 - Platforms: android, ios, macos, web, windows, linux

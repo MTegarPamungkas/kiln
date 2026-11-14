@@ -180,6 +180,27 @@ void main() {
       expect(await tokens.accessToken(), isNotNull);
     });
 
+    test('push target register and unregister round trip', () async {
+      final registry = await buildRegistry(signIn: true);
+      final targets = registry.read<PushTargets>();
+
+      final target = await targets.register(
+        token: 'e2e-transport-${DateTime.now().millisecondsSinceEpoch}',
+      );
+      expect(target.id, isNotEmpty);
+      expect(target.identifier, isNotEmpty);
+
+      // Registering again updates the same target instead of duplicating it.
+      final rotated = await targets.update(
+        targetId: target.id,
+        token: 'e2e-transport-rotated',
+      );
+      expect(rotated.id, target.id);
+      expect(rotated.identifier, 'e2e-transport-rotated');
+
+      await targets.unregister(targetId: target.id);
+    });
+
     test('invoke runs a deployed cloud function', () async {
       final liveFunctionId = functionId;
       if (liveFunctionId == null || liveFunctionId.isEmpty) {

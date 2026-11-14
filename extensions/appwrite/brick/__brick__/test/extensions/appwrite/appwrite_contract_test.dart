@@ -18,6 +18,11 @@ void main() {
     create: () => FakeCloudFunctions(),
   );
 
+  pushTargetsContract(
+    description: 'AppwritePushTargets',
+    create: () => FakePushTargets(),
+  );
+
   fileStorageContract(
     description: 'AppwriteFileStorage',
     create: () => createFakeFileStorage(),

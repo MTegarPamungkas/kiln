@@ -1,7 +1,7 @@
 # appwrite
 
 Implementation of `AuthRepository`, `SocialAuth`, `RemoteDatabase`,
-`FileStorage`, and `CloudFunctions` from `kiln_core` on top of
+`FileStorage`, `CloudFunctions`, and `PushTargets` from `kiln_core` on top of
 [Appwrite](https://appwrite.io).
 
 - `AppwriteAuth` uses the Appwrite `Account` to sign in, sign up, sign out, and

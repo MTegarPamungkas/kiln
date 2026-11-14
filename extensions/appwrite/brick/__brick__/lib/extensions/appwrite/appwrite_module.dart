@@ -9,6 +9,7 @@ import 'appwrite_config.dart';
 import 'appwrite_database_gateway.dart';
 import 'appwrite_file_storage.dart';
 import 'appwrite_functions.dart';
+import 'appwrite_push_targets.dart';
 import 'appwrite_remote_database.dart';
 import 'appwrite_realtime_gateway.dart';
 import 'appwrite_session_bridge.dart';
@@ -16,8 +17,8 @@ import 'appwrite_social_auth.dart';
 import 'appwrite_storage_gateway.dart';
 import 'appwrite_support.dart';
 
-/// Registers AuthRepository, SocialAuth, RemoteDatabase, FileStorage, and
-/// CloudFunctions for Appwrite.
+/// Registers AuthRepository, SocialAuth, RemoteDatabase, FileStorage,
+/// CloudFunctions, and PushTargets for Appwrite.
 final class AppwriteModule extends KilnModule {
   AppwriteModule({
     this.config = AppwriteConfig.defaults,
@@ -50,14 +51,16 @@ final class AppwriteModule extends KilnModule {
     'functions',
     'token_provider',
     'account_management',
+    'push_targets',
   };
 
   @override
   void register(Registry registry) {
     final support = AppwriteSupport(config: config);
     final client = clientFactory.create(config: config, flavor: flavor);
+    final sdkAccount = appwrite.Account(client);
     final account = SdkAppwriteAccount(
-      account: appwrite.Account(client),
+      account: sdkAccount,
       client: client,
     );
     final tokens = AppwriteTokenProvider(account: account);
@@ -100,6 +103,8 @@ final class AppwriteModule extends KilnModule {
       functions: appwrite.Functions(client),
     );
 
+    final pushTargets = AppwritePushTargets(account: sdkAccount);
+
     _bridge = bridge;
     _realtime = realtime;
 
@@ -113,6 +118,7 @@ final class AppwriteModule extends KilnModule {
       ..registerSingleton<RemoteDatabase>(database)
       ..registerSingleton<FileStorage>(storage)
       ..registerSingleton<CloudFunctions>(functions)
+      ..registerSingleton<PushTargets>(pushTargets)
       ..registerSingleton<TokenProvider>(tokens);
   }
 

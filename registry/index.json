@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T09:24:23.180653Z",
+  "generated_at": "2026-11-14T09:47:02.190615Z",
   "extensions": [
     {
       "id": "analytics",
@@ -29,7 +29,7 @@
       "name": "Appwrite",
       "description": "Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.",
       "category": "auth",
-      "latest": "0.2.1",
+      "latest": "0.3.0",
       "tier": "official",
       "versions": [
         {
@@ -74,6 +74,25 @@
             "functions",
             "token_provider",
             "account_management"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/appwrite-0.3.0.tgz",
+          "sha256": "dd6b5e9cb6fcc67ed6bb57b808edb563e980b7acbe2538b720389561a3ddd7ba",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",

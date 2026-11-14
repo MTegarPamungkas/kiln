@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- New `push_targets` capability: the `PushTargets` contract registers, updates, and removes the device's push token for the signed-in user through the Appwrite push target endpoints (one target per provider per session, upsert on token rotation).
+- Adds the `push_targets.not_found` failure code and a `push_targets` failure-mapping scope.
+
 ## 0.2.1
 
 - Declares the `token_provider` and `account_management` capabilities the module already registers, so `kiln doctor` capability coverage and backend-swap guidance see them.

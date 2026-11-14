@@ -2,7 +2,15 @@ import 'package:appwrite/appwrite.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 /// Contract area an Appwrite error came from.
-enum AppwriteFailureScope { auth, account, database, storage, realtime, functions }
+enum AppwriteFailureScope {
+  auth,
+  account,
+  database,
+  storage,
+  realtime,
+  functions,
+  pushTargets,
+}
 
 /// Converts Appwrite and transport exceptions into contract failures.
 final class AppwriteFailureMapper {
@@ -90,6 +98,13 @@ final class AppwriteFailureMapper {
           error: error,
           stackTrace: stackTrace,
         ),
+        AppwriteFailureScope.pushTargets => _build(
+          code: FailureCode.pushTargetsNotFound,
+          message: _message(error, 'The requested push target does not exist.'),
+          kind: FailureKind.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
       };
     }
     if (status == 409) {
@@ -122,6 +137,13 @@ final class AppwriteFailureMapper {
         AppwriteFailureScope.functions => _build(
           code: FailureCode.unexpected,
           message: _message(error, 'The function execution conflicts.'),
+          kind: FailureKind.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+        AppwriteFailureScope.pushTargets => _build(
+          code: FailureCode.unexpected,
+          message: _message(error, 'The push target conflicts.'),
           kind: FailureKind.unknown,
           error: error,
           stackTrace: stackTrace,
@@ -264,7 +286,8 @@ final class AppwriteFailureMapper {
       AppwriteFailureScope.database ||
       AppwriteFailureScope.realtime => FailureKind.database,
       AppwriteFailureScope.storage => FailureKind.file,
-      AppwriteFailureScope.functions => FailureKind.unknown,
+      AppwriteFailureScope.functions ||
+      AppwriteFailureScope.pushTargets => FailureKind.unknown,
     };
   }
 

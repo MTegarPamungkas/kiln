@@ -22,6 +22,7 @@ void main() {
       'functions',
       'token_provider',
       'account_management',
+      'push_targets',
     ]);
     expect(manifest.optionalRequires, isEmpty);
     expect(manifest.dependencies, contains('appwrite'));
