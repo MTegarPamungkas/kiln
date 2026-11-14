@@ -1,12 +1,14 @@
 id: rest_auth
 name: REST auth
-version: 0.1.1
+version: 0.1.2
 description: Email and password authentication against a REST API.
 category: auth
 tier: official
 exclusive: true
 provides:
   - auth
+  - token_provider
+  - account_management
 requires:
   - http_client
   - secure_storage

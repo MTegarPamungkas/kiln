@@ -6,6 +6,7 @@ export 'src/contracts/analytics.dart';
 export 'src/contracts/app_flavor.dart';
 export 'src/contracts/auth.dart';
 export 'src/contracts/calendar.dart';
+export 'src/contracts/cloud_functions.dart';
 export 'src/contracts/connectivity.dart';
 export 'src/contracts/crash_reporter.dart';
 export 'src/contracts/deep_links.dart';

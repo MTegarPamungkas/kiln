@@ -1,7 +1,7 @@
 id: appwrite
 name: Appwrite
-version: 0.1.1
-description: Appwrite auth, social sign-in, remote database, and file storage backends.
+version: 0.2.1
+description: Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.
 category: auth
 tier: official
 exclusive: true
@@ -10,6 +10,9 @@ provides:
   - social_auth
   - remote_database
   - file_storage
+  - functions
+  - token_provider
+  - account_management
 dependencies:
   appwrite: ^28.2.0
   http: ^1.6.0

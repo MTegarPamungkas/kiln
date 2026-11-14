@@ -7,6 +7,7 @@ import 'package:{{app_name}}/extensions/appwrite/appwrite_account_management.dar
 import 'package:{{app_name}}/extensions/appwrite/appwrite_auth.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_config.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_file_storage.dart';
+import 'package:{{app_name}}/extensions/appwrite/appwrite_functions.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_module.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_remote_database.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_session_bridge.dart';
@@ -59,6 +60,7 @@ void main() {
     );
     expect(registry.read<RemoteDatabase>(), isA<AppwriteRemoteDatabase>());
     expect(registry.read<FileStorage>(), isA<AppwriteFileStorage>());
+    expect(registry.read<CloudFunctions>(), isA<AppwriteFunctions>());
     expect(registry.read<TokenProvider>(), isA<AppwriteTokenProvider>());
 
     await module.dispose();
@@ -73,6 +75,9 @@ void main() {
       'social_auth',
       'remote_database',
       'file_storage',
+      'functions',
+      'token_provider',
+      'account_management',
     });
     expect(module.optionalRequires, isEmpty);
   });

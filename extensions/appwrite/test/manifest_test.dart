@@ -19,6 +19,9 @@ void main() {
       'social_auth',
       'remote_database',
       'file_storage',
+      'functions',
+      'token_provider',
+      'account_management',
     ]);
     expect(manifest.optionalRequires, isEmpty);
     expect(manifest.dependencies, contains('appwrite'));

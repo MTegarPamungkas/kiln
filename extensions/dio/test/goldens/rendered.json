@@ -2,7 +2,7 @@
   "extension": "dio",
   "files": {
     "lib/extensions/dio/cancellation.dart": "31e26a39d97bef14ecd43c7d4499ea27a1565def69e964286d1556897ab78022",
-    "lib/extensions/dio/dio_client.dart": "1c3506b8dfc10e6c7735ef37f3f496ad6b7c728a851fb438b36ba82a16dc4599",
+    "lib/extensions/dio/dio_client.dart": "77cb006bd14340701360329cf9a9adf6a86d50dbdc7d0396f0b3b8e7b41e4d2a",
     "lib/extensions/dio/dio_config.dart": "a09bd6adc79f01c3fd0b795c1679bfd62f259024fc2f5c6d7296e485d496b93c",
     "lib/extensions/dio/dio_failure_mapper.dart": "9b1b894994e242a63847e3f3868671197a60179c0a531fd870d28cb0d5d6f309",
     "lib/extensions/dio/dio_module.dart": "e1c6539db6866f357868d673d60437ba6c844fd708f55a4d050ec854101496df",
@@ -14,7 +14,7 @@
     "lib/extensions/dio/interceptors/user_agent_interceptor.dart": "2efa50201a2ce4cb5eaaf8c77e39d84964e40a6890c797aae70955f6accd6211",
     "lib/extensions/dio/multipart_helper.dart": "0936cc2aa9767cb99274a646ae5f0531947c66419a0a941bddbd30b8e9391cb7",
     "test/extensions/dio/cancellation_test.dart": "1a0fd0762ef9ac5c9c38f47d2230a18ea6c154c6a59b7dd3f028d391fedb5d64",
-    "test/extensions/dio/dio_client_test.dart": "c5002a4eda4a699be329822965e2bb1e51d92e105d1b19d3a02f711a337ab012",
+    "test/extensions/dio/dio_client_test.dart": "7efbf4fd8218d63d642a8c5dc20e7b07b91248cd79722a7a66e1b7830e78f314",
     "test/extensions/dio/dio_config_test.dart": "5f18dd7e1af559be1e4c34937a1928eca40bf9b96577efe827613001fe50fa2d",
     "test/extensions/dio/dio_failure_mapper_test.dart": "360c09ffaadfd29eac03805d815e4c9a3b19cfebeed6c8ae7af063e700a99842",
     "test/extensions/dio/dio_module_test.dart": "52cbfdc15e0a24ec382edd23587ba45a67f591f893aa8ed94da010b2d42d2764",

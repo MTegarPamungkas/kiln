@@ -28,7 +28,7 @@ Exit codes are stable; see [exit codes](#exit-codes).
 | `kiln list` | Installed and available extensions |
 | `kiln info <extension>` | Full manifest of one extension |
 | `kiln graph` | Capability graph as text or Mermaid |
-| `kiln doctor` | Check hashes, codegen, journal, dependencies, manifests, platforms, feature layers, and core resolution |
+| `kiln doctor` | Check hashes, codegen, journal, dependencies, manifests, platforms, feature layers, capability coverage, and core resolution |
 | `kiln upgrade` | Upgrade from the registry or the bundled catalog |
 | `kiln rollback` | Undo the last or an interrupted transaction |
 | `kiln config` | Registry, mirror, offline mode |
@@ -138,9 +138,11 @@ kiln doctor --fix
 | `doctor` | `--fix` applies safe repairs; `--json` |
 
 `doctor` checks file hashes, codegen drift, interrupted journals, dependencies,
-manifest and platform compatibility, feature-layer rules, and how `kiln_core`
-resolves. It only sees manifests and the project; device support is a runtime
-probe.
+manifest and platform compatibility, feature-layer rules, backend capability
+coverage (feature code that references a capability no installed extension
+provides, for example `CloudFunctions` after a backend swap), and how
+`kiln_core` resolves. It only sees manifests and the project; device support is
+a runtime probe.
 
 ## upgrade
 

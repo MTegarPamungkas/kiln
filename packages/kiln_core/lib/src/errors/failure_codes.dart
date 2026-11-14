@@ -71,6 +71,9 @@ final class FailureCode {
   static const fileDownloadFailed = FailureCode('file.download_failed');
   static const fileDeleteFailed = FailureCode('file.delete_failed');
 
+  static const functionsNotFound = FailureCode('functions.not_found');
+  static const functionsUnavailable = FailureCode('functions.unavailable');
+
   static const notificationsPermissionDenied = FailureCode(
     'notifications.permission_denied',
   );

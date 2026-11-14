@@ -13,7 +13,7 @@
     "lib/extensions/theme/theme_context_x.dart": "ce5dcb59ee5d96225eabf2b6b6e8196d105907dd5ce8353a09bf973d0ca3c94b",
     "lib/extensions/theme/theme_mode_controller.dart": "9b7bce6210a8752d645ee28169a119cf6acb24ca95923868a0c40a666760a15f",
     "lib/extensions/theme/theme_mode_store.dart": "ce266e64e1da3fa8c0d778336f0a0a6588c46147c930f25e3c2be8f9bacb59a0",
-    "lib/extensions/theme/theme_module.dart": "aa243665a6f7f266b6f7a4b64184261af409ae52c4499c5d69741af566e33212",
+    "lib/extensions/theme/theme_module.dart": "bc931e3be6797fe09bcff95b2affed589be579bf4080671418179f68fefa58e7",
     "lib/extensions/theme/theme_support.dart": "778198e56a27ff6b83d75d8e4ea656986624b05d4fde7db64851b9db1373a9c2",
     "test/extensions/theme/brand_theme_test.dart": "4e16cc312b20c1fe66ff89f5081fc8cbd54775d2dec92a2dfdce8317e90e0dee",
     "test/extensions/theme/color_schemes_test.dart": "2b56a3acf8c5abb971fb138eee21171e92411b6cce665655e057dc7ee1c1e3da",
@@ -27,7 +27,7 @@
     "test/extensions/theme/theme_golden_test.dart": "0c972be10865440fc825fd3ed0a41c8245a9661fd4439027f4f41ccfef50e03a",
     "test/extensions/theme/theme_mode_controller_test.dart": "6926f3ff7da618d1c8aff9eb2e34eb246c3eb3bdc666a13e23d509d85d9e3242",
     "test/extensions/theme/theme_mode_store_test.dart": "954e60319731ba632816bf567b41634fffb9188b2f6d592b52bdbd9457372e63",
-    "test/extensions/theme/theme_module_test.dart": "fc8b6e3f76b711b7c885f2645f50755e4c50b1ae61692ab305c502759523e4cb",
+    "test/extensions/theme/theme_module_test.dart": "a5f52c9f76ee97301611b313929959926a41a12c82b0c12fc090d3ad00cb60d0",
     "test/extensions/theme/theme_support_test.dart": "a0b1ce87601e619c8e7685763df236e86386f50299d8180f82bbfe3df2f9df4f"
   }
 }

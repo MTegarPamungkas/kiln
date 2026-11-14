@@ -119,6 +119,7 @@ final class DoctorCommand extends KilnCommand {
       ),
     );
 
+    final providedCapabilities = <String>{};
     for (final entry in project.lockfile.extensions.entries) {
       final id = entry.key;
       final locked = entry.value;
@@ -134,6 +135,7 @@ final class DoctorCommand extends KilnCommand {
         continue;
       }
       final manifest = available.manifest;
+      providedCapabilities.addAll(manifest.provides);
 
       for (final fileEntry in locked.files.entries) {
         final target = File(p.join(project.root.path, fileEntry.key));
@@ -219,6 +221,12 @@ final class DoctorCommand extends KilnCommand {
     }
 
     final layerSources = readLibSources(project.root);
+    checks.add(
+      capabilityCoverageCheck(
+        sourcesByPath: layerSources,
+        providedCapabilities: providedCapabilities,
+      ),
+    );
     if (layerSources.isNotEmpty) {
       for (final violation in layerViolations(
         sourcesByPath: layerSources,
@@ -328,4 +336,65 @@ final class DoctorCommand extends KilnCommand {
         );
     }
   }
+}
+
+/// Contract type names feature code can reference, mapped to the capability
+/// id an installed extension must provide for the usage to resolve.
+const Map<String, String> _capabilityByContractType = <String, String>{
+  'AuthRepository': 'auth',
+  'SocialAuth': 'social_auth',
+  'RemoteDatabase': 'remote_database',
+  'PaginatedRemoteDatabase': 'remote_database',
+  'BatchRemoteDatabase': 'remote_database',
+  'FileStorage': 'file_storage',
+  'CloudFunctions': 'functions',
+  'TokenProvider': 'token_provider',
+  'AccountManagement': 'account_management',
+};
+
+/// Warns when feature code references a backend capability that no installed
+/// extension provides — the situation a backend swap produces for
+/// backend-specific capabilities such as `functions`.
+DoctorCheck capabilityCoverageCheck({
+  required Map<String, String> sourcesByPath,
+  required Set<String> providedCapabilities,
+}) {
+  final typeNames = _capabilityByContractType.keys.toList()..sort();
+  final pattern = RegExp('\\b(${typeNames.join('|')})\\b');
+  final used = <String>{};
+  for (final entry in sourcesByPath.entries) {
+    // Extension-owned files implement what their extension provides; only
+    // application-owned code decides whether a capability is required.
+    if (entry.key.startsWith('lib/extensions/')) {
+      continue;
+    }
+    for (final match in pattern.allMatches(entry.value)) {
+      used.add(_capabilityByContractType[match.group(0)]!);
+    }
+  }
+  if (used.isEmpty) {
+    return const DoctorCheck(
+      id: 'capability.coverage',
+      status: DoctorStatus.ok,
+      message: 'No backend capability usage in feature code',
+    );
+  }
+  final usedList = used.toList()..sort();
+  final missing = used.difference(providedCapabilities).toList()..sort();
+  if (missing.isEmpty) {
+    return DoctorCheck(
+      id: 'capability.coverage',
+      status: DoctorStatus.ok,
+      message: 'Feature code uses ${usedList.join(', ')}; every capability is '
+          'provided by the installed extensions',
+    );
+  }
+  return DoctorCheck(
+    id: 'capability.coverage',
+    status: DoctorStatus.warn,
+    message: 'Feature code uses ${missing.join(', ')}, which no installed '
+        'extension provides',
+    suggestion: 'Swap to a backend that provides the capability, keep the '
+        'usage behind a capability check, or remove the usage',
+  );
 }

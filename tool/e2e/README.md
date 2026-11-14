@@ -1,9 +1,9 @@
 # End-to-end extension run
 
-> The maintained end-to-end apps now live in
-> [`examples/e2e`](../../examples/e2e): two generated apps, a real REST backend,
-> and 28 automated probes for `bloc` and `riverpod`. This template remains a
-> minimal copy-in probe screen.
+> For automated live-server testing, the `appwrite` extension ships a
+> provisioning tool and contract-driven e2e suite; see
+> [`extensions/appwrite/docs/e2e-testing.md`](../../extensions/appwrite/docs/e2e-testing.md).
+> This template remains a minimal copy-in probe screen for device runs.
 
 `e2e_page.dart.tmpl` is the screen used to exercise every Kiln extension on a
 real device. It is not part of any package: copy it into a generated app, then

@@ -55,13 +55,25 @@ void remoteDatabaseContract({
       final created = await database.create('users', {'name': 'First'});
       final id = '${created['id']}';
 
-      final updated = database
-          .watch('users', id)
-          .firstWhere((document) => document?['name'] == 'Second');
-      await database.update('users', id, {'name': 'Second'});
+      // One subscription observes both phases: the current document first,
+      // then the update. Waiting for the first emission keeps the update
+      // below from racing a backend handshake that has not subscribed yet.
+      final current = Completer<Map<String, Object?>?>();
+      final updated = Completer<Map<String, Object?>?>();
+      final subscription = database.watch('users', id).listen((document) {
+        if (document?['name'] == 'Second') {
+          if (!updated.isCompleted) {
+            updated.complete(document);
+          }
+        } else if (!current.isCompleted) {
+          current.complete(document);
+        }
+      });
 
-      final document = await updated.timeout(timeout);
-      expect(document?['name'], 'Second');
+      expect((await current.future.timeout(timeout))?['name'], 'First');
+      await database.update('users', id, {'name': 'Second'});
+      expect((await updated.future.timeout(timeout))?['name'], 'Second');
+      await subscription.cancel();
     });
 
     test('a missing document cannot be updated or deleted', () async {

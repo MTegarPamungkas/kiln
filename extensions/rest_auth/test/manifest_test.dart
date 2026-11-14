@@ -11,7 +11,7 @@ void main() {
     );
 
     expect(const ManifestValidator().validate(manifest), isEmpty);
-    expect(manifest.provides, ['auth']);
+    expect(manifest.provides, ['auth', 'token_provider', 'account_management']);
     expect(
       manifest.requires,
       containsAll(<String>['http_client', 'secure_storage']),

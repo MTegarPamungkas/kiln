@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
@@ -124,7 +125,10 @@ final class SdkAppwriteAccount implements AppwriteAccount {
   /// Shared client that must carry the session header for follow-up calls.
   final Client? client;
 
-  static const _sessionCookieKey = 'kiln.appwrite.session.cookie';
+  /// SharedPreferences key the persisted session cookie lives under. Public so
+  /// tests can seed a live session without repeating the login request.
+  static const sessionCookieKey = 'kiln.appwrite.session.cookie';
+  static const _sessionCookieKey = sessionCookieKey;
   Client get _transport => client ?? account.client;
   String get _signedOutKey =>
       'kiln.appwrite.signedOut.${_transport.endPoint}.${_transport.config['project']}';
@@ -136,6 +140,52 @@ final class SdkAppwriteAccount implements AppwriteAccount {
   Future<void> _allowSession() async {
     await (await SharedPreferences.getInstance()).remove(_signedOutKey);
     _locallySignedOut = false;
+  }
+
+  /// Mirrors the session into the SDK cookie jar when the client keeps one.
+  ///
+  /// REST calls authenticate through the explicit `X-Appwrite-Session` header,
+  /// but realtime authenticates at the WebSocket handshake with cookies from
+  /// the jar, so the jar must know the session too. Missing jar support (older
+  /// SDK shapes) is ignored; those setups keep header-based sessions.
+  void _seedCookieJar(String cookie) {
+    final shared = client;
+    if (shared == null) {
+      return;
+    }
+    // The SDK exposes no public type for its cookie jar, so this one seam has
+    // to cross into it dynamically.
+    try {
+      // ignore: avoid_dynamic_calls
+      final jar = (shared as dynamic).cookieJar;
+      if (jar == null) {
+        return;
+      }
+      final uri = Uri.parse(shared.endPoint);
+      // ignore: avoid_dynamic_calls
+      jar.saveFromResponse(uri, <Object?>[
+        Cookie.fromSetCookieValue(
+          'a_session_${shared.config['project']}=$cookie; Path=/',
+        ),
+      ]);
+    } on Object {
+      // Header-based sessions keep working without a jar.
+    }
+  }
+
+  void _clearCookieJar() {
+    final shared = client;
+    if (shared == null) {
+      return;
+    }
+    try {
+      // ignore: avoid_dynamic_calls
+      final jar = (shared as dynamic).cookieJar;
+      // ignore: avoid_dynamic_calls
+      jar?.delete(Uri.parse(shared.endPoint));
+    } on Object {
+      // Nothing to clear.
+    }
   }
 
   @override
@@ -212,6 +262,7 @@ final class SdkAppwriteAccount implements AppwriteAccount {
     }
     shared.setSession(cookie);
     await _persistCookie(cookie);
+    _seedCookieJar(cookie);
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     return AppwriteAccountSession(
@@ -342,6 +393,7 @@ final class SdkAppwriteAccount implements AppwriteAccount {
     final cookie = prefs.getString(_sessionCookieKey) ?? '';
     if (cookie.isNotEmpty) {
       shared.setSession(cookie);
+      _seedCookieJar(cookie);
     }
   }
 
@@ -351,6 +403,7 @@ final class SdkAppwriteAccount implements AppwriteAccount {
     }
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_sessionCookieKey);
+    _clearCookieJar();
   }
 
   @override

@@ -41,8 +41,8 @@ tests; those that own a contract also ship a `kiln_testing` contract suite.
 `kiln ext publish`. `kiln_lints` adds five custom lints
 (`no_cross_extension_import`, `prefer_contract_over_impl`, `no_plugin_in_features`,
 `no_edit_generated_files`, `require_failure_handling`). Examples live under
-`examples/` (`minimal`, `full_stack`, `backend_swap`, `custom_extension`, and the
-[`e2e`](examples/e2e) Bloc/Riverpod device run).
+`examples/` (`minimal`, `full_stack`, `backend_swap`, `custom_extension`), and
+[`tool/e2e`](tool/e2e) holds the device-run probe screen for generated apps.
 
 See [getting-started.md](docs/getting-started.md) and
 [roadmap.md](docs/roadmap.md).

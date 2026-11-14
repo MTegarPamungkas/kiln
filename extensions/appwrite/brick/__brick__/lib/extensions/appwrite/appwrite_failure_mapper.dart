@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 /// Contract area an Appwrite error came from.
-enum AppwriteFailureScope { auth, account, database, storage, realtime }
+enum AppwriteFailureScope { auth, account, database, storage, realtime, functions }
 
 /// Converts Appwrite and transport exceptions into contract failures.
 final class AppwriteFailureMapper {
@@ -83,6 +83,13 @@ final class AppwriteFailureMapper {
           error: error,
           stackTrace: stackTrace,
         ),
+        AppwriteFailureScope.functions => _build(
+          code: FailureCode.functionsNotFound,
+          message: _message(error, 'The requested function does not exist.'),
+          kind: FailureKind.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
       };
     }
     if (status == 409) {
@@ -109,6 +116,13 @@ final class AppwriteFailureMapper {
           code: FailureCode.validationInvalidInput,
           message: _message(error, 'The account already exists.'),
           kind: FailureKind.validation,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+        AppwriteFailureScope.functions => _build(
+          code: FailureCode.unexpected,
+          message: _message(error, 'The function execution conflicts.'),
+          kind: FailureKind.unknown,
           error: error,
           stackTrace: stackTrace,
         ),
@@ -250,6 +264,7 @@ final class AppwriteFailureMapper {
       AppwriteFailureScope.database ||
       AppwriteFailureScope.realtime => FailureKind.database,
       AppwriteFailureScope.storage => FailureKind.file,
+      AppwriteFailureScope.functions => FailureKind.unknown,
     };
   }
 

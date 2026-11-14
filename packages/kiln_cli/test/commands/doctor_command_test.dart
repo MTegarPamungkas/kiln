@@ -188,5 +188,96 @@ $coreBlock
         expect(check['message'], contains('not a dependency'));
       });
     });
+
+    group('capability coverage', () {
+      Future<void> writeFeatureProbe(String body) async {
+        final file = File(
+          p.join(project.path, 'lib', 'features', 'swap', 'swap.dart'),
+        );
+        await file.parent.create(recursive: true);
+        await file.writeAsString(body);
+      }
+
+      Map<String, dynamic>? capabilityCheck(List<String> output) {
+        final report =
+            jsonDecode(output.join('\n')) as Map<String, dynamic>;
+        final checks = report['checks'] as List<dynamic>;
+        for (final entry in checks) {
+          final check = entry as Map<String, dynamic>;
+          if (check['id'] == 'capability.coverage') {
+            return check;
+          }
+        }
+        return null;
+      }
+
+      test('warns when feature code uses an unprovided capability', () async {
+        await writeFeatureProbe('''
+import 'package:kiln_core/kiln_core.dart';
+
+final class SwapProbe {
+  CloudFunctions? functions;
+}
+''');
+
+        final runner = buildTestRunner(cwd: project, captured: captured);
+        final code = await runner.run(<String>['doctor', '--json']);
+
+        expect(code, ExitCodes.success);
+        final check = capabilityCheck(captured.out);
+        expect(check, isNotNull);
+        expect(check!['status'], 'warn');
+        expect(check['message'], contains('functions'));
+      });
+
+      test(
+        'reports covered capabilities when the backend provides them',
+        () async {
+          final runner = buildTestRunner(cwd: project, captured: captured);
+          await runner.run(<String>[
+            'add',
+            'appwrite',
+            '--answer',
+            'endpoint=https://appwrite.example.com/v1',
+            '--answer',
+            'project_id=kiln_demo',
+            '--answer',
+            'database_id=kiln',
+            '--answer',
+            'bucket_id=kiln_files',
+            '--no-verify',
+            '--yes',
+          ]);
+          captured.clear();
+
+          await writeFeatureProbe('''
+import 'package:kiln_core/kiln_core.dart';
+
+final class SwapProbe {
+  CloudFunctions? functions;
+}
+''');
+
+          final code = await runner.run(<String>['doctor', '--json']);
+
+          expect(code, ExitCodes.success);
+          final check = capabilityCheck(captured.out);
+          expect(check, isNotNull);
+          expect(check!['status'], 'ok');
+          expect(check['message'], contains('functions'));
+        },
+      );
+
+      test('reports no usage when feature code never touches a capability', () async {
+        final runner = buildTestRunner(cwd: project, captured: captured);
+        final code = await runner.run(<String>['doctor', '--json']);
+
+        expect(code, ExitCodes.success);
+        final check = capabilityCheck(captured.out);
+        expect(check, isNotNull);
+        expect(check!['status'], 'ok');
+        expect(check['message'], contains('No backend capability usage'));
+      });
+    });
   });
 }

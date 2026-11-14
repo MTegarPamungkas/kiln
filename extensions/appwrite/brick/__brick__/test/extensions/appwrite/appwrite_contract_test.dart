@@ -13,6 +13,11 @@ void main() {
     create: () => createFakeRemoteDatabase().database,
   );
 
+  cloudFunctionsContract(
+    description: 'AppwriteFunctions',
+    create: () => FakeCloudFunctions(),
+  );
+
   fileStorageContract(
     description: 'AppwriteFileStorage',
     create: () => createFakeFileStorage(),

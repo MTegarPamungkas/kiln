@@ -4,7 +4,7 @@
     ".vscode/launch.json": "aa6b22bbca4c012008b3e08fae8a51ab65448d2a57d104e1f62b9c78917084d8",
     "lib/extensions/flavors/app_flavors.dart": "ff6d860e66fda725d52783165685150dbd228251715ea50739632a5003aed536",
     "lib/extensions/flavors/flavor_x.dart": "38bea40ea3241ec8abb51da9d510202261c031364da7a4315b211ab58e3736dc",
-    "lib/extensions/flavors/flavors_module.dart": "d3655a322cbe2f505860c39daf0f323d065414153fe65853bb948b9cd2426e9f",
+    "lib/extensions/flavors/flavors_module.dart": "599064bc3aea41e6d7b92860ade7fe2aafa88b197d9b1f46fbd0649410b56315",
     "lib/extensions/flavors/flavors_support.dart": "af247b96eff50791e8f093a2933c037607a4ef3c9b80405f4b9798e1ae195734",
     "lib/extensions/flavors/release_guard.dart": "5e9b0a4b16cf6bd9126f2d5124a6439034417a79face8e9c5ee794060c9a907a",
     "lib/main_development.dart": "65d8044449b0a009e7b8c9ab5fe9e212162e3a92e84243daa75003504dbf9320",
@@ -12,7 +12,7 @@
     "lib/main_staging.dart": "a20b0e4a7eea3ac1bd09d4933f224a97ac4b0636ae6992878be7904274d97447",
     "test/extensions/flavors/app_flavors_test.dart": "fcb10a57e62eaaf1008564f4d96d6d3d9ba372dd15faecd9c2cfb538c1b62e2d",
     "test/extensions/flavors/flavor_x_test.dart": "595eb5e062e4de95059e26a540f9a892fe2bfd7e7a26188633f418a83b7c1cc1",
-    "test/extensions/flavors/flavors_module_test.dart": "2e64db4d49214e9ae688d5dd9b50c1f0f606971299b7c01a5a196c98bf5787bf",
+    "test/extensions/flavors/flavors_module_test.dart": "5de94c0f094daba64d816b9cd26175870a2bc5cc60ac4d009368c7e8a0868ee9",
     "test/extensions/flavors/flavors_support_test.dart": "06221e0e7ec300cfc355121ae38b74e9352f14c2bbcc391df9b97819880016d7",
     "test/extensions/flavors/launch_config_test.dart": "23a918565383d368bf94f7b7b4bfcb9a35c2291646a29e877bd913d9726afbbf",
     "test/extensions/flavors/release_guard_test.dart": "78d2328b1b6b7ee39c910c05bdfbf3cb9039a631afd6081b74ea862c3234fd0b"

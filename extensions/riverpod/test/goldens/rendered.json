@@ -7,8 +7,8 @@
     "lib/core/riverpod/kiln_providers.dart": "87be4860a4331d1f74f5dfbbec54e92703412eeea2f15d77953099dae146547b",
     "lib/core/riverpod/provider_overrides.dart": "7eea7badd2914d29454ca9dad7b2332ea74d54c57dec5fb468de951718cad5a2",
     "lib/core/riverpod/session_notifier.dart": "6f7900ea5d0524b88c76bcf1e4ed18828a22a29683d2f2cc8306c463a795641c",
-    "lib/extensions/riverpod/riverpod_module.dart": "56b308ac51192119173ae423e40cba95514cd12c0c1c6f81fafbf7e47b58e2e0",
-    "lib/extensions/riverpod/riverpod_support.dart": "b4d2e5f833c19f7725376e84c808690ce2f73bfa7056224f4a0a1df4b025553a",
+    "lib/extensions/riverpod/riverpod_module.dart": "f3395026545672c0f74dcea521fa831cf5ea49ddec0385ea3072178296c83052",
+    "lib/extensions/riverpod/riverpod_support.dart": "7758f075b5efd3b66a5e9c04df50aec06541e7cf24b44030ffc1a4ec75c4f445",
     "lib/features/notes/data/datasources/notes_local_datasource.dart": "23a916be48c6f3fbf71eeb4e10350bf3bd4bb27c94479cfd933f59e06e7c8d49",
     "lib/features/notes/data/models/note_dto.dart": "97e290e29e50c2198eb811b2c3b5241f97e58ac919b858fd68f459d73d6a534a",
     "lib/features/notes/data/repositories/notes_repository_impl.dart": "fcd8709ba5ebcdbfec151b401a67851b4bf2437d81deeb5be818e5635a45b40f",
@@ -27,7 +27,7 @@
     "test/extensions/riverpod/core/riverpod/kiln_providers_test.dart": "0c9323034f950ecfee008162744279521774127c5cb297eb6db661d4a990b194",
     "test/extensions/riverpod/core/riverpod/session_notifier_test.dart": "c1574d5aebb9d1119cbb071fac470befe4928f07bd3cfb9d879567005a63b699",
     "test/extensions/riverpod/riverpod_bootstrap_test.dart": "c602ab25fca967231ab8757b10e17300232d95cbedda389a91be98cfafbf2b64",
-    "test/extensions/riverpod/riverpod_module_test.dart": "6e2ee9a6241a2291366e31083a64f4f6ae458283f35de61551837849edb9a836",
+    "test/extensions/riverpod/riverpod_module_test.dart": "9f30c71d084cdc51dade9edcd9df253c797b9e3a20f560befa1b21fc5bc054f8",
     "test/features/notes/notes_controller_test.dart": "f912d1d5956cf3aa4c8642bb9b47424d2ae92d32f57e883722ef7a6abff96655",
     "test/features/notes/notes_page_test.dart": "4c9fb4c7e879e6e285cac54c40e37bbaa6090451598e061532cea5f403ea865f"
   }

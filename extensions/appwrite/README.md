@@ -1,7 +1,8 @@
 # appwrite
 
-Implementation of `AuthRepository`, `SocialAuth`, `RemoteDatabase`, and
-`FileStorage` from `kiln_core` on top of [Appwrite](https://appwrite.io).
+Implementation of `AuthRepository`, `SocialAuth`, `RemoteDatabase`,
+`FileStorage`, and `CloudFunctions` from `kiln_core` on top of
+[Appwrite](https://appwrite.io).
 
 - `AppwriteAuth` uses the Appwrite `Account` to sign in, sign up, sign out, and
   restore a session that is still active.
@@ -16,6 +17,8 @@ Implementation of `AuthRepository`, `SocialAuth`, `RemoteDatabase`, and
   forwards realtime changes through `watch`.
 - `AppwriteFileStorage` uploads, downloads, links, and deletes files
   in the selected bucket.
+- `AppwriteFunctions` invokes cloud functions deployed on the project and
+  returns the execution result.
 - All SDK calls sit behind a gateway, so the app can test
   its flows without a network.
 
@@ -59,6 +62,11 @@ final stored = await storage.upload(
   FileUpload(path: 'avatars/user-1.png', bytes: bytes),
   onProgress: (progress) => debugPrint('${progress * 100}%'),
 );
+
+// Invoke a function deployed on the project (extension 0.2.0+).
+final functions = registry.read<CloudFunctions>();
+final execution = await functions.invoke('hello-kiln', body: {'name': 'Kiln'});
+debugPrint(execution.bodyJson?['message']);
 ```
 
 Query mapping, document permissions, and behavior differences are covered in
@@ -66,6 +74,14 @@ Query mapping, document permissions, and behavior differences are covered in
 [docs/backend-swap-notes.md](docs/backend-swap-notes.md). Offline logout and
 session cleanup are covered in
 [docs/logout-and-session-cleanup.md](docs/logout-and-session-cleanup.md).
+
+## Live e2e suite
+
+The same contract suites run against a real Appwrite server — Cloud or
+self-hosted — through `tool/appwrite_e2e.dart`. The live suite skips itself
+unless the `KILN_APPWRITE_E2E` environment is set, so offline tests and CI stay
+hermetic. See [docs/e2e-testing.md](docs/e2e-testing.md) for the provisioning
+and run commands.
 
 ## Gate
 

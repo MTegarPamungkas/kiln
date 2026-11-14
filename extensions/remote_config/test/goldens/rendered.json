@@ -3,8 +3,8 @@
   "files": {
     "lib/extensions/remote_config/gate_remote_config.dart": "13bfe5e6677516af65ea05b6610a8707e0539ad53c42302bfead51265b5af07a",
     "lib/extensions/remote_config/http_remote_config_gateway.dart": "a4e2f9e1ffc38af50912f843ab09d4ebee159f785f157d7c902793013e013187",
-    "lib/extensions/remote_config/remote_config_client.dart": "79398b10242b2556ef59962d2361f8e5dfaa7d91a5d7a1f63484a6f9f6be9d4d",
-    "lib/extensions/remote_config/remote_config_config.dart": "21cafcc7fa128f03b3099e229aa12119eea5a14ea1bd8c474706f5a3f06cdf06",
+    "lib/extensions/remote_config/remote_config_client.dart": "f349c12f72270a0736d89fae56deac1c63c61370212255eb45963960710284b5",
+    "lib/extensions/remote_config/remote_config_config.dart": "b429384eeee5c89c99b8bae6c2d66c8c0ee25532280e37e932928ec533e65558",
     "lib/extensions/remote_config/remote_config_failure_mapper.dart": "d0ee3b8fe07165af171ec67a484d37c291ddf9b801d92feec44ddadbea2d8c79",
     "lib/extensions/remote_config/remote_config_gateway.dart": "3d9d13674e6ab6b474a9756cbc2cd7c6937a10841ad8af5c59331e5ac35efb67",
     "lib/extensions/remote_config/remote_config_module.dart": "f6cb5e1f021b11127b5b6ca4d057435b801dc4e5d1af8fd2c5b801b636ea3450",

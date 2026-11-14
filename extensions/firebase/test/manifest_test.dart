@@ -21,6 +21,8 @@ void main() {
         'social_auth',
         'remote_database',
         'file_storage',
+        'token_provider',
+        'account_management',
       ]),
     );
     expect(manifest.dependencies, contains('firebase_core'));

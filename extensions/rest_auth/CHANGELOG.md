@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Declares the `token_provider` and `account_management` capabilities the module already registers, so `kiln doctor` capability coverage and backend-swap guidance see them.
+
 ## 0.1.1
 
 - Bearer injection and 401 recovery are scoped to the configured backend

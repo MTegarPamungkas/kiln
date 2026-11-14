@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T19:00:06.191459Z",
+  "generated_at": "2026-11-14T09:24:23.180653Z",
   "extensions": [
     {
       "id": "analytics",
@@ -27,9 +27,9 @@
     {
       "id": "appwrite",
       "name": "Appwrite",
-      "description": "Appwrite auth, social sign-in, remote database, and file storage backends.",
+      "description": "Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.2.1",
       "tier": "official",
       "versions": [
         {
@@ -61,6 +61,24 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/appwrite-0.2.1.tgz",
+          "sha256": "ee5fd20da03744b55c020ae2aa0d6d6b2747ddb9759d7bdec90844099f5448d4",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -87,7 +105,7 @@
         {
           "version": "0.1.1",
           "url": "archives/biometric-0.1.1.tgz",
-          "sha256": "59a189f8eca2b3753b9aa0042a665a72305cdb7675f173ec635f2bad0517a67a",
+          "sha256": "49cd3bb67f87691d364d7c328b2df798129ec7f821b342f2c5bcef3871beef31",
           "provides": [
             "biometric"
           ],
@@ -133,7 +151,7 @@
         {
           "version": "0.2.1",
           "url": "archives/bloc-0.2.1.tgz",
-          "sha256": "7f05b5724f3583b94846fab2234557aa663c0b4756e31610cb60f4c499b6b64b",
+          "sha256": "a6e1e2e17b5a3f8ddbcc14d1eec6f3a038c0d7bef9cef8dcefc5d6a4980b0519",
           "provides": [
             "state_bloc"
           ],
@@ -223,7 +241,7 @@
         {
           "version": "0.1.2",
           "url": "archives/connectivity-0.1.2.tgz",
-          "sha256": "0a70bd2351b59c2a9d37a4cf67b72a4396ca5516c0982aefaf1e9e80f250ba79",
+          "sha256": "db3d38b9c5f6dcb0e7af6366e9bbdd3dbc44a1626513e0c29b1f5549dabc66de",
           "provides": [
             "connectivity"
           ],
@@ -327,7 +345,7 @@
         {
           "version": "0.1.2",
           "url": "archives/dio-0.1.2.tgz",
-          "sha256": "0b6bcb818000930441e8936da088e572016ad68d9f9de1ba2637635e8a97ff8d",
+          "sha256": "352aec1ab49caea806b09e2ed8d6844a491a51b9716acc4167b37e93429d3f46",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -366,7 +384,7 @@
       "name": "Firebase",
       "description": "Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.",
       "category": "auth",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
@@ -378,6 +396,24 @@
             "social_auth",
             "remote_database",
             "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/firebase-0.1.1.tgz",
+          "sha256": "6458ed824ba15f5e5752c635f1bdc9341050746b4528ad870f76cb3505dc6197",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "token_provider",
+            "account_management"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",
@@ -410,7 +446,7 @@
         {
           "version": "0.1.1",
           "url": "archives/flavors-0.1.1.tgz",
-          "sha256": "f141bf8dea042bb95b844f02097a8dbfde063868451a683cd0a9ecc963658498",
+          "sha256": "0a63434adfb1b2e1ade99bf6e96b4e7c87846e14c75d1ce64c670f2783bca481",
           "provides": [
             "flavor"
           ],
@@ -735,7 +771,7 @@
         {
           "version": "0.1.1",
           "url": "archives/remote_config-0.1.1.tgz",
-          "sha256": "311a2165973600933f0ddf20c5a174bd173084d602aa0850fc8b91f69dba938b",
+          "sha256": "8715e6825196f46fc2888a69619f2ee021b0b6fe4c3ac4980dafb8374428ee02",
           "provides": [
             "remote_config"
           ],
@@ -751,7 +787,7 @@
       "name": "REST auth",
       "description": "Email and password authentication against a REST API.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -780,6 +816,24 @@
           ],
           "provides": [
             "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/rest_auth-0.1.2.tgz",
+          "sha256": "3ba1a7af54a4266e98c73715082c388b4ab5b1c7b70f1c2cab0d1ac8ee48af6c",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth",
+            "token_provider",
+            "account_management"
           ],
           "compatibility": {
             "kiln": ">=0.1.0 <0.2.0",
@@ -823,7 +877,7 @@
         {
           "version": "0.2.1",
           "url": "archives/riverpod-0.2.1.tgz",
-          "sha256": "4f7c3520cb6628beeb3482d0f447de4f41c1a28d1a27c382c73c6f1cf0358f76",
+          "sha256": "944091ab1b9c85a3352f64a3d2c6a420691dc88984ed886efc38f91ec0be3f3e",
           "provides": [
             "state_riverpod"
           ],
@@ -973,7 +1027,7 @@
         {
           "version": "0.1.1",
           "url": "archives/theme-0.1.1.tgz",
-          "sha256": "d7f9a0e9da26f546305ecc89c50be5b5341cee7c0c21a56c13bc00164aa9fe87",
+          "sha256": "70d3c3577c9c1472be4d5676f5eb020c504fd1b6d6b26f85828a24706f8c2769",
           "provides": [
             "theme"
           ],

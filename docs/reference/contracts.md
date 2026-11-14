@@ -32,6 +32,7 @@ Feature code never imports the provider.
 | --- | --- |
 | Auth and account | `AuthRepository`, `AccountManagement`, `SocialAuth`, `SocialLogin` |
 | Data and storage | `Storage`, `SecureStorage`, `LocalDatabase`, `RemoteDatabase`, `FileStorage` |
+| Backend compute | `CloudFunctions` |
 | Network | `HttpClient`, `HttpPipeline`, `HttpCache` |
 | Device and platform | `NetworkMonitor`, `Permissions`, `Notifications`, `DeepLinks`, `MediaPicker`, `ShareService`, `CalendarService`, `LocationProvider` |
 | Observability and config | `AppLogger`, `Analytics`, `CrashReporter`, `RemoteConfig`, `Env`, `AppFlavor` |
@@ -151,6 +152,23 @@ for exact semantics.
 `FileUpload` contains `path`, `bytes`, optional `contentType`, and metadata.
 `ProgressCallback` reports `0..1`. A missing object on download is
 `file.not_found`; deleting an absent object is provider-defined.
+
+### `CloudFunctions`
+
+| Member | Result |
+| --- | --- |
+| `invoke(functionId, {body, headers, path, method})` | `FunctionExecution` |
+
+`FunctionExecution` carries the execution's backend-neutral `status`
+(`completed` / `failed`), the function's HTTP-style `statusCode`, the raw
+`body` (plus a `bodyJson` convenience), `responseHeaders`, backend `logs` and
+`errors`, and `durationMs`. A function that itself fails still completes the
+invocation — the caller inspects the execution instead of catching. Transport,
+permission, validation, and lookup problems throw: an unknown function is
+`functions.not_found`.
+
+Appwrite implements the contract through `Functions.createExecution`
+(extension `appwrite` 0.2.0+).
 
 ## Network
 

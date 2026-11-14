@@ -25,11 +25,18 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
     required this.realtime,
     required this.database,
     required this.databaseId,
+    this.reconcileDelay = const Duration(milliseconds: 1500),
   });
 
   final Realtime realtime;
   final AppwriteDatabaseGateway database;
   final String databaseId;
+
+  /// How long after subscribing the reconciliation read runs. Events
+  /// published while Appwrite is still registering the channel are dropped
+  /// server-side, so one delayed read lets the stream converge on the row's
+  /// real state.
+  final Duration reconcileDelay;
   final Map<StreamController<Map<String, Object?>?>, _Watch> _watches =
       <StreamController<Map<String, Object?>?>, _Watch>{};
   bool _disposed = false;
@@ -50,6 +57,17 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
     final controller = StreamController<Map<String, Object?>?>.broadcast();
     final buffered = <Map<String, Object?>?>[];
     var live = false;
+    Map<String, Object?>? lastEmitted;
+    void emit(Map<String, Object?>? document) {
+      if (_sameDocument(document, lastEmitted)) {
+        return;
+      }
+      lastEmitted = document;
+      if (!controller.isClosed) {
+        controller.add(document);
+      }
+    }
+
     final subscription = realtime.subscribe(<Object>[
       Channel.tablesdb(databaseId).table(tableId).row(rowId).toString(),
     ]);
@@ -57,7 +75,7 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
       (message) {
         final document = _fromMessage(message, rowId);
         if (live) {
-          controller.add(document);
+          emit(document);
         } else {
           buffered.add(document);
         }
@@ -66,10 +84,15 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
       onDone: controller.close,
     );
 
+    final reconcile = Timer(reconcileDelay, () {
+      unawaited(_reconcile(controller: controller, tableId: tableId, rowId: rowId, emit: emit));
+    });
+
     _watches[controller] = _Watch(
       subscription: subscription,
       listener: listener,
       controller: controller,
+      reconcile: reconcile,
     );
     unawaited(
       _emitCurrent(
@@ -77,6 +100,7 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
         tableId: tableId,
         rowId: rowId,
         buffered: buffered,
+        emit: emit,
         goLive: () => live = true,
       ),
     );
@@ -88,13 +112,12 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
     required String tableId,
     required String rowId,
     required List<Map<String, Object?>?> buffered,
+    required void Function(Map<String, Object?>?) emit,
     required void Function() goLive,
   }) async {
     try {
       final current = await database.getRow(tableId, rowId);
-      if (!controller.isClosed) {
-        controller.add(current);
-      }
+      emit(current);
     } on Object catch (error, stackTrace) {
       if (!controller.isClosed) {
         controller.addError(error, stackTrace);
@@ -102,11 +125,44 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
     }
     goLive();
     for (final document in buffered) {
-      if (!controller.isClosed) {
-        controller.add(document);
-      }
+      emit(document);
     }
     buffered.clear();
+  }
+
+  Future<void> _reconcile({
+    required StreamController<Map<String, Object?>?> controller,
+    required String tableId,
+    required String rowId,
+    required void Function(Map<String, Object?>?) emit,
+  }) async {
+    if (_disposed || controller.isClosed) {
+      return;
+    }
+    try {
+      emit(await database.getRow(tableId, rowId));
+    } on Object {
+      // Realtime events remain the source of truth; a failed reconciliation
+      // read must not break the stream.
+    }
+  }
+
+  bool _sameDocument(
+    Map<String, Object?>? left,
+    Map<String, Object?>? right,
+  ) {
+    if (identical(left, right)) {
+      return true;
+    }
+    if (left == null || right == null || left.length != right.length) {
+      return false;
+    }
+    for (final entry in left.entries) {
+      if (right[entry.key] != entry.value) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Map<String, Object?>? _fromMessage(RealtimeMessage message, String rowId) {
@@ -133,6 +189,7 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
     final watches = _watches.values.toList(growable: false);
     _watches.clear();
     for (final watch in watches) {
+      watch.reconcile.cancel();
       try {
         await watch.listener.cancel();
       } on Object {
@@ -155,9 +212,11 @@ final class _Watch {
     required this.subscription,
     required this.listener,
     required this.controller,
+    required this.reconcile,
   });
 
   final RealtimeSubscription subscription;
   final StreamSubscription<RealtimeMessage> listener;
   final StreamController<Map<String, Object?>?> controller;
+  final Timer reconcile;
 }

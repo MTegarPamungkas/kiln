@@ -6,18 +6,18 @@ This catalog is generated from extension manifests by
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.1.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
-| `biometric` | Biometric | 0.1.0 | security | official | `biometric` |
-| `bloc` | Bloc state management | 0.2.0 | state | official | `state_bloc` |
+| `appwrite` | Appwrite | 0.2.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management` |
+| `biometric` | Biometric | 0.1.1 | security | official | `biometric` |
+| `bloc` | Bloc state management | 0.2.1 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
 | `codegen` | Codegen | 0.1.0 | codegen | official | `codegen` |
-| `connectivity` | Connectivity | 0.1.1 | connectivity | official | `connectivity` |
+| `connectivity` | Connectivity | 0.1.2 | connectivity | official | `connectivity` |
 | `crash_report` | Crash Report | 0.1.0 | crash | official | `crash_reporter` |
-| `deep_link` | Deep links | 0.1.0 | deep_link | official | `deep_links` |
-| `dio` | Dio HTTP client | 0.1.1 | network | official | `http_client`, `http_pipeline` |
+| `deep_link` | Deep links | 0.1.1 | deep_link | official | `deep_links` |
+| `dio` | Dio HTTP client | 0.1.2 | network | official | `http_client`, `http_pipeline` |
 | `env` | Environment | 0.1.0 | config | official | `env` |
-| `firebase` | Firebase | 0.1.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
-| `flavors` | Flavors | 0.1.0 | flavor | official | `flavor` |
+| `firebase` | Firebase | 0.1.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `token_provider`, `account_management` |
+| `flavors` | Flavors | 0.1.1 | flavor | official | `flavor` |
 | `geolocation` | Geolocation | 0.1.0 | location | official | `location` |
 | `go_router` | GoRouter | 0.1.0 | navigation | official | `navigation` |
 | `http_cache` | HTTP cache | 0.1.1 | network | official | `http_cache` |
@@ -29,15 +29,15 @@ This catalog is generated from extension manifests by
 | `neon` | Neon | 0.1.1 | database | official | `auth`, `remote_database`, `file_storage` |
 | `notifications` | Notifications | 0.1.1 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
-| `remote_config` | Remote Config | 0.1.0 | config | official | `remote_config` |
-| `rest_auth` | REST auth | 0.1.1 | auth | official | `auth` |
-| `riverpod` | Riverpod state management | 0.2.0 | state | official | `state_riverpod` |
+| `remote_config` | Remote Config | 0.1.1 | config | official | `remote_config` |
+| `rest_auth` | REST auth | 0.1.2 | auth | official | `auth`, `token_provider`, `account_management` |
+| `riverpod` | Riverpod state management | 0.2.1 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.0 | storage | official | `secure_storage` |
 | `share` | Share | 0.1.0 | share | official | `share` |
 | `social_login` | Social login | 0.1.0 | social | official | `social_login` |
 | `storage` | Key-value storage | 0.1.0 | storage | official | `storage` |
 | `supabase` | Supabase | 0.1.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
-| `theme` | Theme | 0.1.0 | theme | official | `theme` |
+| `theme` | Theme | 0.1.1 | theme | official | `theme` |
 
 ## analytics
 
@@ -50,9 +50,9 @@ PostHog product analytics with consent gating and PII scrubbing.
 
 ## appwrite
 
-Appwrite auth, social sign-in, remote database, and file storage backends.
+Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.
 
-- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`
+- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`
 - Prompts: endpoint, project_id, database_id, bucket_id
 - Dependencies: `appwrite: ^28.2.0`, `http: ^1.6.0`, `shared_preferences: ^2.3.0`
 - Platforms: android, ios, macos, web, windows, linux
@@ -137,7 +137,7 @@ Typed build-time configuration from --dart-define values.
 
 Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.
 
-- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`
+- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `token_provider`, `account_management`
 - Prompts: options_source, firebase_options_path, emulator_host, use_emulator_in_development
 - Dependencies: `firebase_core: ^5.1.0`, `firebase_auth: ^7.0.1`, `cloud_firestore: ^7.1.0`, `firebase_storage: ^14.0.1`
 - Platforms: android, ios, macos, web, windows
@@ -256,7 +256,7 @@ Feature flags and remote configuration fetched from any JSON HTTP endpoint, read
 
 Email and password authentication against a REST API.
 
-- Provides: `auth`
+- Provides: `auth`, `token_provider`, `account_management`
 - Requires: `http_client`, `secure_storage`
 - Prompts: base_url, login_path, register_path, refresh_path, logout_path, me_path
 

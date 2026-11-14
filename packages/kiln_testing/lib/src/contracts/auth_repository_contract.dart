@@ -12,6 +12,10 @@ void authRepositoryContract({
   String validEmail = 'user@kiln.dev',
   String validPassword = 'password123',
   String invalidPassword = 'wrong-password',
+
+  /// Address the signUp test registers. Backends that reject duplicate emails
+  /// need a fresh value per run; the default keeps the suite hermetic.
+  String signUpEmail = 'new@kiln.dev',
 }) {
   group('$description contract', () {
     test('starts signed out', () async {
@@ -60,7 +64,7 @@ void authRepositoryContract({
       final auth = await create();
 
       final session = await auth.signUp(
-        email: 'new@kiln.dev',
+        email: signUpEmail,
         password: 'password123',
         displayName: 'New User',
       );
