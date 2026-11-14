@@ -106,7 +106,7 @@ flutter:
         // The analysis server can hold a handle briefly on Windows.
       }
     }
-  });
+  }, timeout: const Timeout(Duration(minutes: 3)));
 }
 
 Future<void> _writeFiles(Directory root, List<RenderedFile> files) async {

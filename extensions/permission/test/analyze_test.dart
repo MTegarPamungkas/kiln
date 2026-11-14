@@ -78,5 +78,5 @@ dependency_overrides:
         // The analysis server can hold a handle briefly on Windows.
       }
     }
-  });
+  }, timeout: const Timeout(Duration(minutes: 3)));
 }
