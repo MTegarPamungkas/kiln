@@ -1,0 +1,8 @@
+{
+  "name": "notify-user",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "dependencies": {
+    "node-appwrite": "^31.2.0"
+  }
+}
