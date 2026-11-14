@@ -142,7 +142,7 @@ kiln/
 │                 └─ test/extensions/{{id.snakeCase()}}/  # extension tests that go into the user project test/
 │                    ├─ {{id.snakeCase()}}_module_test.dart          # tests that the module registers its services with the Registry
 │                    └─ {{id.snakeCase()}}_failure_mapper_test.dart  # tests that third-party errors map to the correct Failure
-├─ extensions/                               # 33 extension folders, described in the Extension sections
+├─ extensions/                               # 35 extension folders, described in the Extension sections
 ├─ examples/                                 # generated example projects as Kiln usage references
 │  ├─ minimal/                               # kiln create output without extensions
 │  │  ├─ kiln.yaml                           # project configuration without extensions
@@ -448,7 +448,7 @@ packages/kiln_cli/
 │     └─ bundles/  # bundle of all extensions, generated from extensions/, do not edit
 │        ├─ catalog.g.dart  # catalog of available extensions, generated from extension.yaml, do not edit
 │        ├─ app_basic_bundle.dart  # app_basic bundle for create, generated from extensions/app_basic, do not edit
-│        └─ <id>_bundle.dart  # per-extension bundle (33 files), generated from extensions/<id>, do not edit
+│        └─ <id>_bundle.dart  # per-extension bundle (35 files), generated from extensions/<id>, do not edit
 ├─ test/  # kiln_cli package tests: command runner, commands, infra, fixtures, and goldens
 │  ├─ command_runner_test.dart  # tests argument mapping to commands and the command runner exit codes
 │  ├─ commands/  # one test file for each CLI command

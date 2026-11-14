@@ -1,0 +1,42 @@
+id: appwrite_push_native
+name: Appwrite Native Push
+version: 0.1.0
+description: Push transport over Appwrite Push (MQTT), without Firebase or device tokens.
+category: notifications
+tier: official
+exclusive: true
+provides:
+  - push_transport
+requires:
+  - auth
+dependencies:
+  appwrite: ^28.2.0
+prompts:
+  - name: push_endpoint
+    type: string
+    label: Appwrite Push broker endpoint (blank for the SDK default)
+    default: ""
+  - name: background
+    type: bool
+    label: Deliver notifications while the app is backgrounded
+    default: true
+  - name: notification_title
+    type: string
+    label: Background notification title
+    default: Notifications
+platforms:
+  - android
+  - ios
+android:
+  permissions:
+    - android.permission.POST_NOTIFICATIONS
+manual_steps:
+  - id: appwrite_push_provider
+    description: Create an Appwrite Push provider under Messaging in the Appwrite console. It needs no credentials, and pushing to a user reaches every device that user subscribed on.
+  - id: appwrite_push_broker
+    description: Self-hosted servers must expose the MQTT broker. Set push_endpoint to mqtts, for example mqtts://push.example.com:8883, with port 8883 reachable; a Cloudflare-proxied API hostname does not forward it, so use a DNS-only push hostname.
+  - id: appwrite_push_ios
+    description: On iOS, enable Push Notifications and the remote-notification background mode, then add APNs credentials to the Appwrite provider so background notifications show while the app is suspended.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

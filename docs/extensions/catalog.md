@@ -6,8 +6,9 @@ This catalog is generated from extension manifests by
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.3.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets` |
+| `appwrite` | Appwrite | 0.3.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets` |
 | `appwrite_push` | Appwrite Push | 0.1.1 | notifications | official | `push_transport` |
+| `appwrite_push_native` | Appwrite Native Push | 0.1.0 | notifications | official | `push_transport` |
 | `biometric` | Biometric | 0.1.1 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.2.1 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
@@ -66,6 +67,16 @@ Push transport bridging Firebase Cloud Messaging into the push_targets capabilit
 - Requires: `push_targets`
 - Dependencies: `firebase_core: ^5.1.0`, `firebase_messaging: ^17.0.1`, `flutter_local_notifications: ^22.3.3`
 - Platforms: android
+
+## appwrite_push_native
+
+Push transport over Appwrite Push (MQTT), without Firebase or device tokens.
+
+- Provides: `push_transport`
+- Requires: `auth`
+- Prompts: push_endpoint, background, notification_title
+- Dependencies: `appwrite: ^28.2.0`
+- Platforms: android, ios
 
 ## biometric
 

@@ -1,0 +1,13 @@
+{
+  "extension": "appwrite_push_native",
+  "files": {
+    "lib/extensions/appwrite_push_native/appwrite_push_native_config.dart": "674f0b4c0e1fa0093b7359d9dc3c6c2bc098e8e0d57093d82942cec35223fdc7",
+    "lib/extensions/appwrite_push_native/appwrite_push_native_module.dart": "843d54c5d6e3f594daee46d5f513dc855430d4b653c7730a4592995222e2c28b",
+    "lib/extensions/appwrite_push_native/appwrite_push_native_transport.dart": "136116d86ba7f325b55f333ab8e330d1529036dd97023eb8fb26d30215490322",
+    "test/extensions/appwrite_push_native/appwrite_push_native_contract_test.dart": "de4df5aff1e3d5c1c6c1f9c5874abe396e5883a18e71ea00e18dd9eda8199597",
+    "test/extensions/appwrite_push_native/appwrite_push_native_e2e_test.dart": "67eba244558a63ef7b06a4ca1e821cfbfacdd85e58c0ff9768104172afe07819",
+    "test/extensions/appwrite_push_native/appwrite_push_native_envelope_test.dart": "d3fa54d7ec6c87f874a743b7861346738ab41ba5db842bef61840204e477d717",
+    "test/extensions/appwrite_push_native/appwrite_push_native_module_test.dart": "bf382786ed6e4cca16a57e58c601e2e92208c427a6b923067a7ba2c520445389",
+    "test/extensions/appwrite_push_native/appwrite_push_native_transport_test.dart": "8f8e8539e80558f8bb163b35f3f19f18c7198b4636ac731f970c85bdbd27f5fb"
+  }
+}

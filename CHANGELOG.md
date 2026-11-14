@@ -9,6 +9,13 @@ records release-level changes for the monorepo.
 
 ## Unreleased
 
+- New `appwrite_push_native` extension 0.1.0: a `push_transport` over Appwrite
+  Push (MQTT subscriptions) with no Firebase project or device token. It follows
+  the signed-in session, re-subscribes when the user changes, replays the launch
+  tap, reports subscribe failures, and supports self-hosted broker endpoints.
+- The `appwrite` extension 0.3.1 registers its configured `appwrite.Client` so
+  sibling transports subscribe on the same signed-in session, and decodes the
+  URL-encoded session cookie Appwrite 2.7+ returns.
 - `kiln doctor` reports capability coverage: feature code that references a
   backend capability no installed extension provides (for example
   `CloudFunctions` after swapping from Appwrite to Supabase) now produces a

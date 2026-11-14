@@ -1,10 +1,10 @@
 {
   "extension": "appwrite_push",
   "files": {
-    "lib/extensions/appwrite_push/appwrite_push_background.dart": "79fe84387e2d594019c6908f91d341e416cb7499faea2ce7f3ef26b949cb09e5",
-    "lib/extensions/appwrite_push/appwrite_push_module.dart": "a5dcf2d9484df84b75ec846224ea1119dd8c9c03934d558be268223e0534e705",
-    "lib/extensions/appwrite_push/appwrite_push_transport.dart": "423896a746fc752bd419306c10b59a72f2917ead246a197cae742a127ccc1742",
+    "lib/extensions/appwrite_push/appwrite_push_background.dart": "2a30e05672c72e2032760651272e11acd010be9e29237a71da2801921e4691ad",
+    "lib/extensions/appwrite_push/appwrite_push_module.dart": "0ea8be1c13d2cf9dee89f1df08f1c844467829eeef4ed4005f1ffffc5967612f",
+    "lib/extensions/appwrite_push/appwrite_push_transport.dart": "7a5841fb33c95101cdcae6d7572ac228c7f5774108dca6d69955849db7ffaa87",
     "test/extensions/appwrite_push/appwrite_push_contract_test.dart": "2eecba3f976355fb170fbf9ad35eaba2e715e730915e3503667ce7839d07ccb2",
-    "test/extensions/appwrite_push/appwrite_push_module_test.dart": "5d72cd9717679552f0ee46bc29668c001f491157c2e7b9314cfe8c41a259b616"
+    "test/extensions/appwrite_push/appwrite_push_module_test.dart": "8fb0b0c15beb7055c4a62fc62f918b954bd83dda99be5a776b3b54be1f2873e2"
   }
 }

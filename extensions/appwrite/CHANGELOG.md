@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+
+- Sign-in works against Appwrite 2.7+, which URL-encodes the session cookie
+  value. The extension now decodes it before sending `X-Appwrite-Session` and
+  before seeding the SDK cookie jar.
+- Registers the configured `appwrite.Client` so sibling transport extensions
+  (such as `appwrite_push_native`) can subscribe on the same signed-in session.
+
 ## 0.3.0
 
 - New `push_targets` capability: the `PushTargets` contract registers, updates, and removes the device's push token for the signed-in user through the Appwrite push target endpoints (one target per provider per session, upsert on token rotation).

@@ -34,6 +34,7 @@ Kiln documentation, grouped by what you are trying to do.
 
 - [Set up flavors and env](guides/setup-flavors-and-env.md)
 - [Add offline support](guides/add-offline-support.md)
+- [Push notifications](guides/push-notifications.md)
 - [Swap a backend](guides/swap-backend.md)
 - [Migrate bloc to riverpod](guides/migrate-bloc-to-riverpod.md)
 - [Kotlin Gradle Plugin warning](guides/android-kotlin-plugin-warning.md)

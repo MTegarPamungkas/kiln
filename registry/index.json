@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T12:12:29.264091Z",
+  "generated_at": "2026-11-14T17:51:38.436336Z",
   "extensions": [
     {
       "id": "analytics",
@@ -29,7 +29,7 @@
       "name": "Appwrite",
       "description": "Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.",
       "category": "auth",
-      "latest": "0.3.0",
+      "latest": "0.3.1",
       "tier": "official",
       "versions": [
         {
@@ -98,6 +98,25 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.3.1",
+          "url": "archives/appwrite-0.3.1.tgz",
+          "sha256": "f868a39852fec388047854fb66b185b3254c3bbb84d109dbe786afd206c32b46",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -127,9 +146,34 @@
         {
           "version": "0.1.1",
           "url": "archives/appwrite_push-0.1.1.tgz",
-          "sha256": "a56a929868cdda7af70219dfb38a174c2347d7cc8a599bfd77cda4338d2bf084",
+          "sha256": "a73bf539d2035c23da46816bd88c2d2f96cc935b41f802e3c1933d64a0df048b",
           "requires": [
             "push_targets"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "appwrite_push_native",
+      "name": "Appwrite Native Push",
+      "description": "Push transport over Appwrite Push (MQTT), without Firebase or device tokens.",
+      "category": "notifications",
+      "latest": "0.1.0",
+      "tier": "official",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "url": "archives/appwrite_push_native-0.1.0.tgz",
+          "sha256": "8682e6c5414bfc410ca0ecefa9576221da3921b556e54e2bc22284ceafbd64dd",
+          "requires": [
+            "auth"
           ],
           "provides": [
             "push_transport"
@@ -164,7 +208,7 @@
         {
           "version": "0.1.1",
           "url": "archives/biometric-0.1.1.tgz",
-          "sha256": "49cd3bb67f87691d364d7c328b2df798129ec7f821b342f2c5bcef3871beef31",
+          "sha256": "d231a2a738afab5a9bcaf48ef72659b12287b720fc551511291822968d26810d",
           "provides": [
             "biometric"
           ],
@@ -210,7 +254,7 @@
         {
           "version": "0.2.1",
           "url": "archives/bloc-0.2.1.tgz",
-          "sha256": "a6e1e2e17b5a3f8ddbcc14d1eec6f3a038c0d7bef9cef8dcefc5d6a4980b0519",
+          "sha256": "7b13c88e8f23e3048f0220b882bc72749ff60aac99580411bd32254e60bc269f",
           "provides": [
             "state_bloc"
           ],
@@ -232,7 +276,7 @@
         {
           "version": "0.1.0",
           "url": "archives/calendar-0.1.0.tgz",
-          "sha256": "e0d9a00623b838427f6271c43b25a08f13019c6e0f4794e4e707dc6032bffd7f",
+          "sha256": "061bd8231102057f8bbba0282564501f1fcdbf7a7bbd57b5c5a7ed89d5c2e06d",
           "provides": [
             "calendar"
           ],
@@ -300,7 +344,7 @@
         {
           "version": "0.1.2",
           "url": "archives/connectivity-0.1.2.tgz",
-          "sha256": "db3d38b9c5f6dcb0e7af6366e9bbdd3dbc44a1626513e0c29b1f5549dabc66de",
+          "sha256": "67794ab9820fabb1ff3077d7693bb97a0b9c4df1b5250ecb01e05b0fab38ca32",
           "provides": [
             "connectivity"
           ],
@@ -404,7 +448,7 @@
         {
           "version": "0.1.2",
           "url": "archives/dio-0.1.2.tgz",
-          "sha256": "352aec1ab49caea806b09e2ed8d6844a491a51b9716acc4167b37e93429d3f46",
+          "sha256": "20c4525e9e28dd15a10c638f932d18eee69ace8feaa439cbc2aa73e466458be5",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -465,7 +509,7 @@
         {
           "version": "0.1.1",
           "url": "archives/firebase-0.1.1.tgz",
-          "sha256": "6458ed824ba15f5e5752c635f1bdc9341050746b4528ad870f76cb3505dc6197",
+          "sha256": "f27b60348d54aeae9a4557140b3ab669e234670da19b3b3431050a9e8e6ecb99",
           "provides": [
             "auth",
             "social_auth",
@@ -527,7 +571,7 @@
         {
           "version": "0.1.0",
           "url": "archives/geolocation-0.1.0.tgz",
-          "sha256": "192d8ef3c262d4a34ec6853e797ecb7d2598ea314211aee7fba73a83e4e02ad5",
+          "sha256": "2fbb0e3502608bc9cc37cdc90b1300a09c84872c43b6c9b5a5c7e0f9309ac6aa",
           "provides": [
             "location"
           ],
@@ -549,7 +593,7 @@
         {
           "version": "0.1.0",
           "url": "archives/go_router-0.1.0.tgz",
-          "sha256": "45903654d0a20ee44949fff32f094e16c4b7da4a3c37675ff2b374e19f83d115",
+          "sha256": "bbaadfd01663704e005733df7ca759cdb484ef90ab08fd8592a67d79f379a38c",
           "provides": [
             "navigation"
           ],
@@ -587,7 +631,7 @@
         {
           "version": "0.1.1",
           "url": "archives/http_cache-0.1.1.tgz",
-          "sha256": "49875963ba16758a3b17c2e602857bb15a61b8053abf6f61112c797b8a50b989",
+          "sha256": "d981a71d0efba942e7c8c9adaef42ccad9755a9a1b61b388d551ce1242b51a0e",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -613,7 +657,7 @@
         {
           "version": "0.1.0",
           "url": "archives/http_retry-0.1.0.tgz",
-          "sha256": "712ed0ebc76e8e16ed872082f5b6cf24c0f57217ac2c00fcea98ae56629bec92",
+          "sha256": "92240a17b937e8889feff1eb3b4481959806248cb9b65828ea7370dc3e75fc89",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -636,7 +680,7 @@
         {
           "version": "0.1.0",
           "url": "archives/image_picker-0.1.0.tgz",
-          "sha256": "1a9b6aa3aeac407d439ed889507b3adf481539837d1e2fa25f7e675c1e908a2a",
+          "sha256": "8b27fe14ebc35094caa8485bf06f61d013fff2c641c0222e4fe4009cc3c80809",
           "provides": [
             "media"
           ],
@@ -658,7 +702,7 @@
         {
           "version": "0.1.0",
           "url": "archives/l10n-0.1.0.tgz",
-          "sha256": "2d4e6f9821bc9905572caeb58cb3fce1392874e02c96ca39322742e453338ad8",
+          "sha256": "82448b9a25b0b7d5154d904b5d750fa33316a49f0b8dfdf3567afd28684f83f1",
           "provides": [
             "l10n"
           ],
@@ -680,7 +724,7 @@
         {
           "version": "0.1.0",
           "url": "archives/local_db-0.1.0.tgz",
-          "sha256": "3e33a689632f394f9d53b264aa8c5d7cd4bf53c6b703291687244da85de7875f",
+          "sha256": "b1c6358bbfb9464f3070da997b5e34a7eddb0207a479da6cb02e6af8cdf1b3e8",
           "provides": [
             "local_db"
           ],
@@ -774,7 +818,7 @@
         {
           "version": "0.1.1",
           "url": "archives/notifications-0.1.1.tgz",
-          "sha256": "3fb21f3819897348f879a39bd4832711261809f6a83a7a443f4340c1a1a4f85f",
+          "sha256": "300cb960dd22a05d5af7175987cd423f4d211be100d5c853bc603c9b58593904",
           "provides": [
             "notifications"
           ],
@@ -796,7 +840,7 @@
         {
           "version": "0.1.0",
           "url": "archives/permission-0.1.0.tgz",
-          "sha256": "cca4e3a9200e2b200f716d8949a9894c4bcc11ce5b7b98e06eaad59c89cf38ef",
+          "sha256": "9b36709fb5b9a66a1bde7c654990a9dee3ed157197f54c51ce522a40f3131bac",
           "provides": [
             "permission"
           ],
@@ -884,7 +928,7 @@
         {
           "version": "0.1.2",
           "url": "archives/rest_auth-0.1.2.tgz",
-          "sha256": "3ba1a7af54a4266e98c73715082c388b4ab5b1c7b70f1c2cab0d1ac8ee48af6c",
+          "sha256": "af2e17c8bef8cdd92e651fde6d9b0fcc23bf8669ee213ff72f9a2461e366617b",
           "requires": [
             "http_client",
             "secure_storage"
@@ -936,7 +980,7 @@
         {
           "version": "0.2.1",
           "url": "archives/riverpod-0.2.1.tgz",
-          "sha256": "944091ab1b9c85a3352f64a3d2c6a420691dc88984ed886efc38f91ec0be3f3e",
+          "sha256": "79bbd7a2152f20ad1ddfab874da111b2dcb85db459db602db619add44ed82dd2",
           "provides": [
             "state_riverpod"
           ],
@@ -958,7 +1002,7 @@
         {
           "version": "0.1.0",
           "url": "archives/secure_storage-0.1.0.tgz",
-          "sha256": "0e58b8dd312e24fd92d987c1d91601ed19c9e5e8bb48cf16a551832900a139a8",
+          "sha256": "332d124109b76f6678a661f179bfeb3f8cc276e1c4e16868d01e4b713e55c030",
           "provides": [
             "secure_storage"
           ],
@@ -980,7 +1024,7 @@
         {
           "version": "0.1.0",
           "url": "archives/share-0.1.0.tgz",
-          "sha256": "a91152a326f2b239cfa9cbb859d7b38000e876372c12f4ce1d799a97c96682c8",
+          "sha256": "5e9790b3a3b3d54f3fd9d3e71f2c513a2e01b17f44b3f02d803c8f71e7e345ce",
           "provides": [
             "share"
           ],
@@ -1002,7 +1046,7 @@
         {
           "version": "0.1.0",
           "url": "archives/social_login-0.1.0.tgz",
-          "sha256": "0a6d4b4825e94b12836627872ce770c65b321323ea9b34a350b92c5b860ae8a0",
+          "sha256": "9bc98a185e8b3f0b62cc95191d295ea05d0834a56e6251278bb0e351b25c2d53",
           "requires": [
             "social_auth"
           ],
@@ -1027,7 +1071,7 @@
         {
           "version": "0.1.0",
           "url": "archives/storage-0.1.0.tgz",
-          "sha256": "efc0cdfb7dbbb55a78c07cdcd149779f3efbc4d2d7c259c5744e0dd13f851320",
+          "sha256": "00646a645a818cd543b6b9793c49cfe1ba32ad2ed8a82b35023e27eaf16cb25d",
           "provides": [
             "storage"
           ],
@@ -1049,7 +1093,7 @@
         {
           "version": "0.1.0",
           "url": "archives/supabase-0.1.0.tgz",
-          "sha256": "ac6661703f44698fc43750ee02bf7f68316bf949b1da6f5b59420a184d03620c",
+          "sha256": "d51a5e01d95088acb064bfa5a865920cd642c6bd28f99ed679bf864dcb3d963a",
           "provides": [
             "auth",
             "social_auth",
@@ -1086,7 +1130,7 @@
         {
           "version": "0.1.1",
           "url": "archives/theme-0.1.1.tgz",
-          "sha256": "70d3c3577c9c1472be4d5676f5eb020c504fd1b6d6b26f85828a24706f8c2769",
+          "sha256": "272a661e4fb72cf4562a630510364f1fe2e6b21d05deef2aa092f2443090cbef",
           "provides": [
             "theme"
           ],

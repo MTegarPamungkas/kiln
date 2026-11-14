@@ -10,6 +10,7 @@ workspace:
   - extensions/analytics
   - extensions/appwrite
   - extensions/appwrite_push
+  - extensions/appwrite_push_native
   - extensions/biometric
   - extensions/bloc
   - extensions/calendar

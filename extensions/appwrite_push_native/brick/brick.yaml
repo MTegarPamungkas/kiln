@@ -1,0 +1,26 @@
+name: appwrite_push_native
+description: Appwrite Push (MQTT) transport for Kiln.
+version: 0.1.0
+environment:
+  mason: ">=0.1.0 <0.2.0"
+vars:
+  push_endpoint:
+    type: string
+    description: Appwrite Push broker endpoint (blank for the SDK default)
+    default: ""
+  id:
+    type: string
+    description: Extension id
+    default: appwrite_push_native
+  app_name:
+    type: string
+    description: Application package name
+    default: my_app
+  notification_title:
+    type: string
+    description: Background notification title
+    default: Notifications
+  background:
+    type: boolean
+    description: Deliver notifications while the app is backgrounded
+    default: true

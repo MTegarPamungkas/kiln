@@ -1,6 +1,6 @@
 id: appwrite
 name: Appwrite
-version: 0.3.0
+version: 0.3.1
 description: Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.
 category: auth
 tier: official

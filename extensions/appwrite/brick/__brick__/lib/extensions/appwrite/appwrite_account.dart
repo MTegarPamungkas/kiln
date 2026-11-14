@@ -284,10 +284,20 @@ final class SdkAppwriteAccount implements AppwriteAccount {
       }
       final value = cookie.substring(name.length + 1).split(';').first;
       if (value.isNotEmpty) {
-        return value;
+        return _decodeCookie(value);
       }
     }
     return null;
+  }
+
+  /// Appwrite 2.7+ URL-encodes the session cookie value; the server only
+  /// accepts the decoded form in `X-Appwrite-Session` and the cookie jar.
+  String _decodeCookie(String value) {
+    try {
+      return Uri.decodeComponent(value);
+    } on FormatException {
+      return value;
+    }
   }
 
   String _responseMessage(String body) {
@@ -390,7 +400,8 @@ final class SdkAppwriteAccount implements AppwriteAccount {
       return;
     }
     final prefs = await SharedPreferences.getInstance();
-    final cookie = prefs.getString(_sessionCookieKey) ?? '';
+    final stored = prefs.getString(_sessionCookieKey) ?? '';
+    final cookie = stored.isEmpty ? '' : _decodeCookie(stored);
     if (cookie.isNotEmpty) {
       shared.setSession(cookie);
       _seedCookieJar(cookie);

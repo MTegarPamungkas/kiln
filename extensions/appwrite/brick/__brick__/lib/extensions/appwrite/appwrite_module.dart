@@ -109,6 +109,7 @@ final class AppwriteModule extends KilnModule {
     _realtime = realtime;
 
     registry
+      ..registerSingleton<appwrite.Client>(client)
       ..registerSingleton<AppwriteConfig>(config)
       ..registerSingleton<AppwriteSupport>(support)
       ..registerSingleton<AuthRepository>(auth)
