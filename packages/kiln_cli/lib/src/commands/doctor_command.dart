@@ -351,6 +351,7 @@ const Map<String, String> _capabilityByContractType = <String, String>{
   'TokenProvider': 'token_provider',
   'AccountManagement': 'account_management',
   'PushTargets': 'push_targets',
+  'PushTransport': 'push_transport',
 };
 
 /// Warns when feature code references a backend capability that no installed

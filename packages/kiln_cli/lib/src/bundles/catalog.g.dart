@@ -5,6 +5,7 @@
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'analytics_bundle.dart';
 import 'appwrite_bundle.dart';
+import 'appwrite_push_bundle.dart';
 import 'biometric_bundle.dart';
 import 'bloc_bundle.dart';
 import 'calendar_bundle.dart';
@@ -40,6 +41,7 @@ import 'theme_bundle.dart';
 final List<AvailableExtension> bundledExtensions = <AvailableExtension>[
   analyticsExtension,
   appwriteExtension,
+  appwritePushExtension,
   biometricExtension,
   blocExtension,
   calendarExtension,

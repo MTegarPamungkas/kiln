@@ -1,0 +1,29 @@
+id: appwrite_push
+name: Appwrite Push
+version: 0.1.0
+description: Push transport bridging Firebase Cloud Messaging into the push_targets capability on Appwrite.
+category: notifications
+tier: official
+exclusive: true
+provides:
+  - push_transport
+requires:
+  - push_targets
+optional_requires:
+  - notifications
+dependencies:
+  firebase_core: ^5.1.0
+  firebase_messaging: ^17.0.1
+platforms:
+  - android
+android:
+  permissions:
+    - android.permission.POST_NOTIFICATIONS
+manual_steps:
+  - id: appwrite_push_google_services
+    description: Place the Firebase project's google-services.json at android/app/google-services.json and apply the Google Services Gradle plugin, or run flutterfire configure.
+  - id: appwrite_push_fcm_provider
+    description: Add a Firebase Cloud Messaging provider in the Appwrite console (Messaging) with the same Firebase project's service account so the backend can deliver pushes.
+compatibility:
+  kiln: ">=0.1.0 <0.2.0"
+  dart: ">=3.9.0"

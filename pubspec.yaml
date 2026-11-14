@@ -9,6 +9,7 @@ environment:
 workspace:
   - extensions/analytics
   - extensions/appwrite
+  - extensions/appwrite_push
   - extensions/biometric
   - extensions/bloc
   - extensions/calendar

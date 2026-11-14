@@ -20,6 +20,7 @@ export 'src/contracts/media_picker.dart';
 export 'src/contracts/notifications.dart';
 export 'src/contracts/permissions.dart';
 export 'src/contracts/push_targets.dart';
+export 'src/contracts/push_transport.dart';
 export 'src/contracts/remote_config.dart';
 export 'src/contracts/remote_database.dart';
 export 'src/contracts/secure_storage.dart';

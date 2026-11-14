@@ -7,6 +7,7 @@ This catalog is generated from extension manifests by
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
 | `appwrite` | Appwrite | 0.3.0 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets` |
+| `appwrite_push` | Appwrite Push | 0.1.0 | notifications | official | `push_transport` |
 | `biometric` | Biometric | 0.1.1 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.2.1 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
@@ -56,6 +57,15 @@ Appwrite auth, social sign-in, remote database, file storage, and cloud function
 - Prompts: endpoint, project_id, database_id, bucket_id
 - Dependencies: `appwrite: ^28.2.0`, `http: ^1.6.0`, `shared_preferences: ^2.3.0`
 - Platforms: android, ios, macos, web, windows, linux
+
+## appwrite_push
+
+Push transport bridging Firebase Cloud Messaging into the push_targets capability on Appwrite.
+
+- Provides: `push_transport`
+- Requires: `push_targets`
+- Dependencies: `firebase_core: ^5.1.0`, `firebase_messaging: ^17.0.1`
+- Platforms: android
 
 ## biometric
 
