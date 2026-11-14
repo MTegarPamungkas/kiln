@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T10:57:45.874073Z",
+  "generated_at": "2026-11-14T12:12:29.264091Z",
   "extensions": [
     {
       "id": "analytics",
@@ -106,13 +106,28 @@
       "name": "Appwrite Push",
       "description": "Push transport bridging Firebase Cloud Messaging into the push_targets capability on Appwrite.",
       "category": "notifications",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/appwrite_push-0.1.0.tgz",
           "sha256": "32a411c04f60dad15d4214e74c2de04941870706cedc96db365b881bb6d79911",
+          "requires": [
+            "push_targets"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/appwrite_push-0.1.1.tgz",
+          "sha256": "a56a929868cdda7af70219dfb38a174c2347d7cc8a599bfd77cda4338d2bf084",
           "requires": [
             "push_targets"
           ],

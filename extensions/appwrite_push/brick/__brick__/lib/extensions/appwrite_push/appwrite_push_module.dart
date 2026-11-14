@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kiln_core/kiln_core.dart';
 
+import 'appwrite_push_background.dart' as background;
 import 'appwrite_push_transport.dart';
 
 /// Registers the FCM push transport for Appwrite.
@@ -50,6 +52,11 @@ final class AppwritePushModule extends KilnModule {
     }
     try {
       await transport.initialize();
+      // Appwrite delivers data payloads, so background pushes render through
+      // the system tray via this handler (foreground goes to the stream).
+      FirebaseMessaging.onBackgroundMessage(
+        background.appwritePushBackgroundHandler,
+      );
     } on Failure catch (failure) {
       registry.readOrNull<SupportRegistry>()?.record(
         id,
