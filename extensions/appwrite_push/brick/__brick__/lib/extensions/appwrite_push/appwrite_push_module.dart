@@ -19,9 +19,13 @@ final class AppwritePushModule extends KilnModule {
   final bool autoRegister;
 
   AppwritePushTransport? _transport;
+  bool _disposed = false;
 
   @override
   String get id => 'appwrite_push';
+
+  @override
+  Set<String> get platforms => const <String>{'android'};
 
   @override
   Set<String> get requires => const <String>{'push_targets'};
@@ -47,17 +51,26 @@ final class AppwritePushModule extends KilnModule {
   @override
   Future<void> ready(Registry registry) async {
     final transport = _transport;
-    if (transport == null || !autoRegister) {
+    if (transport == null || !autoRegister || _disposed) {
       return;
     }
     try {
       await transport.initialize();
+      // Initialization awaits Firebase; a bootstrap timeout may have disposed
+      // this module in the meantime. Registering a global background handler
+      // after disposal would outlive the application.
+      if (_disposed) {
+        return;
+      }
       // Appwrite delivers data payloads, so background pushes render through
       // the system tray via this handler (foreground goes to the stream).
       FirebaseMessaging.onBackgroundMessage(
         background.appwritePushBackgroundHandler,
       );
     } on Failure catch (failure) {
+      if (_disposed) {
+        return;
+      }
       registry.readOrNull<SupportRegistry>()?.record(
         id,
         SupportInfo.unsupported(
@@ -71,6 +84,10 @@ final class AppwritePushModule extends KilnModule {
 
   @override
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _transport?.dispose();
     _transport = null;
   }

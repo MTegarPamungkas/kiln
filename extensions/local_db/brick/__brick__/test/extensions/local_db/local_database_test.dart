@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
+import 'package:sembast/sembast_memory.dart';
+import 'package:{{app_name}}/extensions/local_db/sembast_local_database.dart';
 
 import 'test_support.dart';
 
@@ -35,6 +37,29 @@ void main() {
 
     await database.delete('tasks', '1');
     expect(await database.get('tasks', '1'), isNull);
+    await database.close();
+  });
+
+  test('retries after a failed open', () async {
+    var attempts = 0;
+    final database = SembastLocalDatabase(
+      opener: () async {
+        attempts++;
+        if (attempts == 1) {
+          throw StateError('disk busy');
+        }
+        return databaseFactoryMemory.openDatabase('retry_$attempts.db');
+      },
+    );
+
+    await expectLater(
+      database.get('tasks', '1'),
+      throwsA(isA<Failure>()),
+    );
+    expect(await database.get('tasks', '1'), isNull);
+    expect(attempts, 2);
+
+    await database.close();
     await database.close();
   });
 }

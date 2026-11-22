@@ -1,0 +1,116 @@
+import 'dart:async';
+import 'dart:io' as io;
+
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/analytics/analytics_module.dart';
+import 'package:{{app_name}}/extensions/crash_report/crash_report_module.dart';
+
+// Loopback ingestion host reached from the phone through `adb reverse`.
+const String captureHost = 'http://127.0.0.1:8799';
+
+/// How long each phase is held open. The default outlasts the SDK's 30 s flush
+/// timer; a short grant hold revokes before the first periodic flush, which is
+/// the case that shows whether a queued event can still leave after revoke.
+const int grantHoldSeconds = @GRANT_SECONDS@;
+const int revokeHoldSeconds = @REVOKE_SECONDS@;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const MaterialApp(
+      home: Scaffold(body: Center(child: Text('Kiln K09 native probe'))),
+    ),
+  );
+  unawaited(runProbe());
+}
+
+void log(String line) => debugPrint('K09NATIVE $line');
+
+String failureText(Object error) =>
+    error is Failure ? '${error.code.value} ${error.kind.name}' : '$error';
+
+/// Marks a phase on the capture host so requests can be attributed to it.
+Future<void> phase(String label) async {
+  log('phase=$label');
+  try {
+    final client = io.HttpClient();
+    final request = await client.getUrl(
+      Uri.parse('$captureHost/__mark?label=$label'),
+    );
+    final response = await request.close();
+    await response.drain<void>();
+    client.close();
+  } on Object catch (error) {
+    log('phase_mark_failed ${failureText(error)}');
+  }
+}
+
+Future<void> runProbe() async {
+  final Registry registry;
+  try {
+    registry = await KilnBootstrap.run(
+      modules: [AnalyticsModule(), CrashReportModule()],
+      onError: (error, stackTrace) =>
+          log('bootstrap_error ${failureText(error)}'),
+    );
+  } catch (error) {
+    log('bootstrap_failed ${failureText(error)}');
+    return;
+  }
+
+  final consent = registry.read<ConsentController>();
+  final analytics = registry.read<Analytics>();
+  final crash = registry.read<CrashReporter>();
+  final support = registry.read<SupportRegistry>();
+
+  void report(String step) {
+    log(
+      'support $step '
+      'analytics=${support['analytics']?.state.name} '
+      'crash=${support['crash_report']?.state.name}',
+    );
+  }
+
+  // 1. Nothing is granted: calls must be dropped and no SDK may send.
+  await phase('deny_start');
+  analytics.capture('kiln_native_deny').ignore();
+  crash.captureError(StateError('kiln-native-deny-error')).ignore();
+  await Future<void>.delayed(const Duration(seconds: 3));
+  report('deny');
+  await phase('deny_end');
+
+  // 2. Grant both categories: SDK setup runs and sends are allowed.
+  await phase('grant_start');
+  consent.grant(ConsentCategory.analytics);
+  consent.grant(ConsentCategory.crashReports);
+  await Future<void>.delayed(const Duration(seconds: 2));
+  report('grant');
+  await analytics.identify('kiln-native-user', traits: {'phase': 'grant'});
+  await analytics.capture(
+    'kiln_native_grant',
+    properties: {'phase': 'grant'},
+  );
+  await crash.addBreadcrumb('kiln-native-breadcrumb', data: {'phase': 'grant'});
+  await crash.captureError(
+    StateError('kiln-native-grant-error'),
+    context: {'kiln_phase': 'grant'},
+  );
+  // Give the SDKs time to flush their queues (default PostHog flush is 30s).
+  await Future<void>.delayed(Duration(seconds: grantHoldSeconds));
+  await phase('grant_end');
+
+  // 3. Revoke: later traffic must stop, including a call made after revoke.
+  await phase('revoke_start');
+  consent.deny(ConsentCategory.analytics);
+  consent.deny(ConsentCategory.crashReports);
+  await Future<void>.delayed(const Duration(seconds: 2));
+  report('revoke');
+  analytics.capture('kiln_native_after_revoke').ignore();
+  crash.captureError(StateError('kiln-native-after-revoke-error')).ignore();
+  // Longer than one flush interval: a queued event must not drain after revoke.
+  await Future<void>.delayed(Duration(seconds: revokeHoldSeconds));
+  await phase('revoke_end');
+
+  log('probe_done');
+}

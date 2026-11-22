@@ -1,0 +1,111 @@
+import 'dart:async';
+
+import 'package:appwrite/appwrite.dart' as sdk;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+
+import 'extensions/appwrite/appwrite_config.dart';
+import 'extensions/appwrite/appwrite_module.dart';
+import 'extensions/appwrite_push_native/appwrite_push_native_transport.dart';
+import 'extensions/dio/dio_client.dart';
+import 'extensions/dio/dio_config.dart';
+
+final status = ValueNotifier<String>('Starting real Appwrite push probe');
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MaterialApp(initialRoute: '/', home: Scaffold(body: Center(
+    child: ValueListenableBuilder<String>(valueListenable: status,
+      builder: (_, text, _) => Text(text))))));
+  unawaited(runPushProbe());
+}
+
+Future<void> runPushProbe() async {
+  final platform = kIsWeb ? 'web' : 'android';
+  final control = DioClient(config: const DioConfig(baseUrl: 'http://127.0.0.1:8767'));
+  final checks = <String>[];
+  Registry? registry;
+  AppwritePushNativeTransport? transport;
+  StreamSubscription<PushEnvelope>? listener;
+  var phase = 'push';
+  var step = 'fixture';
+  void verify(bool ok, String label) {
+    step = label;
+    if (!ok) throw StateError(label);
+    checks.add(label);
+    status.value = '$platform $phase: ${checks.length} checks passed';
+  }
+  try {
+    final response = await control.get(Uri.parse('/fixture?platform=$platform'));
+    final fixture = Map<String, Object?>.from(response.data as Map);
+    phase = fixture['phase'] as String;
+    final background = phase == 'push-background';
+    registry = await KilnBootstrap.run(modules: [AppwriteModule(config: AppwriteConfig(
+      endpoint: fixture['endpoint'] as String, projectId: fixture['project'] as String))]);
+    final auth = registry.read<AuthRepository>();
+    if (auth.currentSession?.userId != fixture['userId']) {
+      try { await auth.signOut(); } on Failure catch (failure) {
+        if (failure.kind != FailureKind.authentication && failure.kind != FailureKind.permission) rethrow;
+      }
+      await auth.signIn(email: fixture['email'] as String, password: fixture['password'] as String);
+    }
+    verify(auth.currentSession?.userId == fixture['userId'], 'push_user_authenticated');
+    final received = Completer<PushEnvelope>();
+    transport = AppwritePushNativeTransport(auth: auth, client: registry.read<sdk.Client>(),
+      pushEndpoint: fixture['pushEndpoint'] as String, background: background,
+      notificationTitle: 'Kiln push probe');
+    listener = transport.foreground.listen((envelope) {
+      if (envelope.data['run'] == fixture['userId'] && !received.isCompleted) {
+        received.complete(envelope);
+      }
+    });
+    step = 'mqtt_subscribe';
+    await transport.start().timeout(const Duration(seconds: 25));
+    verify(transport.isSubscribed, 'mqtt_subscription_acknowledged');
+    if (background) {
+      await control.post(Uri.parse('/report'), body: {'platform': platform,
+        'phase': 'push-background-ready', 'checks': checks});
+      step = 'background_message_delivery';
+    } else {
+      final jwt = await registry.read<TokenProvider>().accessToken();
+      step = 'queue_push';
+      final queued = await control.post(Uri.parse('/control/push'),
+        headers: {'Authorization': 'Bearer $jwt'}, body: {'platform': platform});
+      verify(queued.statusCode == 202, 'push_queued_by_host_coordinator');
+      step = 'foreground_message_delivery';
+    }
+    final message = await received.future.timeout(const Duration(seconds: 60));
+    verify(message.title?.startsWith('Kiln ') ?? false, 'push_notification_title');
+    verify(message.body == 'Functional delivery check', 'push_notification_body');
+    verify(message.data['route'] == '/probe', 'push_custom_payload');
+    verify(message.data['run'] == fixture['userId'], 'push_scoped_to_temporary_user');
+    if (background) {
+      await control.post(Uri.parse('/report'), body: {'platform': platform,
+        'phase': 'push-background-received', 'checks': List<String>.of(checks)});
+      // Keep the session alive briefly for the host's notification-tray check.
+      await Future<void>.delayed(const Duration(seconds: 60));
+    }
+    step = 'logout';
+    await auth.signOut();
+    final deadline = DateTime.now().add(const Duration(seconds: 10));
+    while (transport.isSubscribed && DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    verify(!transport.isSubscribed, 'logout_unsubscribes_push_transport');
+    status.value = '$platform $phase: PASS (${checks.length} checks)';
+    await control.post(Uri.parse('/report'), body: {'platform': platform,
+      'phase': phase, 'checks': checks});
+  } catch (error) {
+    final detail = error is Failure ? '${error.code.value}: ${error.message}'
+      : error is StateError ? '${error.message}' : error.runtimeType.toString();
+    status.value = '$platform $phase: FAIL at $step';
+    await control.post(Uri.parse('/report'), body: {'platform': platform,
+      'phase': phase, 'checks': checks, 'error': '$step: $detail'});
+  } finally {
+    await listener?.cancel();
+    await transport?.dispose();
+    await registry?.read<Lifecycle>().dispose();
+    control.close(force: true);
+  }
+}

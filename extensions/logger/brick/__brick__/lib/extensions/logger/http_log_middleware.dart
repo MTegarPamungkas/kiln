@@ -82,7 +82,9 @@ final class HttpLogMiddleware implements HttpMiddleware {
 
   String _safeUrl(HttpRequest request) {
     final resolved = request.resolvedUri;
-    final sanitized = resolved.replace(userInfo: '', query: '').toString();
+    final sanitized = resolved
+        .replace(userInfo: '', query: '', fragment: '')
+        .toString();
     final redacted = redactor.redactText(sanitized);
     if (redacted.length <= maxUrlLength) {
       return redacted;

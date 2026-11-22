@@ -18,6 +18,12 @@ sent until `ConsentCategory.crashReports` is granted:
 The application owns the consent UI; it calls `gate.consent.grant(ConsentCategory.crashReports)`
 when the user agrees.
 
+Sentry is initialized only after that consent exists. Granting it later starts
+the SDK, and revoking it clears the Sentry user immediately; a `beforeSend`
+filter drops queued or automatic events while consent is missing. The gateway
+and concrete reporter are private to the module, so application code cannot
+bypass the consent and redaction layers.
+
 ## PII redaction
 
 `PiiScrubbingCrashReporter` runs every message, breadcrumb, and context map

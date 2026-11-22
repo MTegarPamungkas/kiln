@@ -16,6 +16,14 @@ Gate _gate(FakePermissionGateway gateway) {
 }
 
 void main() {
+  test('missing permissions return Err when opening settings', () async {
+    final gate = Gate(GetItRegistry());
+
+    final result = await gate.openPermissionSettings();
+
+    expect(result.failureOrNull?.code, FailureCode.configurationMissing);
+  });
+
   test('ensurePermissions requests a group and merges statuses', () async {
     final gateway = FakePermissionGateway(
       statuses: const <PermissionKind, PermissionStatus>{

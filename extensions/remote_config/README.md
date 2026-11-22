@@ -25,6 +25,8 @@ before the service exists.
 - `endpoint` — absolute URL returning a flat JSON object of values.
 - `fetchInterval` — suggested background refresh cadence.
 - `requestTimeout` — per-request timeout.
+- `cacheTtl` — how long a persisted snapshot may be served when the endpoint is
+  unreachable (default 24 h; `Duration.zero` disables the cache).
 - `enabledFlavors` — flavors allowed to hit the network.
 - `noopWhenEndpointEmpty` — empty endpoint yields defaults only.
 
@@ -56,6 +58,10 @@ The endpoint must return a JSON object such as:
 
 - An initial fetch+activate runs during bootstrap `ready`; if it fails the app
   still boots and serves defaults.
+- With the `storage` extension installed, every successful fetch is persisted.
+  When the endpoint is unreachable at startup, a snapshot newer than `cacheTtl`
+  is served instead, so feature gates keep the last known values offline; the
+  extension still reports supported so `ready` can apply it.
 - Empty endpoint or a non-enabled flavor marks the extension unsupported in
   `kiln doctor`, without reaching the network.
 - To target Firebase Remote Config or LaunchDarkly specifically, add a

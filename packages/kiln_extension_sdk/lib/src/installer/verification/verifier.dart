@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -27,9 +29,12 @@ final class VerificationResult {
 
 /// Runs the verification commands declared in `kiln.yaml`.
 final class Verifier {
-  const Verifier({this.runner});
+  const Verifier({this.runner, this.timeout = const Duration(minutes: 5)});
 
   final CommandRunner? runner;
+
+  /// Upper bound for one verification command; a hung process is killed.
+  final Duration timeout;
 
   Future<VerificationResult> verify(
     Directory projectRoot, {
@@ -84,16 +89,44 @@ final class Verifier {
     String executable,
     List<String> arguments,
     String workingDirectory,
-  ) {
+  ) async {
     final customRunner = runner;
     if (customRunner != null) {
-      return customRunner(executable, arguments, workingDirectory);
+      try {
+        return await customRunner(
+          executable,
+          arguments,
+          workingDirectory,
+        ).timeout(timeout);
+      } on TimeoutException {
+        throw TimeoutException(
+          'Verification command timed out: $executable ${arguments.join(' ')}',
+          timeout,
+        );
+      }
     }
-    return Process.run(
+    final process = await Process.start(
       executable,
       arguments,
       workingDirectory: workingDirectory,
       runInShell: Platform.isWindows,
     );
+    final stdoutFuture = process.stdout.transform(utf8.decoder).join();
+    final stderrFuture = process.stderr.transform(utf8.decoder).join();
+    try {
+      final exitCode = await process.exitCode.timeout(timeout);
+      return ProcessResult(
+        process.pid,
+        exitCode,
+        await stdoutFuture,
+        await stderrFuture,
+      );
+    } on TimeoutException {
+      process.kill(ProcessSignal.sigkill);
+      throw TimeoutException(
+        'Verification command timed out: $executable ${arguments.join(' ')}',
+        timeout,
+      );
+    }
   }
 }

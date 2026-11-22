@@ -2,6 +2,53 @@ import 'package:kiln_core/kiln_core.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test(
+    'cycles are replaced while repeated non-cyclic values remain usable',
+    () {
+      final map = <String, Object?>{};
+      final list = <Object?>[map];
+      map['cycle'] = list;
+      final shared = {'token': 'private'};
+      final result = const PiiRedactor().redact({
+        'loop': map,
+        'a': shared,
+        'b': shared,
+      });
+      expect(result, {
+        'loop': {
+          'cycle': ['[redacted]'],
+        },
+        'a': {'token': '[redacted]'},
+        'b': {'token': '[redacted]'},
+      });
+    },
+  );
+
+  test('nested maps may have non-string keys', () {
+    expect(
+      const PiiRedactor().redact({
+        1: {'password': 'private'},
+      }),
+      {
+        '1': {'password': '[redacted]'},
+      },
+    );
+  });
+
+  test('depth, iterable work and text are bounded', () {
+    const redactor = PiiRedactor(maxDepth: 1, maxEntries: 5, maxTextLength: 8);
+    expect(
+      redactor.redact({
+        'a': {'b': 'private'},
+      }),
+      {
+        'a': {'b': '[redacted]'},
+      },
+    );
+    expect(redactor.redact(Iterable<int>.generate(1000000)), [0, 1, 2, 3]);
+    expect(redactor.redactText('very long secret'), '[redacted]');
+  });
+
   group('PiiRedactor', () {
     const redactor = PiiRedactor();
 

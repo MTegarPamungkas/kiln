@@ -27,7 +27,8 @@ final class L10nFailureMessages implements FailureMessages {
   String messageFor(Failure failure) {
     final l10n = _localizations;
     return switch (failure.code.value) {
-      'network.timeout' => l10n.failureNetwork,
+      'network.timeout' ||
+      'network.deadline_exceeded' => l10n.failureNetwork,
       'network.offline' || 'network.unreachable' => l10n.failureNetworkOffline,
       'network.server' ||
       'network.retry_exhausted' ||

@@ -32,13 +32,12 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
   final AppwriteDatabaseGateway database;
   final String databaseId;
 
-  /// How long after subscribing the reconciliation read runs. Events
+  /// How long after the initial read the reconciliation read runs. Events
   /// published while Appwrite is still registering the channel are dropped
   /// server-side, so one delayed read lets the stream converge on the row's
   /// real state.
   final Duration reconcileDelay;
-  final Map<StreamController<Map<String, Object?>?>, _Watch> _watches =
-      <StreamController<Map<String, Object?>?>, _Watch>{};
+  final Set<Future<void> Function()> _watches = {};
   bool _disposed = false;
 
   @override
@@ -54,103 +53,113 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
       );
     }
 
-    final controller = StreamController<Map<String, Object?>?>.broadcast();
-    final buffered = <Map<String, Object?>?>[];
-    var live = false;
+    late final StreamController<Map<String, Object?>?> controller;
+    RealtimeSubscription? subscription;
+    StreamSubscription<RealtimeMessage>? listener;
+    Timer? reconcile;
+    Future<void>? cleanup;
+    var stopped = false;
+    var started = false;
+    var emitted = false;
+    var revision = 0;
     Map<String, Object?>? lastEmitted;
     void emit(Map<String, Object?>? document) {
-      if (_sameDocument(document, lastEmitted)) {
+      if (stopped || (emitted && _sameDocument(document, lastEmitted))) {
         return;
       }
+      emitted = true;
       lastEmitted = document;
       if (!controller.isClosed) {
         controller.add(document);
       }
     }
 
-    final subscription = realtime.subscribe(<Object>[
-      Channel.tablesdb(databaseId).table(tableId).row(rowId).toString(),
-    ]);
-    final listener = subscription.stream.listen(
-      (message) {
-        final document = _fromMessage(message, rowId);
-        if (live) {
-          emit(document);
-        } else {
-          buffered.add(document);
+    Future<void> stop() {
+      return cleanup ??= () async {
+        stopped = true;
+        reconcile?.cancel();
+        try {
+          await listener?.cancel();
+        } on Object {
+          // Continue cleanup after a socket failure.
+        }
+        try {
+          await subscription?.unsubscribe();
+        } on Object {
+          // The server may have already removed the subscription.
+        }
+        // Do not await close here: paused listeners must not block disposal.
+        unawaited(controller.close());
+        _watches.remove(stop);
+      }();
+    }
+
+    Future<void> readCurrent({required bool initial}) async {
+      final readRevision = ++revision;
+      try {
+        final current = await database.getRow(tableId, rowId);
+        // An event or newer read wins over an older HTTP response.
+        if (!stopped && readRevision == revision) {
+          revision++;
+          emit(current);
+        }
+      } on Object catch (error, stackTrace) {
+        if (initial && !stopped && readRevision == revision) {
+          controller.addError(error, stackTrace);
+        }
+      }
+    }
+
+    controller = StreamController<Map<String, Object?>?>.broadcast(
+      onListen: () {
+        if (started || stopped) return;
+        started = true;
+        if (_disposed) {
+          controller.addError(
+            const Failure(
+              code: FailureCode.unavailable,
+              message: 'The Appwrite realtime gateway is disposed.',
+              kind: FailureKind.unavailable,
+            ),
+          );
+          unawaited(stop());
+          return;
+        }
+        _watches.add(stop);
+        try {
+          subscription = realtime.subscribe(<Object>[
+            Channel.tablesdb(databaseId).table(tableId).row(rowId).toString(),
+          ]);
+          listener = subscription!.stream.listen(
+            (message) {
+              revision++;
+              emit(_fromMessage(message, rowId));
+            },
+            onError: (Object error, StackTrace stackTrace) {
+              if (!stopped) controller.addError(error, stackTrace);
+            },
+            onDone: () => unawaited(stop()),
+          );
+          unawaited(
+            readCurrent(initial: true).whenComplete(() {
+              if (!stopped) {
+                reconcile = Timer(reconcileDelay, () {
+                  unawaited(readCurrent(initial: false));
+                });
+              }
+            }),
+          );
+        } on Object catch (error, stackTrace) {
+          controller.addError(error, stackTrace);
+          unawaited(stop());
         }
       },
-      onError: controller.addError,
-      onDone: controller.close,
-    );
-
-    final reconcile = Timer(reconcileDelay, () {
-      unawaited(_reconcile(controller: controller, tableId: tableId, rowId: rowId, emit: emit));
-    });
-
-    _watches[controller] = _Watch(
-      subscription: subscription,
-      listener: listener,
-      controller: controller,
-      reconcile: reconcile,
-    );
-    unawaited(
-      _emitCurrent(
-        controller: controller,
-        tableId: tableId,
-        rowId: rowId,
-        buffered: buffered,
-        emit: emit,
-        goLive: () => live = true,
-      ),
+      onCancel: () => unawaited(stop()),
     );
     return controller.stream;
   }
 
-  Future<void> _emitCurrent({
-    required StreamController<Map<String, Object?>?> controller,
-    required String tableId,
-    required String rowId,
-    required List<Map<String, Object?>?> buffered,
-    required void Function(Map<String, Object?>?) emit,
-    required void Function() goLive,
-  }) async {
-    try {
-      final current = await database.getRow(tableId, rowId);
-      emit(current);
-    } on Object catch (error, stackTrace) {
-      if (!controller.isClosed) {
-        controller.addError(error, stackTrace);
-      }
-    }
-    goLive();
-    for (final document in buffered) {
-      emit(document);
-    }
-    buffered.clear();
-  }
-
-  Future<void> _reconcile({
-    required StreamController<Map<String, Object?>?> controller,
-    required String tableId,
-    required String rowId,
-    required void Function(Map<String, Object?>?) emit,
-  }) async {
-    if (_disposed || controller.isClosed) {
-      return;
-    }
-    try {
-      emit(await database.getRow(tableId, rowId));
-    } on Object {
-      // Realtime events remain the source of truth; a failed reconciliation
-      // read must not break the stream.
-    }
-  }
-
-  bool _sameDocument(
-    Map<String, Object?>? left,
-    Map<String, Object?>? right,
-  ) {
+  bool _sameDocument(Map<String, Object?>? left, Map<String, Object?>? right) {
     if (identical(left, right)) {
       return true;
     }
@@ -158,11 +167,26 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
       return false;
     }
     for (final entry in left.entries) {
-      if (right[entry.key] != entry.value) {
+      if (!right.containsKey(entry.key) ||
+          !_sameValue(right[entry.key], entry.value)) {
         return false;
       }
     }
     return true;
+  }
+
+  bool _sameValue(Object? left, Object? right) {
+    if (left is Map<String, Object?> && right is Map<String, Object?>) {
+      return _sameDocument(left, right);
+    }
+    if (left is List && right is List) {
+      return left.length == right.length &&
+          List.generate(
+            left.length,
+            (index) => index,
+          ).every((index) => _sameValue(left[index], right[index]));
+    }
+    return left == right;
   }
 
   Map<String, Object?>? _fromMessage(RealtimeMessage message, String rowId) {
@@ -186,37 +210,10 @@ final class SdkAppwriteRealtimeGateway implements AppwriteRealtimeGateway {
       return;
     }
     _disposed = true;
-    final watches = _watches.values.toList(growable: false);
+    final watches = _watches.toList(growable: false);
     _watches.clear();
     for (final watch in watches) {
-      watch.reconcile.cancel();
-      try {
-        await watch.listener.cancel();
-      } on Object {
-        // A socket that is already gone must not hide later cleanup.
-      }
-      try {
-        await watch.subscription.unsubscribe();
-      } on Object {
-        // The server may have closed the subscription first.
-      }
-      if (!watch.controller.isClosed) {
-        await watch.controller.close();
-      }
+      await watch();
     }
   }
-}
-
-final class _Watch {
-  const _Watch({
-    required this.subscription,
-    required this.listener,
-    required this.controller,
-    required this.reconcile,
-  });
-
-  final RealtimeSubscription subscription;
-  final StreamSubscription<RealtimeMessage> listener;
-  final StreamController<Map<String, Object?>?> controller;
-  final Timer reconcile;
 }

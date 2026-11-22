@@ -51,7 +51,7 @@ final class ImagePickerModule extends KilnModule {
     final storage = registry.readOrNull<FileStorage>();
     if (storage != null) {
       registry.registerSingleton<PickedImageUploadAdapter>(
-        PickedImageUploadAdapter(storage: storage),
+        PickedImageUploadAdapter(storage: storage, validator: picker.validator),
       );
     }
   }

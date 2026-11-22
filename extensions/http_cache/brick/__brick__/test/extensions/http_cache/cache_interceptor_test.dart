@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/http_cache/cache_interceptor.dart';
@@ -23,7 +25,9 @@ HttpResponse _response(String data, {String? cacheControl, String? etag}) {
 }
 
 const _offline = Failure(
-  code: FailureCode.networkOffline, message: 'offline', kind: FailureKind.network,
+  code: FailureCode.networkOffline,
+  message: 'offline',
+  kind: FailureKind.network,
 );
 
 final class _Harness {
@@ -36,23 +40,115 @@ final class _Harness {
   late final CacheInterceptor interceptor;
 
   Future<void> seed(String control) async {
-    await interceptor.handle(_get(), (_) async =>
-        _response('cached', cacheControl: control, etag: 'v1'));
+    await interceptor.handle(
+      _get(),
+      (_) async => _response('cached', cacheControl: control, etag: 'v1'),
+    );
   }
 }
 
+final class _DelayedWriteCache implements HttpCache {
+  final inner = MemoryHttpCache();
+  final started = Completer<void>();
+  final release = Completer<void>();
+  @override
+  Future<CacheEntry?> read(String key) => inner.read(key);
+  @override
+  Future<void> write(
+    String key,
+    HttpResponse response, {
+    Duration? ttl,
+    Set<String> tags = const {},
+  }) async {
+    started.complete();
+    await release.future;
+    await inner.write(key, response, ttl: ttl, tags: tags);
+  }
+
+  @override
+  Future<void> invalidate(String prefix, {String? tag}) =>
+      inner.invalidate(prefix, tag: tag);
+  @override
+  Future<void> clear() => inner.clear();
+}
+
 void main() {
+  test(
+    'a completed row mutation invalidates a cached collection list',
+    () async {
+      final cache = MemoryHttpCache();
+      final interceptor = CacheInterceptor(cache: cache);
+      await interceptor.handle(
+        _get(),
+        (_) async => _response('old-list', cacheControl: 'max-age=60'),
+      );
+      await interceptor.handle(
+        _get('/users/42').copyWith(method: HttpMethod.put),
+        (_) async => const HttpResponse(statusCode: 200),
+      );
+      expect(await cache.read(const CacheKeyBuilder().build(_get())), isNull);
+    },
+  );
+
+  test('row mutation fences an older in-flight collection snapshot', () async {
+    final cache = MemoryHttpCache();
+    final interceptor = CacheInterceptor(cache: cache);
+    final started = Completer<void>();
+    final release = Completer<void>();
+    final reading = interceptor.handle(_get(), (_) async {
+      started.complete();
+      await release.future;
+      return _response('old-list', cacheControl: 'max-age=60');
+    });
+    await started.future;
+    await interceptor.handle(
+      _get('/users/42').copyWith(method: HttpMethod.put),
+      (_) async => const HttpResponse(statusCode: 200),
+    );
+    release.complete();
+    await reading;
+    expect(await cache.read(const CacheKeyBuilder().build(_get())), isNull);
+  });
+
+  test('invalidation waits for an already-started cache write', () async {
+    final cache = _DelayedWriteCache();
+    final interceptor = CacheInterceptor(cache: cache);
+    final reading = interceptor.handle(
+      _get(),
+      (_) async => _response('old-list', cacheControl: 'max-age=60'),
+    );
+    await cache.started.future;
+    final mutation = interceptor.handle(
+      _get().copyWith(method: HttpMethod.post),
+      (_) async => const HttpResponse(statusCode: 200),
+    );
+    await pumpEventQueue();
+    cache.release.complete();
+    await Future.wait([reading, mutation]);
+    expect(await cache.read(const CacheKeyBuilder().build(_get())), isNull);
+  });
+
   for (final header in ['Authorization', 'cOoKiE']) {
     test('$header bypasses cache when users switch or sign in', () async {
       final harness = _Harness();
       var calls = 0;
       Future<HttpResponse> network(HttpRequest request) async {
         calls++;
-        return _response(request.headers[header] ?? 'anonymous', cacheControl: 'max-age=60');
+        return _response(
+          request.headers[header] ?? 'anonymous',
+          cacheControl: 'max-age=60',
+        );
       }
+
       final anonymous = await harness.interceptor.handle(_get(), network);
-      final a = await harness.interceptor.handle(_get().copyWith(headers: {header: 'user-a'}), network);
-      final b = await harness.interceptor.handle(_get().copyWith(headers: {header: 'user-b'}), network);
+      final a = await harness.interceptor.handle(
+        _get().copyWith(headers: {header: 'user-a'}),
+        network,
+      );
+      final b = await harness.interceptor.handle(
+        _get().copyWith(headers: {header: 'user-b'}),
+        network,
+      );
       final signedOut = await harness.interceptor.handle(_get(), network);
       expect(a.data, 'user-a');
       expect(b.data, 'user-b');
@@ -64,22 +160,46 @@ void main() {
 
     test('$header responses never populate an empty shared cache', () async {
       final harness = _Harness();
-      await harness.interceptor.handle(_get().copyWith(headers: {header: 'secret'}),
-          (_) async => _response('private', cacheControl: 'public, max-age=60'));
-      expect(await harness.cache.read(const CacheKeyBuilder().build(_get())), isNull);
+      await harness.interceptor.handle(
+        _get().copyWith(headers: {header: 'secret'}),
+        (_) async => _response('private', cacheControl: 'public, max-age=60'),
+      );
+      expect(
+        await harness.cache.read(const CacheKeyBuilder().build(_get())),
+        isNull,
+      );
     });
   }
 
   for (final headers in <Map<String, List<String>>>[
-    {'Cache-Control': ['private, max-age=60']},
-    {'Cache-Control': ['max-age=60', 'private="X-User"']},
-    {'Cache-Control': ['no-store']},
-    {'Set-Cookie': ['session=secret']},
-    {'WWW-Authenticate': ['Bearer']},
-    {'Vary': ['*']},
-    {'Vary': ['Accept-Language']},
-    {'Vary': ['Accept', 'X-Tenant']},
-    {'Vary': ['Accept'], 'vary': ['Cookie']},
+    {
+      'Cache-Control': ['private, max-age=60'],
+    },
+    {
+      'Cache-Control': ['max-age=60', 'private="X-User"'],
+    },
+    {
+      'Cache-Control': ['no-store'],
+    },
+    {
+      'Set-Cookie': ['session=secret'],
+    },
+    {
+      'WWW-Authenticate': ['Bearer'],
+    },
+    {
+      'Vary': ['*'],
+    },
+    {
+      'Vary': ['Accept-Language'],
+    },
+    {
+      'Vary': ['Accept', 'X-Tenant'],
+    },
+    {
+      'Vary': ['Accept'],
+      'vary': ['Cookie'],
+    },
   ]) {
     test('does not store sensitive or unkeyed response: $headers', () async {
       final harness = _Harness();
@@ -88,52 +208,86 @@ void main() {
         calls++;
         return HttpResponse(statusCode: 200, data: 'body', headers: headers);
       }
+
       await harness.interceptor.handle(_get(), network);
       await harness.interceptor.handle(_get(), network);
       expect(calls, 2);
     });
   }
 
-  test('caches keyed Vary variants and normalizes custom key headers', () async {
-    final harness = _Harness();
-    final interceptor = CacheInterceptor(cache: harness.cache, clock: harness.clock,
-        keyBuilder: const CacheKeyBuilder(varyHeaders: {'Accept-Language'}));
-    var calls = 0;
-    Future<HttpResponse> network(HttpRequest request) async {
-      calls++;
-      return HttpResponse(statusCode: 200, data: request.headers['Accept-Language'],
-          headers: {'Vary': ['aCcEpT-LaNgUaGe'], 'Cache-Control': ['max-age=60']});
-    }
-    for (final language in ['en', 'fr', 'en']) {
-      final response = await interceptor.handle(_get().copyWith(headers: {'Accept-Language': language}), network);
-      expect(response.data, language);
-    }
-    expect(calls, 2);
-  });
+  test(
+    'caches keyed Vary variants and normalizes custom key headers',
+    () async {
+      final harness = _Harness();
+      final interceptor = CacheInterceptor(
+        cache: harness.cache,
+        clock: harness.clock,
+        keyBuilder: const CacheKeyBuilder(varyHeaders: {'Accept-Language'}),
+      );
+      var calls = 0;
+      Future<HttpResponse> network(HttpRequest request) async {
+        calls++;
+        return HttpResponse(
+          statusCode: 200,
+          data: request.headers['Accept-Language'],
+          headers: {
+            'Vary': ['aCcEpT-LaNgUaGe'],
+            'Cache-Control': ['max-age=60'],
+          },
+        );
+      }
+
+      for (final language in ['en', 'fr', 'en']) {
+        final response = await interceptor.handle(
+          _get().copyWith(headers: {'Accept-Language': language}),
+          network,
+        );
+        expect(response.data, language);
+      }
+      expect(calls, 2);
+    },
+  );
 
   test('request no-store bypasses reads and writes', () async {
     final harness = _Harness();
     await harness.seed('max-age=60');
     final request = _get().copyWith(headers: {'cAcHe-CoNtRoL': 'no-store'});
-    final response = await harness.interceptor.handle(request,
-        (_) async => _response('uncached', cacheControl: 'max-age=60'));
+    final response = await harness.interceptor.handle(
+      request,
+      (_) async => _response('uncached', cacheControl: 'max-age=60'),
+    );
     expect(response.data, 'uncached');
     expect(response.fromCache, isFalse);
-    expect((await harness.cache.read(const CacheKeyBuilder().build(_get())))?.response.data, 'cached');
+    expect(
+      (await harness.cache.read(const CacheKeyBuilder().build(_get())))
+          ?.response
+          .data,
+      'cached',
+    );
   });
 
-  test('request no-cache revalidates even fresh data and refuses stale', () async {
-    final harness = _Harness();
-    await harness.seed('max-age=60, stale-if-error=120, stale-while-revalidate=120');
-    final request = _get().copyWith(headers: {'Cache-Control': 'no-cache'});
-    final response = await harness.interceptor.handle(request, (outgoing) async {
-      expect(outgoing.headers['If-None-Match'], 'v1');
-      return const HttpResponse(statusCode: 304);
-    });
-    expect(response.data, 'cached');
-    harness.clock.advance(const Duration(seconds: 61));
-    await expectLater(harness.interceptor.handle(request, (_) async => throw _offline), throwsA(_offline));
-  });
+  test(
+    'request no-cache revalidates even fresh data and refuses stale',
+    () async {
+      final harness = _Harness();
+      await harness.seed(
+        'max-age=60, stale-if-error=120, stale-while-revalidate=120',
+      );
+      final request = _get().copyWith(headers: {'Cache-Control': 'no-cache'});
+      final response = await harness.interceptor.handle(request, (
+        outgoing,
+      ) async {
+        expect(outgoing.headers['If-None-Match'], 'v1');
+        return const HttpResponse(statusCode: 304);
+      });
+      expect(response.data, 'cached');
+      harness.clock.advance(const Duration(seconds: 61));
+      await expectLater(
+        harness.interceptor.handle(request, (_) async => throw _offline),
+        throwsA(_offline),
+      );
+    },
+  );
 
   for (final control in [
     'max-age=1',
@@ -145,7 +299,10 @@ void main() {
       final harness = _Harness();
       await harness.seed(control);
       harness.clock.advance(const Duration(seconds: 2));
-      await expectLater(harness.interceptor.handle(_get(), (_) async => throw _offline), throwsA(_offline));
+      await expectLater(
+        harness.interceptor.handle(_get(), (_) async => throw _offline),
+        throwsA(_offline),
+      );
     });
   }
 
@@ -153,24 +310,45 @@ void main() {
     final harness = _Harness();
     await harness.seed('max-age=1, stale-if-error="5"');
     harness.clock.advance(const Duration(seconds: 2));
-    final response = await harness.interceptor.handle(_get(), (_) async => throw _offline);
+    final response = await harness.interceptor.handle(
+      _get(),
+      (_) async => throw _offline,
+    );
     expect(response.data, 'cached');
     expect(response.fromCache, isTrue);
     harness.clock.advance(const Duration(seconds: 4));
-    await expectLater(harness.interceptor.handle(_get(), (_) async => throw _offline), throwsA(_offline));
+    await expectLater(
+      harness.interceptor.handle(_get(), (_) async => throw _offline),
+      throwsA(_offline),
+    );
   });
 
   for (final error in <Object>[
-    const Failure(code: FailureCode.authUnauthorized, message: '401', kind: FailureKind.authentication),
-    const Failure(code: FailureCode.cancelled, message: 'cancelled', kind: FailureKind.cancelled),
-    const Failure(code: FailureCode.storageReadFailed, message: 'storage', kind: FailureKind.storage),
+    const Failure(
+      code: FailureCode.authUnauthorized,
+      message: '401',
+      kind: FailureKind.authentication,
+    ),
+    const Failure(
+      code: FailureCode.cancelled,
+      message: 'cancelled',
+      kind: FailureKind.cancelled,
+    ),
+    const Failure(
+      code: FailureCode.storageReadFailed,
+      message: 'storage',
+      kind: FailureKind.storage,
+    ),
     StateError('programmer error'),
   ]) {
     test('stale-if-error does not hide $error', () async {
       final harness = _Harness();
       await harness.seed('max-age=1, stale-if-error=60');
       harness.clock.advance(const Duration(seconds: 2));
-      await expectLater(harness.interceptor.handle(_get(), (_) async => throw error), throwsA(same(error)));
+      await expectLater(
+        harness.interceptor.handle(_get(), (_) async => throw error),
+        throwsA(same(error)),
+      );
     });
   }
 
@@ -179,10 +357,16 @@ void main() {
       final harness = _Harness();
       await harness.seed('max-age=1, stale-if-error=60');
       harness.clock.advance(const Duration(seconds: 2));
-      final response = await harness.interceptor.handle(_get(), (_) async => HttpResponse(statusCode: status));
+      final response = await harness.interceptor.handle(
+        _get(),
+        (_) async => HttpResponse(statusCode: status),
+      );
       expect(response.statusCode, status);
       expect(response.fromCache, isFalse);
-      expect(await harness.cache.read(const CacheKeyBuilder().build(_get())), isNull);
+      expect(
+        await harness.cache.read(const CacheKeyBuilder().build(_get())),
+        isNull,
+      );
     });
   }
 
@@ -190,39 +374,69 @@ void main() {
     final harness = _Harness();
     await harness.seed('max-age=60, stale-if-error=60');
     final cancel = HttpCancelToken()..cancel();
-    await expectLater(harness.interceptor.handle(_get().copyWith(cancelToken: cancel),
-        (_) async => throw StateError('must not call network')), throwsA(isA<Failure>().having((f) => f.isCancelled, 'cancelled', isTrue)));
+    await expectLater(
+      harness.interceptor.handle(
+        _get().copyWith(cancelToken: cancel),
+        (_) async => throw StateError('must not call network'),
+      ),
+      throwsA(isA<Failure>().having((f) => f.isCancelled, 'cancelled', isTrue)),
+    );
   });
 
   test('mutation errors propagate without cache fallback', () async {
     final harness = _Harness();
     await harness.seed('max-age=60, stale-if-error=60');
-    await expectLater(harness.interceptor.handle(_get().copyWith(method: HttpMethod.post),
-        (_) async => throw _offline), throwsA(_offline));
-    final response = await harness.interceptor.handle(_get().copyWith(method: HttpMethod.delete),
-        (_) async => const HttpResponse(statusCode: 401));
+    await expectLater(
+      harness.interceptor.handle(
+        _get().copyWith(method: HttpMethod.post),
+        (_) async => throw _offline,
+      ),
+      throwsA(_offline),
+    );
+    final response = await harness.interceptor.handle(
+      _get().copyWith(method: HttpMethod.delete),
+      (_) async => const HttpResponse(statusCode: 401),
+    );
     expect(response.statusCode, 401);
     expect(response.fromCache, isFalse);
   });
 
-  test('304 merges cache directives and can prohibit further caching', () async {
-    final harness = _Harness();
-    await harness.seed('max-age=1');
-    harness.clock.advance(const Duration(seconds: 2));
-    final validated = await harness.interceptor.handle(_get(), (_) async => const HttpResponse(
-      statusCode: 304, headers: {'cache-control': ['private, max-age=60']},
-    ));
-    expect(validated.data, 'cached');
-    expect(await harness.cache.read(const CacheKeyBuilder().build(_get())), isNull);
-  });
+  test(
+    '304 merges cache directives and can prohibit further caching',
+    () async {
+      final harness = _Harness();
+      await harness.seed('max-age=1');
+      harness.clock.advance(const Duration(seconds: 2));
+      final validated = await harness.interceptor.handle(
+        _get(),
+        (_) async => const HttpResponse(
+          statusCode: 304,
+          headers: {
+            'cache-control': ['private, max-age=60'],
+          },
+        ),
+      );
+      expect(validated.data, 'cached');
+      expect(
+        await harness.cache.read(const CacheKeyBuilder().build(_get())),
+        isNull,
+      );
+    },
+  );
 
   test('304 no-cache metadata forces the next request to revalidate', () async {
     final harness = _Harness();
     await harness.seed('max-age=1');
     harness.clock.advance(const Duration(seconds: 2));
-    await harness.interceptor.handle(_get(), (_) async => const HttpResponse(
-      statusCode: 304, headers: {'Cache-Control': ['no-cache, max-age=60']},
-    ));
+    await harness.interceptor.handle(
+      _get(),
+      (_) async => const HttpResponse(
+        statusCode: 304,
+        headers: {
+          'Cache-Control': ['no-cache, max-age=60'],
+        },
+      ),
+    );
     var calls = 0;
     await harness.interceptor.handle(_get(), (_) async {
       calls++;
@@ -301,6 +515,131 @@ void main() {
     expect(calls, 2);
   });
 
+  test(
+    'range and partial responses never occupy the full-response key',
+    () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 1, 12));
+      final cache = MemoryHttpCache(clock: clock);
+      final interceptor = CacheInterceptor(cache: cache, clock: clock);
+      var calls = 0;
+      final seenData = <Object?>[];
+
+      Future<HttpResponse> network(HttpRequest request) async {
+        calls++;
+        final range = request.headers['Range'];
+        if (range == null) {
+          seenData.add('full');
+          return _response('full-body', cacheControl: 'max-age=60');
+        }
+        final partial = 'partial-$range';
+        seenData.add(partial);
+        return HttpResponse(
+          statusCode: 206,
+          data: partial,
+          headers: <String, List<String>>{
+            'Cache-Control': <String>['max-age=60'],
+            'Content-Range': <String>[
+              'bytes ${range == 'bytes=0-9' ? '0-9' : '10-19'}/20',
+            ],
+          },
+        );
+      }
+
+      final firstRange = _get().copyWith(headers: {'Range': 'bytes=0-9'});
+      final partial = await interceptor.handle(firstRange, network);
+      expect(partial.statusCode, 206);
+
+      final full = await interceptor.handle(_get(), network);
+      final secondRange = await interceptor.handle(
+        _get().copyWith(headers: {'Range': 'bytes=10-19'}),
+        network,
+      );
+
+      expect(full.data, 'full-body');
+      expect(secondRange.data, 'partial-bytes=10-19');
+      expect(seenData, <Object?>[
+        'partial-bytes=0-9',
+        'full',
+        'partial-bytes=10-19',
+      ]);
+      expect(calls, 3);
+      expect(
+        await cache.read(const CacheKeyBuilder().build(_get())),
+        isNotNull,
+      );
+    },
+  );
+
+  test('stale refresh cannot repopulate data invalidated meanwhile', () async {
+    final clock = FixedClock(DateTime.utc(2026, 11, 1, 12));
+    final cache = MemoryHttpCache(clock: clock);
+    final interceptor = CacheInterceptor(cache: cache, clock: clock);
+    final refreshStarted = Completer<void>();
+    final releaseRefresh = Completer<void>();
+    var getCalls = 0;
+
+    Future<HttpResponse> network(HttpRequest request) async {
+      if (request.method != HttpMethod.get) {
+        return const HttpResponse(statusCode: 200);
+      }
+      getCalls++;
+      if (getCalls == 1) {
+        return _response(
+          'seed',
+          cacheControl: 'max-age=1, stale-while-revalidate=30',
+        );
+      }
+      refreshStarted.complete();
+      await releaseRefresh.future;
+      return _response('stale-refresh', cacheControl: 'max-age=60');
+    }
+
+    await interceptor.handle(_get(), network);
+    clock.advance(const Duration(seconds: 2));
+    final stale = await interceptor.handle(_get(), network);
+    expect(stale.data, 'seed');
+    await refreshStarted.future;
+
+    await interceptor.handle(_get().copyWith(method: HttpMethod.post), network);
+    releaseRefresh.complete();
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    expect(await cache.read(const CacheKeyBuilder().build(_get())), isNull);
+  });
+
+  test('deduplicates overlapping stale refreshes for one key', () async {
+    final clock = FixedClock(DateTime.utc(2026, 11, 1, 12));
+    final cache = MemoryHttpCache(clock: clock);
+    final interceptor = CacheInterceptor(cache: cache, clock: clock);
+    final release = Completer<void>();
+    var getCalls = 0;
+
+    Future<HttpResponse> network(HttpRequest request) async {
+      getCalls++;
+      if (getCalls == 1) {
+        return _response(
+          'seed',
+          cacheControl: 'max-age=1, stale-while-revalidate=30',
+        );
+      }
+      await release.future;
+      return _response('refresh', cacheControl: 'max-age=60');
+    }
+
+    await interceptor.handle(_get(), network);
+    clock.advance(const Duration(seconds: 2));
+    await interceptor.handle(_get(), network);
+    await interceptor.handle(_get(), network);
+    release.complete();
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    expect(getCalls, 2);
+    expect(
+      (await cache.read(const CacheKeyBuilder().build(_get())))?.response.data,
+      'refresh',
+    );
+  });
+
   test('serves stale data while refreshing in the background', () async {
     final clock = FixedClock(DateTime.utc(2026, 11, 1, 12));
     final cache = MemoryHttpCache(clock: clock);
@@ -321,9 +660,7 @@ void main() {
 
     expect(stale.data, 'data-1');
     await Future<void>.delayed(const Duration(milliseconds: 20));
-    final refreshed = await cache.read(
-      const CacheKeyBuilder().build(_get()),
-    );
+    final refreshed = await cache.read(const CacheKeyBuilder().build(_get()));
     expect(refreshed?.response.data, 'data-2');
   });
 }

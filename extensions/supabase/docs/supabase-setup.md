@@ -56,6 +56,24 @@ in the app.
 policies on `storage.objects` for the folders the app uses. `url()` always
 returns a signed URL, so the bucket may be private.
 
+### Verify the lifetime locally
+
+A local stack can prove that the issued link stops working after
+`signedUrlLifetime`:
+
+```bash
+export KILN_SUPABASE_URL=http://127.0.0.1:54321
+export KILN_SUPABASE_ANON_KEY=<anon key>
+export KILN_SUPABASE_SERVICE_KEY=<service_role key>
+dart run tool/e2e/supabase_signed_url_probe.dart
+```
+
+The rendered suite carries the same check as an opt-in test: set
+`KILN_SUPABASE_LOCAL_STORAGE=1` plus the three variables prefixed
+`KILN_SUPABASE_LOCAL_`, then run
+`dart run tool/verify_extensions.dart --only supabase --analyze --test`. See
+[the acceptance report](../../../docs/audit/supabase-signed-urls-2026-11-22.md).
+
 ## 6. Local and self-hosted Supabase
 
 A `supabase start` (Docker) stack runs its API behind Kong on

@@ -31,6 +31,23 @@ expect(gate.remoteConfigInt('daily_limit'), 10);
 `FakeRemoteConfig` also supports failing a fetch. Assert that the app keeps
 serving defaults and does not crash.
 
+## Live endpoint
+
+The fake exercises the snapshot rules; a loopback server exercises the transport.
+`remote_config_live_endpoint_test.dart` starts an `HttpServer` on
+`127.0.0.1:0`, uses the real `HttpRemoteConfigGateway`, and covers bootstrap
+fetch+activate (probe reuse), a superseded slow response, HTTP 500,
+`network.timeout`, invalid JSON, and an unreachable endpoint degrading to
+defaults. It needs no credentials and runs as part of the rendered suite:
+
+```bash
+dart run tool/verify_extensions.dart --only remote_config --analyze --test
+```
+
+`fetchInterval` is advisory: nothing in the extension schedules refreshes, so the
+app owns the cadence and should call `fetchAndActivate()` from its own timer or
+lifecycle hook.
+
 ## Rollout rules
 
 - Fetch and activate during bootstrap `ready`. A failed fetch keeps the app on

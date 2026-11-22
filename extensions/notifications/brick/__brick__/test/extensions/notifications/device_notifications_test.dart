@@ -82,6 +82,31 @@ void main() {
     );
   });
 
+  test('a late subscriber receives the launch payload once', () async {
+    final gateway = FakeNotificationGateway()
+      ..launch = '{"route":"/orders/42"}';
+    final notifications = createDeviceNotifications(gateway: gateway);
+
+    await notifications.initialize();
+    final taps = <NotificationTap>[];
+    final first = notifications.taps.listen(taps.add);
+
+    await pumpEventQueue();
+
+    expect(taps.single.payload, '{"route":"/orders/42"}');
+
+    await first.cancel();
+    final second = <NotificationTap>[];
+    final reListen = notifications.taps.listen(second.add);
+    expect(second, isEmpty);
+
+    gateway.emitTap('warm');
+    expect(second.single.payload, 'warm');
+
+    await reListen.cancel();
+    await notifications.dispose();
+  });
+
   test('taps flow before initialize and after', () async {
     final gateway = FakeNotificationGateway();
     final notifications = createDeviceNotifications(gateway: gateway);

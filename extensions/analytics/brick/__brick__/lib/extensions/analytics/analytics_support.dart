@@ -11,11 +11,15 @@ final class AnalyticsSupport {
     required this.config,
     required this.flavor,
     required this.probe,
+    this.isAllowed,
   });
 
   final AnalyticsConfig config;
   final AppFlavor? flavor;
   final AnalyticsSetupProbe probe;
+
+  /// Reports whether analytics consent currently allows the SDK to start.
+  final bool Function()? isAllowed;
   SupportInfo? _last;
 
   Future<SupportInfo> check() async {
@@ -48,6 +52,17 @@ final class AnalyticsSupport {
             : 'Analytics is disabled for this flavor.',
         details: <String, Object?>{
           'noop': config.isNoop,
+          'flavor': flavor?.name,
+        },
+      );
+    }
+    if (!(isAllowed?.call() ?? true)) {
+      return SupportInfo.unsupported(
+        SupportState.notConfigured,
+        message: 'Analytics starts after analytics consent is granted.',
+        details: <String, Object?>{
+          'consent': false,
+          'host': config.host,
           'flavor': flavor?.name,
         },
       );

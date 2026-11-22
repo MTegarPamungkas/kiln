@@ -18,6 +18,9 @@ final class SecureStorageModule extends KilnModule {
   Set<String> get provides => const <String>{'secure_storage'};
 
   @override
+  Set<String> get optionalRequires => const <String>{'storage'};
+
+  @override
   void register(Registry registry) {
     const config = SecureStorageConfig.defaults;
     final gateway = FlutterSecureStorageGateway(config: config);
@@ -40,10 +43,14 @@ final class SecureStorageModule extends KilnModule {
     if (markerStorage == null) {
       return;
     }
+    final config =
+        registry.readOrNull<SecureStorageConfig>() ??
+        SecureStorageConfig.defaults;
     try {
       await FirstRunWipe(
-        gateway: FlutterSecureStorageGateway(),
+        gateway: FlutterSecureStorageGateway(config: config),
         storage: markerStorage,
+        prefix: config.prefix,
       ).run(isIOS: defaultTargetPlatform == TargetPlatform.iOS);
     } on Object catch (error) {
       registry.readOrNull<SupportRegistry>()?.record(

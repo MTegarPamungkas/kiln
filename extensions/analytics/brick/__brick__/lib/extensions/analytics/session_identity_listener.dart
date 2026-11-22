@@ -44,10 +44,19 @@ final class SessionIdentityListener {
     }
   }
 
+  /// Identifies the session that exists when consent is granted later.
+  void syncCurrentSession() {
+    final current = _sessions.session;
+    if (current != null) {
+      _dispatch(current);
+    }
+  }
+
   Future<void> dispose() async {
     final subscription = _subscription;
     _subscription = null;
     await subscription?.cancel();
+    await _tail;
   }
 
   void _dispatch(AuthSession? session) {

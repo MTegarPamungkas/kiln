@@ -21,7 +21,7 @@ final class AuthMiddleware implements HttpMiddleware {
     if (hasAuthorization) {
       return next(request);
     }
-    final token = await tokens.accessToken();
+    final token = await tokens.accessToken(deadline: request.deadline);
     if (token == null || token.isEmpty) {
       return next(request);
     }

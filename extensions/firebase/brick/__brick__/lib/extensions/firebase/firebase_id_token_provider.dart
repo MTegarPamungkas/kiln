@@ -18,7 +18,7 @@ final class FirebaseIdTokenProvider implements TokenProvider {
   final FirebaseFailureMapper failureMapper;
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) async {
+  Future<String?> accessToken({bool forceRefresh = false, DateTime? deadline}) async {
     try {
       return await gateway.idToken(forceRefresh: forceRefresh);
     } catch (error, stackTrace) {

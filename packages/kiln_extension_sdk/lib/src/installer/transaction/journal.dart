@@ -74,8 +74,14 @@ final class Journal {
   }
 
   void save() {
-    file.parent.createSync(recursive: true);
-    file.writeAsStringSync(jsonEncode(toJson()));
+    final target = file;
+    target.parent.createSync(recursive: true);
+    final temp = File('${target.path}.tmp-$pid');
+    temp.writeAsStringSync(jsonEncode(toJson()));
+    if (target.existsSync()) {
+      target.deleteSync();
+    }
+    temp.renameSync(target.path);
   }
 
   void markCommitted() {

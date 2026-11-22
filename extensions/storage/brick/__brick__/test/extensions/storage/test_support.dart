@@ -10,6 +10,7 @@ final class FakeStorageGateway implements StorageGateway {
   bool failReads = false;
   bool failWrites = false;
   bool failDeletes = false;
+  String? failNextWriteKey;
   Object? keysError;
 
   @override
@@ -47,6 +48,12 @@ final class FakeStorageGateway implements StorageGateway {
 
   @override
   Future<void> write(String key, String value) async {
+    if (key == failNextWriteKey) {
+      failNextWriteKey = null;
+      // Model a backend that reports failure after applying a write.
+      values[key] = value;
+      throw StateError('write acknowledgement failed');
+    }
     if (failWrites) {
       throw StateError('write failed');
     }

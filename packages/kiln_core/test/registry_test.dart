@@ -7,6 +7,19 @@ final class _Thing {
   final int value;
 }
 
+final class _DisposableThing implements Disposable {
+  _DisposableThing(this.events);
+
+  final List<String> events;
+  bool disposed = false;
+
+  @override
+  Future<void> dispose() async {
+    disposed = true;
+    events.add('dispose:thing');
+  }
+}
+
 void main() {
   group('GetItRegistry', () {
     late GetItRegistry registry;
@@ -73,6 +86,65 @@ void main() {
 
       expect(registry.isRegistered<String>(), isFalse);
       expect(registry.readOrNull<String>(), isNull);
+    });
+
+    test('owned registrations dispose once in reverse order', () async {
+      final events = <String>[];
+      final thing = _DisposableThing(events);
+      registry.registerOwned<String>(
+        'owned',
+        instanceName: 'owned',
+        dispose: () {
+          events.add('dispose:string');
+        },
+      );
+      registry.registerOwned<_DisposableThing>(thing);
+      registry.registerSingleton<int>(1);
+
+      await registry.dispose();
+      await registry.dispose();
+
+      expect(events, ['dispose:thing', 'dispose:string']);
+      expect(thing.disposed, isTrue);
+      expect(registry.isRegistered<int>(), isFalse);
+      expect(registry.isRegistered<String>(), isFalse);
+    });
+
+    test('registration after disposal is rejected', () async {
+      await registry.dispose();
+
+      expect(
+        () => registry.registerOwned<String>('late'),
+        throwsStateError,
+      );
+    });
+
+    test('a failing owned callback does not skip the rest', () async {
+      final events = <String>[];
+      registry.registerOwned<String>(
+        'first',
+        instanceName: 'first',
+        dispose: () {
+          events.add('first');
+        },
+      );
+      registry.registerOwned<String>(
+        'broken',
+        instanceName: 'broken',
+        dispose: () {
+          throw StateError('broken');
+        },
+      );
+      registry.registerOwned<String>(
+        'last',
+        instanceName: 'last',
+        dispose: () {
+          events.add('last');
+        },
+      );
+
+      await expectLater(registry.dispose(), throwsStateError);
+      expect(events, ['last', 'first']);
     });
   });
 }

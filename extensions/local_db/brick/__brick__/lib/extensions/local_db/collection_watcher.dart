@@ -14,10 +14,7 @@ final class CollectionWatcher {
   }) {
     final store = stringMapStoreFactory.store(collection);
     final finder = const LocalQueryBuilder().build(query);
-    return store
-        .query(finder: finder)
-        .onSnapshots(database)
-        .map(toRecords);
+    return store.query(finder: finder).onSnapshots(database).map(toRecords);
   }
 
   List<LocalRecord> toRecords(

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/biometric/app_lock.dart';
+import 'package:{{app_name}}/extensions/biometric/biometric_availability.dart';
 import 'package:{{app_name}}/extensions/biometric/biometric_config.dart';
 import 'package:{{app_name}}/extensions/biometric/biometric_gate.dart';
 
@@ -54,7 +55,10 @@ void main() {
 
   test('disables itself when the device has no biometrics', () async {
     final harness = _build();
-    harness.gateway.supported = false;
+    harness.gateway
+      ..supported = false
+      ..canCheck = false
+      ..methods = <BiometricMethod>[];
 
     await harness.lock.initialize();
     harness.lock.lock();

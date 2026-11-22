@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
 import 'package:{{app_name}}/extensions/analytics/analytics_config.dart';
@@ -26,10 +28,15 @@ final class FakeAnalyticsGateway implements AnalyticsGateway {
   final List<RecordedAnalyticsIdentity> identities =
       <RecordedAnalyticsIdentity>[];
   final List<AnalyticsConfig> setups = <AnalyticsConfig>[];
+  final List<bool> setupConsent = <bool>[];
+  final List<bool> enabledStates = <bool>[];
   int setupCalls = 0;
+  int setEnabledCalls = 0;
   int resetCalls = 0;
   int flushCalls = 0;
+  int shutdownCalls = 0;
   Object? failure;
+  Completer<void>? setupGate;
 
   RecordedAnalyticsEvent? get lastEvent => events.isEmpty ? null : events.last;
 
@@ -37,10 +44,22 @@ final class FakeAnalyticsGateway implements AnalyticsGateway {
       identities.isEmpty ? null : identities.last;
 
   @override
-  Future<void> setup(AnalyticsConfig config) async {
+  Future<void> setup(
+    AnalyticsConfig config, {
+    required bool Function() isAllowed,
+  }) async {
     setupCalls++;
+    await setupGate?.future;
     _maybeFail();
     setups.add(config);
+    setupConsent.add(isAllowed());
+  }
+
+  @override
+  Future<void> setEnabled(bool enabled) async {
+    setEnabledCalls++;
+    _maybeFail();
+    enabledStates.add(enabled);
   }
 
   @override
@@ -65,6 +84,12 @@ final class FakeAnalyticsGateway implements AnalyticsGateway {
   Future<void> flush() async {
     _maybeFail();
     flushCalls++;
+  }
+
+  @override
+  Future<void> shutdown() async {
+    _maybeFail();
+    shutdownCalls++;
   }
 
   void _maybeFail() {

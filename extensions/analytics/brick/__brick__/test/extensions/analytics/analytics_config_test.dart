@@ -54,6 +54,12 @@ void main() {
       expect(copy.enabledFlavors, config.enabledFlavors);
     });
 
+    test('queues at most one event so a revoke cannot strand a batch', () {
+      // A revoke stops new captures but cannot discard what the SDK already
+      // queued, so the pending window is kept to a single event.
+      expect(AnalyticsConfig.pendingEventLimit, 1);
+    });
+
     test('validate rejects a relative host', () {
       final config = AnalyticsConfig(apiKey: 'phc_test', host: 'posthog');
 

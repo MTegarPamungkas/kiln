@@ -29,4 +29,7 @@ Rules:
 
 `BackupExport` complements migrations: it exports selected collections to JSON and
 restores them with `import`, so you can snapshot a database before a risky
-migration and roll it back by hand if needed.
+migration and roll it back by hand if needed. `import` validates the version and
+every record before writing, then rolls back the records it wrote if a later
+write fails, so a malformed or failed import cannot leave a partially restored
+database that is reported as successful.

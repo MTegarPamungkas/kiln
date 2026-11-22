@@ -2,7 +2,7 @@
   "extension": "permission",
   "files": {
     "lib/extensions/permission/device_permissions.dart": "4f14c8814241423e76dd4cf45f8f0cfef7ea053e36142b998c48a1765a321f50",
-    "lib/extensions/permission/gate_permission.dart": "30a94ccfba86027684d22d7d994e7e6396880c99e3e9cada2e6bcd2121c695ed",
+    "lib/extensions/permission/gate_permission.dart": "297103837f12c44d86e9a37e0691427a12b9384d6f52f49cb634a5365c14e5b9",
     "lib/extensions/permission/permission_config.dart": "415382f436c4d07544e076eb1e324787880ac387fdb5623b2ebfbc38e36106f5",
     "lib/extensions/permission/permission_failure_mapper.dart": "179a1960fb03956ea99307e57b968235713ee0ea554529facf83e599a89eb29a",
     "lib/extensions/permission/permission_flow.dart": "4fa6686f891faae27cc4137e8001426126c2a54359af54c53f197617d84241c8",
@@ -14,7 +14,7 @@
     "lib/extensions/permission/permission_status_cache.dart": "26180d34d859dfe13cf42c6a5780565bf1199d0b40cd710105f632254bc1f25a",
     "lib/extensions/permission/permission_support.dart": "a220efdb6ff7c81440a95ca6db05c30b3fc5889ccb13968dece9866628aa522d",
     "test/extensions/permission/device_permissions_test.dart": "e9540f28d7fea88193c8e76523ffe1ca51c2d50e1d41bbc8a3b04e6f32ca0e3c",
-    "test/extensions/permission/gate_permission_test.dart": "da5d78eb608b3604c5b59ffa760e114b52a639fae16cf79c38078064e4f49dda",
+    "test/extensions/permission/gate_permission_test.dart": "d8249c91e1aefdabfb2879da5c6b0a36e60e04c7699ae5918b369e589eff30aa",
     "test/extensions/permission/permission_flow_test.dart": "ac5f9930ea5b293ec7988d5c9d71b9a2676e17388e3d656d42227d7d15c5354f",
     "test/extensions/permission/permission_group_test.dart": "f448a56cb63987c8913677dac076b1f553f78d74bcf1f844c49ca8c9f94a6003",
     "test/extensions/permission/permission_kind_guard_test.dart": "79b101e3c0479d7efaf8a09b59ecc50a24c8bcec1a021ddb350d43af24f0622e",

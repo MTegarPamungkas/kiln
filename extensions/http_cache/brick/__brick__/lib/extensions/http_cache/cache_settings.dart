@@ -10,7 +10,6 @@ final class HttpCacheSettings {
       200,
       203,
       204,
-      206,
       300,
       301,
       308,

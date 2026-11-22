@@ -12,16 +12,38 @@ final class SdkPosthogGateway implements AnalyticsGateway {
   Posthog get _posthog => Posthog();
 
   @override
-  Future<void> setup(AnalyticsConfig config) async {
+  Future<void> setup(
+    AnalyticsConfig config, {
+    required bool Function() isAllowed,
+  }) async {
     config.validate();
     final sdkConfig = PostHogConfig(config.apiKey)
       ..host = config.host
       ..flushInterval = config.flushInterval
+      // One event per send: a revoke cannot discard what the SDK already
+      // queued, so the queue is kept as short as possible.
+      ..flushAt = AnalyticsConfig.pendingEventLimit
       // Consent gates capture and identify; automatic lifecycle events would
       // bypass that gate, so they stay off.
-      ..captureApplicationLifecycleEvents = false;
+      ..captureApplicationLifecycleEvents = false
+      // Feature flags are not part of the Analytics contract, and a revoke
+      // calls reset(), which would otherwise poll /flags after consent is
+      // withdrawn.
+      ..preloadFeatureFlags = false
+      // A revoked consent must also drop events captured by Dart APIs before
+      // they reach the queue. Native-initiated events are stopped by optOut.
+      ..beforeSend = <BeforeSendCallback>[
+        (event) => isAllowed() ? event : null,
+      ];
     await _posthog.setup(sdkConfig);
+    if (!isAllowed()) {
+      await _posthog.optOut();
+    }
   }
+
+  @override
+  Future<void> setEnabled(bool enabled) =>
+      enabled ? _posthog.optIn() : _posthog.optOut();
 
   @override
   Future<void> capture(String event, Map<String, Object?> properties) {
@@ -44,6 +66,9 @@ final class SdkPosthogGateway implements AnalyticsGateway {
 
   @override
   Future<void> flush() => _posthog.flush();
+
+  @override
+  Future<void> shutdown() => _posthog.flush();
 
   Map<String, Object> _sdkProperties(Map<String, Object?> values) {
     return <String, Object>{

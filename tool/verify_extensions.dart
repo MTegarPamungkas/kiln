@@ -26,6 +26,13 @@ Future<void> main(List<String> arguments) async {
           .toList(growable: false)
         ..sort((left, right) => left.path.compareTo(right.path));
   final failure = StringBuffer();
+  if ((onlyIndex >= 0 && only == null) ||
+      (only != null &&
+          !extensionDirs.any((dir) => p.basename(dir.path) == only))) {
+    stderr.writeln('Pass one existing extension ID after --only.');
+    exitCode = 1;
+    return;
+  }
 
   final appBasic = createBundle(
     Directory(p.join(root.path, 'bricks', 'app_basic')),
@@ -52,7 +59,7 @@ Future<void> main(List<String> arguments) async {
       rootPath: directory.path,
     );
     final bundle = createBundle(Directory(p.join(directory.path, 'brick')));
-    final vars = _vars(manifest);
+    final vars = _vars(manifest, bundle);
     final rendered = await const BrickRenderer().render(
       bundle: bundle,
       vars: vars,
@@ -98,7 +105,7 @@ Future<void> main(List<String> arguments) async {
   }
 }
 
-Map<String, dynamic> _vars(ExtensionManifest manifest) {
+Map<String, dynamic> _vars(ExtensionManifest manifest, MasonBundle bundle) {
   final vars = <String, dynamic>{'id': manifest.id, 'app_name': 'verify_app'};
   for (final prompt in manifest.prompts) {
     if (prompt.defaultValue != null) {
@@ -117,7 +124,11 @@ Map<String, dynamic> _vars(ExtensionManifest manifest) {
       PromptType.string => 'sample',
     };
   }
-  return vars;
+  return buildTemplateVars(
+    extension: AvailableExtension(manifest: manifest, bundle: bundle),
+    answers: vars,
+    project: const {'name': 'verify_app'},
+  );
 }
 
 String _golden(String id, List<RenderedFile> files) {

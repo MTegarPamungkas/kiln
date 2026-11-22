@@ -46,5 +46,6 @@ final enabled = gate.crashReportsConsented;
 ## Support
 
 `kiln doctor` marks the extension unsupported when the DSN is empty, the current
-flavor is not enabled, or Sentry fails to initialize. A failed init is reported,
-not thrown, so the app still boots.
+flavor is not enabled, crash-report consent has not been granted yet, or Sentry
+fails to initialize. A failed init is reported, not thrown, so the app still
+boots; a later consent change retries it.

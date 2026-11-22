@@ -5,6 +5,8 @@ description: Appwrite auth, social sign-in, remote database, file storage, and c
 category: auth
 tier: official
 exclusive: true
+optional_requires:
+  - secure_storage
 provides:
   - auth
   - social_auth
@@ -18,6 +20,7 @@ dependencies:
   appwrite: ^28.2.0
   http: ^1.6.0
   shared_preferences: ^2.3.0
+  web: ^1.1.1
 prompts:
   - name: endpoint
     type: url
@@ -43,6 +46,8 @@ platforms:
   - windows
   - linux
 android:
+  core_library_desugaring: true
+  min_sdk: 24
   permissions:
     - android.permission.INTERNET
 manual_steps:

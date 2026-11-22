@@ -6,7 +6,7 @@ import 'package:kiln_core/kiln_core.dart';
 /// logs and never send it to an analytics event.
 final class AnalyticsConfig {
   AnalyticsConfig({
-    this.apiKey = '{{api_key}}',
+    this.apiKey = {{#api_key_dart}}{{{api_key_dart}}}{{/api_key_dart}}{{^api_key_dart}}'{{api_key}}'{{/api_key_dart}},
     this.host = '{{{host}}}',
     this.flushInterval = const Duration(seconds: 30),
     Set<AppFlavor>? enabledFlavors,
@@ -42,6 +42,15 @@ final class AnalyticsConfig {
   /// Set this to `false` only when the key is supplied at runtime, for example
   /// from a remote configuration service.
   final bool noopWhenApiKeyEmpty;
+
+  /// How many queued events may wait before the SDK sends a batch.
+  ///
+  /// The SDK keeps captured events in memory until this many accumulate or
+  /// [flushInterval] elapses. A revoke can only stop *new* captures, so
+  /// anything still queued when consent is withdrawn would leave afterwards.
+  /// Sending one event per batch keeps the window at a single event instead of
+  /// a whole batch; the transport-level consent filter is the hard boundary.
+  static const int pendingEventLimit = 1;
 
   bool get hasApiKey => apiKey.trim().isNotEmpty;
 

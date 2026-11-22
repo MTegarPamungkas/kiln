@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'package:mason/mason.dart' show MasonBundle;
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
 
 import 'support/fixtures.dart';
 
@@ -221,6 +222,116 @@ void main() {
 
       expect(verifierCalls, 2);
       expect(result.verification?.isSuccess, isTrue);
+      expect(result.committed, isTrue);
+    });
+
+    test('verification failure rolls back every managed change', () async {
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+        verifier: Verifier(
+          runner: (executable, arguments, workingDirectory) async =>
+              ProcessResult(1, 1, 'analysis failed', ''),
+        ),
+      );
+      final pubspecBefore =
+          File('${project.path}/pubspec.yaml').readAsStringSync();
+      final configBefore =
+          File('${project.path}/kiln.yaml').readAsStringSync();
+      final manifest = File(
+        '${project.path}/android/app/src/main/AndroidManifest.xml',
+      );
+      final manifestBefore = manifest.readAsStringSync();
+
+      final result = await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        answers: const {
+          'demo': {'api_key': 'value'},
+        },
+        persistAnswers: true,
+      );
+
+      expect(result.committed, isFalse);
+      expect(result.verification?.isSuccess, isFalse);
+      expect(
+        File('${project.path}/lib/extensions/demo/demo_module.dart')
+            .existsSync(),
+        isFalse,
+      );
+      expect(
+        File('${project.path}/pubspec.yaml').readAsStringSync(),
+        pubspecBefore,
+      );
+      expect(File('${project.path}/kiln.lock.yaml').existsSync(), isFalse);
+      expect(manifest.readAsStringSync(), manifestBefore);
+      expect(
+        File('${project.path}/kiln.yaml').readAsStringSync(),
+        configBefore,
+      );
+    });
+
+    test('a verifier exception rolls back and is rethrown', () async {
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+        verifier: Verifier(
+          runner: (executable, arguments, workingDirectory) async =>
+              throw ProcessException(executable, arguments),
+        ),
+      );
+      final pubspecBefore =
+          File('${project.path}/pubspec.yaml').readAsStringSync();
+
+      await expectLater(
+        installer.add(
+          requested: const ['demo'],
+          project: const {'name': 'fresh_app'},
+          persistAnswers: true,
+        ),
+        throwsA(isA<ProcessException>()),
+      );
+
+      expect(
+        File('${project.path}/lib/extensions/demo/demo_module.dart')
+            .existsSync(),
+        isFalse,
+      );
+      expect(
+        File('${project.path}/pubspec.yaml').readAsStringSync(),
+        pubspecBefore,
+      );
+      expect(
+        File('${project.path}/kiln.yaml').readAsStringSync(),
+        contains('extensions: {}'),
+      );
+    });
+
+    test('persistAnswers writes saved answers with the install', () async {
+      final installer = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+        verifier: Verifier(
+          runner: (executable, arguments, workingDirectory) async =>
+              ProcessResult(0, 0, 'ok', ''),
+        ),
+      );
+
+      final result = await installer.add(
+        requested: const ['demo'],
+        project: const {'name': 'fresh_app'},
+        answers: const {
+          'demo': {'api_key': 'abc'},
+        },
+        persistAnswers: true,
+      );
+
+      expect(result.committed, isTrue);
+      final config =
+          loadYaml(File('${project.path}/kiln.yaml').readAsStringSync())
+              as YamlMap;
+      final saved = (config['extensions'] as YamlMap)['demo'] as YamlMap;
+      expect(saved['api_key'], 'abc');
     });
   });
 
@@ -500,6 +611,46 @@ void main() {
         isTrue,
       );
       expect(LockfileStore(project).read().extensions, isNotEmpty);
+    });
+
+    test('a failed verified remove restores files and saved answers', () async {
+      final config = File('${project.path}/kiln.yaml');
+      config.writeAsStringSync(
+        config.readAsStringSync().replaceFirst(
+          'extensions: {}',
+          'extensions:\n  demo:\n    api_key: abc',
+        ),
+      );
+      final configBefore = config.readAsStringSync();
+      final failing = ExtensionInstaller(
+        projectRoot: project,
+        available: [_demoExtension()],
+        verifier: Verifier(
+          runner: (executable, arguments, workingDirectory) async =>
+              ProcessResult(1, 1, 'analysis failed', ''),
+        ),
+      );
+
+      final result = await failing.remove(
+        id: 'demo',
+        persistAnswers: true,
+        options: const RemoveOptions(verify: true),
+      );
+
+      expect(result.committed, isFalse);
+      expect(result.verification?.isSuccess, isFalse);
+      expect(
+        File('${project.path}/lib/extensions/demo/demo_module.dart')
+            .existsSync(),
+        isTrue,
+      );
+      expect(
+        File('${project.path}/android/app/src/main/AndroidManifest.xml')
+            .readAsStringSync(),
+        contains('android.permission.INTERNET'),
+      );
+      expect(LockfileStore(project).read().extensions['demo'], isNotNull);
+      expect(config.readAsStringSync(), configBefore);
     });
   });
 

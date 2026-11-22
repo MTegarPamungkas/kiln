@@ -32,6 +32,7 @@ final class DeviceNetworkMonitor implements NetworkMonitor {
   NetworkStatus _status = NetworkStatus.unknown;
   StreamSubscription<NetworkStatus>? _subscription;
   bool _started = false;
+  bool _disposed = false;
 
   @override
   NetworkStatus get status => _status;
@@ -40,10 +41,15 @@ final class DeviceNetworkMonitor implements NetworkMonitor {
   Stream<NetworkStatus> get changes => _changes.stream;
 
   Future<void> start() async {
-    if (_started) {
+    if (_started || _disposed) {
       return;
     }
     final status = await gateway.check();
+    // Bootstrap may time out and dispose while the platform check is in flight;
+    // registering the listener then would leak it and publish after close.
+    if (_disposed) {
+      return;
+    }
     final subscription = gateway.changes.listen((status) {
       _stabilizer.add(status, _emit);
     });
@@ -51,16 +57,20 @@ final class DeviceNetworkMonitor implements NetworkMonitor {
     _started = true;
     _status = status;
     reconnectTrigger?.update(status);
-    _changes.add(status);
+    if (!_changes.isClosed) {
+      _changes.add(status);
+    }
   }
 
   void _emit(NetworkStatus status) {
-    if (_status == status) {
+    if (_disposed || _status == status) {
       return;
     }
     _status = status;
     reconnectTrigger?.update(status);
-    _changes.add(status);
+    if (!_changes.isClosed) {
+      _changes.add(status);
+    }
   }
 
   /// Probes the configured `probeUrl` through [client].
@@ -86,7 +96,13 @@ final class DeviceNetworkMonitor implements NetworkMonitor {
 
   @override
   Future<void> dispose() async {
-    await _subscription?.cancel();
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    final subscription = _subscription;
+    _subscription = null;
+    await subscription?.cancel();
     _stabilizer.dispose();
     await _changes.close();
   }

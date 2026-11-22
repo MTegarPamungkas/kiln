@@ -20,7 +20,7 @@ void main() {
   test('registers the ARB localization seam without storage', () {
     final registry = GetItRegistry();
 
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
 
     final config = registry.read<L10nConfig>();
     final controller = registry.read<LocaleController>();
@@ -37,19 +37,31 @@ void main() {
     expect(registry.read<CoreCopy>(), isA<LocalizedCoreCopy>());
   });
 
+  test('module disposes its controller once', () async {
+    final registry = GetItRegistry();
+    final module = L10nModule()..register(registry);
+    final controller = registry.read<LocaleController>();
+
+    await module.dispose();
+    await module.dispose();
+    await controller.setLocale(const Locale('en'));
+
+    expect(controller.locale, isNull);
+  });
+
   test('registers LocaleStore when Storage is available', () {
     final registry = GetItRegistry();
     final storage = InMemoryStorage();
     registry.registerSingleton<Storage>(storage);
 
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
 
     expect(registry.read<LocaleStore>().storage, same(storage));
   });
 
   test('current locale follows the controller listenable', () async {
     final registry = GetItRegistry();
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
     final app = registry.read<AppLocalizationsConfig>();
     final controller = registry.read<LocaleController>();
 
@@ -67,7 +79,7 @@ void main() {
 
   test('failure messages follow the platform locale by default', () {
     final registry = GetItRegistry();
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
 
     final expected = lookupAppLocalizations(
       L10nConfig.defaults.resolve(PlatformDispatcher.instance.locale),
@@ -87,8 +99,8 @@ void main() {
     final registry = GetItRegistry();
     registry.registerSingleton<Storage>(storage);
 
-    const L10nModule().register(registry);
-    await const L10nModule().ready(registry);
+    L10nModule().register(registry);
+    await L10nModule().ready(registry);
 
     expect(registry.read<LocaleController>().locale, const Locale('en'));
   });
@@ -97,8 +109,8 @@ void main() {
     final registry = GetItRegistry();
     registry.registerSingleton<Storage>(_ThrowingStorage());
 
-    const L10nModule().register(registry);
-    await const L10nModule().ready(registry);
+    L10nModule().register(registry);
+    await L10nModule().ready(registry);
 
     expect(registry.read<LocaleController>().locale, isNull);
   });

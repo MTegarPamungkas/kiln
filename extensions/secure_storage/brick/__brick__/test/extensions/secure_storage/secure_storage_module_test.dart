@@ -14,4 +14,11 @@ void main() {
     expect(registry.read<SecureStorageConfig>().prefix, isNotEmpty);
     expect(registry.read<SecureStorageSupport>(), isA<SecureStorageSupport>());
   });
+
+  test('declares the optional storage dependency for the wipe marker', () {
+    expect(
+      const SecureStorageModule().optionalRequires,
+      contains('storage'),
+    );
+  });
 }

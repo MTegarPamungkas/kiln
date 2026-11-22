@@ -35,9 +35,9 @@ final class SocialCredentials {
 
   Future<void> signOut() => google.signOut();
 
-  Future<SocialCredential?> _apple() {
+  Future<SocialCredential?> _apple() async {
     final nonce = nonceGenerator.generate();
-    return apple.signIn(
+    final credential = await apple.signIn(
       nonce: nonce,
       nonceSha256: nonceGenerator.sha256(nonce),
       serviceId: config.appleServiceId.isEmpty ? null : config.appleServiceId,
@@ -45,5 +45,8 @@ final class SocialCredentials {
           ? null
           : config.appleRedirectUri,
     );
+    // The raw nonce is the backend's proof that the ID token belongs to this
+    // attempt; keep it even if a gateway forgets to copy it.
+    return credential?.copyWith(rawNonce: nonce);
   }
 }

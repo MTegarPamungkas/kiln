@@ -17,7 +17,7 @@ your models are ordinary Dart classes you write in your own `lib/`.
 kiln add codegen
 ```
 
-The installer asks which **generators** to enable (`json_serializable`,
+Both **json_serializable** and **freezed** are always installed together;
 `freezed`, or both — default both). Because this ships an official hook, hooks
 run only when you approve them (`kiln add codegen --yes`), and they execute
 `build_runner` once. If you skip the hook, run it yourself:

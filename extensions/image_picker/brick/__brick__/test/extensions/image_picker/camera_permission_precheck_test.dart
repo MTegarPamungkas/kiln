@@ -69,8 +69,7 @@ void main() {
   });
 
   test('ignores a contract that cannot answer', () async {
-    await const CameraPermissionPrecheck(
-      permissions: _UnavailablePermissions(),
-    ).ensure(MediaSource.camera);
+    await const CameraPermissionPrecheck(permissions: _UnavailablePermissions())
+        .ensure(MediaSource.camera);
   });
 }

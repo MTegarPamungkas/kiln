@@ -44,4 +44,45 @@ void main() {
 
     expect(await store.readUser(), isNull);
   });
+
+  test('normalizes a trailing slash for the backend identity', () {
+    expect(
+      RestTokenStore.identityFor('https://api.kiln.dev/'),
+      RestTokenStore.identityFor('https://api.kiln.dev'),
+    );
+  });
+
+  test('tokens from another backend are not restored', () async {
+    final storage = InMemorySecureStorage();
+    final first = RestTokenStore(
+      storage: storage,
+      backend: RestTokenStore.identityFor('https://api.one.example/'),
+    );
+    await first.save(
+      const AuthTokens(accessToken: 'one', refreshToken: 'refresh-one'),
+    );
+
+    final second = RestTokenStore(
+      storage: storage,
+      backend: RestTokenStore.identityFor('https://api.two.example'),
+    );
+
+    expect(await second.read(), isNull);
+    expect(await second.refreshToken(), isNull);
+    expect(storage.snapshot, isEmpty);
+  });
+
+  test('legacy tokens without a marker are not reused', () async {
+    final storage = InMemorySecureStorage(<String, String>{
+      'rest_auth.access_token': 'legacy',
+      'rest_auth.refresh_token': 'legacy-refresh',
+    });
+    final store = RestTokenStore(
+      storage: storage,
+      backend: RestTokenStore.identityFor('https://api.kiln.dev'),
+    );
+
+    expect(await store.read(), isNull);
+    expect(storage.snapshot, isEmpty);
+  });
 }

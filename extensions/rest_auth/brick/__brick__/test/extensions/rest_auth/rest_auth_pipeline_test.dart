@@ -115,13 +115,21 @@ void main() {
       expiresAt: clock.now().subtract(const Duration(hours: 1)),
     ));
     final built = _build(store);
+    final deadline = clock.now().add(const Duration(seconds: 30));
 
     final response = await built.auth.client
-        .send(HttpRequest(method: HttpMethod.get, uri: Uri.parse('https://api.kiln.dev/auth/me')))
+        .send(
+          HttpRequest(
+            method: HttpMethod.get,
+            uri: Uri.parse('https://api.kiln.dev/auth/me'),
+            deadline: deadline,
+          ),
+        )
         .timeout(const Duration(seconds: 2));
 
     expect(response.statusCode, 200);
     expect(_terminalRequests.map((request) => request.uri.path), ['/auth/refresh', '/auth/me']);
+    expect(_terminalRequests.first.deadline, deadline);
     expect((await store.read())?.accessToken, 'h.p.fresh');
   });
 

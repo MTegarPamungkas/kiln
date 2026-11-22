@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
@@ -12,12 +14,18 @@ import 'registry_index.dart';
 /// Fetches registry indexes and extension archives over HTTP, `file:`, or a
 /// local filesystem path.
 final class RegistryClient {
-  RegistryClient({required this.config, http.Client? httpClient, this.cache})
-    : _http = httpClient ?? http.Client(),
-      _ownsHttpClient = httpClient == null {
+  RegistryClient({
+    required this.config,
+    http.Client? httpClient,
+    this.cache,
+    this.requestTimeout = const Duration(seconds: 15),
+    this.maxDownloadBytes = 20 * 1024 * 1024,
+  }) : _http = httpClient ?? http.Client(),
+       _ownsHttpClient = httpClient == null {
     if (cache != null && cache!.registryIdentity != config.identity) {
       throw const KilnStoreException(
-        'Cache belongs to a different registry.', code: 'store.invalid_config',
+        'Cache belongs to a different registry.',
+        code: 'store.invalid_config',
       );
     }
   }
@@ -26,6 +34,10 @@ final class RegistryClient {
   final LocalCache? cache;
   final http.Client _http;
   final bool _ownsHttpClient;
+
+  /// Upper bound for one registry request and its response body.
+  final Duration requestTimeout;
+  final int maxDownloadBytes;
 
   /// Fetches and parses `index.json`.
   ///
@@ -103,7 +115,7 @@ final class RegistryClient {
             details: <String, Object?>{'uri': uri.toString()},
           );
         }
-        return await file.readAsBytes();
+        return await _readBounded(file.openRead(), uri);
       } on KilnStoreException {
         rethrow;
       } on Object catch (error) {
@@ -117,8 +129,35 @@ final class RegistryClient {
 
     if (scheme == 'http' || scheme == 'https') {
       final http.Response response;
+      final abort = Completer<void>();
       try {
-        response = await _http.get(uri);
+        response = await (() async {
+          final streamed = await _http.send(
+            http.AbortableRequest('GET', uri, abortTrigger: abort.future),
+          );
+          final contentLength = streamed.contentLength;
+          if (contentLength != null && contentLength > maxDownloadBytes) {
+            await streamed.stream.listen(null).cancel();
+            throw _tooLarge(uri);
+          }
+          final bytes = await _readBounded(streamed.stream, uri);
+          return http.Response.bytes(
+            bytes,
+            streamed.statusCode,
+            headers: streamed.headers,
+            request: streamed.request,
+          );
+        })().timeout(requestTimeout);
+      } on TimeoutException {
+        if (!abort.isCompleted) abort.complete();
+        throw KilnStoreException(
+          'Registry request to $uri timed out after ${requestTimeout.inSeconds}s.',
+          code: 'store.fetch_failed',
+          suggestion: 'Check the URL and your network connection.',
+          details: <String, Object?>{'uri': uri.toString()},
+        );
+      } on KilnStoreException {
+        rethrow;
       } on Object catch (error) {
         throw KilnStoreException(
           'Could not reach registry at $uri: $error',
@@ -147,5 +186,22 @@ final class RegistryClient {
       suggestion: 'Use HTTP(S), a file: URI, or a local directory.',
       details: <String, Object?>{'uri': uri.toString()},
     );
+  }
+
+  KilnStoreException _tooLarge(Uri uri) => KilnStoreException(
+    'Registry response from $uri is larger than $maxDownloadBytes bytes.',
+    code: 'store.fetch_failed',
+    details: {'uri': uri.toString()},
+  );
+
+  Future<List<int>> _readBounded(Stream<List<int>> stream, Uri uri) async {
+    final bytes = BytesBuilder(copy: false);
+    await for (final chunk in stream) {
+      if (bytes.length + chunk.length > maxDownloadBytes) {
+        throw _tooLarge(uri);
+      }
+      bytes.add(chunk);
+    }
+    return bytes.takeBytes();
   }
 }

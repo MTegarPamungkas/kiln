@@ -32,9 +32,7 @@ final class TypedCollection<T> {
     return database
         .watch(collection, query: query)
         .map(
-          (records) => <T>[
-            for (final record in records) fromJson(record.data),
-          ],
+          (records) => <T>[for (final record in records) fromJson(record.data)],
         );
   }
 

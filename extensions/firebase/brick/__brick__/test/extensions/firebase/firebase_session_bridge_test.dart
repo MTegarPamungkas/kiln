@@ -37,6 +37,32 @@ void main() {
     await controller.dispose();
   });
 
+  test('start after dispose does not subscribe again', () async {
+    final controller = SessionController();
+    final gateway = FakeFirebaseAuthGateway();
+    final bridge = FirebaseSessionBridge(
+      controller: controller,
+      users: () => gateway.authStateChanges,
+    );
+
+    bridge.start();
+    await bridge.dispose();
+    bridge.start();
+
+    expect(bridge.isRunning, isFalse);
+    gateway.emit(
+      const FirebaseUser(
+        uid: 'user-2',
+        email: 'late@kiln.dev',
+        displayName: 'Late',
+        emailVerified: true,
+      ),
+    );
+    expect(controller.session, isNull);
+
+    await controller.dispose();
+  });
+
   test('start is idempotent and dispose cancels the subscription', () async {
     final controller = SessionController();
     final gateway = FakeFirebaseAuthGateway();

@@ -24,11 +24,19 @@ final class FirebaseSessionBridge implements Disposable {
   final AuthSession? Function(FirebaseUser? user) toSession;
 
   StreamSubscription<FirebaseUser?>? _subscription;
+  bool _disposed = false;
 
   bool get isRunning => _subscription != null;
 
   /// Starts listening; calling this twice is a no-op.
+  ///
+  /// Bootstrap can time out and dispose this module while `ready()` is still
+  /// awaiting `Firebase.initializeApp`, so a late [start] must not re-subscribe
+  /// and write into an already disposed session.
   void start() {
+    if (_disposed) {
+      return;
+    }
     _subscription ??= users().listen((user) {
       controller.setSession(toSession(user));
     });
@@ -42,5 +50,8 @@ final class FirebaseSessionBridge implements Disposable {
   }
 
   @override
-  Future<void> dispose() => stop();
+  Future<void> dispose() async {
+    _disposed = true;
+    await stop();
+  }
 }

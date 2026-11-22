@@ -1,0 +1,73 @@
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/image_picker/image_picker_module.dart';
+import 'package:{{app_name}}/extensions/image_picker/lost_data_recovery.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const MaterialApp(
+      home: Scaffold(body: Center(child: Text('Kiln media probe'))),
+    ),
+  );
+  await runProbe();
+}
+
+void log(String line) => debugPrint('KILNPROBE $line');
+
+String failureText(Object error) => error is Failure
+    ? '${error.code.value} ${error.kind.name}'
+    : error.runtimeType.toString();
+
+Future<void> runProbe() async {
+  final Registry registry;
+  try {
+    registry = await KilnBootstrap.run(
+      modules: [ImagePickerModule()],
+      onError: (error, stackTrace) => log('bootstrap_error ${failureText(error)}'),
+    );
+  } catch (error) {
+    log('bootstrap_failed ${failureText(error)}');
+    return;
+  }
+
+  final info = registry.read<SupportRegistry>()['image_picker'];
+  log('support image_picker ${info?.state.name} ${info?.details}');
+  final picker = registry.read<MediaPicker>();
+
+  // Each step waits for the operator to act in the real system UI:
+  // gallery pick, gallery cancel, then camera capture.
+  await step('gallery', () => picker.pickImage(source: MediaSource.gallery));
+  await step('gallery_cancel', () => picker.pickImage(source: MediaSource.gallery));
+  await step('camera', () => picker.pickImage(source: MediaSource.camera));
+
+  final recovery = registry.read<LostDataRecovery>();
+  try {
+    final recovered = await recovery.recover();
+    log(
+      recovered == null
+          ? 'recover null'
+          : 'recover ok mime=${recovered.mimeType} '
+                'bytes=${recovered.sizeBytes} dims=${recovered.width}x${recovered.height}',
+    );
+  } on Object catch (error) {
+    log('recover_failure ${failureText(error)}');
+  }
+  log('probe_done');
+}
+
+Future<void> step(String label, Future<PickedImage?> Function() pick) async {
+  try {
+    final image = await pick();
+    if (image == null) {
+      log('$label null');
+      return;
+    }
+    log(
+      '$label ok mime=${image.mimeType} bytes=${image.sizeBytes} '
+      'dims=${image.width}x${image.height} name=${image.name}',
+    );
+  } on Object catch (error) {
+    log('${label}_failure ${failureText(error)}');
+  }
+}

@@ -22,8 +22,13 @@ final config = AnalyticsConfig.defaults.copyWith(
 ```
 
 The module uses `NoopAnalytics` when the API key is empty, `enabledFlavors` is
-empty, or the current `AppFlavor` is not in the list. SDK setup runs on a best
-effort basis: a PostHog failure does not stop the application.
+empty, or the current `AppFlavor` is not in the list. Otherwise the PostHog SDK
+is initialized only after `ConsentCategory.analytics` is granted; until then the
+support probe reports "waiting for consent" instead of starting the SDK. Setup
+runs on a best-effort basis: a PostHog failure does not stop the application, and
+a later consent change retries it. `kiln doctor` therefore shows analytics as
+not configured until the user grants consent. On shutdown the module waits for
+queued identity work and flushes the SDK it started.
 
 ## Usage
 
@@ -57,6 +62,8 @@ listener never throws an error into the sign-in flow.
 All plugin access sits in `AnalyticsGateway`. The SDK implementation is
 `SdkPosthogGateway`; tests use a fake gateway. For another vendor, replace the
 gateway and `PosthogAnalytics` without changing the consent or PII decorators.
+The gateway and `PosthogAnalytics` are intentionally not registered as
+services, so application code cannot bypass the consent and PII layers.
 
 See [event-naming.md](event-naming.md) and
 [privacy-and-consent.md](privacy-and-consent.md).

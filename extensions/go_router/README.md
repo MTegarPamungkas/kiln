@@ -22,6 +22,15 @@ fills the `RouterConfig<Object>` seam read by `app_shell.dart`, so
 
 ## Install
 
+With auth redirection enabled, an unknown session waits at `/session-loading`;
+neither protected pages nor the sign-in page are built during restoration.
+Customize that screen with `AppRouterConfig.sessionLoadingBuilder`. Local
+deep-link destinations, including query parameters, survive restoration and
+sign-in through a validated `returnTo` parameter. External and recursive auth
+destinations are rejected. The waiting route is reserved by the extension.
+Existing guards retain a path-only `context.location`; `context.requestedUri`
+and `context.sessionStatus` expose the full request and three-state session.
+
 ```bash
 kiln ext add go_router
 ```

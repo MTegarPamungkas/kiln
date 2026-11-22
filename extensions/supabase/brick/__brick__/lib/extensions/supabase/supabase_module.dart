@@ -99,6 +99,13 @@ final class SupabaseModule extends KilnModule {
       ..registerSingleton<FileStorage>(storage)
       ..registerSingleton<SupabaseSessionBridge>(bridge)
       ..registerSingleton<SupabaseLinkHandler>(linkHandler);
+
+    // The link handler owns a DeepLinks subscription; dispose it with the
+    // application so a late ready() cannot attach after shutdown.
+    registry
+        .readOrNull<LifecycleController>()
+        ?.addDisposeCallback(linkHandler.dispose);
+    registry.readOrNull<LifecycleController>()?.addDisposeCallback(bridge.dispose);
   }
 
   @override

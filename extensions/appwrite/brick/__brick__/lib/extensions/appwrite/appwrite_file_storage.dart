@@ -42,6 +42,13 @@ final class AppwriteFileStorage implements FileStorage {
   Future<Uri> url(String path, {Duration? expiresIn}) {
     return _guard(() {
       _requirePath(path);
+      if (expiresIn != null) {
+        throw const Failure(
+          code: FailureCode.validationUnsupportedValue,
+          message: 'Appwrite client storage cannot issue expiring URLs. Use a trusted backend to create a file token.',
+          kind: FailureKind.unsupported,
+        );
+      }
       return gateway.url(path);
     });
   }

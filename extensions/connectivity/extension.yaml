@@ -8,6 +8,7 @@ exclusive: true
 provides:
   - connectivity
 optional_requires:
+  - http_client
   - http_pipeline
 dependencies:
   connectivity_plus: ^7.3.2

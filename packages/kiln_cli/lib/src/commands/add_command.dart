@@ -58,24 +58,52 @@ final class AddCommand extends KilnCommand {
     final installer = ExtensionInstaller(
       projectRoot: project.root,
       available: extensionCatalog,
-    );
-    final result = await installer.add(
-      requested: requested,
-      project: project.projectForTemplates,
-      answers: answers,
-      options: InstallOptions(
-        dryRun: argResults!['dry-run'] == true,
-        verify: argResults!['no-verify'] != true,
-        collisionPolicy: argResults!['force'] == true
-            ? CollisionPolicy.overwrite
-            : CollisionPolicy.ask,
-        approveHooks: assumeYes,
+      verifier: Verifier(
+        runner: (executable, arguments, workingDirectory) => processRunner.run(
+          executable,
+          arguments,
+          workingDirectory: workingDirectory,
+        ),
       ),
-      hostCapabilities: const <String>{'app_basic'},
     );
+    final lock = argResults!['dry-run'] == true
+        ? null
+        : await ProjectLock.acquire(project.root);
+    final InstallResult result;
+    try {
+      result = await installer.add(
+        requested: requested,
+        project: project.projectForTemplates,
+        answers: answers,
+        persistAnswers: true,
+        options: InstallOptions(
+          dryRun: argResults!['dry-run'] == true,
+          verify: argResults!['no-verify'] != true,
+          collisionPolicy: argResults!['force'] == true
+              ? CollisionPolicy.overwrite
+              : CollisionPolicy.ask,
+          approveHooks: assumeYes,
+        ),
+        hostCapabilities: const <String>{'app_basic'},
+      );
+    } finally {
+      lock?.release();
+    }
+
+    final dryRun = argResults!['dry-run'] == true;
+    final verification = result.verification;
+    final verificationFailed = verification != null && !verification.isSuccess;
 
     if (argResults!['json'] == true) {
       JsonReporter(logger.raw).write(<String, Object?>{
+        'status': result.hasConflicts
+            ? 'conflict'
+            : verificationFailed
+            ? 'verification_failed'
+            : dryRun
+            ? 'preview'
+            : 'installed',
+        'committed': result.committed,
         'added': result.plan.added.map((extension) => extension.id).toList(),
         'changes': result.changes.map((change) => change.toJson()).toList(),
         'patches': result.patches,
@@ -83,17 +111,17 @@ final class AddCommand extends KilnCommand {
         'manual_steps': result.manualSteps
             .map((step) => step.step.description)
             .toList(),
-        'verification': result.verification == null
+        'verification': verification == null
             ? null
             : <String, Object?>{
-                'pub_get': result.verification!.pubGetExitCode,
-                'analyze': result.verification!.analyzeExitCode,
+                'pub_get': verification.pubGetExitCode,
+                'analyze': verification.analyzeExitCode,
               },
         'dry_run': result.dryRun?.toJson(),
       });
-    } else if (result.dryRun != null && argResults!['dry-run'] == true) {
+    } else if (result.dryRun != null && dryRun) {
       logger.info(result.dryRun!.toText());
-    } else {
+    } else if (!verificationFailed) {
       printChanges(logger, result.changes);
       printWarnings(logger, result.warnings);
       printManualSteps(logger, result.manualSteps);
@@ -104,23 +132,13 @@ final class AddCommand extends KilnCommand {
       return ExitCodes.conflict;
     }
 
-    if (argResults!['dry-run'] != true) {
-      for (final extension in result.plan.added) {
-        project.updateExtensionAnswers(
-          extension.id,
-          answers[extension.id] ?? const <String, Object?>{},
-        );
-      }
-    }
-
-    final verification = result.verification;
-    if (verification != null && !verification.isSuccess) {
-      logger.error('Verification failed.');
-      logger.info(verification.output);
+    if (verificationFailed) {
+      logger.error('Verification failed; all changes were rolled back.');
+      logger.error(verification.output);
       return ExitCodes.verification;
     }
 
-    if (argResults!['dry-run'] != true) {
+    if (!dryRun) {
       if (result.plan.added.isEmpty) {
         logger.info('No new extensions to install.');
       } else {
@@ -128,6 +146,11 @@ final class AddCommand extends KilnCommand {
           'Installed extension(s): '
           '${result.plan.added.map((extension) => extension.id).join(', ')}',
         );
+        for (final extension in result.plan.added) {
+          logger.info(
+            'Next: kiln setup ${extension.id} to review settings and remaining setup steps.',
+          );
+        }
       }
     }
     return ExitCodes.success;

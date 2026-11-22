@@ -22,10 +22,13 @@ final class HttpRemoteConfigGateway implements RemoteConfigGateway {
     final uri = Uri.parse(url);
     http.Response response;
     try {
-      final request = _client.get(uri, headers: const <String, String>{
-        'Accept': 'application/json',
-      });
-      response = timeout == null ? await request : await request.timeout(timeout);
+      final request = _client.get(
+        uri,
+        headers: const <String, String>{'Accept': 'application/json'},
+      );
+      response = timeout == null
+          ? await request
+          : await request.timeout(timeout);
     } on TimeoutException {
       throw Failure(
         code: FailureCode.networkTimeout,
@@ -72,9 +75,7 @@ final class HttpRemoteConfigGateway implements RemoteConfigGateway {
         kind: FailureKind.validation,
       );
     }
-    return decoded.map(
-      (Object? key, Object? value) => MapEntry('$key', value),
-    );
+    return decoded.map((Object? key, Object? value) => MapEntry('$key', value));
   }
 
   @override

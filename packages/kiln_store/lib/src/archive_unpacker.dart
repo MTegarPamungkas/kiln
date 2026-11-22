@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:path/path.dart' as p;
@@ -7,9 +8,29 @@ import 'kiln_store_exception.dart';
 
 /// Extracts extension archives while rejecting path traversal and links.
 final class ArchiveUnpacker {
-  const ArchiveUnpacker();
+  const ArchiveUnpacker({
+    this.maxCompressedBytes = 50 * 1024 * 1024,
+    this.maxExpandedBytes = 100 * 1024 * 1024,
+    this.maxEntryBytes = 50 * 1024 * 1024,
+    this.maxEntries = 2000,
+  });
+
+  final int maxCompressedBytes;
+  final int maxExpandedBytes;
+  final int maxEntryBytes;
+  final int maxEntries;
 
   static final RegExp _drivePattern = RegExp(r'^[a-zA-Z]:');
+
+  void _requireBudget(bool ok, String message) {
+    if (!ok) {
+      throw KilnStoreException(
+        message,
+        code: 'store.archive_too_large',
+        suggestion: 'Publish a smaller extension archive.',
+      );
+    }
+  }
 
   /// Extracts [bytes] (a `.tar.gz`) into [target].
   ///
@@ -18,10 +39,27 @@ final class ArchiveUnpacker {
   /// links, hard links, and special files are rejected with code
   /// `store.unsafe_archive`.
   void extract(List<int> bytes, Directory target) {
+    _requireBudget(
+      bytes.length <= maxCompressedBytes,
+      'Archive is ${bytes.length} bytes; the limit is $maxCompressedBytes.',
+    );
     final Archive archive;
     try {
-      final tarBytes = GZipDecoder().decodeBytes(bytes);
+      // Bound inflated bytes before the tar parser can allocate every entry.
+      // Tar adds a header and up to one padding block per file.
+      final sink = _BoundedArchiveSink(
+        maxExpandedBytes + (maxEntries + 1) * 1024,
+      );
+      final decoder = gzip.decoder.startChunkedConversion(sink);
+      for (var offset = 0; offset < bytes.length; offset += 4096) {
+        final end = offset + 4096 < bytes.length ? offset + 4096 : bytes.length;
+        decoder.add(bytes.sublist(offset, end));
+      }
+      decoder.close();
+      final tarBytes = sink.bytes.takeBytes();
       archive = TarDecoder().decodeBytes(tarBytes, verify: true);
+    } on KilnStoreException {
+      rethrow;
     } on Object catch (error) {
       throw KilnStoreException(
         'Archive is not a valid .tar.gz file: $error',
@@ -30,9 +68,25 @@ final class ArchiveUnpacker {
       );
     }
 
+    _requireBudget(
+      archive.length <= maxEntries,
+      'Archive has ${archive.length} entries; the limit is $maxEntries.',
+    );
+    var expandedBytes = 0;
     final rootPath = p.normalize(p.absolute(target.path));
     final pending = <_PendingEntry>[];
     for (final entry in archive) {
+      if (entry.isFile) {
+        _requireBudget(
+          entry.size <= maxEntryBytes,
+          'Archive entry "${entry.name}" is ${entry.size} bytes; the limit is $maxEntryBytes.',
+        );
+        expandedBytes += entry.size;
+        _requireBudget(
+          expandedBytes <= maxExpandedBytes,
+          'Archive expands to more than $maxExpandedBytes bytes.',
+        );
+      }
       final segments = _safeSegments(entry.name);
       if (entry.isSymbolicLink ||
           entry.isHardLink ||
@@ -117,6 +171,26 @@ final class ArchiveUnpacker {
     }
     return segments;
   }
+}
+
+final class _BoundedArchiveSink implements Sink<List<int>> {
+  _BoundedArchiveSink(this.limit);
+  final int limit;
+  final BytesBuilder bytes = BytesBuilder(copy: false);
+
+  @override
+  void add(List<int> data) {
+    if (bytes.length + data.length > limit) {
+      throw const KilnStoreException(
+        'The decompressed archive exceeds its size budget.',
+        code: 'store.archive_too_large',
+      );
+    }
+    bytes.add(data);
+  }
+
+  @override
+  void close() {}
 }
 
 final class _PendingEntry {

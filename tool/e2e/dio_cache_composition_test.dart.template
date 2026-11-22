@@ -1,0 +1,196 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io' as io;
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/dio/dio_client.dart';
+import 'package:{{app_name}}/extensions/dio/dio_config.dart';
+import 'package:{{app_name}}/extensions/http_cache/cache_interceptor.dart';
+import 'package:{{app_name}}/extensions/http_cache/cache_settings.dart';
+import 'package:{{app_name}}/extensions/http_cache/memory_http_cache.dart';
+
+/// Composition check: the real Dio transport, the real middleware pipeline and
+/// the real cache interceptor against a loopback HTTP server.
+///
+/// The single-extension suites use fakes for the transport; this fixture exists
+/// to prove the pieces still agree when they are wired together.
+void main() {
+  late io.HttpServer server;
+  late Uri baseUri;
+  late Map<String, int> hits;
+  late HttpCacheSettings settings;
+  late DioClient client;
+
+  setUp(() async {
+    server = await io.HttpServer.bind(io.InternetAddress.loopbackIPv4, 0);
+    baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+    hits = <String, int>{};
+    settings = const HttpCacheSettings(staleWhileRevalidate: false);
+    final pipeline = HttpPipeline()
+      ..use(
+        CacheInterceptor(
+          cache: MemoryHttpCache(settings: settings),
+          settings: settings,
+        ),
+        priority: 30,
+      );
+    client = DioClient(
+      config: DioConfig(baseUrl: baseUri.toString()),
+      pipeline: pipeline,
+    );
+  });
+
+  tearDown(() async {
+    client.close(force: true);
+    await server.close(force: true);
+  });
+
+  void serve(FutureOr<void> Function(io.HttpRequest request) handler) {
+    server.listen((request) async {
+      final key = '${request.method} ${request.uri.path}';
+      hits.update(key, (value) => value + 1, ifAbsent: () => 1);
+      await handler(request);
+    });
+  }
+
+  Future<void> writeJson(
+    io.HttpRequest request,
+    Object? body, {
+    Map<String, String> headers = const <String, String>{},
+  }) async {
+    request.response
+      ..statusCode = 200
+      ..headers.contentType = io.ContentType.json;
+    for (final entry in headers.entries) {
+      request.response.headers.set(entry.key, entry.value);
+    }
+    request.response.write(jsonEncode(body));
+    await request.response.close();
+  }
+
+  test(
+    'a repeated GET is served from the cache after one server hit',
+    () async {
+      serve(
+        (request) => writeJson(
+          request,
+          <String, Object?>{'value': 1},
+          headers: <String, String>{'cache-control': 'max-age=60'},
+        ),
+      );
+
+      final first = await client.get(baseUri.resolve('/items'));
+      final second = await client.get(baseUri.resolve('/items'));
+
+      expect(first.fromCache, isFalse);
+      expect(second.fromCache, isTrue);
+      expect(second.data, first.data);
+      expect(hits['GET /items'], 1);
+    },
+  );
+
+  test('a no-store response is never cached', () async {
+    serve(
+      (request) => writeJson(
+        request,
+        <String, Object?>{'value': 2},
+        headers: <String, String>{'cache-control': 'no-store'},
+      ),
+    );
+
+    final first = await client.get(baseUri.resolve('/live'));
+    final second = await client.get(baseUri.resolve('/live'));
+
+    expect(first.fromCache, isFalse);
+    expect(second.fromCache, isFalse);
+    expect(hits['GET /live'], 2);
+  });
+
+  test('a mutation invalidates the cached collection', () async {
+    serve((request) async {
+      if (request.method == 'POST') {
+        request.response.statusCode = 201;
+        await request.response.close();
+        return;
+      }
+      await writeJson(
+        request,
+        <String, Object?>{'items': hits['GET /items']},
+        headers: <String, String>{'cache-control': 'max-age=60'},
+      );
+    });
+
+    final cached = await client.get(baseUri.resolve('/items'));
+    final fromCache = await client.get(baseUri.resolve('/items'));
+    await client.post(baseUri.resolve('/items'));
+    final afterMutation = await client.get(baseUri.resolve('/items'));
+
+    expect(cached.fromCache, isFalse);
+    expect(fromCache.fromCache, isTrue);
+    expect(afterMutation.fromCache, isFalse);
+    expect(hits['GET /items'], 2);
+    expect(hits['POST /items'], 1);
+  });
+
+  test('a range request bypasses the cached full response', () async {
+    serve((request) async {
+      if (request.headers.value('range') != null) {
+        request.response
+          ..statusCode = 206
+          ..headers.set('content-range', 'bytes 0-1/10');
+        request.response.write('ab');
+        await request.response.close();
+        return;
+      }
+      await writeJson(
+        request,
+        <String, Object?>{'body': 'abcdefghij'},
+        headers: <String, String>{'cache-control': 'max-age=60'},
+      );
+    });
+
+    await client.get(baseUri.resolve('/file'));
+    final partial = await client.get(
+      baseUri.resolve('/file'),
+      headers: <String, String>{'range': 'bytes=0-1'},
+    );
+    final full = await client.get(baseUri.resolve('/file'));
+
+    expect(partial.statusCode, 206);
+    expect(partial.fromCache, isFalse);
+    // The partial payload must not have replaced the cached full response.
+    expect(full.fromCache, isTrue);
+    expect(full.statusCode, 200);
+    expect(hits['GET /file'], 2);
+  });
+
+  test(
+    'a stale entry revalidates with If-None-Match and reuses the body',
+    () async {
+      serve((request) async {
+        if (request.headers.value('if-none-match') == '"v1"') {
+          request.response.statusCode = 304;
+          await request.response.close();
+          return;
+        }
+        await writeJson(
+          request,
+          <String, Object?>{'version': 1},
+          headers: <String, String>{
+            'cache-control': 'max-age=0',
+            'etag': '"v1"',
+          },
+        );
+      });
+
+      final first = await client.get(baseUri.resolve('/etag'));
+      final revalidated = await client.get(baseUri.resolve('/etag'));
+
+      expect(first.fromCache, isFalse);
+      expect(revalidated.fromCache, isTrue);
+      expect(revalidated.data, first.data);
+      expect(hits['GET /etag'], 2);
+    },
+  );
+}

@@ -7,6 +7,8 @@ tier: official
 exclusive: true
 provides:
   - state_bloc
+optional_requires:
+  - logger
 dependencies:
   bloc: ^9.2.1
   flutter_bloc: ^9.1.1

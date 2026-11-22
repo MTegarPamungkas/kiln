@@ -21,5 +21,5 @@ extension GatePermissionX on Gate {
 
   /// Opens the platform settings screen; `Ok(false)` when it cannot open.
   Future<Result<bool>> openPermissionSettings() =>
-      call(permissions.openSettings);
+      call(() => permissions.openSettings());
 }

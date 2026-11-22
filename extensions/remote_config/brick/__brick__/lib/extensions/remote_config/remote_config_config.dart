@@ -10,6 +10,8 @@ final class RemoteConfigConfig {
     this.endpoint = '{{{endpoint}}}',
     this.fetchInterval = const Duration(minutes: 15),
     this.requestTimeout = const Duration(seconds: 10),
+    this.cacheTtl = const Duration(hours: 24),
+    this.refreshOnResume = true,
     Set<AppFlavor>? enabledFlavors,
     this.noopWhenEndpointEmpty = true,
   }) : enabledFlavors = Set<AppFlavor>.unmodifiable(
@@ -29,11 +31,29 @@ final class RemoteConfigConfig {
   /// Absolute URL returning a JSON object of flag/config values.
   final String endpoint;
 
-  /// Suggested cadence for background refreshes.
+  /// Minimum time between resume-triggered refreshes.
+  ///
+  /// The app owns refresh cadence: the module only refreshes when the app
+  /// resumes after it has been in the background for [fetchInterval]. Set
+  /// [refreshOnResume] to false to disable even that.
   final Duration fetchInterval;
 
   /// Per-request network timeout.
   final Duration requestTimeout;
+
+  /// How long a persisted snapshot stays usable when the endpoint cannot be
+  /// reached at startup. `Duration.zero` disables the last-known-good cache.
+  final Duration cacheTtl;
+
+  /// Whether a resume after [fetchInterval] triggers a refresh.
+  ///
+  /// This is a foreground-only policy: it never schedules OS background work,
+  /// so it adds no native dependency. Apps that want refresh while the process
+  /// is dead should call [RemoteConfig.fetchAndActivate] themselves.
+  final bool refreshOnResume;
+
+  /// Whether a fresh persisted snapshot may be served.
+  bool get cacheEnabled => cacheTtl > Duration.zero;
 
   /// Flavors allowed to hit the network.
   final Set<AppFlavor> enabledFlavors;
@@ -83,6 +103,13 @@ final class RemoteConfigConfig {
         kind: FailureKind.configuration,
       );
     }
+    if (cacheTtl.isNegative) {
+      throw const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Remote config cache TTL cannot be negative.',
+        kind: FailureKind.configuration,
+      );
+    }
     if (!noopWhenEndpointEmpty && !hasEndpoint) {
       throw const Failure(
         code: FailureCode.configurationMissing,
@@ -96,6 +123,8 @@ final class RemoteConfigConfig {
     String? endpoint,
     Duration? fetchInterval,
     Duration? requestTimeout,
+    Duration? cacheTtl,
+    bool? refreshOnResume,
     Set<AppFlavor>? enabledFlavors,
     bool? noopWhenEndpointEmpty,
   }) {
@@ -103,6 +132,8 @@ final class RemoteConfigConfig {
       endpoint: endpoint ?? this.endpoint,
       fetchInterval: fetchInterval ?? this.fetchInterval,
       requestTimeout: requestTimeout ?? this.requestTimeout,
+      cacheTtl: cacheTtl ?? this.cacheTtl,
+      refreshOnResume: refreshOnResume ?? this.refreshOnResume,
       enabledFlavors: enabledFlavors ?? this.enabledFlavors,
       noopWhenEndpointEmpty:
           noopWhenEndpointEmpty ?? this.noopWhenEndpointEmpty,

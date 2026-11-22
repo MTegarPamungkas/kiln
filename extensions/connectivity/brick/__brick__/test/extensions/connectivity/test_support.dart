@@ -10,6 +10,10 @@ final class FakeConnectivityGateway implements ConnectivityGateway {
 
   NetworkStatus current;
   Object? checkError;
+
+  /// When set, [check] waits for it before answering, so a test can dispose
+  /// the monitor while the first platform check is still in flight.
+  Completer<void>? checkGate;
   final StreamController<NetworkStatus> controller =
       StreamController<NetworkStatus>.broadcast(sync: true);
 
@@ -19,6 +23,7 @@ final class FakeConnectivityGateway implements ConnectivityGateway {
     if (error != null) {
       throw error;
     }
+    await checkGate?.future;
     return current;
   }
 

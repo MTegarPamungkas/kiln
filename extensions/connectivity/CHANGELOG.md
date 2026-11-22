@@ -2,6 +2,9 @@
 
 ## 0.1.2
 
+- Bootstrap can dispose the module while the first platform status check
+  is still running; the monitor now stops before registering its listener or
+  publishing after disposal, instead of throwing or leaking the subscription.
 - The module declares its optional `http_client` dependency explicitly,
   so reachability probing is wired regardless of module input order.
 

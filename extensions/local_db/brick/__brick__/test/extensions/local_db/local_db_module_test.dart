@@ -8,10 +8,18 @@ void main() {
   test('module registers LocalDatabase and config', () {
     final registry = GetItRegistry();
 
-    const LocalDbModule().register(registry);
+    LocalDbModule().register(registry);
 
     expect(registry.read<LocalDatabase>(), isA<LocalDatabase>());
     expect(registry.read<LocalDbConfig>().databaseName, isNotEmpty);
     expect(registry.read<LocalDatabaseSupport>(), isA<LocalDatabaseSupport>());
+  });
+
+  test('module dispose is idempotent before the database opens', () async {
+    final registry = GetItRegistry();
+    final module = LocalDbModule()..register(registry);
+
+    await module.dispose();
+    await module.dispose();
   });
 }

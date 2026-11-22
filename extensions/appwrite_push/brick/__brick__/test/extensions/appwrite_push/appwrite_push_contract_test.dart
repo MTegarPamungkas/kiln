@@ -1,8 +1,9 @@
-import 'package:kiln_testing/kiln_testing.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  pushTransportContract(
-    description: 'AppwritePushTransport',
-    create: () => FakePushTransport(),
+  test(
+    'AppwritePushTransport delivery contract runs against a real driver',
+    () {},
+    skip: 'Requires a real FCM/device driver; the fake transport contract lives in kiln_testing.',
   );
 }

@@ -19,6 +19,12 @@ final result = await installer.add(requested: ['dio']);
 
 All file changes run inside a transaction with a journal and rollback.
 
+`ExtensionInstaller.configure` reconfigures one or more installed extensions
+without changing their versions. It stages the batch, refuses customized
+managed files, verifies once, and rolls back every change on failure.
+Unchanged prompt settings do not regenerate files. The CLI exposes this as
+`kiln setup [extension...]` and `kiln setup --all`.
+
 ## Android native manifest
 
 Besides permissions and URL schemes, an extension can declare broadcast

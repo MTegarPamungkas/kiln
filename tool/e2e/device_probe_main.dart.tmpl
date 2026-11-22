@@ -1,0 +1,82 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/deep_link/deep_link_module.dart';
+import 'package:{{app_name}}/extensions/geolocation/geolocation_module.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const MaterialApp(
+      home: Scaffold(body: Center(child: Text('Kiln device probe'))),
+    ),
+  );
+  unawaited(runProbe());
+}
+
+void log(String line) => debugPrint('KILNPROBE $line');
+
+String failureText(Object error) => error is Failure
+    ? '${error.code.value} ${error.kind.name}'
+    : error.runtimeType.toString();
+
+Future<void> runProbe() async {
+  final Registry registry;
+  try {
+    registry = await KilnBootstrap.run(
+      modules: [DeepLinkModule(), GeolocationModule()],
+      onError: (error, stackTrace) => log('bootstrap_error ${failureText(error)}'),
+    );
+  } catch (error) {
+    log('bootstrap_failed ${failureText(error)}');
+    return;
+  }
+  final support = registry.read<SupportRegistry>();
+  for (final id in const <String>['geolocation', 'deep_link']) {
+    final info = support[id];
+    log('support $id ${info?.state.name} ${info?.message}');
+  }
+
+  final location = registry.read<LocationProvider>();
+  try {
+    log('service_enabled ${await location.isServiceEnabled()}');
+  } on Object catch (error) {
+    log('service_enabled_failure ${failureText(error)}');
+  }
+  try {
+    final position = await location.current();
+    log('current ok ${position.latitude},${position.longitude}');
+  } on Object catch (error) {
+    log('current_failure ${failureText(error)}');
+  }
+  final subscription = location.updates().listen(
+    (position) => log('update ok ${position.latitude},${position.longitude}'),
+    onError: (Object error) => log('update_failure ${failureText(error)}'),
+  );
+  unawaited(
+    Future<void>.delayed(const Duration(minutes: 5), subscription.cancel),
+  );
+
+  final links = registry.read<DeepLinks>();
+  log('initial_link ${links.initialLink}');
+  links.links.listen(
+    (uri) => log('link $uri'),
+    onError: (Object error) => log('link_error ${failureText(error)}'),
+  );
+  log('probe_ready');
+
+  // Re-reads the location state so a mid-run permission/service change is
+  // observed by the same layer the app uses, not just at startup.
+  unawaited(() async {
+    for (var tick = 1;; tick++) {
+      try {
+        final position = await location.current();
+        log('tick $tick ok ${position.latitude},${position.longitude}');
+      } on Object catch (error) {
+        log('tick $tick failure ${failureText(error)}');
+      }
+      await Future<void>.delayed(const Duration(seconds: 4));
+    }
+  }());
+}

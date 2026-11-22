@@ -1,6 +1,6 @@
 id: appwrite_push_native
 name: Appwrite Native Push
-version: 0.1.0
+version: 0.2.0
 description: Push transport over Appwrite Push (MQTT), without Firebase or device tokens.
 category: notifications
 tier: official
@@ -24,12 +24,30 @@ prompts:
     type: string
     label: Background notification title
     default: Notifications
+  - name: background_reliability
+    type: bool
+    label: Declare the Android battery and exact-alarm permissions
+    description: Adds SCHEDULE_EXACT_ALARM and REQUEST_IGNORE_BATTERY_OPTIMIZATIONS so the app can ask the user for punctual background wake-ups. The permissions are declared only; the app still has to ask, for example with AppwritePushNativeTransport.requestIgnoreBatteryOptimizations.
+    default: false
 platforms:
   - android
   - ios
 android:
   permissions:
     - android.permission.POST_NOTIFICATIONS
+conditional:
+  - when:
+      background: true
+    ios:
+      plist:
+        UIBackgroundModes:
+          - remote-notification
+  - when:
+      background_reliability: true
+    android:
+      permissions:
+        - android.permission.SCHEDULE_EXACT_ALARM
+        - android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 manual_steps:
   - id: appwrite_push_provider
     description: Create an Appwrite Push provider under Messaging in the Appwrite console. It needs no credentials, and pushing to a user reaches every device that user subscribed on.
@@ -37,6 +55,8 @@ manual_steps:
     description: Self-hosted servers must expose the MQTT broker. Set push_endpoint to mqtts, for example mqtts://push.example.com:8883, with port 8883 reachable; a Cloudflare-proxied API hostname does not forward it, so use a DNS-only push hostname.
   - id: appwrite_push_ios
     description: On iOS, enable Push Notifications and the remote-notification background mode, then add APNs credentials to the Appwrite provider so background notifications show while the app is suspended.
+  - id: appwrite_push_doze
+    description: Delivery while the app is closed is best effort. read AppwritePushNativeTransport.status and offer the Android exact-alarm and battery-optimisation requests from a user action, or enable setForeground while the app is visible for immediate delivery.
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

@@ -12,9 +12,3 @@ vars:
     type: string
     description: Application package name
     default: my_app
-  generators:
-    type: array
-    description: Model generators to enable
-    defaults:
-      - json_serializable
-      - freezed

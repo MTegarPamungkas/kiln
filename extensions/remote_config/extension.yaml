@@ -10,6 +10,7 @@ provides:
   - remote_config
 optional_requires:
   - flavor
+  - storage
 dependencies:
   http: ^1.6.0
 prompts:

@@ -11,11 +11,15 @@ final class CrashReportSupport {
     required this.config,
     required this.flavor,
     required this.probe,
+    this.isAllowed,
   });
 
   final CrashReportConfig config;
   final AppFlavor? flavor;
   final CrashReportSetupProbe probe;
+
+  /// Reports whether crash-report consent currently allows the SDK to start.
+  final bool Function()? isAllowed;
   SupportInfo? _last;
 
   Future<SupportInfo> check() async {
@@ -48,6 +52,17 @@ final class CrashReportSupport {
             : 'Crash reporting is disabled for this flavor.',
         details: <String, Object?>{
           'noop': config.isNoop,
+          'flavor': flavor?.name,
+        },
+      );
+    }
+    if (!(isAllowed?.call() ?? true)) {
+      return SupportInfo.unsupported(
+        SupportState.notConfigured,
+        message: 'Crash reporting starts after crash-report consent is granted.',
+        details: <String, Object?>{
+          'consent': false,
+          'environment': config.environmentFor(flavor),
           'flavor': flavor?.name,
         },
       );

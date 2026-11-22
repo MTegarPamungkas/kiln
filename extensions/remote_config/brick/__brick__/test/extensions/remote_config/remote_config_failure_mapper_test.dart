@@ -15,9 +15,7 @@ void main() {
     });
 
     test('wraps other errors as unavailable', () {
-      final failure = const RemoteConfigFailureMapper().map(
-        StateError('down'),
-      );
+      final failure = const RemoteConfigFailureMapper().map(StateError('down'));
 
       expect(failure.kind, FailureKind.unavailable);
       expect(failure.code, FailureCode.unavailable);

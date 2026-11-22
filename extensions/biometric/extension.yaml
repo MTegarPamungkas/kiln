@@ -7,6 +7,8 @@ tier: official
 exclusive: true
 provides:
   - biometric
+optional_requires:
+  - secure_storage
 dependencies:
   local_auth: ^3.0.2
 prompts:

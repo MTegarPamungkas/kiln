@@ -2,6 +2,7 @@ import 'dart:async';
 
 // ignore_for_file: prefer_initializing_formals
 
+import 'package:flutter/services.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 import 'appwrite_account.dart';
@@ -41,24 +42,41 @@ final class AppwriteSocialAuth implements SocialAuth {
 
   @override
   Future<SocialCredential?> signIn(SocialProvider provider) async {
-    await _guard(
-      () => _account.createOAuth2Session(
+    final revision = _bridge.beginOperation();
+    try {
+      await _account.createOAuth2Session(
         provider: provider,
         successUrl: _config.oAuthSuccessUrl,
-      ),
-    );
-    final user = await _waitForUser();
+      );
+    } on PlatformException catch (error, stackTrace) {
+      if (error.code == 'CANCELED' || error.code == 'CANCELLED') return null;
+      throw _failures.map(
+        error,
+        scope: AppwriteFailureScope.auth,
+        stackTrace: stackTrace,
+      );
+    } on Object catch (error, stackTrace) {
+      throw _failures.map(
+        error,
+        scope: AppwriteFailureScope.auth,
+        stackTrace: stackTrace,
+      );
+    }
+    final user = await _waitForUser(revision);
+    if (revision != _bridge.revision) return null;
     if (user == null) {
       return null;
     }
-    _bridge.establish(user: user);
     final token = await _guard(_account.createJwt);
+    if (revision != _bridge.revision) return null;
+    _bridge.establish(user: user);
     return SocialCredential(
       provider: provider,
-      // Appwrite verifies the identity on the server, so the token a caller can
-      // hold locally is the session JWT for the account that just signed in.
+      // Appwrite verified the identity on its server; the token available here
+      // is the Appwrite session JWT, not a provider identity token.
       idToken: token ?? '',
-      accessToken: token,
+      audience: SocialTokenAudience.backend,
+      backendSessionToken: token,
       email: user.email.isEmpty ? null : user.email,
       displayName: user.displayName,
     );
@@ -66,13 +84,14 @@ final class AppwriteSocialAuth implements SocialAuth {
 
   @override
   Future<void> signOut() async {
-    await _guard(_account.signOut);
     _bridge.clear();
+    await _guard(_account.signOut);
   }
 
-  Future<AppwriteAccountUser?> _waitForUser() async {
+  Future<AppwriteAccountUser?> _waitForUser(int revision) async {
     final deadline = DateTime.now().add(_timeout);
     while (DateTime.now().isBefore(deadline)) {
+      if (revision != _bridge.revision) return null;
       final user = await _guard(_account.currentUser);
       if (user != null) {
         return user;

@@ -26,10 +26,13 @@ void pushTransportContract({
       // Real transports are driven by the platform; only fakes can be fed
       // from the test.
       final emitter = switch (transport) {
-        FakePushTransportEmitter emitter => emitter,
+        final FakePushTransportEmitter emitter => emitter,
         _ => null,
       };
       if (emitter == null) {
+        markTestSkipped(
+          'The transport has no test driver; delivery is not verified here.',
+        );
         return;
       }
 

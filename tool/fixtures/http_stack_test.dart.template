@@ -1,0 +1,181 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io' as io;
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:kiln_testing/kiln_testing.dart';
+import 'package:verify_http_stack/extensions/dio/dio_client.dart';
+import 'package:verify_http_stack/extensions/dio/dio_config.dart';
+import 'package:verify_http_stack/extensions/http_cache/cache_interceptor.dart';
+import 'package:verify_http_stack/extensions/http_cache/memory_http_cache.dart';
+import 'package:verify_http_stack/extensions/http_retry/retry_events.dart';
+import 'package:verify_http_stack/extensions/http_retry/retry_middleware.dart';
+import 'package:verify_http_stack/extensions/rest_auth/auth_middleware.dart';
+import 'package:verify_http_stack/extensions/rest_auth/auth_request_policy.dart';
+import 'package:verify_http_stack/extensions/rest_auth/rest_auth.dart';
+import 'package:verify_http_stack/extensions/rest_auth/rest_auth_config.dart';
+import 'package:verify_http_stack/extensions/rest_auth/rest_token_store.dart';
+import 'package:verify_http_stack/extensions/rest_auth/unauthorized_handler.dart';
+
+void main() {
+  late io.HttpServer server;
+  late Uri base;
+  setUp(() async {
+    server = await io.HttpServer.bind(io.InternetAddress.loopbackIPv4, 0);
+    base = Uri.parse('http://127.0.0.1:${server.port}');
+  });
+  tearDown(() async => server.close(force: true));
+
+  Future<void> reply(io.HttpRequest request, int status, Object data,
+      {Map<String, String> headers = const {}}) async {
+    request.response.statusCode = status;
+    request.response.headers.contentType = io.ContentType.json;
+    headers.forEach(request.response.headers.set);
+    request.response.write(jsonEncode(data));
+    await request.response.close();
+  }
+
+  test('real range requests cannot read or replace the cached full response', () async {
+    var requests = 0;
+    server.listen((request) async {
+      requests++;
+      final ranged = request.headers.value('range') != null;
+      await reply(request, ranged ? 206 : 200, {'value': ranged ? 'part' : 'full'},
+        headers: {'Cache-Control': 'max-age=60',
+          if (ranged) 'Content-Range': 'bytes 0-3/20'});
+    });
+    final pipeline = HttpPipeline()..use(CacheInterceptor(cache: MemoryHttpCache()));
+    final client = DioClient(config: DioConfig(baseUrl: base.toString()), pipeline: pipeline);
+    addTearDown(() => client.close(force: true));
+    final first = await client.get(Uri.parse('/range'), headers: {'Range': 'bytes=0-3'});
+    expect(first.statusCode, 206);
+    final full = await client.get(Uri.parse('/range'));
+    expect(full.statusCode, 200);
+    expect(full.fromCache, isFalse);
+    expect((await client.get(Uri.parse('/range'))).fromCache, isTrue);
+    final again = await client.get(Uri.parse('/range'), headers: {'range': 'bytes=0-3'});
+    expect(again.statusCode, 206);
+    expect(again.fromCache, isFalse);
+    expect((await client.get(Uri.parse('/range'))).statusCode, 200);
+    expect(requests, 3);
+  });
+
+  test('an unsolicited real 206 response is never cached as a full response', () async {
+    var requests = 0;
+    server.listen((request) async {
+      requests++;
+      await reply(request, requests == 1 ? 206 : 200, {'request': requests},
+        headers: {'Cache-Control': 'max-age=60'});
+    });
+    final pipeline = HttpPipeline()..use(CacheInterceptor(cache: MemoryHttpCache()));
+    final client = DioClient(config: DioConfig(baseUrl: base.toString()), pipeline: pipeline);
+    addTearDown(() => client.close(force: true));
+    expect((await client.get(Uri.parse('/partial'))).statusCode, 206);
+    expect((await client.get(Uri.parse('/partial'))).statusCode, 200);
+    expect((await client.get(Uri.parse('/partial'))).fromCache, isTrue);
+    expect(requests, 2);
+  });
+
+  test('real Dio + REST auth refreshes once and keeps private data out of cache', () async {
+    var refreshes = 0;
+    final privateHeaders = <String?>[];
+    server.listen((request) async {
+      await request.drain<void>();
+      switch (request.uri.path) {
+        case '/auth/login':
+          await reply(request, 200, {'access_token': 'old', 'refresh_token': 'refresh',
+            'expires_in': 3600, 'user': {'id': 'user-1'}});
+        case '/auth/refresh':
+          refreshes++;
+          await reply(request, 200, {'access_token': 'fresh', 'refresh_token': 'rotated',
+            'expires_in': 3600});
+        case '/private':
+          final header = request.headers.value('authorization');
+          privateHeaders.add(header);
+          await reply(request, header == 'Bearer fresh' ? 200 : 401, {'owner': 'user-1'},
+              headers: {'Cache-Control': 'max-age=60'});
+        default:
+          await reply(request, 404, {});
+      }
+    });
+    final pipeline = HttpPipeline();
+    final client = DioClient(config: DioConfig(baseUrl: base.toString()), pipeline: pipeline);
+    addTearDown(() => client.close(force: true));
+    final config = RestAuthConfig(baseUrl: base.toString());
+    final auth = RestAuth(client: client, config: config,
+        store: RestTokenStore(storage: InMemorySecureStorage()));
+    addTearDown(auth.dispose);
+    final policy = AuthRequestPolicy(config);
+    pipeline
+      ..use(AuthMiddleware(auth.tokenProvider, policy: policy), priority: 10)
+      ..use(UnauthorizedHandler(policy: policy, refresh: auth.refreshAccessToken,
+          signOut: auth.clearSession), priority: 11)
+      ..use(RetryMiddleware(delay: (_) async {}), priority: 20)
+      ..use(CacheInterceptor(cache: MemoryHttpCache()), priority: 30);
+    await auth.signIn(email: 'test@example.test', password: 'synthetic-password');
+    expect((await client.get(Uri.parse('/private'))).statusCode, 200);
+    expect((await client.get(Uri.parse('/private'))).fromCache, isFalse);
+    expect(refreshes, 1);
+    expect(privateHeaders, ['Bearer old', 'Bearer fresh', 'Bearer fresh']);
+  });
+
+  test('default Dio authorization is visible to cache policy on user switch', () async {
+    var requests = 0;
+    server.listen((request) async {
+      requests++;
+      await reply(request, 200, {'owner': request.headers.value('authorization') ?? ''},
+          headers: {'Cache-Control': 'max-age=60'});
+    });
+    final pipeline = HttpPipeline()..use(CacheInterceptor(cache: MemoryHttpCache()));
+    final client = DioClient(pipeline: pipeline, config: DioConfig(
+      baseUrl: base.toString(), defaultHeaders: {'Authorization': 'Bearer user-a'},
+    ));
+    addTearDown(() => client.close(force: true));
+    final first = await client.get(Uri.parse('/private'));
+    client.dio.options.headers['Authorization'] = 'Bearer user-b';
+    final second = await client.get(Uri.parse('/private'));
+    expect(first.data, {'owner': 'Bearer user-a'});
+    expect(second.data, {'owner': 'Bearer user-b'});
+    expect(second.fromCache, isFalse);
+    expect(requests, 2);
+  });
+
+  test('real 429 response honors Retry-After and retries once', () async {
+    var attempts = 0;
+    server.listen((request) async {
+      attempts++;
+      await reply(request, attempts == 1 ? 429 : 200, {'ok': true},
+          headers: {'Retry-After': '0'});
+    });
+    final waits = <Duration>[];
+    final pipeline = HttpPipeline()..use(RetryMiddleware(delay: (wait) async => waits.add(wait)));
+    final client = DioClient(config: DioConfig(baseUrl: base.toString()), pipeline: pipeline);
+    addTearDown(() => client.close(force: true));
+    expect((await client.get(Uri.parse('/limited'))).statusCode, 200);
+    expect(attempts, 2);
+    expect(waits, [Duration.zero]);
+  });
+
+  test('cancelling during a real response retry wait prevents another request', () async {
+    var attempts = 0;
+    server.listen((request) async {
+      attempts++;
+      await reply(request, 503, {}, headers: {'Retry-After': '3600'});
+    });
+    final waiting = Completer<void>();
+    final pipeline = HttpPipeline()..use(RetryMiddleware(events: RetryEvents(
+      onRetry: (_) { if (!waiting.isCompleted) waiting.complete(); },
+    )));
+    final client = DioClient(config: DioConfig(baseUrl: base.toString()), pipeline: pipeline);
+    addTearDown(() => client.close(force: true));
+    final token = HttpCancelToken();
+    final result = client.get(Uri.parse('/slow'), cancelToken: token);
+    final rejected = expectLater(result, throwsA(isA<Failure>()
+        .having((failure) => failure.code, 'code', FailureCode.cancelled)));
+    await waiting.future.timeout(const Duration(seconds: 5));
+    token.cancel();
+    await rejected.timeout(const Duration(seconds: 1));
+    expect(attempts, 1);
+  });
+}

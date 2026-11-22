@@ -7,7 +7,9 @@ import 'device_deep_links.dart';
 
 /// Registers DeepLinks, its config, and the outgoing link builder.
 final class DeepLinkModule extends KilnModule {
-  const DeepLinkModule();
+  DeepLinkModule();
+
+  DeviceDeepLinks? _links;
 
   @override
   String get id => 'deep_link';
@@ -23,6 +25,7 @@ final class DeepLinkModule extends KilnModule {
       config: config,
       clock: registry.readOrNull<Clock>(),
     );
+    _links = links;
 
     registry
       ..registerSingleton<DeepLinkConfig>(config)
@@ -37,6 +40,13 @@ final class DeepLinkModule extends KilnModule {
       return links.probeSupport();
     }
     return const SupportInfo.supported();
+  }
+
+  @override
+  Future<void> dispose() async {
+    final links = _links;
+    _links = null;
+    await links?.dispose();
   }
 
   @override

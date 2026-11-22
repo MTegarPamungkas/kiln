@@ -8,11 +8,16 @@ final class LinkAllowlist {
         for (final host in config.allowedHosts)
           if (host.trim().isNotEmpty) host.trim().toLowerCase(),
       },
+      _customHosts = <String>{
+        for (final host in config.customSchemeHosts)
+          if (host.trim().isNotEmpty) host.trim().toLowerCase(),
+      },
       _prefixes = _tidyPrefixes(config.pathPrefixes);
 
   final DeepLinkConfig config;
   final String _scheme;
   final Set<String> _hosts;
+  final Set<String> _customHosts;
   final List<String> _prefixes;
 
   /// Whether `https` links can pass at all.
@@ -24,11 +29,19 @@ final class LinkAllowlist {
   /// Whether [link] may reach the router.
   bool allows(Uri link) {
     final scheme = link.scheme.toLowerCase();
-    if (scheme.isEmpty) {
+    if (scheme.isEmpty ||
+        const {'http', 'file', 'javascript', 'data', 'about', 'mailto', 'tel', 'sms'}
+            .contains(scheme) ||
+        link.userInfo.isNotEmpty || _unsafePath(link.path)) {
       return false;
     }
-    if (scheme == _scheme) {
-      return true;
+    if (scheme == _scheme && scheme != 'https') {
+      if ((_customHosts.isNotEmpty && !_customHosts.contains(link.host.toLowerCase())) ||
+          link.hasPort || (!link.hasAuthority && !link.path.startsWith('/'))) {
+        return false;
+      }
+      final path = link.host.isEmpty ? link.path : '/${link.host}${link.path}';
+      return _matchesPath(Uri(path: path).normalizePath().path);
     }
     if (scheme != 'https') {
       return false;
@@ -36,7 +49,19 @@ final class LinkAllowlist {
     if (!_hosts.contains(link.host.toLowerCase())) {
       return false;
     }
-    return _matchesPath(link.path);
+    return _matchesPath(link.normalizePath().path);
+  }
+
+  static bool _unsafePath(String path) {
+    try {
+      final decoded = Uri.decodeComponent(path);
+      return decoded.contains('\\') ||
+          decoded.codeUnits.any((unit) => unit < 32) ||
+          RegExp(r'%2e|%2f|%5c', caseSensitive: false).hasMatch(decoded) ||
+          decoded.split('/').any((segment) => segment == '.' || segment == '..');
+    } on FormatException {
+      return true;
+    }
   }
 
   bool _matchesPath(String path) {

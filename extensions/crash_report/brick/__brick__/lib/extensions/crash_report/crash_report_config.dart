@@ -6,7 +6,7 @@ import 'package:kiln_core/kiln_core.dart';
 /// in a log line or a reported event; [toString] masks it on purpose.
 final class CrashReportConfig {
   CrashReportConfig({
-    this.dsn = '{{dsn}}',
+    this.dsn = {{#dsn_dart}}{{{dsn_dart}}}{{/dsn_dart}}{{^dsn_dart}}'{{dsn}}'{{/dsn_dart}},
     this.release = '{{release}}',
     this.environment,
     this.sampleRate = 1.0,

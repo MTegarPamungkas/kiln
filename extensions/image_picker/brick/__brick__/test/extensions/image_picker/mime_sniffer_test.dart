@@ -8,29 +8,14 @@ void main() {
 
   test('detects png', () {
     expect(
-      MimeSniffer.detect(<int>[
-        0x89,
-        0x50,
-        0x4E,
-        0x47,
-        0x0D,
-        0x0A,
-        0x1A,
-        0x0A,
-      ]),
+      MimeSniffer.detect(<int>[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
       'image/png',
     );
   });
 
   test('detects gif', () {
-    expect(
-      MimeSniffer.detect('GIF89a'.codeUnits),
-      'image/gif',
-    );
-    expect(
-      MimeSniffer.detect('GIF87a'.codeUnits),
-      'image/gif',
-    );
+    expect(MimeSniffer.detect('GIF89a'.codeUnits), 'image/gif');
+    expect(MimeSniffer.detect('GIF87a'.codeUnits), 'image/gif');
   });
 
   test('detects webp', () {

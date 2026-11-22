@@ -40,4 +40,12 @@ void main() {
     expect(config.breadcrumbSinkEnabled, isFalse);
     expect(config.levelFor(AppFlavor.development), LogLevel.info);
   });
+
+  test('rejects a non-positive record cap', () {
+    const config = LoggerConfig(maxRecordTextLength: 0);
+
+    final failure = config.validate();
+
+    expect(failure?.code, FailureCode.configurationInvalid);
+  });
 }

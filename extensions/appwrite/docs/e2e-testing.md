@@ -1,10 +1,101 @@
 # Live e2e testing against Appwrite
 
+## Android and web service probes
+
+With `KILN_APPWRITE_ENDPOINT`, `KILN_APPWRITE_PROJECT` and
+`KILN_APPWRITE_API_KEY` set in the host environment, run from the repository:
+
+```powershell
+node tool/e2e/run_platform_probe.mjs --services --android --web
+$env:KILN_APPWRITE_PUSH_ENDPOINT = 'mqtts://push.example.com:8883'
+node tool/e2e/run_platform_probe.mjs --push --android
+```
+
+Start the Android emulator first. Service mode creates an isolated temporary
+database, tables, bucket and user. Push mode creates a temporary user and
+Appwrite messaging provider and sends only to that user. The helper backend
+uses memory. The API key stays on the host; credentials are not rendered into
+client source. Reports and credential-free ownership journals are written under
+`.dart_tool/`; inspect cleanup errors before repeating an interrupted run.
+
+Native push requires a reachable TLS MQTT broker with a valid certificate.
+Opening a firewall port alone does not start the broker or configure its TLS.
+This extension does not support browser push. Background/tray/tap acceptance
+requires separate device checks; the automated push mode checks foreground
+delivery and logout only. The complete coordinator still needs a clean-fixture
+end-to-end rerun; current device evidence used its fixtures and host helper.
+
+Google OAuth requires an enabled Google provider with its client ID/secret and
+approved callback URLs configured in Appwrite and Google. Service and push
+probes do not establish successful OAuth login.
+
+For minimal Android/web auth, router and Dio functional checks without an
+additional database, use `node tool/e2e/run_platform_probe.mjs` from the Kiln
+repository with the endpoint/project/API-key environment configured below.
+It validates auth against Appwrite and CRUD against a loopback memory backend;
+it does not run the Appwrite database/storage contracts. Test credentials are
+supplied at runtime and the server key stays in the host coordinator.
+
 The offline suites exercise every flow against in-memory fakes. When you own an
 Appwrite server — Cloud or self-hosted — the same `kiln_testing` contract
 suites can run against the real thing. The live suite renders the brick into a
 fixture app and drives `AppwriteAuth`, `AppwriteRemoteDatabase`,
 `AppwriteFileStorage`, the token provider, and realtime there.
+
+## Auth-only testing on an existing project
+
+Set `KILN_APPWRITE_ENDPOINT`, `KILN_APPWRITE_PROJECT`, and
+`KILN_APPWRITE_API_KEY` in the process environment, then run:
+
+```bash
+dart run tool/appwrite_e2e.dart auth
+```
+
+This mode creates one temporary user with a random password, renders an
+isolated fixture under `.dart_tool/`, and runs six live checks: initial signed-out
+state, valid login, invalid credentials, logout, JWT creation, and persistence
+across adapter restarts. The final check also verifies that the old session is
+rejected by the server after logout.
+
+The temporary user is deleted in `finally`. This command does not invoke the
+broader cleanup used by `provision`, `run`, or `clean`; it does not create or
+change databases, buckets, or existing users. The API key needs permissions to
+create and delete users and is removed from the Flutter test process environment.
+The password is generated in memory, and credentials are not written to the
+fixture. A credential-free summary is saved to
+`.dart_tool/appwrite_auth_result.json`, including the test count and cleanup result.
+
+Auth-only mode deliberately excludes account registration, database, storage,
+realtime, push, and deployed-function tests. Use the full suite below only with
+dedicated test resources: its cleanup removes matching test users and all rows
+and files in the configured test tables and bucket.
+
+## Isolated service testing on an existing project
+
+With the same endpoint, project, and API key environment variables, run:
+
+```bash
+dart run tool/appwrite_e2e.dart services
+```
+
+This creates a unique temporary user, database, tables/indexes, and bucket.
+Nine live checks cover database CRUD/query/update/delete/missing reads,
+realtime updates/deletion/initial missing row, storage round trips/progress,
+and push target registration/update/removal. All resources created by this run
+are deleted in `finally`; cleanup continues if deleting one resource fails.
+The report `.dart_tool/appwrite_services_result.json` lists any cleanup still
+pending. Existing databases, buckets, and users are not modified. The key needs
+the corresponding users, database/schema, storage, and cleanup scopes.
+
+The child Flutter process does not receive the server API key. This mode does
+not verify device notification delivery, OAuth, recovery mail, or functions.
+Prefer it to the broad cleanup commands below when using an existing project.
+
+`dart run tool/appwrite_e2e.dart render` prepares an offline test fixture at
+`.dart_tool/appwrite_platform` using only endpoint/project settings. Run
+selected browser-compatible tests there with `flutter test --platform chrome`.
+The live suite and native session-lifecycle tests import `dart:io`; do not run
+the entire test directory in a browser.
 
 ## 1. Prepare the environment
 

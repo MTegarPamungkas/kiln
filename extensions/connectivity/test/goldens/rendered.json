@@ -6,8 +6,8 @@
     "lib/extensions/connectivity/connectivity_gateway.dart": "116dc207a6502f91eb3bc15d2b3c4f331aa1f096323aa787b8209337e4da3fb5",
     "lib/extensions/connectivity/connectivity_module.dart": "6763bf20ab93c2ebbbaac990ae604d429fd9c15ef47857d12adc41738ee68999",
     "lib/extensions/connectivity/connectivity_support.dart": "1792e12ced2a67e42f0ea8d27d604b9f76faa64be656ab98198eebd645732aac",
-    "lib/extensions/connectivity/device_network_monitor.dart": "ae3ef6ee6cb34c1c0c620a6debd38d08113e75daf94cb6f7ee606407a74bea75",
-    "lib/extensions/connectivity/gate_connectivity.dart": "d2810d628352d8586fd2a50f9c2cdbbac9e2e4d1ba132b53791b5164a65fe48c",
+    "lib/extensions/connectivity/device_network_monitor.dart": "5b05173fe78d3545b8734e95d0dc0978d874acd8ba2f2b3a185bd0509096fa63",
+    "lib/extensions/connectivity/gate_connectivity.dart": "fd5f0ec4ad672444c5e86013c6e093b52ebf352e71a4c68b76ca5e4bc2145fda",
     "lib/extensions/connectivity/offline_guard_middleware.dart": "7c14b6636a12290e22e9483bece2f41e09dcc240053c33a129fd0f2bdd5b1dd1",
     "lib/extensions/connectivity/reachability_probe.dart": "e50b4749840e51b7db4693ab34e8b97ccfa049f5d4fd85ecb273f6288065be8a",
     "lib/extensions/connectivity/reconnect_trigger.dart": "2ccda1203c56108a61ec9b409632dd93767f67d339ece0ae0aae5fc6d172f7b3",
@@ -17,12 +17,12 @@
     "test/extensions/connectivity/connectivity_failure_mapper_test.dart": "de913c46b5e26dcd3e84106b638e20e43a8659d089035545144a754738faeff7",
     "test/extensions/connectivity/connectivity_module_test.dart": "b790bf460fd4c2a61224a23d8cc04dedff69a1878772b710dd5857c97cf375e9",
     "test/extensions/connectivity/connectivity_support_test.dart": "ee37c02d2fe18adc1a849567e3eec17cea6bd424a6d65fdc161ac54120846a79",
-    "test/extensions/connectivity/device_network_monitor_test.dart": "2599d78f757aca903473feb544fc52e01344f9fece3a04b5a809de718977c597",
-    "test/extensions/connectivity/gate_connectivity_test.dart": "87471e89ed10524ecaa5084094b88edf185f3a475bdf0aa510c36d4de2763e8d",
+    "test/extensions/connectivity/device_network_monitor_test.dart": "0471b02a81fb8b9ec0dcfc025e372ac0933764bf4f2a430015c5c704338748d3",
+    "test/extensions/connectivity/gate_connectivity_test.dart": "da6e936860f912df1a69e8c317aa7f45946ecf0861fc2d1f9e69bb2d7f5a1ca5",
     "test/extensions/connectivity/offline_guard_middleware_test.dart": "03373d7b51f91ce5ab690f7184d8254cfee95c9ea5d2cf772410c9422205262f",
     "test/extensions/connectivity/reachability_probe_test.dart": "2fc9b7dec93d6aebb9d0d51623459bf2e3c766200b29f19c8a5676dbbe83f7af",
     "test/extensions/connectivity/reconnect_trigger_test.dart": "d48474b25d3683b3dadaa4b24d7ed5db10e2646510c4c2bfc7a08744087c2556",
     "test/extensions/connectivity/status_stabilizer_test.dart": "a7fdb42e50936a9f2f20290d616e3bc42adfc38fd80e1d638c0bac30793daef3",
-    "test/extensions/connectivity/test_support.dart": "40918fff2af1316fc46d56a3058d177adda60e34102914050016a139ab76136c"
+    "test/extensions/connectivity/test_support.dart": "628f2598c19e0fe26d95bc4eacf93e0fd695e280dc46be4fa907dbecdb2d135b"
   }
 }

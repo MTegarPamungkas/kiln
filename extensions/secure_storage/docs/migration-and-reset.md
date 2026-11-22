@@ -24,8 +24,11 @@ rename makes existing secrets unreachable.
 
 iOS Keychain items can survive an uninstall. `FirstRunWipe` deletes leftover
 entries once, on the first launch after install, guarded by a marker key in the
-preference store. Run it only on iOS during bootstrap; Android and web do not
-need it.
+preference store. It removes only keys that start with the configured
+`SecureStorageConfig.prefix` and uses the same platform options as the storage
+gateway, so entries written by another app or access group survive. The marker
+is written after cleanup succeeds; an interrupted cleanup runs again on the next
+launch. Run it only on iOS during bootstrap; Android and web do not need it.
 
 ## Android restore and lock-screen changes
 

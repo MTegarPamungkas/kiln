@@ -36,6 +36,13 @@ not retried.
   request is sent at most three times.
 - The budget defaults to 10 retries per path per rolling minute. A path that
   exhausts it is returned to the caller without another retry.
+- `totalBudget` (optional) caps one request's whole retry sequence in
+  wall-clock time: a wait is clipped to the time left, and no attempt starts
+  once the budget is spent, so a stuck endpoint cannot keep a call alive for
+  `maxAttempts x maxDelay`. It is off by default.
+- `HttpRequest.deadline` is also honoured and combines with `totalBudget`: the
+  stricter bound wins. A deadline that passes before an attempt starts (or while
+  waiting) throws `Failure(network.deadline_exceeded)` instead of sending again.
 - Backoff starts at `initialDelay` (250 ms), doubles, caps at `maxDelay` (8 s),
   and applies 0.8–1.2 jitter when enabled.
 - The retry attempt number starts at 1; the first delay uses the initial delay.

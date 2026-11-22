@@ -89,6 +89,19 @@ void main() {
       expect(_backupDirectories(project), isEmpty);
     });
 
+    test('rolls back saved answers with the rest of the transaction', () async {
+      await addDio();
+      final config = projectFile('kiln.yaml');
+      expect(config.readAsStringSync(), contains('base_url'));
+
+      final runner = buildTestRunner(cwd: project, captured: captured);
+      final code = await runner.run(<String>['rollback']);
+
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      expect(config.readAsStringSync(), isNot(contains('base_url')));
+      expect(config.readAsStringSync(), contains('extensions: {}'));
+    });
+
     test('--list --json reports the committed transaction id', () async {
       await addDio();
 

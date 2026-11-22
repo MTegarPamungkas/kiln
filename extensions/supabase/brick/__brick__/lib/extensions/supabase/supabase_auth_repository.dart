@@ -27,6 +27,10 @@ final class SupabaseAuthRepository implements AuthRepository {
       StreamController<AuthSession?>.broadcast(sync: true);
   StreamSubscription<SupabaseSession?>? _subscription;
   SupabaseSession? _session;
+  int _generation = 0;
+  bool _disposed = false;
+  bool _locallySignedOut = false;
+  Future<void> _commits = Future<void>.value();
 
   @override
   AuthSession? get currentSession {
@@ -46,9 +50,9 @@ final class SupabaseAuthRepository implements AuthRepository {
   /// ready.
   Future<AuthSession?> restore() async {
     _start();
+    final generation = ++_generation;
     final session = await _call(_gateway.restoreSession);
-    _apply(session);
-    return currentSession;
+    return _commit(session, generation);
   }
 
   @override
@@ -57,11 +61,12 @@ final class SupabaseAuthRepository implements AuthRepository {
     required String password,
   }) async {
     _start();
+    final generation = ++_generation;
     final session = await _call(
       () => _gateway.signInWithPassword(email: email, password: password),
     );
-    _apply(session);
-    return _toAuthSession(session);
+    final committed = await _commit(session, generation);
+    return committed!;
   }
 
   @override
@@ -71,6 +76,7 @@ final class SupabaseAuthRepository implements AuthRepository {
     String? displayName,
   }) async {
     _start();
+    final generation = ++_generation;
     final session = await _call(
       () => _gateway.signUp(
         email: email,
@@ -86,27 +92,50 @@ final class SupabaseAuthRepository implements AuthRepository {
         kind: FailureKind.authentication,
       );
     }
-    _apply(session);
-    return _toAuthSession(session);
+    final committed = await _commit(session, generation);
+    return committed!;
   }
 
   @override
   Future<void> signOut() async {
     _start();
-    await _call(_gateway.signOut);
-    _apply(null);
+    ++_generation;
+    _locallySignedOut = true;
+    await _serialize(() async {
+      _apply(null);
+    });
+    try {
+      await _call(_gateway.signOut);
+    } on Object {
+      // Signing out must succeed offline; the adapter already cleared its
+      // local session and ignores stale SDK events from the failed attempt.
+    }
   }
 
   /// Cancels the session subscription and closes the stream.
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _subscription?.cancel();
     _subscription = null;
     await _changes.close();
   }
 
   void _start() {
+    if (_disposed) {
+      return;
+    }
     _subscription ??= _gateway.authStateChanges.listen(
-      _apply,
+      (session) {
+        // A failed remote sign-out must not resurrect the old user through a
+        // delayed SDK event.
+        if (_locallySignedOut && session != null) {
+          return;
+        }
+        _apply(session);
+      },
       onError: (Object error, StackTrace stackTrace) {
         // Keep the last known session; a failed refresh is reported by the
         // next request that uses the token.
@@ -114,8 +143,33 @@ final class SupabaseAuthRepository implements AuthRepository {
     );
   }
 
+  Future<AuthSession?> _commit(SupabaseSession? session, int generation) {
+    return _serialize(() async {
+      if (_disposed || generation != _generation) {
+        throw const Failure(
+          code: FailureCode.authCancelled,
+          message: 'The session changed while the request was in flight.',
+          kind: FailureKind.authentication,
+        );
+      }
+      _locallySignedOut = false;
+      _apply(session);
+      return currentSession;
+    });
+  }
+
+  /// Runs session writes in order so late results cannot interleave.
+  Future<T> _serialize<T>(Future<T> Function() action) {
+    final result = _commits.then((_) => action());
+    _commits = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
   void _apply(SupabaseSession? session) {
-    if (_session == session) {
+    if (_disposed || _session == session) {
       return;
     }
     _session = session;
@@ -153,8 +207,18 @@ final class SupabaseAuthRepository implements AuthRepository {
 
 /// Source of an ID token from a social SDK such as Google Sign-In or Apple.
 ///
-/// Null means the user cancelled the account picker.
+/// Null means the user cancelled the account picker. Prefer
+/// [SupabaseCredentialSource], which also carries the raw nonce and
+/// authorization code that Apple exchanges need.
 typedef SupabaseIdTokenSource = Future<String?> Function(
+  SocialProvider provider,
+);
+
+/// Source of a full native credential for the Supabase ID-token exchange.
+///
+/// The credential must use [SocialTokenAudience.provider]; its [rawNonce] and
+/// [authorizationCode] are forwarded to Supabase when present.
+typedef SupabaseCredentialSource = Future<SocialCredential?> Function(
   SocialProvider provider,
 );
 
@@ -169,16 +233,49 @@ final class SupabaseSocialAuth implements SocialAuth {
     required SupabaseGateway gateway,
     required SupabaseConfig config,
     SupabaseIdTokenSource? idTokenSource,
+    SupabaseCredentialSource? credentialSource,
   }) : _gateway = gateway,
        _config = config,
-       _idTokenSource = idTokenSource;
+       _idTokenSource = idTokenSource,
+       _credentialSource = credentialSource;
 
   final SupabaseGateway _gateway;
   final SupabaseConfig _config;
   final SupabaseIdTokenSource? _idTokenSource;
+  final SupabaseCredentialSource? _credentialSource;
 
   @override
   Future<SocialCredential?> signIn(SocialProvider provider) async {
+    final credentialSource = _credentialSource;
+    if (credentialSource != null) {
+      final credential = await _call(() => credentialSource(provider));
+      if (credential == null) {
+        return null;
+      }
+      if (credential.audience != SocialTokenAudience.provider) {
+        throw const Failure(
+          code: FailureCode.validationUnsupportedValue,
+          message:
+              'The Supabase ID-token exchange requires provider credentials, '
+              'not a backend session.',
+          kind: FailureKind.validation,
+        );
+      }
+      final session = await _call(
+        () => _gateway.signInWithIdToken(
+          provider: provider,
+          idToken: credential.idToken,
+          accessToken: credential.accessToken,
+          nonce: credential.rawNonce,
+        ),
+      );
+      return credential.copyWith(
+        backendSessionToken: session.accessToken,
+        email: credential.email ?? session.email,
+        displayName: credential.displayName ?? session.displayName,
+      );
+    }
+
     final source = _idTokenSource;
     if (source != null) {
       final idToken = await _call(() => source(provider));
@@ -191,7 +288,7 @@ final class SupabaseSocialAuth implements SocialAuth {
       return SocialCredential(
         provider: provider,
         idToken: idToken,
-        accessToken: session.accessToken,
+        backendSessionToken: session.accessToken,
         email: session.email,
         displayName: session.displayName,
       );
@@ -205,6 +302,8 @@ final class SupabaseSocialAuth implements SocialAuth {
         kind: FailureKind.configuration,
       );
     }
+    // A session that existed before this flow must not count as its result.
+    final before = _gateway.currentSession;
     final launched = await _call(
       () =>
           _gateway.signInWithOAuth(provider: provider, redirectTo: redirectTo),
@@ -212,17 +311,18 @@ final class SupabaseSocialAuth implements SocialAuth {
     if (!launched) {
       return null;
     }
-    final session = _gateway.currentSession ?? await _waitForSession();
+    final session = await _waitForNewSession(before);
     final token = session?.accessToken;
     if (session == null || token == null || token.isEmpty) {
       return null;
     }
-    // The provider verifies the identity on the Supabase server, so the token
-    // available to callers is the access token of the resulting OAuth session.
+    // The provider verified the identity on the Supabase server; the token
+    // available here is the Supabase session, not a provider identity token.
     return SocialCredential(
       provider: provider,
       idToken: token,
-      accessToken: token,
+      audience: SocialTokenAudience.backend,
+      backendSessionToken: token,
       email: session.email,
       displayName: session.displayName,
     );
@@ -231,14 +331,31 @@ final class SupabaseSocialAuth implements SocialAuth {
   @override
   Future<void> signOut() => _call(_gateway.signOut);
 
-  Future<SupabaseSession?> _waitForSession() async {
+  Future<SupabaseSession?> _waitForNewSession(SupabaseSession? before) async {
+    final current = _gateway.currentSession;
+    if (current != null && !_sameSession(before, current)) {
+      return current;
+    }
+    final completer = Completer<SupabaseSession?>();
+    final subscription = _gateway.authStateChanges.listen(
+      (session) {
+        if (session != null &&
+            !completer.isCompleted &&
+            !_sameSession(before, session)) {
+          completer.complete(session);
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (!completer.isCompleted) {
+          completer.completeError(error, stackTrace);
+        }
+      },
+    );
     try {
-      return await _gateway.authStateChanges
-          .where((session) => session != null)
-          .first
-          .timeout(_config.authTimeout);
-    } on TimeoutException {
-      return null;
+      return await completer.future.timeout(
+        _config.authTimeout,
+        onTimeout: () => null,
+      );
     } on Object catch (error, stackTrace) {
       throw mapSupabaseError(
         error,
@@ -246,7 +363,18 @@ final class SupabaseSocialAuth implements SocialAuth {
         fallbackCode: FailureCode.authUnauthorized,
         fallbackKind: FailureKind.authentication,
       );
+    } finally {
+      await subscription.cancel();
     }
+  }
+
+  bool _sameSession(SupabaseSession? before, SupabaseSession session) {
+    final previous = before;
+    if (previous == null) {
+      return false;
+    }
+    return previous.userId == session.userId &&
+        previous.accessToken == session.accessToken;
   }
 
   Future<T> _call<T>(Future<T> Function() action) async {

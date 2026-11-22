@@ -11,7 +11,11 @@ import 'retry_settings.dart';
 /// When the application registers a [RetryEvents] before bootstrap, the module
 /// wires it into the middleware so retries and give-ups can be observed.
 final class HttpRetryModule extends KilnModule {
-  const HttpRetryModule();
+  const HttpRetryModule({this.settings = HttpRetrySettings.defaults});
+
+  /// Retry settings; override to add a [HttpRetrySettings.totalBudget] or a
+  /// different attempt policy.
+  final HttpRetrySettings settings;
 
   @override
   String get id => 'http_retry';
@@ -21,18 +25,18 @@ final class HttpRetryModule extends KilnModule {
 
   @override
   void register(Registry registry) {
-    const settings = HttpRetrySettings.defaults;
     final pipeline = registry.read<HttpPipeline>();
     pipeline.use(
       RetryMiddleware(
         settings: settings,
         budget: RetryBudget(clock: registry.readOrNull<Clock>()),
         events: registry.readOrNull<RetryEvents>(),
+        clock: registry.readOrNull<Clock>() ?? const SystemClock(),
       ),
       priority: 20,
     );
     registry.registerSingleton<HttpRetrySupport>(
-      const HttpRetrySupport(settings: settings),
+      HttpRetrySupport(settings: settings),
     );
   }
 

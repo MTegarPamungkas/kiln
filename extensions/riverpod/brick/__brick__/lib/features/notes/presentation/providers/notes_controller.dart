@@ -12,17 +12,44 @@ import 'package:{{app_name}}/features/notes/presentation/providers/notes_provide
 /// the first snapshot and every later change, so the stream stays the single
 /// source of truth.
 final class NotesController extends AsyncNotifier<List<Note>> {
+  bool _disposed = false;
+
   @override
   Future<List<Note>> build() async {
+    _disposed = false;
     final first = Completer<List<Note>>();
-    final subscription = ref.watch(watchNotesProvider).call().listen((items) {
-      if (!first.isCompleted) {
-        first.complete(items);
-        return;
-      }
-      _push(items);
+    final subscription = ref.watch(watchNotesProvider).call().listen(
+      (items) {
+        if (!first.isCompleted) {
+          first.complete(items);
+          return;
+        }
+        _push(items);
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        final failure = _failure(error, stackTrace);
+        if (!first.isCompleted) {
+          first.completeError(failure, stackTrace);
+          return;
+        }
+        _pushError(failure, stackTrace);
+      },
+      onDone: () {
+        if (!first.isCompleted) {
+          first.completeError(
+            const Failure(
+              code: FailureCode.unavailable,
+              message: 'The notes stream ended before its first value.',
+              kind: FailureKind.unavailable,
+            ),
+          );
+        }
+      },
+    );
+    ref.onDispose(() {
+      _disposed = true;
+      subscription.cancel();
     });
-    ref.onDispose(subscription.cancel);
     return first.future;
   }
 
@@ -39,13 +66,29 @@ final class NotesController extends AsyncNotifier<List<Note>> {
       _report(() => ref.read(removeNoteProvider).call(id));
 
   void _push(List<Note> items) {
+    if (_disposed) {
+      return;
+    }
     state = AsyncData<List<Note>>(items);
   }
+
+  void _pushError(Failure failure, StackTrace stackTrace) {
+    if (_disposed) {
+      return;
+    }
+    state = AsyncError<List<Note>>(failure, stackTrace);
+  }
+
+  Failure _failure(Object error, StackTrace stackTrace) =>
+      error is Failure ? error : Failure.from(error, stackTrace: stackTrace);
 
   /// A successful mutation needs no assignment: the watched stream already
   /// carries the new list and replaces the state.
   Future<void> _report(Future<Result<Object?>> Function() action) async {
     final result = await action();
+    if (_disposed) {
+      return;
+    }
     final failure = result.failureOrNull;
     if (failure != null) {
       state = AsyncError<List<Note>>(failure, StackTrace.current);
@@ -53,5 +96,10 @@ final class NotesController extends AsyncNotifier<List<Note>> {
   }
 }
 
+/// Automatic retries would keep a broken source in a loading state; the screen
+/// surfaces [AsyncError] and offers an explicit Retry action instead.
 final notesControllerProvider =
-    AsyncNotifierProvider<NotesController, List<Note>>(NotesController.new);
+    AsyncNotifierProvider<NotesController, List<Note>>(
+      NotesController.new,
+      retry: (_, _) => null,
+    );

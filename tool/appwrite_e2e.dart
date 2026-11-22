@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
@@ -34,6 +35,17 @@ Future<void> main(List<String> args) async {
       await _run();
     case 'clean':
       await _provision(cleanOnly: true);
+    case 'auth':
+      await _runAuth();
+    case 'services':
+      await _runAuth(services: true);
+    case 'render':
+      await _renderFixture(
+        Directory(
+          p.join(Directory.current.path, '.dart_tool', 'appwrite_platform'),
+        ),
+        Directory.current.path,
+      );
     case 'help':
     default:
       _printUsage();
@@ -42,7 +54,9 @@ Future<void> main(List<String> args) async {
 }
 
 void _printUsage() {
-  stderr.writeln('Usage: dart run tool/appwrite_e2e.dart <provision|run|clean>');
+  stderr.writeln(
+    'Usage: dart run tool/appwrite_e2e.dart <auth|services|render|provision|run|clean>',
+  );
   stderr.writeln();
   stderr.writeln('Environment:');
   for (final line in const <String>[
@@ -59,7 +73,192 @@ void _printUsage() {
   }
 }
 
-Map<String, String> get _environment => Platform.environment;
+/// Runs only auth against an existing project, using one owned temporary user.
+/// Does not invoke the broad database/storage/user cleanup used by `run`.
+Future<void> _runAuth({bool services = false}) async {
+  _requireEnv('KILN_APPWRITE_API_KEY');
+  final version = await _send('GET', '/health/version', apiKey: '');
+  stdout.writeln(
+    'Isolated ${services ? 'services' : 'auth'} live test: Appwrite ${version['version']} (project $_projectId).',
+  );
+  final runId = DateTime.now().microsecondsSinceEpoch.toRadixString(36);
+  final userId = 'kilnauth_$runId';
+  final email = 'kiln-auth-$runId@kiln.test';
+  final random = Random.secure();
+  final password =
+      'KilnAuth9!${base64Url.encode(List<int>.generate(32, (_) => random.nextInt(256)))}';
+  var created = false;
+  var databaseCreated = false;
+  var bucketCreated = false;
+  final cleanupFailures = <String>[];
+  if (services) {
+    _overrides['KILN_APPWRITE_DATABASE'] = 'kilntest_$runId';
+    _overrides['KILN_APPWRITE_BUCKET'] = 'kilntest_$runId';
+  }
+  var code = 1;
+  var passedTests = 0;
+  var cleanedUp = false;
+  var phase = 'provision';
+  String? errorKind;
+  int? pubGetExitCode;
+  try {
+    await _send(
+      'POST',
+      '/users',
+      body: <String, Object?>{
+        'userId': userId,
+        'email': email,
+        'password': password,
+        'name': 'Kiln temporary auth test',
+      },
+    );
+    created = true;
+    if (services) {
+      // POST first: a collision fails instead of taking ownership of existing data.
+      await _send(
+        'POST',
+        '/databases',
+        body: {'databaseId': _databaseId, 'name': 'Kiln isolated service test'},
+      );
+      databaseCreated = true;
+      await _ensureTables();
+      await _send(
+        'POST',
+        '/storage/buckets',
+        body: {
+          'bucketId': _bucketId,
+          'name': 'Kiln isolated service test',
+          'permissions': [
+            'create("users")',
+            'read("users")',
+            'update("users")',
+            'delete("users")',
+          ],
+          'fileSecurity': false,
+          'enabled': true,
+        },
+      );
+      bucketCreated = true;
+    }
+    stdout.writeln(
+      'Created an isolated temporary auth user. Existing resources are unchanged.',
+    );
+    final root = Directory.current.path;
+    final fixture = Directory(
+      p.join(
+        root,
+        '.dart_tool',
+        'appwrite_${services ? 'services' : 'auth'}_$runId',
+      ),
+    );
+    phase = 'render';
+    await _renderFixture(fixture, root);
+    final testEnvironment = <String, String>{
+      ..._environment,
+      'KILN_APPWRITE_E2E': '1',
+      'KILN_APPWRITE_TEST_EMAIL': email,
+      'KILN_APPWRITE_TEST_PASSWORD': password,
+    }..remove('KILN_APPWRITE_API_KEY');
+    phase = 'pub_get';
+    final pub = await Process.run(
+      'flutter',
+      const ['pub', 'get'],
+      workingDirectory: fixture.path,
+      runInShell: Platform.isWindows,
+      environment: testEnvironment,
+    );
+    pubGetExitCode = pub.exitCode;
+    if (pub.exitCode != 0) {
+      stderr.write(pub.stdout);
+      stderr.write(pub.stderr);
+      code = pub.exitCode;
+    } else {
+      phase = 'tests';
+      final test = await Process.run(
+        'flutter',
+        [
+          'test',
+          'test/extensions/appwrite/appwrite_e2e_test.dart',
+          '--name',
+          services
+              ? '(AppwriteRemoteDatabase against a live server|AppwriteFileStorage against a live server|push target register|watch emits null)'
+              : '^(?!.*signUp).*(AppwriteAuth against a live server contract|token provider mints a short-lived JWT|session survives a restart)',
+          '--reporter',
+          'expanded',
+        ],
+        workingDirectory: fixture.path,
+        runInShell: Platform.isWindows,
+        environment: testEnvironment,
+      );
+      // Account details and credentials are generated for this run only.
+      final output = '${test.stdout}${test.stderr}'
+          .replaceAll(password, '[redacted]')
+          .replaceAll(email, '[temporary-user]');
+      stdout.write(output);
+      code = test.exitCode;
+      final counts = RegExp(r'\+(\d+)').allMatches(output).toList();
+      if (counts.isNotEmpty) passedTests = int.parse(counts.last.group(1)!);
+      if (code == 0 && passedTests < (services ? 9 : 6)) code = 1;
+    }
+  } catch (error) {
+    errorKind = error.runtimeType.toString();
+    rethrow;
+  } finally {
+    try {
+      final owned = <String>[
+        if (bucketCreated) '/storage/buckets/$_bucketId',
+        if (databaseCreated) '/databases/$_databaseId',
+        if (created) '/users/$userId',
+      ];
+      for (final path in owned) {
+        try {
+          await _send('DELETE', path);
+        } on Object {
+          cleanupFailures.add(path);
+        }
+      }
+      cleanedUp = cleanupFailures.isEmpty;
+      if (!cleanedUp) code = 1;
+      stdout.writeln(
+        cleanedUp
+            ? 'Deleted all resources owned by this run.'
+            : 'Cleanup incomplete; see the result report.',
+      );
+    } finally {
+      final report = File(
+        p.join(
+          Directory.current.path,
+          '.dart_tool',
+          'appwrite_${services ? 'services' : 'auth'}_result.json',
+        ),
+      );
+      await report.parent.create(recursive: true);
+      await report.writeAsString(
+        const JsonEncoder.withIndent('  ').convert({
+          'completed_at': DateTime.now().toUtc().toIso8601String(),
+          'endpoint': _endpoint,
+          'project': _projectId,
+          'exit_code': code,
+          'passed_tests': passedTests,
+          'phase': phase,
+          'error_kind': errorKind,
+          'pub_get_exit_code': pubGetExitCode,
+          'temporary_user_created': created,
+          'cleanup_succeeded': cleanedUp,
+          'cleanup_pending': cleanupFailures,
+        }),
+      );
+      _client.close();
+    }
+  }
+  exitCode = code;
+}
+
+final _overrides = <String, String>{};
+Map<String, String> get _environment => {
+  ...Platform.environment,
+  ..._overrides,
+};
 
 String _requireEnv(String name) {
   final value = _environment[name];
@@ -84,18 +283,17 @@ Uri _uri(
 }) {
   // Join onto the endpoint instead of resolving an absolute path, which would
   // drop the endpoint's `/v1` segment.
-  final base = Uri.parse(
-    _endpoint.endsWith('/') ? _endpoint : '$_endpoint/',
-  );
+  final base = Uri.parse(_endpoint.endsWith('/') ? _endpoint : '$_endpoint/');
   final uri = base.resolveUri(
     Uri(path: path.startsWith('/') ? path.substring(1) : path),
   );
   final components = <String>[
     ...pairs,
-    ...?params?.entries
-        .map((entry) =>
-            '${Uri.encodeQueryComponent(entry.key)}='
-            '${Uri.encodeQueryComponent(entry.value)}'),
+    ...?params?.entries.map(
+      (entry) =>
+          '${Uri.encodeQueryComponent(entry.key)}='
+          '${Uri.encodeQueryComponent(entry.value)}',
+    ),
   ];
   return uri.replace(query: components.isEmpty ? null : components.join('&'));
 }
@@ -103,15 +301,15 @@ Uri _uri(
 /// Appwrite list endpoints take repeated `queries[]` params, each a JSON
 /// object such as `{"method":"limit","values":[100]}`.
 List<String> _queryPairs(int limit, int offset) => <String>[
-      'queries[]=${Uri.encodeQueryComponent(jsonEncode(<String, Object?>{
-        'method': 'limit',
-        'values': <Object?>[limit],
-      }))}',
-      'queries[]=${Uri.encodeQueryComponent(jsonEncode(<String, Object?>{
-        'method': 'offset',
-        'values': <Object?>[offset],
-      }))}',
-    ];
+  'queries[]=${Uri.encodeQueryComponent(jsonEncode(<String, Object?>{
+    'method': 'limit',
+    'values': <Object?>[limit],
+  }))}',
+  'queries[]=${Uri.encodeQueryComponent(jsonEncode(<String, Object?>{
+    'method': 'offset',
+    'values': <Object?>[offset],
+  }))}',
+];
 
 final http.Client _client = http.Client();
 
@@ -219,13 +417,24 @@ Future<void> _provision({bool cleanOnly = false}) async {
   }
 
   await _ensureDatabase();
+  await _ensureTables();
+  await _ensureBucket();
+  await _ensureTestUser();
+
+  stdout.writeln();
+  stdout.writeln('Provisioned. Next: dart run tool/appwrite_e2e.dart run');
+}
+
+Future<void> _ensureTables() async {
   await _ensureTable(
     tableId: 'users',
     name: 'E2E users',
     columns: const <_Column>[
       _Column.string(key: 'name', size: 256, required: true),
     ],
-    indexes: const [_Index(key: 'name_name', columns: <String>['name'])],
+    indexes: const [
+      _Index(key: 'name_name', columns: <String>['name']),
+    ],
   );
   await _ensureTable(
     tableId: 'tasks',
@@ -239,11 +448,6 @@ Future<void> _provision({bool cleanOnly = false}) async {
       _Index(key: 'done_key', columns: <String>['done']),
     ],
   );
-  await _ensureBucket();
-  await _ensureTestUser();
-
-  stdout.writeln();
-  stdout.writeln('Provisioned. Next: dart run tool/appwrite_e2e.dart run');
 }
 
 Future<void> _requireServer() async {
@@ -262,10 +466,7 @@ Future<void> _requireServer() async {
 Future<void> _cleanupLeftovers({bool withTestUser = false}) async {
   stdout.writeln('Cleaning leftovers from earlier runs…');
 
-  final emails = <String>[
-    if (withTestUser) _testEmail,
-    'new@kiln.dev',
-  ];
+  final emails = <String>[if (withTestUser) _testEmail, 'new@kiln.dev'];
   for (final email in emails) {
     final userId = await _findUserIdByEmail(email);
     if (userId != null) {
@@ -377,10 +578,11 @@ Future<void> _ensureDatabase() async {
     stdout.writeln('Database $_databaseId exists.');
     return;
   }
-  await _send('POST', '/databases', body: <String, Object?>{
-    'databaseId': _databaseId,
-    'name': 'Kiln e2e',
-  });
+  await _send(
+    'POST',
+    '/databases',
+    body: <String, Object?>{'databaseId': _databaseId, 'name': 'Kiln e2e'},
+  );
   stdout.writeln('Created database $_databaseId.');
 }
 
@@ -392,8 +594,8 @@ final class _Column {
   }) : type = 'string';
 
   const _Column.boolean({required this.key, required this.required})
-      : type = 'boolean',
-        size = null;
+    : type = 'boolean',
+      size = null;
 
   final String key;
   final String type;
@@ -422,20 +624,28 @@ Future<void> _ensureTable({
     'delete("users")',
   ];
   if (await _exists('GET', path)) {
-    await _send('PUT', path, body: <String, Object?>{
-      'permissions': permissions,
-      'rowSecurity': false,
-      'enabled': true,
-    });
+    await _send(
+      'PUT',
+      path,
+      body: <String, Object?>{
+        'permissions': permissions,
+        'rowSecurity': false,
+        'enabled': true,
+      },
+    );
     stdout.writeln('Table $tableId exists; permissions refreshed.');
   } else {
-    await _send('POST', '/tablesdb/$_databaseId/tables', body: <String, Object?>{
-      'tableId': tableId,
-      'name': name,
-      'permissions': permissions,
-      'rowSecurity': false,
-      'enabled': true,
-    });
+    await _send(
+      'POST',
+      '/tablesdb/$_databaseId/tables',
+      body: <String, Object?>{
+        'tableId': tableId,
+        'name': name,
+        'permissions': permissions,
+        'rowSecurity': false,
+        'enabled': true,
+      },
+    );
     stdout.writeln('Created table $tableId.');
   }
 
@@ -445,11 +655,15 @@ Future<void> _ensureTable({
       continue;
     }
     // Required columns cannot declare a default, so none is sent.
-    await _send('POST', '$path/columns/${column.type}', body: <String, Object?>{
-      'key': column.key,
-      'required': column.required,
-      if (column.size != null) 'size': column.size,
-    });
+    await _send(
+      'POST',
+      '$path/columns/${column.type}',
+      body: <String, Object?>{
+        'key': column.key,
+        'required': column.required,
+        if (column.size != null) 'size': column.size,
+      },
+    );
     stdout.writeln('  created column ${column.key} (${column.type}).');
   }
 
@@ -458,11 +672,15 @@ Future<void> _ensureTable({
     if (await _exists('GET', indexPath)) {
       continue;
     }
-    await _send('POST', '$path/indexes', body: <String, Object?>{
-      'key': index.key,
-      'type': 'key',
-      'columns': index.columns,
-    });
+    await _send(
+      'POST',
+      '$path/indexes',
+      body: <String, Object?>{
+        'key': index.key,
+        'type': 'key',
+        'columns': index.columns,
+      },
+    );
     stdout.writeln('  created index ${index.key}.');
   }
 
@@ -483,9 +701,9 @@ bool _tableReady(
   final tableColumns = table['columns'] as List<Object?>? ?? const <Object?>[];
   final tableIndexes = table['indexes'] as List<Object?>? ?? const <Object?>[];
   for (final column in columns) {
-    final found = tableColumns
-        .cast<Map<String, Object?>?>()
-        .any((entry) => entry?['key'] == column.key);
+    final found = tableColumns.cast<Map<String, Object?>?>().any(
+      (entry) => entry?['key'] == column.key,
+    );
     if (!found) {
       return false;
     }
@@ -511,22 +729,30 @@ Future<void> _ensureBucket() async {
     'delete("users")',
   ];
   if (await _exists('GET', path)) {
-    await _send('PUT', path, body: <String, Object?>{
+    await _send(
+      'PUT',
+      path,
+      body: <String, Object?>{
+        'name': 'Kiln e2e files',
+        'permissions': permissions,
+        'fileSecurity': false,
+        'enabled': true,
+      },
+    );
+    stdout.writeln('Bucket $_bucketId exists; permissions refreshed.');
+    return;
+  }
+  await _send(
+    'POST',
+    '/storage/buckets',
+    body: <String, Object?>{
+      'bucketId': _bucketId,
       'name': 'Kiln e2e files',
       'permissions': permissions,
       'fileSecurity': false,
       'enabled': true,
-    });
-    stdout.writeln('Bucket $_bucketId exists; permissions refreshed.');
-    return;
-  }
-  await _send('POST', '/storage/buckets', body: <String, Object?>{
-    'bucketId': _bucketId,
-    'name': 'Kiln e2e files',
-    'permissions': permissions,
-    'fileSecurity': false,
-    'enabled': true,
-  });
+    },
+  );
   stdout.writeln('Created bucket $_bucketId.');
 }
 
@@ -537,21 +763,29 @@ Future<void> _ensureTestUser() async {
   }
   final userId = 'e2e-user';
   try {
-    await _send('POST', '/users', body: <String, Object?>{
-      'userId': userId,
-      'email': _testEmail,
-      'password': _testPassword,
-      'name': 'Kiln e2e user',
-    });
-  } on _ApiError catch (error) {
-    if (error.statusCode == 409) {
-      // The id lingers when a same-id user exists under another email.
-      await _send('POST', '/users', body: <String, Object?>{
-        'userId': 'e2e-user-${DateTime.now().millisecondsSinceEpoch}',
+    await _send(
+      'POST',
+      '/users',
+      body: <String, Object?>{
+        'userId': userId,
         'email': _testEmail,
         'password': _testPassword,
         'name': 'Kiln e2e user',
-      });
+      },
+    );
+  } on _ApiError catch (error) {
+    if (error.statusCode == 409) {
+      // The id lingers when a same-id user exists under another email.
+      await _send(
+        'POST',
+        '/users',
+        body: <String, Object?>{
+          'userId': 'e2e-user-${DateTime.now().millisecondsSinceEpoch}',
+          'email': _testEmail,
+          'password': _testPassword,
+          'name': 'Kiln e2e user',
+        },
+      );
     } else {
       rethrow;
     }
@@ -575,7 +809,8 @@ Future<void> _run() async {
 
   final repoRoot = Directory(p.join(Directory.current.path)).parent.path;
   final toolDir = Directory(p.join(Directory.current.path, 'tool'));
-  final root = toolDir.existsSync() &&
+  final root =
+      toolDir.existsSync() &&
           File(p.join(toolDir.path, 'appwrite_e2e.dart')).existsSync()
       ? Directory.current.path
       : repoRoot;
@@ -594,9 +829,7 @@ Future<void> _run() async {
 }
 
 Future<void> _renderFixture(Directory fixture, String root) async {
-  final brick = Directory(
-    p.join(root, 'extensions', 'appwrite', 'brick'),
-  );
+  final brick = Directory(p.join(root, 'extensions', 'appwrite', 'brick'));
   final files = await const BrickRenderer().render(
     bundle: createBundle(brick),
     vars: <String, dynamic>{
@@ -615,8 +848,9 @@ Future<void> _renderFixture(Directory fixture, String root) async {
   }
 
   final corePath = p.join(root, 'packages', 'kiln_core').replaceAll('\\', '/');
-  final testingPath =
-      p.join(root, 'packages', 'kiln_testing').replaceAll('\\', '/');
+  final testingPath = p
+      .join(root, 'packages', 'kiln_testing')
+      .replaceAll('\\', '/');
   await File(p.join(fixture.path, 'pubspec.yaml')).writeAsString('''
 name: e2e_appwrite
 publish_to: none

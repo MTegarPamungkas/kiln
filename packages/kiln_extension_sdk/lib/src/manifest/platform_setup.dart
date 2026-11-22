@@ -47,6 +47,7 @@ final class AndroidSetup {
     this.activity,
     this.minSdk,
     this.compileSdk,
+    this.coreLibraryDesugaring = false,
   });
 
   final List<String> permissions;
@@ -62,6 +63,7 @@ final class AndroidSetup {
   final String? activity;
   final int? minSdk;
   final int? compileSdk;
+  final bool coreLibraryDesugaring;
 
   bool get isEmpty =>
       permissions.isEmpty &&
@@ -72,7 +74,8 @@ final class AndroidSetup {
       allowBackup == null &&
       activity == null &&
       minSdk == null &&
-      compileSdk == null;
+      compileSdk == null &&
+      !coreLibraryDesugaring;
 
   static AndroidSetup fromMap(Map<String, Object?> map) {
     final appLinks = _asMap(map['app_links']);
@@ -87,6 +90,7 @@ final class AndroidSetup {
       activity: map['activity'] as String?,
       minSdk: _asInt(map['min_sdk']),
       compileSdk: _asInt(map['compile_sdk']),
+      coreLibraryDesugaring: map['core_library_desugaring'] == true,
     );
   }
 
@@ -109,6 +113,7 @@ final class AndroidSetup {
       if (activity != null) 'activity': activity,
       if (minSdk != null) 'min_sdk': minSdk,
       if (compileSdk != null) 'compile_sdk': compileSdk,
+      if (coreLibraryDesugaring) 'core_library_desugaring': true,
     };
   }
 }

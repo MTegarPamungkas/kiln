@@ -7,10 +7,7 @@ Goal: feature code does not change when the backend is swapped.
 - Features use the `AuthRepository`, `RemoteDatabase`, and `FileStorage`
   contracts from `kiln_core`.
 - The full backends (`appwrite`, `firebase`, `supabase`) are exclusive
-  extensions that provide those three contracts. `neon` provides
-  `RemoteDatabase` and `FileStorage` (over the Neon Data API and S3-compatible
-  Object Storage) but not auth, so it swaps the database and files without
-  touching login. Install one `RemoteDatabase` and one `FileStorage` provider
+  extensions that provide those three contracts. Install one `RemoteDatabase` and one `FileStorage` provider
   at a time; the resolver rejects two.
 - No concrete backend types are imported in `features/`.
 

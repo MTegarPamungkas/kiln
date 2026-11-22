@@ -29,13 +29,21 @@ Available prompts:
 | --- | --- | --- |
 | `scheme` | custom scheme without `://` | `kiln` |
 | `hosts` | allowed universal link hosts | `kiln.dev` |
-| `path_prefixes` | allowed path prefixes for universal links | empty |
+| `path_prefixes` | allowed route prefixes for HTTPS and custom links | empty |
 
 `hosts` and `path_prefixes` are of type `multi`, so the choices are taken from
 `options` in `extension.yaml`. Add your host or prefix to `options` before
 running `kiln add` if it is not listed yet.
 
 ## Configuration
+
+Path prefixes apply to both HTTPS and custom links. A custom host is the first
+route segment: `kiln://orders/42` is checked against `/orders/42`. HTTPS hosts
+continue to use `allowedHosts`; set `customSchemeHosts` in `DeepLinkConfig` to
+restrict custom hosts separately. Its empty default allows any custom host
+subject to the route prefixes. Links with credentials, traversal segments or
+encoded traversal are rejected. Existing apps that configured prefixes only
+for web links should review their custom callback routes before updating.
 
 Runtime settings live in `DeepLinkConfig`. Default values are rendered from the
 prompts; normalization options can be changed through the constructor:

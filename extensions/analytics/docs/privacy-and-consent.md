@@ -11,8 +11,15 @@ checks `ConsentController.isGranted(ConsentCategory.analytics)` on every
 - no events or identities are sent.
 
 Because the check happens per call, granting permission after the application is
-running immediately enables sending without rebuilding the module. Withdrawing
-permission likewise stops the next events right away.
+running immediately enables sending without rebuilding the module. The first
+grant initializes PostHog, re-enables it after an earlier revocation, and
+identifies the session that is already signed in. A `beforeSend` filter drops
+Dart-captured events if the SDK ever sees one while consent is missing.
+
+Withdrawing permission calls the SDK's opt-out and clears its identity, so
+queued events stop and later capture or identify calls never reach the transport.
+The registered `Analytics` is the only public seam; the raw gateway and the
+concrete PostHog reporter are private to the module.
 
 `reset` is always forwarded to the SDK because it only removes the identity
 stored on the device and does not send an event.
@@ -37,9 +44,9 @@ personal data the product does not need.
 ```dart
 final consent = registry.read<ConsentController>();
 consent.deny(ConsentCategory.analytics);
-await registry.read<Analytics>().reset();
 ```
 
-After permission is withdrawn, subsequent analytics calls send nothing. Call
-`reset` if the application also wants to clear the identity already stored in
-the SDK.
+The module reacts to the change: it opts the SDK out, resets the stored
+identity, and updates support to "waiting for consent". Subsequent analytics
+calls send nothing. Calling `Analytics.reset()` as well is harmless but no
+longer required.

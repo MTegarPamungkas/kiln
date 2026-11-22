@@ -69,7 +69,7 @@ final class StorageHttpCache implements HttpCache {
   }) async {
     final all = await _keys();
     if (!all.contains(_key(key)) && all.length >= settings.maxEntries) {
-      await storage.delete(all.first);
+      await _evictOldest(all);
     }
     final payload = <String, Object?>{
       'status': response.statusCode,
@@ -101,6 +101,46 @@ final class StorageHttpCache implements HttpCache {
         await storage.delete(key);
       }
     }
+  }
+
+  /// Evicts the entry with the oldest `storedAt`; a key whose payload cannot
+  /// be read is removed first.
+  Future<void> _evictOldest(List<String> keys) async {
+    if (keys.isEmpty) {
+      return;
+    }
+    String? oldestKey;
+    DateTime? oldestAt;
+    for (final key in keys) {
+      final raw = await storage.read(key);
+      if (raw == null) {
+        continue;
+      }
+      final storedAt = _storedAt(raw);
+      if (storedAt == null) {
+        await storage.delete(key);
+        return;
+      }
+      if (oldestAt == null || storedAt.isBefore(oldestAt)) {
+        oldestAt = storedAt;
+        oldestKey = key;
+      }
+    }
+    if (oldestKey != null) {
+      await storage.delete(oldestKey);
+    }
+  }
+
+  DateTime? _storedAt(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        return DateTime.tryParse('${decoded['storedAt'] ?? ''}');
+      }
+    } on FormatException {
+      // A payload the cache cannot read is not a usable entry.
+    }
+    return null;
   }
 
   Future<bool> _hasTag(String key, String tag) async {

@@ -37,6 +37,42 @@ void main() {
     );
   });
 
+  test('readAll authenticates once before returning every value', () async {
+    final gateway = FakeBiometricGateway();
+    final protected = BiometricProtectedStorage(
+      storage: InMemorySecureStorage(<String, String>{
+        'token': 'secret',
+        'pin': '1234',
+      }),
+      biometric: createBiometric(gateway: gateway),
+    );
+
+    final values = await protected.readAll();
+
+    expect(values, <String, String>{'token': 'secret', 'pin': '1234'});
+    expect(gateway.authCalls, 1);
+  });
+
+  test('readAll returns no values when authentication fails', () async {
+    final gateway = FakeBiometricGateway()..result = false;
+    final protected = BiometricProtectedStorage(
+      storage: InMemorySecureStorage(<String, String>{'token': 'secret'}),
+      biometric: createBiometric(gateway: gateway),
+    );
+
+    await expectLater(
+      protected.readAll(),
+      throwsA(
+        isA<Failure>().having(
+          (failure) => failure.code,
+          'code',
+          FailureCode.permissionDenied,
+        ),
+      ),
+    );
+    expect(gateway.authCalls, 1);
+  });
+
   test('delegates writes without authentication', () async {
     final gateway = FakeBiometricGateway();
     final storage = InMemorySecureStorage();

@@ -11,8 +11,12 @@ final class SocialSignOutListener {
   final AuthRepository auth;
   final GoogleCredentialGateway google;
   StreamSubscription<AuthSession?>? _subscription;
+  bool _disposed = false;
 
   Future<void> start() async {
+    if (_disposed) {
+      return;
+    }
     _subscription ??= auth.authStateChanges.listen((session) {
       if (session == null) {
         unawaited(_signOutQuietly());
@@ -29,6 +33,10 @@ final class SocialSignOutListener {
   }
 
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _subscription?.cancel();
     _subscription = null;
   }

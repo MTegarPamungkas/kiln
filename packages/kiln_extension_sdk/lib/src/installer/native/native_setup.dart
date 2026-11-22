@@ -91,6 +91,9 @@ final class NativeSetup {
 
     final androidDir = Directory(p.join(projectRoot.path, 'android'));
     if (androidDir.existsSync() && supports('android')) {
+      if (android.coreLibraryDesugaring) {
+        patches.add(const AndroidGradleDesugaringPatch());
+      }
       for (final permission in android.permissions) {
         patches.add(AndroidPermissionPatch(permission));
       }

@@ -117,6 +117,8 @@ final class FirebaseSocialAuth implements SocialAuth {
       return SocialCredential(
         provider: provider,
         idToken: result.idToken,
+        audience: SocialTokenAudience.backend,
+        backendSessionToken: result.idToken,
         accessToken: result.accessToken,
         email: result.user.email,
         displayName: result.user.displayName,

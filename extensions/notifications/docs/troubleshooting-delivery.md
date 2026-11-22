@@ -50,8 +50,10 @@ to the app. If the permission is not granted, the plugin throws an error and
 
 ## Taps not registering
 
-- Taps that open the app are read through `getNotificationAppLaunchDetails`, so
-  call `initialize()` before listening to `taps`.
+- Taps that open the app are read through `getNotificationAppLaunchDetails`
+  during `initialize()`. The launch payload and taps received before the first
+  listener are retained and replayed once, so a router that subscribes later
+  still receives them.
 - Background action taps use `IsolateNameServer`; the web does not support them.
 - Make sure the payload is smaller than `NotificationPayload.maxEncodedLength`.
 

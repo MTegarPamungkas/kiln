@@ -1,73 +1,28 @@
 # Kiln
 
-Kiln generates and evolves Flutter applications through composable
-extensions. A generated application depends only on the contracts in
-`kiln_core`; extensions provide those contracts and communicate through
-slots, never by importing each other.
+Kiln generates Flutter applications and adds services through extensions.
+Install the services you need with the CLI, then call them through `Gate` and
+handle the returned `Result`. Your application owns the UI.
 
-## What works today
+Start with [getting-started.md](docs/getting-started.md) for create → add → call
+→ handle results. Extension authors and contributors can continue with
+[architecture.md](docs/architecture.md).
 
-The foundation runs end-to-end: `kiln create` generates a minimal app root from
-the `app_basic` brick (`--template app` adds a starter page); `kiln add` installs
-an extension transactionally (pubspec dependencies, Android patches, the lockfile,
-and `extensions.g.dart`); and generated projects pass `flutter analyze` and
-`flutter test`. `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`,
-`cache`, `store`, `completion`, and `ext new/validate/test/pack` are available.
-
-### Extensions (33)
-
-| Group | Extensions |
-| --- | --- |
-| Auth & backends | `rest_auth`, `supabase`, `firebase`, `appwrite`, `social_login`, `biometric` |
-| Data & storage | `storage`, `secure_storage`, `local_db`, `neon` |
-| Network | `dio`, `http_retry`, `http_cache` |
-| Navigation & UI | `go_router`, `deep_link`, `theme`, `l10n`, `flavors` |
-| Device | `connectivity`, `permission`, `notifications`, `image_picker`, `geolocation`, `share`, `calendar` |
-| State | `bloc`, `riverpod` |
-| Observability & config | `logger`, `analytics`, `crash_report`, `remote_config`, `env` |
-| Tooling | `codegen` |
-
-Extensions never render UI — they expose typed data, contracts, and wiring, and
-each reports runtime platform/device/config support through `SupportRegistry`
-(unsupported extensions return typed failures and do not block startup; see
-[docs/extensions/support-and-devices.md](docs/extensions/support-and-devices.md)).
-Each ships its manifest, docs, README, CHANGELOG, and manifest/render/analyze
-tests; those that own a contract also ship a `kiln_testing` contract suite.
-
-### Distribution
-
-`kiln_store` (client, cache, checksum, trust, pack/publish) plus `registry/`
-(index and archives) enable `kiln store install`, `kiln upgrade`, and
-`kiln ext publish`. `kiln_lints` adds five custom lints
-(`no_cross_extension_import`, `prefer_contract_over_impl`, `no_plugin_in_features`,
-`no_edit_generated_files`, `require_failure_handling`). Examples live under
-`examples/` (`minimal`, `full_stack`, `backend_swap`, `custom_extension`), and
-[`tool/e2e`](tool/e2e) holds the device-run probe screen for generated apps.
-
-See [getting-started.md](docs/getting-started.md) and
-[roadmap.md](docs/roadmap.md).
-
-## Documentation site
-
-A Vite + React documentation site lives in [`website/`](website/README.md). It
-generates pages from `docs/`, every `extension.yaml`, and each extension's
-README/topic docs, so the site follows the repository instead of drifting from
-it.
-
-```bash
-cd website
-npm install
-npm run dev
-```
+After installing extensions, run `kiln setup <extension>` or `kiln setup --all`
+to review their settings. The wizard updates changed settings and generated
+source together; `kiln doctor` identifies incomplete local configuration and
+tells you how to fix it. See [Configure installed extensions](docs/guides/configure-extensions.md)
+or follow the [Appwrite walkthrough](docs/guides/setup-appwrite.md) through your
+first sign-in.
 
 ## The Gate
 
-Every capability is reachable through one facade that returns a `Result`:
-the SDK sends back success or failure plus information and never owns UI.
-Build it from the registry after bootstrap:
+Use Gate verbs for SDK operations that return a `Result`: the SDK sends back
+success or failure plus information and never owns UI. Bootstrap registers
+the Gate automatically, just like the test registry:
 
 ```dart
-final gate = Gate(registry);
+final gate = registry.read<Gate>();
 ```
 
 One call, one result. The `permission` extension is a plain request — the app
@@ -109,13 +64,73 @@ missing:
 
 ```dart
 if (gate.has<Biometric>()) {
-  final biometric = gate.use<Biometric>();
-  final ok = await gate.call(biometric.authenticate);
+  final result = await gate.call(() => gate.use<Biometric>().authenticate());
 }
 ```
 
+Keep service lookup inside the callback so missing services become `Err`.
+Direct getters such as `gate.auth` and `gate.use<T>()` can throw; use typed
+verbs for the usual `Result` flow. Existing `Gate(registry)` construction
+remains supported. See the [Gate reference](docs/reference/gate.md).
+
 `kiln_testing` registers a `Gate` automatically, so widget tests drive the
 same facade through `registry.read<Gate>()`.
+
+## What works today
+
+The foundation runs end-to-end: `kiln create` generates a minimal app root from
+the `app_basic` brick (`--template app` adds a starter page); `kiln add` installs
+an extension transactionally (pubspec dependencies, Android patches, the lockfile,
+and `extensions.g.dart`); and generated projects pass `flutter analyze` and
+`flutter test`. `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`,
+`cache`, `store`, `completion`, and `ext new/validate/test/pack` are available.
+
+### Extensions (35)
+
+| Group | Extensions |
+| --- | --- |
+| Auth & backends | `rest_auth`, `supabase`, `firebase`, `appwrite`, `social_login`, `biometric` |
+| Push transport | `appwrite_push`, `appwrite_push_native` |
+| Data & storage | `storage`, `secure_storage`, `local_db` |
+| Network | `dio`, `http_retry`, `http_cache` |
+| Navigation & UI | `go_router`, `deep_link`, `theme`, `l10n`, `flavors` |
+| Device | `connectivity`, `permission`, `notifications`, `image_picker`, `geolocation`, `share`, `calendar` |
+| State | `bloc`, `riverpod` |
+| Observability & config | `logger`, `analytics`, `crash_report`, `remote_config`, `env` |
+| Tooling | `codegen` |
+
+Extensions never render UI — they expose typed data, contracts, and wiring, and
+each reports runtime platform/device/config support through `SupportRegistry`
+(unsupported extensions return typed failures and do not block startup; see
+[docs/extensions/support-and-devices.md](docs/extensions/support-and-devices.md)).
+Each ships its manifest, docs, README, CHANGELOG, and manifest/render/analyze
+tests; those that own a contract also ship a `kiln_testing` contract suite.
+
+### Distribution
+
+`kiln_store` (client, cache, checksum, trust, pack/publish) plus `registry/`
+(index and archives) enable `kiln store install`, `kiln upgrade`, and
+`kiln ext publish`. `kiln_lints` adds five custom lints
+(`no_cross_extension_import`, `prefer_contract_over_impl`, `no_plugin_in_features`,
+`no_edit_generated_files`, `require_failure_handling`). Examples live under
+`examples/` (`minimal`, `full_stack`, `backend_swap`, `custom_extension`), and
+[`tool/e2e`](tool/e2e) holds the device-run probe screen for generated apps.
+
+See [getting-started.md](docs/getting-started.md) and
+[roadmap.md](docs/roadmap.md).
+
+## Documentation site
+
+A Vite + React documentation site lives in [`website/`](website/README.md). It
+generates pages from `docs/`, every `extension.yaml`, and each extension's
+README/topic docs, so the site follows the repository instead of drifting from
+it.
+
+```bash
+cd website
+npm install
+npm run dev
+```
 
 ## Packages
 

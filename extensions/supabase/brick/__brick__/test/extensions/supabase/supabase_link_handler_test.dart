@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
@@ -101,6 +103,20 @@ void main() {
 
     expect(handler.isAttached, isFalse);
     expect(gateway.exchangedCodes, isEmpty);
+  });
+
+  test('dispose during the initial callback leaves no listener behind', () async {
+    deepLinks.initialLink = Uri.parse('kiln-auth://auth-callback?code=slow');
+    gateway.exchangeGate = Completer<void>();
+
+    final starting = handler.start();
+    await pumpEventQueue();
+    await handler.dispose();
+    gateway.exchangeGate!.complete();
+    await starting;
+
+    expect(handler.isAttached, isFalse);
+    expect(sessions, isEmpty);
   });
 
   test('without DeepLinks the handler attaches no subscription', () async {

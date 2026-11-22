@@ -35,7 +35,24 @@ final class NotificationRouteMapper {
 
   String? _normalize(String route) {
     final trimmed = route.trim();
-    if (!trimmed.startsWith('/')) {
+    if (!trimmed.startsWith('/') ||
+        trimmed.contains('\\') ||
+        trimmed.codeUnits.any((unit) => unit < 32)) {
+      return null;
+    }
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null || uri.hasScheme || uri.hasAuthority) return null;
+    try {
+      // Inspect the original path before Uri normalizes encoded dot segments.
+      final path = Uri.decodeComponent(trimmed.split(RegExp(r'[?#]')).first);
+      if (path.startsWith('//') ||
+          path.contains('\\') ||
+          path.codeUnits.any((unit) => unit < 32) ||
+          RegExp(r'%2f|%5c', caseSensitive: false).hasMatch(path) ||
+          path.split('/').any((part) => part == '.' || part == '..')) {
+        return null;
+      }
+    } on FormatException {
       return null;
     }
     return trimmed;

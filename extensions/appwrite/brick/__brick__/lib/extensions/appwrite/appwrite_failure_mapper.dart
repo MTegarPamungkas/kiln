@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:kiln_core/kiln_core.dart';
 
@@ -239,6 +241,17 @@ final class AppwriteFailureMapper {
     AppwriteFailureScope scope,
     StackTrace? stackTrace,
   ) {
+    if (error is TimeoutException) {
+      return Failure(
+        code: FailureCode.networkTimeout,
+        message: 'The Appwrite request timed out.',
+        kind: FailureKind.network,
+        cause: error,
+        stackTrace: stackTrace,
+        isRetryable: true,
+        details: {'scope': scope.name},
+      );
+    }
     final description = error is AppwriteException
         ? _message(error, 'Appwrite network request failed.')
         : error.toString();

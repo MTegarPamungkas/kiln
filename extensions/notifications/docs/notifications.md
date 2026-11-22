@@ -27,7 +27,10 @@ moment, for example after the user presses a reminder button.
 ## Tap
 
 `taps` emits a `NotificationTap` for foreground taps, background action taps,
-and the payload that launched the app. Read the payload with
+and the payload that launched the app. The launch payload and taps that arrive
+while bootstrap is still running are retained and replayed once to the first
+listener, so a router that subscribes after `initialize()` still receives the
+launch route. Re-listening does not replay it again. Read the payload with
 `NotificationPayload.tryDecode(tap.payload)` and then pass its route to
 navigation.
 

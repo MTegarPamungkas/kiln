@@ -27,17 +27,25 @@ final class AppwritePushTransport implements PushTransport {
   final StreamController<PushEnvelope> _foregroundController =
       StreamController<PushEnvelope>.broadcast();
   bool _initialized = false;
+  bool _disposed = false;
 
   /// Initializes Firebase, mints the token, registers the push target, and
   /// starts listening for foreground messages and token rotation.
+  ///
+  /// Bootstrap can time out and dispose the module while these platform calls
+  /// are still running, so every continuation after an await checks [_disposed]
+  /// before registering a listener.
   Future<void> initialize() async {
-    if (_initialized) {
+    if (_initialized || _disposed) {
       return;
     }
     try {
       await Firebase.initializeApp();
     } on Object catch (error, stackTrace) {
       throw _mapper.map(error, stackTrace: stackTrace);
+    }
+    if (_disposed) {
+      return;
     }
     _initialized = true;
 
@@ -47,8 +55,14 @@ final class AppwritePushTransport implements PushTransport {
       // in favour of the installation FID, which Appwrite cannot send to).
       // ignore: deprecated_member_use
       _token = await FirebaseMessaging.instance.getToken();
+      if (_disposed) {
+        return;
+      }
       if (_token != null) {
         await pushTargets.register(token: _token!);
+        if (_disposed) {
+          return;
+        }
       }
       // ignore: deprecated_member_use
       _tokenRefresh = FirebaseMessaging.instance.onTokenRefresh.listen((token) {
@@ -112,8 +126,14 @@ final class AppwritePushTransport implements PushTransport {
 
   @override
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _tokenRefresh?.cancel();
     await _foreground?.cancel();
+    _tokenRefresh = null;
+    _foreground = null;
     if (!_foregroundController.isClosed) {
       await _foregroundController.close();
     }

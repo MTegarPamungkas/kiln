@@ -61,6 +61,12 @@ accessibility option.
 that matches the brightness. Call `SystemUiStyle.apply(theme)` from the root
 widget if the app manages system UI itself.
 
+## Lifecycle
+
+`ThemeModeController` is owned by the module and disposed on shutdown. A stored
+mode read that finishes after disposal is ignored, and `setMode` after disposal
+is a no-op, so a slow preference store cannot revive a disposed notifier.
+
 ## Table of contents
 
 - [Design tokens](design-tokens.md)

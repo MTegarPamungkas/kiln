@@ -7,6 +7,7 @@ import '../command_context.dart';
 import '../infra/exit_codes.dart';
 import '../infra/json_reporter.dart';
 import '../project_context.dart';
+import '../setup/extension_setup.dart';
 import '../version.dart';
 import 'command_helpers.dart';
 
@@ -136,6 +137,36 @@ final class DoctorCommand extends KilnCommand {
       }
       final manifest = available.manifest;
       providedCapabilities.addAll(manifest.provides);
+
+      {
+        final setup = ExtensionSetup(manifest);
+        final issues = setup.issues(
+          project.extensionAnswers[id] ?? const {},
+          root: project.root,
+        );
+        checks.add(
+          DoctorCheck(
+            id: 'setup.$id',
+            status: issues.isEmpty ? DoctorStatus.ok : DoctorStatus.fail,
+            message: issues.isEmpty
+                ? '${manifest.name} is locally configured; runtime and external setup are not checked'
+                : '${manifest.name} needs configuration: ${issues.keys.join(', ')}',
+            suggestion: issues.isEmpty
+                ? 'Run kiln setup $id to review remaining manual steps.'
+                : 'Run kiln setup $id',
+          ),
+        );
+        for (final entry in issues.entries) {
+          checks.add(
+            DoctorCheck(
+              id: 'setup.$id.${entry.key}',
+              status: DoctorStatus.fail,
+              message: entry.value,
+              suggestion: 'Run kiln setup $id --answer ${entry.key}=<value>',
+            ),
+          );
+        }
+      }
 
       for (final fileEntry in locked.files.entries) {
         final target = File(p.join(project.root.path, fileEntry.key));
@@ -387,16 +418,19 @@ DoctorCheck capabilityCoverageCheck({
     return DoctorCheck(
       id: 'capability.coverage',
       status: DoctorStatus.ok,
-      message: 'Feature code uses ${usedList.join(', ')}; every capability is '
+      message:
+          'Feature code uses ${usedList.join(', ')}; every capability is '
           'provided by the installed extensions',
     );
   }
   return DoctorCheck(
     id: 'capability.coverage',
     status: DoctorStatus.warn,
-    message: 'Feature code uses ${missing.join(', ')}, which no installed '
+    message:
+        'Feature code uses ${missing.join(', ')}, which no installed '
         'extension provides',
-    suggestion: 'Swap to a backend that provides the capability, keep the '
+    suggestion:
+        'Swap to a backend that provides the capability, keep the '
         'usage behind a capability check, or remove the usage',
   );
 }

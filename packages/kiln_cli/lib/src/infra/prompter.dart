@@ -6,6 +6,14 @@ import 'raw_keys.dart';
 
 /// Terminal prompts that can be disabled with `--yes` or a non-TTY stdin.
 final class Prompter {
+  Prompter._({
+    required this.assumeYes,
+    required this.interactive,
+    required this._readLine,
+    required this._customReadLine,
+    required this._write,
+    required this._rawKeys,
+  });
   Prompter({
     this.assumeYes = false,
     this.interactive = true,
@@ -13,19 +21,22 @@ final class Prompter {
     void Function(String message)? write,
     RawKeySource? rawKeys,
   }) : _readLine = readLine ?? ((_) => stdin.readLineSync()),
+       _customReadLine = readLine != null,
        _write = write ?? stdout.write,
        _rawKeys = rawKeys ?? const TerminalRawKeySource();
 
   final bool assumeYes;
   final bool interactive;
+  final bool _customReadLine;
   final String? Function(String prompt) _readLine;
   final void Function(String message) _write;
   final RawKeySource _rawKeys;
 
-  Prompter withAssumeYes(bool value) => Prompter(
+  Prompter withAssumeYes(bool value) => Prompter._(
     assumeYes: value,
     interactive: interactive,
     readLine: _readLine,
+    customReadLine: _customReadLine,
     write: _write,
     rawKeys: _rawKeys,
   );
@@ -51,23 +62,41 @@ final class Prompter {
     return answer == 'y' || answer == 'yes' || answer == 'ya';
   }
 
-  String? text(String question, {String? defaultValue, bool secret = false}) {
+  String? text(
+    String question, {
+    String? defaultValue,
+    bool secret = false,
+    bool cancelOnEof = false,
+    bool trimInput = true,
+  }) {
     if (assumeYes && defaultValue != null) {
       return defaultValue;
     }
     if (!interactive) {
       return defaultValue;
     }
-    final suffix = defaultValue == null ? '' : ' [$defaultValue]';
+    final suffix = defaultValue == null
+        ? ''
+        : secret
+        ? ' [set; Enter to keep]'
+        : ' [$defaultValue]';
     _write('$question$suffix ');
-    if (!secret) {
-      final answer = _readLine(question)?.trim();
+    String? readAnswer() {
+      final raw = _readLine(question);
+      if (raw == null && cancelOnEof) {
+        throw const KilnException('Setup cancelled.', code: 'prompt.cancelled');
+      }
+      return trimInput ? raw?.trim() : raw;
+    }
+
+    if (!secret || _customReadLine) {
+      final answer = readAnswer();
       return answer == null || answer.isEmpty ? defaultValue : answer;
     }
     final previousEchoMode = stdin.echoMode;
     try {
       stdin.echoMode = false;
-      final answer = stdin.readLineSync()?.trim();
+      final answer = readAnswer();
       return answer == null || answer.isEmpty ? defaultValue : answer;
     } finally {
       stdin.echoMode = previousEchoMode;
@@ -214,10 +243,7 @@ final class Prompter {
                 if (selected.contains(option)) option,
             ];
           case RawKey.cancel:
-            throw const KilnException(
-              'Cancelled.',
-              code: 'prompt.cancelled',
-            );
+            throw const KilnException('Cancelled.', code: 'prompt.cancelled');
         }
       }
     } finally {

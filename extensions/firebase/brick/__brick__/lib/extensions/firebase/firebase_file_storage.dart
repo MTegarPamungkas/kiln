@@ -70,9 +70,18 @@ final class FirebaseFileStorage implements FileStorage {
   @override
   Future<Uri> url(String path, {Duration? expiresIn}) async {
     _validatePath(path);
+    if (expiresIn != null) {
+      throw const Failure(
+        code: FailureCode.validationUnsupportedValue,
+        message:
+            'Firebase client storage cannot issue expiring URLs. '
+            'Use a trusted backend to create a signed URL.',
+        kind: FailureKind.unsupported,
+      );
+    }
     try {
-      // Firebase download URLs do not expire; expiresIn is kept for contracts
-      // backed by storage providers that issue signed links.
+      // The download URL is a stable, public link. Callers that need a
+      // temporary capability must request a signed URL from a trusted backend.
       return await gateway.url(path);
     } catch (error, stackTrace) {
       throw _mapError(

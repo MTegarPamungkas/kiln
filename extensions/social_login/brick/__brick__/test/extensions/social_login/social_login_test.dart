@@ -55,6 +55,8 @@ void main() {
     final credential = await login.signIn(SocialProvider.apple);
 
     expect(credential?.idToken, 'apple-id-token');
+    expect(credential?.rawNonce, apple.nonce);
+    expect(credential?.audience, SocialTokenAudience.provider);
     expect(apple.nonce, isNotEmpty);
     expect(apple.nonceSha256, hasLength(64));
     expect(apple.serviceId, 'service-id');

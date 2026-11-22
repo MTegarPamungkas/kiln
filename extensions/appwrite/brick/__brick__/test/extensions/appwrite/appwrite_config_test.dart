@@ -1,8 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_config.dart';
 
 void main() {
+  test('OAuth uses a callback appropriate to the platform', () {
+    const config = AppwriteConfig(projectId: 'project');
+    expect(
+      config.oAuthSuccessUrl,
+      kIsWeb
+          ? Uri.base.resolve('/kiln_appwrite_auth.html').toString()
+          : 'appwrite-callback-project://',
+    );
+    expect(
+      const AppwriteConfig(
+        oAuthRedirectUrl: 'https://app.example/app/callback.html',
+      ).oAuthSuccessUrl,
+      'https://app.example/app/callback.html',
+    );
+  });
   test('defaults carry the rendered prompts', () {
     const config = AppwriteConfig.defaults;
 

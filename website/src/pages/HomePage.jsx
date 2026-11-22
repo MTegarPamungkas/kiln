@@ -144,7 +144,7 @@ return notes.fold(
           <Feature
             icon={ShieldCheck}
             title="Vendor-neutral contracts"
-            text="Features read AuthRepository, RemoteDatabase, FileStorage, and HttpClient. Swap Appwrite, Supabase, Firebase, Neon, or REST without touching UI."
+            text="Features read AuthRepository, RemoteDatabase, FileStorage, and HttpClient. Swap Appwrite, Supabase, Firebase, or REST without touching UI."
             link="/docs/concepts/contracts-and-capabilities"
           />
           <Feature
@@ -241,7 +241,7 @@ result.fold(
           </p>
         </div>
         <div className="backend-row">
-          {['Appwrite', 'Supabase', 'Firebase', 'Neon', 'REST API', 'Your own'].map((name) => (
+          {['Appwrite', 'Supabase', 'Firebase', 'REST API', 'Your own'].map((name) => (
             <div key={name} className="backend-chip">
               <Boxes size={16} />
               {name}

@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/appwrite/appwrite_account.dart';
@@ -16,7 +17,10 @@ void main() {
     bucketId: 'bucket',
   );
 
-  AppwriteSocialAuth social(FakeAppwriteAccount account, AppwriteSessionBridge bridge) {
+  AppwriteSocialAuth social(
+    FakeAppwriteAccount account,
+    AppwriteSessionBridge bridge,
+  ) {
     return AppwriteSocialAuth(
       account: account,
       config: config,
@@ -26,41 +30,65 @@ void main() {
     );
   }
 
-  test('signs in through the OAuth callback and publishes the session', () async {
+  test(
+    'signs in through the OAuth callback and publishes the session',
+    () async {
+      final account = FakeAppwriteAccount()
+        ..oauthUser = const AppwriteAccountUser(
+          id: 'gh-1',
+          email: 'ana@kiln.dev',
+          name: 'Ana',
+        );
+      final bridge = AppwriteSessionBridge();
+      final credential = await social(
+        account,
+        bridge,
+      ).signIn(SocialProvider.google);
+
+      expect(account.lastOAuthProvider, SocialProvider.google);
+      expect(account.lastOAuthSuccessUrl, config.oAuthSuccessUrl);
+      expect(credential, isNotNull);
+      expect(credential!.provider, SocialProvider.google);
+      expect(credential.email, 'ana@kiln.dev');
+      expect(credential.displayName, 'Ana');
+      expect(credential.idToken, 'jwt-gh-1');
+      expect(credential.audience, SocialTokenAudience.backend);
+      expect(credential.backendSessionToken, 'jwt-gh-1');
+      expect(credential.accessToken, isNull);
+      expect(bridge.session?.userId, 'gh-1');
+    },
+  );
+
+  test(
+    'returns null when the user cancels and never writes a session',
+    () async {
+      final account = FakeAppwriteAccount();
+      final bridge = AppwriteSessionBridge();
+
+      final credential = await social(
+        account,
+        bridge,
+      ).signIn(SocialProvider.apple);
+
+      expect(credential, isNull);
+      expect(bridge.session, isNull);
+    },
+  );
+
+  test('native browser cancellation returns null', () async {
     final account = FakeAppwriteAccount()
-      ..oauthUser = const AppwriteAccountUser(
-        id: 'gh-1',
-        email: 'ana@kiln.dev',
-        name: 'Ana',
-      );
+      ..failure = PlatformException(code: 'CANCELED');
     final bridge = AppwriteSessionBridge();
-    final credential = await social(account, bridge).signIn(SocialProvider.google);
-
-    expect(account.lastOAuthProvider, SocialProvider.google);
-    expect(account.lastOAuthSuccessUrl, 'appwrite-callback-proj://');
-    expect(credential, isNotNull);
-    expect(credential!.provider, SocialProvider.google);
-    expect(credential.email, 'ana@kiln.dev');
-    expect(credential.displayName, 'Ana');
-    expect(credential.idToken, 'jwt-gh-1');
-    expect(bridge.session?.userId, 'gh-1');
-  });
-
-  test('returns null when the user cancels and never writes a session', () async {
-    final account = FakeAppwriteAccount();
-    final bridge = AppwriteSessionBridge();
-
-    final credential = await social(account, bridge).signIn(SocialProvider.apple);
-
-    expect(credential, isNull);
+    expect(await social(account, bridge).signIn(SocialProvider.google), isNull);
     expect(bridge.session, isNull);
   });
 
   test('sign-out clears the account and the bridged session', () async {
     final account = FakeAppwriteAccount()
-      ..setCurrent(const AppwriteAccountUser(id: 'gh-1', email: 'ana@kiln.dev'));
-    final bridge = AppwriteSessionBridge()
-      ..establish(user: account.current!);
+      ..setCurrent(
+        const AppwriteAccountUser(id: 'gh-1', email: 'ana@kiln.dev'),
+      );
+    final bridge = AppwriteSessionBridge()..establish(user: account.current!);
 
     await social(account, bridge).signOut();
 
@@ -77,11 +105,16 @@ void main() {
       );
 
     expect(
-      () => social(account, AppwriteSessionBridge()).signIn(
-        SocialProvider.google,
-      ),
+      () => social(
+        account,
+        AppwriteSessionBridge(),
+      ).signIn(SocialProvider.google),
       throwsA(
-        isA<Failure>().having((f) => f.kind, 'kind', FailureKind.authentication),
+        isA<Failure>().having(
+          (f) => f.kind,
+          'kind',
+          FailureKind.authentication,
+        ),
       ),
     );
   });

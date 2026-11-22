@@ -1,0 +1,175 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+
+import 'extensions/appwrite/appwrite_config.dart';
+import 'extensions/appwrite/appwrite_module.dart';
+import 'extensions/dio/dio_client.dart';
+import 'extensions/dio/dio_config.dart';
+
+const backend = String.fromEnvironment('KILN_PROBE_BACKEND', defaultValue: 'http://127.0.0.1:8767');
+final status = ValueNotifier<String>('Starting Appwrite service checks');
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MaterialApp(initialRoute: '/', home: Scaffold(body: Center(
+    child: ValueListenableBuilder<String>(valueListenable: status,
+      builder: (_, text, _) => Text(text))))));
+  unawaited(runChecks());
+}
+
+Future<void> runChecks() async {
+  final platform = kIsWeb ? 'web' : 'android';
+  final control = DioClient(config: const DioConfig(baseUrl: backend));
+  final checks = <String>[];
+  Registry? registry;
+  StreamSubscription<Map<String, Object?>?>? subscription;
+  var step = 'fixture';
+  void verify(bool ok, String label) {
+    step = label;
+    if (!ok) throw StateError(label);
+    checks.add(label);
+    status.value = '$platform: ${checks.length} service checks passed';
+  }
+  try {
+    final response = await control.get(Uri.parse('/fixture?platform=$platform'));
+    final fixture = Map<String, Object?>.from(response.data as Map);
+    registry = await KilnBootstrap.run(modules: [AppwriteModule(config: AppwriteConfig(
+      endpoint: fixture['endpoint'] as String, projectId: fixture['project'] as String,
+      databaseId: fixture['databaseId'] as String, bucketId: fixture['bucketId'] as String,
+    ))]);
+    step = 'login';
+    final auth = registry.read<AuthRepository>();
+    // A rerun may follow a failed assertion before logout. Clear only this
+    // disposable app's session so the live server accepts a fresh login.
+    try { await auth.signOut(); }
+    on Failure catch (failure) {
+      if (failure.kind != FailureKind.authentication && failure.kind != FailureKind.permission) rethrow;
+    }
+    await auth.signIn(email: fixture['email'] as String, password: fixture['password'] as String);
+    verify(auth.currentSession?.userId == fixture['userId'], 'service_user_authenticated');
+    final database = registry.read<RemoteDatabase>();
+    final suffix = '$platform-${DateTime.now().microsecondsSinceEpoch}';
+    step = 'create_rows';
+    final first = await database.create('tasks', {'title': 'alpha-$suffix', 'done': false});
+    final second = await database.create('tasks', {'title': 'beta-$suffix', 'done': true});
+    final id = first['id'] as String;
+    verify(id.isNotEmpty && second['id'] != id, 'create_distinct_row_ids');
+    verify((await database.read('tasks', id))?['title'] == 'alpha-$suffix', 'read_created_row');
+    verify(await database.read('tasks', 'missing_$platform') == null, 'missing_row_returns_null');
+    final filtered = await database.query('tasks', query: RemoteQuery(filters: [
+      RemoteFilter('title', RemoteFilterOperator.equals, 'alpha-$suffix'),
+    ]));
+    verify(filtered.length == 1 && filtered.single['id'] == id, 'query_filter');
+    final ordered = await database.query('tasks', query: const RemoteQuery(
+      orderBy: [RemoteOrder('title')], limit: 1));
+    verify(ordered.length == 1, 'query_limit_and_order');
+    final cursor = await database.query('tasks', query: RemoteQuery(
+      orderBy: const [RemoteOrder('title')], limit: 1, cursor: ordered.single['id'] as String));
+    verify(cursor.isNotEmpty && cursor.single['id'] != ordered.single['id'], 'query_cursor');
+    final offset = await database.query('tasks', query: const RemoteQuery(
+      orderBy: [RemoteOrder('title')], limit: 1, offset: 1));
+    verify(offset.single['id'] == cursor.single['id'], 'query_offset');
+    var denied = false;
+    try { await database.query('denied'); }
+    on Failure catch (failure) {
+      denied = failure.kind == FailureKind.permission || failure.kind == FailureKind.authentication;
+    }
+    verify(denied, 'denied_table_maps_to_typed_failure');
+    final events = <Map<String, Object?>?>[];
+    final streamErrors = <Object>[];
+    step = 'realtime_initial_snapshot';
+    subscription = database.watch('tasks', id).listen(events.add, onError: streamErrors.add);
+    Future<void> waitFor(bool Function() predicate) async {
+      final deadline = DateTime.now().add(const Duration(seconds: 20));
+      while (!predicate()) {
+        if (streamErrors.isNotEmpty) throw StateError('Realtime stream failed');
+        if (DateTime.now().isAfter(deadline)) throw TimeoutException(step);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    await waitFor(() => events.any((row) => row?['id'] == id));
+    verify(events.first?['title'] == 'alpha-$suffix', 'realtime_initial_snapshot');
+    // Let the one-off reconciliation read finish before mutating, so observing
+    // the following update/delete establishes actual realtime delivery.
+    await Future<void>.delayed(const Duration(seconds: 2));
+    step = 'realtime_update';
+    final updated = await database.update('tasks', id, {'title': 'streamed-$platform', 'done': true});
+    verify(updated['done'] == true, 'update_row');
+    await waitFor(() => events.any((row) => row?['title'] == 'streamed-$platform'));
+    verify(true, 'realtime_update_after_reconciliation');
+    step = 'realtime_delete';
+    await database.delete('tasks', id);
+    await waitFor(() => events.contains(null));
+    verify(true, 'realtime_delete_emits_null');
+    await subscription.cancel();
+    subscription = null;
+    verify(await database.read('tasks', id) == null, 'deleted_row_is_missing');
+    await database.delete('tasks', second['id'] as String);
+
+    final files = registry.read<FileStorage>();
+    final payload = utf8.encode('Kiln $platform UTF-8 storage test: \u2603');
+    final filePath = '$platform/roundtrip.txt';
+    final uploadProgress = <double>[];
+    step = 'storage_upload';
+    final stored = await files.upload(FileUpload(path: filePath, bytes: payload,
+      contentType: 'text/plain'), onProgress: uploadProgress.add);
+    verify(stored.path == filePath && stored.size == payload.length, 'storage_upload_metadata');
+    verify(uploadProgress.isNotEmpty && uploadProgress.last == 1 &&
+      uploadProgress.every((value) => value >= 0 && value <= 1), 'storage_upload_progress');
+    final downloaded = await files.download(filePath);
+    verify(listEquals(downloaded, payload), 'storage_download_exact_bytes');
+    verify((await files.url(filePath)).queryParameters['project'] == fixture['project'], 'storage_view_url_project');
+    var expiryRejected = false;
+    try { await files.url(filePath, expiresIn: const Duration(minutes: 1)); }
+    on Failure catch (failure) { expiryRejected = failure.code == FailureCode.validationUnsupportedValue; }
+    verify(expiryRejected, 'storage_expiry_rejected_explicitly');
+    await files.delete(filePath);
+    var missingFile = false;
+    try { await files.download(filePath); }
+    on Failure catch (failure) { missingFile = failure.code == FailureCode.fileNotFound; }
+    verify(missingFile, 'deleted_file_maps_to_not_found');
+    final replacement = utf8.encode('Replacement $platform file');
+    await files.upload(FileUpload(path: filePath, bytes: replacement, contentType: 'text/plain'));
+    verify(listEquals(await files.download(filePath), replacement), 'replaced_file_has_fresh_bytes');
+    await files.delete(filePath);
+    step = 'storage_chunked_upload';
+    final large = List<int>.generate(5 * 1024 * 1024 + 33, (index) => index % 251);
+    final largePath = '$platform/chunked.bin';
+    await files.upload(FileUpload(path: largePath, bytes: large,
+      contentType: 'application/octet-stream'));
+    verify(listEquals(await files.download(largePath), large), 'storage_chunked_upload_roundtrip');
+    await files.delete(largePath);
+    final targets = registry.read<PushTargets>();
+    step = 'push_target_registration';
+    final target = await targets.register(token: 'kiln-synthetic-$platform');
+    verify(target.id.isNotEmpty, 'push_target_registration_only');
+    final rotated = await targets.update(targetId: target.id, token: 'kiln-synthetic-$platform-rotated');
+    verify(rotated.id == target.id && rotated.identifier.endsWith('-rotated'), 'push_target_rotation');
+    await targets.unregister(targetId: target.id);
+    verify(true, 'push_target_unregistration');
+    step = 'logout';
+    await auth.signOut();
+    var anonymousRejected = false;
+    try { await database.query('tasks'); }
+    on Failure catch (failure) { anonymousRejected =
+      failure.kind == FailureKind.permission || failure.kind == FailureKind.authentication; }
+    verify(anonymousRejected, 'logged_out_database_access_rejected');
+    status.value = '$platform services: PASS (${checks.length} checks)';
+    await control.post(Uri.parse('/report'), body: {'platform': platform,
+      'phase': 'services', 'checks': checks});
+  } catch (error) {
+    final detail = error is Failure ? '${error.code.value}: ${error.message}'
+      : error is StateError ? '${error.message}' : error.runtimeType.toString();
+    status.value = '$platform services: FAIL at $step';
+    await control.post(Uri.parse('/report'), body: {'platform': platform,
+      'phase': 'services', 'checks': checks, 'error': '$step: $detail'});
+  } finally {
+    await subscription?.cancel();
+    await registry?.read<Lifecycle>().dispose();
+    control.close(force: true);
+  }
+}

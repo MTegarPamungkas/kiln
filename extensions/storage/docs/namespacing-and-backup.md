@@ -59,6 +59,38 @@ Add new steps; do not delete old ones from the list. Migrations run before the
 app reads feature data, so a failed migration should leave the app on defaults
 and report a configuration/storage failure.
 
+Each step is transactional: the storage is snapshotted before the callback and
+restored if it throws, and `schema_version` is written only after the step
+succeeds. A failed run therefore resumes at that step instead of replaying the
+ones that already completed. A missing migration for a version is an error; the
+version is never advanced silently.
+
+Before each step the migrator writes a recovery checkpoint
+(`__kiln_migration_checkpoint`) with the step's bounds and its snapshot. If the
+process dies inside the step, the next run restores that snapshot, writes the
+version back and runs the step again, so a half-applied step is never kept. A
+checkpoint whose target version was already reached is discarded without
+restoring, because the step committed. Steps must therefore be safe to run again
+from the snapshot. An unreadable checkpoint fails the migration instead of
+guessing.
+
+Pass a `MutationLock` when another isolate or process can migrate the same
+storage at the same time (any core `MutationLock` works; the `local_db` extension
+ships a blocking file-backed one that the operating system releases when the
+process dies):
+
+```dart
+await StorageMigrator(
+  storage: storage,
+  targetVersion: 2,
+  migrations: [migrateToV1, migrateToV2],
+  lock: mutationLock,
+).run();
+```
+
+The checkpoint restores what it snapshotted, so unrelated writers must stay out
+of storage for the duration of a migration anyway.
+
 ## Backup and secrets
 
 SharedPreferences is not encrypted and may be included in platform backups.

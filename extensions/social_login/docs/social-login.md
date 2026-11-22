@@ -8,7 +8,8 @@ final login = registry.read<SocialLogin>();
 
 final credential = await login.signIn(SocialProvider.google);
 if (credential != null) {
-  await backendSocialAuth.signInWithCredential(credential);
+  // Send the provider credential to your backend exchange endpoint:
+  // credential.idToken, rawNonce, authorizationCode, accessToken.
 }
 ```
 
@@ -35,11 +36,22 @@ for (final provider in availability.providers) {
 }
 ```
 
-## Nonce
+## Nonce and code
 
-Apple receives the SHA-256 hash of a random nonce. Store the original nonce only
-if the server verifies the `nonce` claim in the identity token; this extension
-does not store it.
+Apple receives the SHA-256 hash of a random nonce. The original nonce is
+returned as `credential.rawNonce`, and Apple's authorization code is returned as
+`credential.authorizationCode`; forward both to the backend so it can verify the
+`nonce` claim and exchange the code when its flow requires it. `accessToken`
+stays reserved for provider access tokens.
+
+## Audience
+
+Credentials from this extension use
+`SocialTokenAudience.provider`. A backend adapter that already created its own
+session (Appwrite, Supabase OAuth, Firebase) returns
+`SocialTokenAudience.backend` and exposes that token in
+`backendSessionToken`; never forward such a token to another backend as a
+provider identity token.
 
 ## Sign out
 

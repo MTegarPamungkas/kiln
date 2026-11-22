@@ -26,13 +26,23 @@ Implementation of `AuthRepository`, `SocialAuth`, `RemoteDatabase`,
 
 ```bash
 kiln add appwrite
+kiln setup appwrite
+kiln doctor
 ```
 
-Prompts requested: `endpoint`, `project_id`, `database_id`, and `bucket_id`.
-After installing, follow [docs/appwrite-setup.md](docs/appwrite-setup.md) and
-complete the manual steps recorded by `kiln doctor`: add the app platform,
-register the redirect URLs `kiln://auth/recovery` and `kiln://auth/verify`, and
-enable the OAuth2 providers you want to use.
+Settings: `endpoint`, `project_id`, `database_id`, and `bucket_id`. The setup
+wizard reviews saved values and replaces the demo project ID with your real
+project. Explicit `--answer` values override saved settings. No server API key
+is needed. Preview changes with `kiln setup appwrite --dry-run`.
+
+Setup updates client settings, generated source, and ownership hashes in one
+transaction. Modified extension files are protected; failed verification rolls
+the setup back. Doctor checks local configuration and points to setup commands
+for missing or invalid settings. Neither command checks the remote server.
+
+After configuring, follow [docs/appwrite-setup.md](docs/appwrite-setup.md): add
+your app platforms and configure the resources, permissions, and authentication
+flows your app uses.
 
 ## Usage example
 
@@ -95,6 +105,13 @@ await gate.sendPasswordReset(email);
 Every call returns a `Result`; the app owns the UI.
 
 ## Runtime support
+
+Session persistence is scoped per endpoint and project. With `secure_storage`
+installed, Kiln uses the `SecureStorage` contract for its session copy; otherwise
+it uses SharedPreferences. The vendor SDK's cookie jar remains independently
+managed. Email/password auth requests are bounded, logout works offline, and
+late restore/JWT results cannot restore cleared application state. See
+[session lifecycle details](docs/logout-and-session-cleanup.md).
 
 This extension reports platform and device readiness through `SupportRegistry`.
 Unsupported calls return typed information instead of blocking startup. See

@@ -1,0 +1,123 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'app/app_route.dart';
+import 'extensions/appwrite/appwrite_config.dart';
+import 'extensions/appwrite/appwrite_module.dart';
+import 'extensions/appwrite_push_native/appwrite_push_native_config.dart';
+import 'extensions/appwrite_push_native/appwrite_push_native_module.dart';
+import 'extensions/appwrite_push_native/appwrite_push_native_transport.dart';
+import 'extensions/go_router/app_router.dart';
+import 'extensions/go_router/go_router_module.dart';
+import 'extensions/go_router/router_config.dart';
+import 'extensions/go_router/sign_in_page_builder.dart';
+import 'extensions/dio/dio_client.dart';
+import 'extensions/dio/dio_config.dart';
+
+final control = DioClient(config: const DioConfig(baseUrl: 'http://127.0.0.1:8768'));
+final status = ValueNotifier<String>('Starting push routing probe');
+late Registry registry;
+late Map<String,Object?> fixture;
+
+Future<void> report(String phase) async {
+  final push=registry.read<AppwritePushNativeTransport>();
+  await control.post(Uri.parse('/report'), body: {'platform':'android',
+    'phase':phase,'checks':[registry.read<AppRouter>().router.routeInformationProvider.value.uri.toString(),
+      if(registry.read<AuthRepository>().currentSession case final session?) 'user:${session.userId}',
+      'dup:${push.duplicateTapsIgnored}','retry:${push.retryAttempt}']});
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MaterialApp(home:Scaffold(body:Center(child:Text('Starting native push routing probe')))));
+  try {
+    fixture=Map<String,Object?>.from((await control.get(Uri.parse('/fixture?platform=android'))).data as Map);
+    registry=await KilnBootstrap.run(modules:[
+      AppwriteModule(config:AppwriteConfig(endpoint:fixture['endpoint'] as String,projectId:fixture['project'] as String)),
+      ProbeRoutes(),
+      AppwritePushNativeModule(config:AppwritePushNativeConfig(pushEndpoint:fixture['pushEndpoint'] as String)),
+      GoRouterModule(),
+    ]);
+    final router=registry.read<AppRouter>().router;
+    router.routeInformationProvider.addListener(()=>unawaited(report('navigation')));
+    runApp(MaterialApp.router(routerConfig:router));
+    status.value='Ready';
+    await report('ready');
+  } catch(e) {
+    runApp(MaterialApp(home:Scaffold(body:Center(child:Text('Probe failed: ${e.runtimeType}')))));
+    await control.post(Uri.parse('/report'),body:{'platform':'android','phase':'startup','checks':[],'error':e.runtimeType.toString()});
+  }
+}
+
+Future<void> login({bool google=false}) async {
+  try {
+    status.value='Signing in';
+    if(google) {
+      final credential=await registry.read<SocialAuth>().signIn(SocialProvider.google);
+      if(credential==null){status.value='Google sign-in cancelled';return;}
+    } else {
+      await registry.read<AuthRepository>().signIn(email:fixture['email'] as String,password:fixture['password'] as String);
+    }
+    final push=registry.read<AppwritePushNativeTransport>();
+    final end=DateTime.now().add(const Duration(seconds:25));
+    while(!push.isSubscribed && DateTime.now().isBefore(end)) {
+      await Future<void>.delayed(const Duration(milliseconds:100));
+    }
+    status.value=push.isSubscribed?'Push subscribed':'Push subscription failed';
+    await report(push.isSubscribed?'subscribed':'subscribe-failed');
+  } catch(e) {
+    final code=e is Failure?e.code.value:e.runtimeType.toString();
+    status.value='Login failed: $code';
+    await report('login-failed:$code');
+  }
+}
+
+class ProbeRoutes extends KilnModule {
+  @override String get id=>'probe_routes';
+  @override Set<String> get requires=>{'auth'};
+  @override void register(Registry r) {
+    r.registerSingleton<AppRouterConfig>(AppRouterConfig(enableAuthRedirect:true,
+      sessionLoadingBuilder:(_)=>const ProbePage(title:'Session restoration pending',signIn:true)));
+    r.registerSingleton<SignInPageBuilder>(ProbeSignIn());
+    r.read<SlotRegistry>().open<AppRoute>(SlotNames.routerRoutes)
+      ..add(AppRoute(path:'/',name:'home',builder:(_)=>const ProbePage(title:'Home')))
+      ..add(AppRoute(path:'/orders/:id',name:'order',builder:(context)=>ProbePage(title:'Order ${GoRouterState.of(context).pathParameters['id']}')));
+  }
+}
+class ProbeSignIn implements SignInPageBuilder {
+  @override Widget build(BuildContext context)=>const ProbePage(title:'Sign in required',signIn:true);
+}
+class ProbePage extends StatelessWidget {
+  const ProbePage({super.key,required this.title,this.signIn=false});
+  final String title; final bool signIn;
+  @override Widget build(BuildContext context)=>Scaffold(body:Center(child:Column(mainAxisSize:MainAxisSize.min,children:[
+    Text(title),Text(GoRouterState.of(context).uri.toString()),
+    if(registry.read<AuthRepository>().currentSession case final session?) ...[
+      Text('Account: ${session.email ?? "No email"}'),Text('User ID: ${session.userId}'),
+    ],
+    ValueListenableBuilder<String>(valueListenable:status,builder:(_,text,__)=>Text(text)),
+    if(signIn) ElevatedButton(onPressed:()=>login(google:true),child:const Text('Sign in with Google')),
+    if(signIn) ElevatedButton(onPressed:()=>login(),child:const Text('Sign in with temporary test account')),
+    if(!signIn) ElevatedButton(onPressed:()async{await registry.read<AuthRepository>().signOut();status.value='Signed out';await report('signed-out');},child:const Text('Sign out')),
+    if(!signIn) ElevatedButton(onPressed:()=>registry.read<AppRouter>().router.go('/'),child:const Text('Home')),
+    if(!signIn) ElevatedButton(onPressed:()async{
+      final push=registry.read<AppwritePushNativeTransport>();
+      final delivery=await push.status();
+      status.value='Delivery: ${delivery==null?'unsupported':delivery.toString()}';
+      await control.post(Uri.parse('/report'),body:{'platform':'android','phase':'delivery-status',
+        'checks':[if(delivery!=null)...['exactAlarms:${delivery.exactAlarms}',
+          'batteryExempt:${delivery.ignoringBatteryOptimizations}',
+          'foregroundService:${delivery.foregroundService}',
+          'bestEffort:${delivery.bestEffort}',
+          'backgroundRestricted:${delivery.backgroundRestricted}']]});
+    },child:const Text('Push delivery status')),
+    if(!signIn) ElevatedButton(onPressed:()async{
+      final push=registry.read<AppwritePushNativeTransport>();
+      status.value='Retrying push';
+      await push.retryNow();
+      status.value=push.isSubscribed?'Push subscribed':'Retry failed';
+      await report(push.isSubscribed?'retried-subscribed':'retried-failed');
+    },child:const Text('Retry push')),
+  ])));
+}

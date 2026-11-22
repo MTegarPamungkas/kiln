@@ -19,7 +19,7 @@
     "lib/features/notes/domain/usecases/toggle_note.dart": "580fb25f5837133cd155b62e4d289957667b9d32ebccdf440556a46ebccb0d08",
     "lib/features/notes/domain/usecases/watch_notes.dart": "a408f4cec4a52193a20eda46f219be91fe460aadd58b5c20f82771bf521621a5",
     "lib/features/notes/feature.dart": "a14434230a8467949f8f0ba511870fd254a4a73a7ab5eaf5f306334bf9868431",
-    "lib/features/notes/presentation/providers/notes_controller.dart": "fa5e236d818cb12da2e720f2fca982fbb0a8ea830f6f64ffa066440c71ff0e44",
+    "lib/features/notes/presentation/providers/notes_controller.dart": "b35c1c11202d5b370e9cc0667292a2a9773ca1c03077f013544db8d96bff508a",
     "lib/features/notes/presentation/providers/notes_providers.dart": "4a2b959b4b1034e1df32f801a9e33aab126374cb70f1a375d0c70e9dc56a3f12",
     "lib/features/notes/presentation/screens/notes_page.dart": "1551c2360fe82b14e6b05cfd54614236ce897630dc86d6eee488a9cb78655835",
     "lib/features/notes/presentation/widgets/note_tile.dart": "886830aafd4820e679b5e38f0c8666c9484b11d073668f0299eb5bad9378bd9c",
@@ -28,7 +28,7 @@
     "test/extensions/riverpod/core/riverpod/session_notifier_test.dart": "c1574d5aebb9d1119cbb071fac470befe4928f07bd3cfb9d879567005a63b699",
     "test/extensions/riverpod/riverpod_bootstrap_test.dart": "c602ab25fca967231ab8757b10e17300232d95cbedda389a91be98cfafbf2b64",
     "test/extensions/riverpod/riverpod_module_test.dart": "9f30c71d084cdc51dade9edcd9df253c797b9e3a20f560befa1b21fc5bc054f8",
-    "test/features/notes/notes_controller_test.dart": "f912d1d5956cf3aa4c8642bb9b47424d2ae92d32f57e883722ef7a6abff96655",
+    "test/features/notes/notes_controller_test.dart": "3ad5eb1cc4ab54a199c560bd381194a285dfd42373b3fc61edd42324399e1c4b",
     "test/features/notes/notes_page_test.dart": "4c9fb4c7e879e6e285cac54c40e37bbaa6090451598e061532cea5f403ea865f"
   }
 }

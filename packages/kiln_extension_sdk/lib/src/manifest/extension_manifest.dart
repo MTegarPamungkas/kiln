@@ -217,7 +217,7 @@ final class AvailableExtension {
   final MasonBundle bundle;
 
   /// Documentation installed into the app next to the extension's code, keyed
-  /// by path relative to the extension root (`README.md`, `docs/neon.md`).
+  /// by path relative to the extension root (`README.md`, `docs/setup.md`).
   /// Bundled extensions embed these; store extensions fall back to reading
   /// them from [ExtensionManifest.rootPath].
   final Map<String, List<int>> docs;

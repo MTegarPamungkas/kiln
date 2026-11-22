@@ -6,13 +6,16 @@ void main() {
     const config = MediaPickerConfig.defaults;
 
     expect(config.maxBytes, 5242880);
-    expect(config.allowedTypes, containsAll(<String>[
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'image/heic',
-      'image/gif',
-    ]));
+    expect(
+      config.allowedTypes,
+      containsAll(<String>[
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/heic',
+        'image/gif',
+      ]),
+    );
     expect(config.maxWidth, 1600);
     expect(config.maxHeight, 1600);
     expect(config.imageQuality, 85);

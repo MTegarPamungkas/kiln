@@ -18,12 +18,16 @@ final class SupabaseSessionBridge {
   final AuthRepository _auth;
   final SessionController _controller;
   StreamSubscription<AuthSession?>? _subscription;
+  bool _disposed = false;
 
   bool get isAttached => _subscription != null;
 
   /// Seeds the initial session and subscribes to later changes.
+  ///
+  /// Does nothing after [dispose]; bootstrap may call [start] after disposal
+  /// when `ready()` outlived the bootstrapping application.
   void start() {
-    if (_subscription != null) {
+    if (_subscription != null || _disposed) {
       return;
     }
     _controller.setSession(_auth.currentSession);
@@ -32,6 +36,10 @@ final class SupabaseSessionBridge {
 
   /// Stops forwarding changes; the last session is left untouched.
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _subscription?.cancel();
     _subscription = null;
   }

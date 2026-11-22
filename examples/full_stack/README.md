@@ -9,7 +9,26 @@ flutter pub get
 flutter run
 ```
 
-## Structure
+## Calling the SDK
+
+Bootstrap registers the Gate automatically. In a widget below `KilnApp`,
+import `package:kiln_core/kiln_core.dart` and this app's
+`lib/app/registry_scope.dart`, then call a verb:
+
+```dart
+final gate = RegistryScope.read<Gate>(context);
+final result = await gate.signIn(email: email, password: password);
+result.fold(
+  ok: (session) => print('Signed in: ${session.userId}'),
+  err: (failure) => print(failure.message),
+);
+```
+
+The installed `rest_auth` extension needs a working API configuration. The app
+owns form state, navigation, and error presentation. In services, pass the Gate
+explicitly. See the [Gate reference](../../docs/reference/gate.md).
+
+## Project layout
 
 - `lib/app/` — app skeleton, registry, and MaterialApp shell.
 - `lib/core/` — theme, localization, error handling, and the `bloc` runtime

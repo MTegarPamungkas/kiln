@@ -41,6 +41,11 @@ import '../util/clock.dart';
 /// (or [use]) and invokes it through [call] (or a convenience method) to
 /// receive an [Ok]/[Err] value instead of catching thrown [Failure]s. The SDK
 /// stays a pure gate: it only returns success or failure plus information.
+///
+/// Bootstrap registers one instance, available as `registry.read<Gate>()`.
+/// Direct service access through [use] or a typed getter can throw. To keep
+/// lookup and invocation inside the guard, use a verb or
+/// `gate.call(() => gate.use<MyContract>().operation())`.
 final class Gate {
   const Gate(this.registry);
 
@@ -424,7 +429,8 @@ final class Gate {
   Future<Result<SocialCredential?>> socialSignIn(SocialProvider provider) =>
       call(() => socialAuth.signIn(provider));
 
-  Future<Result<void>> socialSignOut() => call<void>(() => socialAuth.signOut());
+  Future<Result<void>> socialSignOut() =>
+      call<void>(() => socialAuth.signOut());
 
   // Storage
   Future<Result<String?>> readValue(String key) =>

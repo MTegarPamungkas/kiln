@@ -18,10 +18,7 @@ XFile _jpegFile() {
 void main() {
   test('recovers the image lost when the activity was destroyed', () async {
     final gateway = FakeImagePickerGateway()
-      ..lost = LostDataResponse(
-        file: _jpegFile(),
-        type: RetrieveType.image,
-      );
+      ..lost = LostDataResponse(file: _jpegFile(), type: RetrieveType.image);
     final picker = DeviceMediaPicker(gateway: gateway);
     final recovery = LostDataRecovery(
       gateway: gateway,

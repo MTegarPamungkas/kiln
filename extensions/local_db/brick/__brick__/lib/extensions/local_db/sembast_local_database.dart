@@ -9,10 +9,7 @@ typedef LocalDatabaseOpener = Future<Database> Function();
 
 /// [LocalDatabase] backed by Sembast.
 final class SembastLocalDatabase implements LocalDatabase {
-  SembastLocalDatabase({
-    this.opener,
-    this.database,
-  });
+  SembastLocalDatabase({this.opener, this.database});
 
   final LocalDatabaseOpener? opener;
   Database? database;
@@ -27,12 +24,22 @@ final class SembastLocalDatabase implements LocalDatabase {
     if (opening != null) {
       return opening;
     }
-    final future = (opener ?? () async {
-      throw StateError('No database opener configured');
-    })().then<Database>((opened) {
-      database = opened;
-      return opened;
-    });
+    final future =
+        (opener ??
+                () async {
+                  throw StateError('No database opener configured');
+                })()
+            .then<Database>(
+              (opened) {
+                database = opened;
+                return opened;
+              },
+              onError: (Object error, StackTrace stackTrace) {
+                // A failed open must not be cached: the next call retries.
+                _opening = null;
+                Error.throwWithStackTrace(error, stackTrace);
+              },
+            );
     _opening = future;
     return future;
   }
@@ -49,10 +56,9 @@ final class SembastLocalDatabase implements LocalDatabase {
   ) async {
     try {
       final database = await _db();
-      await _store(collection).record(key).put(
-        database,
-        Map<String, Object?>.of(data),
-      );
+      await _store(collection)
+          .record(key)
+          .put(database, Map<String, Object?>.of(data));
     } catch (error, stackTrace) {
       throw mapLocalDbError(
         error,
@@ -81,10 +87,7 @@ final class SembastLocalDatabase implements LocalDatabase {
     try {
       final database = await _db();
       final finder = const LocalQueryBuilder().build(query);
-      final snapshots = await _store(collection).find(
-        database,
-        finder: finder,
-      );
+      final snapshots = await _store(collection).find(database, finder: finder);
       return const CollectionWatcher().toRecords(snapshots);
     } catch (error, stackTrace) {
       throw mapLocalDbError(error, stackTrace: stackTrace);

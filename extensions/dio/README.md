@@ -19,6 +19,10 @@ final response = await client.get(Uri.parse('/users'));
 
 Relative paths are resolved against the configured `base_url`.
 
+Every HTTP response the server sends is returned, including 4xx and 5xx;
+status policy belongs to middleware or the calling adapter. Transport failures
+(timeouts, connection errors, cancellation) throw `Failure` instead.
+
 ## API key
 
 Configure where the key goes, then pass the key at build time:

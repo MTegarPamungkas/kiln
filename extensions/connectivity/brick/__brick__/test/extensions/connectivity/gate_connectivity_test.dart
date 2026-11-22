@@ -21,6 +21,14 @@ Gate _gate(HttpClient? client, {String? probeUrl}) {
 }
 
 void main() {
+  test('missing network monitor returns Err instead of throwing', () async {
+    final gate = Gate(GetItRegistry());
+
+    final result = await gate.networkReachable();
+
+    expect(result.failureOrNull?.code, FailureCode.configurationMissing);
+  });
+
   test('networkReachable is true when no probe is configured', () async {
     final gate = _gate(null);
 

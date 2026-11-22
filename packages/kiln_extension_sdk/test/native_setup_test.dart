@@ -91,6 +91,35 @@ void main() {
       );
     });
 
+    test(
+      'manifest desugaring flag survives round trip and plans the Gradle patch',
+      () {
+        final android = AndroidSetup.fromMap({'core_library_desugaring': true});
+        expect(android.isEmpty, isFalse);
+        expect(android.toJson()['core_library_desugaring'], isTrue);
+        final configured = makeExtension(
+          id: 'appwrite',
+          platformSetup: PlatformSetup(android: android),
+        );
+        final result = const NativeSetup().plan(
+          projectRoot: project,
+          manifest: configured.manifest,
+        );
+        expect(
+          result.patches.map((patch) => patch.id),
+          contains('android.desugar'),
+        );
+        expect(
+          result.changes.values.join(),
+          contains('desugar_jdk_libs:2.1.5'),
+        );
+        expect(
+          AndroidSetup.fromMap({}).toJson(),
+          isNot(contains('core_library_desugaring')),
+        );
+      },
+    );
+
     test('uses the prompt answer for native url schemes', () {
       final prompted = makeExtension(
         id: 'demo',

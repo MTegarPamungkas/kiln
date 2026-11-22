@@ -6,7 +6,14 @@ import 'crash_report_config.dart';
 /// lifecycle calls (`init`, `flush`, `close`) that only the SDK gateway needs.
 abstract interface class CrashReportGateway {
   /// Prepares the vendor SDK for [config], using [environment] when given.
-  Future<void> init(CrashReportConfig config, {String? environment});
+  ///
+  /// [isAllowed] reports current consent so the SDK can drop queued or
+  /// automatic events at the transport boundary after consent is revoked.
+  Future<void> init(
+    CrashReportConfig config, {
+    String? environment,
+    required bool Function() isAllowed,
+  });
 
   /// Reports [error] with an optional [stackTrace] and structured [context].
   Future<void> captureError(

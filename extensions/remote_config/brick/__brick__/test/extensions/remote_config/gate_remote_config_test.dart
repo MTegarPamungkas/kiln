@@ -10,8 +10,7 @@ void main() {
 
     setUp(() {
       fake = FakeRemoteConfig();
-      final registry = GetItRegistry()
-        ..registerSingleton<RemoteConfig>(fake);
+      final registry = GetItRegistry()..registerSingleton<RemoteConfig>(fake);
       gate = Gate(registry);
     });
 

@@ -13,6 +13,7 @@ final class _TrackedModule extends KilnModule {
     this.supportInfo,
     this.supportAction,
     this.events,
+    this.requiredForStartup = false,
   });
 
   @override
@@ -27,6 +28,8 @@ final class _TrackedModule extends KilnModule {
   final SupportInfo? supportInfo;
   final FutureOr<SupportInfo> Function()? supportAction;
   final List<String>? events;
+  @override
+  final bool requiredForStartup;
 
   @override
   void register(Registry registry) {
@@ -74,8 +77,174 @@ final class _FailingRegisterModule extends KilnModule {
   }
 }
 
+final class _GateConsumerModule extends KilnModule {
+  final List<Gate> gates = <Gate>[];
+
+  @override
+  String get id => 'gate-consumer';
+
+  @override
+  void register(Registry registry) => gates.add(registry.read<Gate>());
+
+  @override
+  SupportInfo support(Registry registry) {
+    gates.add(registry.read<Gate>());
+    return const SupportInfo.supported();
+  }
+
+  @override
+  void ready(Registry registry) => gates.add(registry.read<Gate>());
+}
+
 void main() {
   group('KilnBootstrap', () {
+    test('required modules cannot silently degrade', () async {
+      final events = <String>[];
+      await expectLater(
+        KilnBootstrap.run(
+          modules: [
+            _TrackedModule(
+              'env',
+              requiredForStartup: true,
+              events: events,
+              supportInfo: SupportInfo.unsupported(
+                SupportState.unavailable,
+                message: 'Unavailable',
+              ),
+            ),
+          ],
+        ),
+        throwsA(
+          isA<Failure>().having(
+            (failure) => failure.code,
+            'code',
+            FailureCode.unavailable,
+          ),
+        ),
+      );
+      expect(events, ['register:env', 'dispose:env']);
+    });
+
+    test('a required module with invalid config fails with its typed reason', () async {
+      await expectLater(
+        KilnBootstrap.run(
+          modules: [
+            _TrackedModule(
+              'env',
+              requiredForStartup: true,
+              supportInfo: const SupportInfo.unsupported(
+                SupportState.notConfigured,
+                message: 'Missing API key',
+              ),
+            ),
+          ],
+        ),
+        throwsA(
+          isA<Failure>()
+              .having(
+                (failure) => failure.code,
+                'code',
+                FailureCode.configurationMissing,
+              )
+              .having(
+                (failure) => failure.kind,
+                'kind',
+                FailureKind.configuration,
+              ),
+        ),
+      );
+    });
+
+    test('unavailable capabilities prevent dependent readiness', () async {
+      final events = <String>[];
+      final ready = <String>[];
+      final registry = await KilnBootstrap.run(
+        modules: [
+          _TrackedModule(
+            'backend',
+            provides: {'database'},
+            events: events,
+            supportInfo: SupportInfo.unsupported(
+              SupportState.unavailable,
+              message: 'Unavailable',
+            ),
+          ),
+          _TrackedModule(
+            'consumer',
+            requires: {'database'},
+            provides: {'feature'},
+            events: events,
+          ),
+          _TrackedModule('independent', events: events),
+        ],
+        onModuleReady: (module) => ready.add(module.id),
+      );
+      addTearDown(registry.read<Lifecycle>().dispose);
+      expect(events, isNot(contains('ready:consumer')));
+      expect(
+        registry.read<SupportRegistry>()['consumer']!.isSupported,
+        isFalse,
+      );
+      expect(ready, ['independent']);
+    });
+
+    test('apps can require a backend capability explicitly', () async {
+      await expectLater(
+        KilnBootstrap.run(
+          modules: [
+            _TrackedModule(
+              'backend',
+              provides: {'database'},
+              supportInfo: SupportInfo.unsupported(
+                SupportState.unavailable,
+                message: 'Unavailable',
+              ),
+            ),
+          ],
+          requiredCapabilities: {'database'},
+        ),
+        throwsA(
+          isA<Failure>().having(
+            (failure) => failure.code,
+            'code',
+            FailureCode.unavailable,
+          ),
+        ),
+      );
+    });
+
+    test('provides the same Gate throughout module initialization', () async {
+      final module = _GateConsumerModule();
+      final registry = await KilnBootstrap.run(modules: [module]);
+      addTearDown(registry.read<Lifecycle>().dispose);
+      final gate = registry.read<Gate>();
+
+      expect(gate.registry, same(registry));
+      expect(module.gates, hasLength(3));
+      for (final observed in module.gates) {
+        expect(observed, same(gate));
+      }
+      expect(gate.session, same(registry.read<SessionController>()));
+      final result = await gate.signOut();
+      expect(result.failureOrNull?.code, FailureCode.configurationMissing);
+    });
+
+    test('keeps Gate and its services isolated between bootstraps', () async {
+      final first = await KilnBootstrap.run(modules: []);
+      final second = await KilnBootstrap.run(modules: []);
+      addTearDown(first.read<Lifecycle>().dispose);
+      addTearDown(second.read<Lifecycle>().dispose);
+
+      expect(first.read<Gate>(), isNot(same(second.read<Gate>())));
+      expect(first.read<Gate>().registry, same(first));
+      expect(second.read<Gate>().registry, same(second));
+      expect(
+        first.read<Gate>().session,
+        isNot(same(second.read<Gate>().session)),
+      );
+      expect(Gate(first).session, same(first.read<Gate>().session));
+    });
+
     test('skips modules that do not support the current platform', () async {
       final events = <String>[];
       await KilnBootstrap.run(
@@ -270,10 +439,20 @@ void main() {
       await lifecycle.dispose();
 
       expect(events.where((event) => event == 'dispose:once'), hasLength(1));
-      expect(
-        () => lifecycle.addDisposeCallback(() {}),
-        throwsStateError,
+      expect(() => lifecycle.addDisposeCallback(() {}), throwsStateError);
+    });
+
+    test('lifecycle shutdown disposes registry-owned services', () async {
+      final registry = await KilnBootstrap.run(
+        modules: [const _OwnedResourceModule()],
       );
+      final owned = registry.read<_OwnedResource>();
+      final lifecycle = registry.read<LifecycleController>();
+
+      await lifecycle.dispose();
+
+      expect(owned.disposed, isTrue);
+      expect(registry.isRegistered<_OwnedResource>(), isFalse);
     });
 
     test('a module that fails to register is still disposed', () async {
@@ -300,4 +479,25 @@ void main() {
       expect(registry.read<Clock>(), same(clock));
     });
   });
+}
+
+final class _OwnedResource implements Disposable {
+  bool disposed = false;
+
+  @override
+  Future<void> dispose() async {
+    disposed = true;
+  }
+}
+
+final class _OwnedResourceModule extends KilnModule {
+  const _OwnedResourceModule();
+
+  @override
+  String get id => 'owned';
+
+  @override
+  void register(Registry registry) {
+    registry.registerOwned<_OwnedResource>(_OwnedResource());
+  }
 }

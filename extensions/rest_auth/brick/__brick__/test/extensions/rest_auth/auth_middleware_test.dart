@@ -11,7 +11,10 @@ final class _TokenProvider implements TokenProvider {
   String? token;
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) async => token;
+  Future<String?> accessToken({
+    bool forceRefresh = false,
+    DateTime? deadline,
+  }) async => token;
 
   @override
   Future<void> clear() async {

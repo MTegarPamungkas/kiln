@@ -2,6 +2,8 @@
 
 ## 0.2.1
 
+- The manifest declares the optional `logger` dependency the module already
+  uses for the bloc observer.
 - The module orders itself after the logger, so the Bloc observer is
   attached when both extensions are installed.
 

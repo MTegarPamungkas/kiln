@@ -15,15 +15,8 @@ flutter pub get
 dart analyze
 ```
 
-All tests:
-
-```bash
-cd packages/kiln_core && dart test
-cd ../kiln_testing && flutter test
-cd ../kiln_extension_sdk && dart test
-cd ../kiln_cli && dart test
-cd ../../extensions/dio && dart test
-```
+For SDK development and the complete test commands, see the
+[repository development guide](../README.md#development).
 
 ## Creating an app
 
@@ -89,6 +82,65 @@ kiln doctor
 kiln graph
 kiln remove dio --yes
 ```
+
+## Call a service and handle the result
+
+Bootstrap makes `Gate` available automatically. In a widget below the generated
+`KilnApp`, import the app's `registry_scope.dart` and `kiln_core`, then read it:
+
+```dart
+final gate = RegistryScope.read<Gate>(context);
+final result = await gate.httpGet(Uri.parse('https://api.example.com/items'));
+result.fold(
+  ok: (response) => print('HTTP ${response.statusCode}: ${response.body}'),
+  err: (failure) => print('${failure.code}: ${failure.message}'),
+);
+```
+
+This example needs the `dio` extension installed above. Replace the URL with
+your endpoint. Inside a widget under `lib/features/home/presentation/screens/`,
+the imports are:
+
+```dart
+import 'package:kiln_core/kiln_core.dart';
+import '../../../../app/registry_scope.dart';
+```
+
+Outside widgets, pass the Gate to your feature or service. After bootstrap,
+retrieve it with `registry.read<Gate>()`; do not introduce a global instance.
+
+Typed verbs such as `httpGet` and `signIn` return `Ok(value)` or `Err(failure)`.
+A missing service also returns `Err`. HTTP responses retain their status code,
+including 4xx and 5xx; decide how your UI handles them. Direct getters such as
+`gate.http` can throw and are intended for advanced use.
+
+For operations without a verb, keep the service lookup inside `call`:
+
+```dart
+// Requires the local_db extension.
+final notes = await gate.call(() => gate.localDb.query('notes'));
+```
+
+The application decides what to display, navigate to, or retry. See the
+[Gate reference](reference/gate.md) for available operations. You can start
+building features with this flow; capability and slot details are covered
+separately in [architecture](architecture.md).
+
+## Editing and updating your app
+
+Run `kiln setup` to list the configuration status of installed extensions.
+Use `kiln setup <extension>` to review one, or `kiln setup --all` to review all
+installed extensions. See [Configure installed extensions](guides/configure-extensions.md)
+for previews, typed answers, secret handling, and batch rollback.
+
+For an Appwrite backend, continue with
+[Set up Appwrite](guides/setup-appwrite.md): install → configure → doctor → sign in.
+
+Build your screens and business logic in `lib/features/`. Before editing
+installed extension code, read the
+[file ownership guide](concepts/lockfile-and-ownership.md#editing-installed-code).
+Preview upgrades with `kiln upgrade --dry-run`, and use `kiln doctor` to report
+modified files and wiring issues.
 
 ## Generated project structure
 

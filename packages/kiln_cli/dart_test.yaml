@@ -1,0 +1,4 @@
+# Command tests install full extension bundles into temp projects and verify the
+# catalog. The default 30-second per-test timeout is too tight when the suite
+# runs in parallel; the whole suite still completes in a few minutes.
+timeout: 2m

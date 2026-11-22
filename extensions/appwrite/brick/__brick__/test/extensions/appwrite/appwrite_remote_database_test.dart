@@ -1,9 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/appwrite/appwrite_remote_database.dart';
+import 'package:{{app_name}}/extensions/appwrite/appwrite_realtime_gateway.dart';
 
 import 'test_support.dart';
 
 void main() {
+  test('a synchronous watch failure becomes a typed stream error', () async {
+    final database = AppwriteRemoteDatabase(
+      gateway: FakeAppwriteDatabaseGateway(),
+      realtime: _BrokenRealtime(),
+    );
+    final stream = database.watch('users', 'missing');
+    await expectLater(stream, emitsError(isA<Failure>()));
+  });
   test('create, read, update, and delete round-trip', () async {
     final fixture = createFakeRemoteDatabase();
     final database = fixture.database;
@@ -119,4 +129,14 @@ void main() {
     );
     expect(fixture.gateway.calls, isEmpty);
   });
+}
+
+class _BrokenRealtime implements AppwriteRealtimeGateway {
+  @override
+  Stream<Map<String, Object?>?> watch({
+    required String tableId,
+    required String rowId,
+  }) => throw StateError('Unable to subscribe.');
+  @override
+  Future<void> dispose() async {}
 }

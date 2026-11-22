@@ -69,5 +69,12 @@ void main() {
       await subscription.cancel();
       await registry.dispose();
     });
+
+    test('late probes cannot publish after disposal', () async {
+      final registry = SupportRegistry();
+      await registry.dispose();
+      registry.record('late', const SupportInfo.supported());
+      expect(registry['late'], isNull);
+    });
   });
 }

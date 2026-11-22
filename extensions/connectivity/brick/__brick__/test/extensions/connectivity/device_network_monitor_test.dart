@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/extensions/connectivity/connectivity_config.dart';
@@ -25,6 +27,28 @@ void main() {
 
     await subscription.cancel();
     await monitor.dispose();
+    await gateway.dispose();
+  });
+
+  test('dispose during the first check leaves no listener behind', () async {
+    final gateway = FakeConnectivityGateway(current: NetworkStatus.online);
+    final gate = Completer<void>();
+    gateway.checkGate = gate;
+    final monitor = createTestMonitor(gateway);
+    final statuses = <NetworkStatus>[];
+    final subscription = monitor.changes.listen(statuses.add);
+
+    final starting = monitor.start();
+    await pumpEventQueue();
+    await monitor.dispose();
+    gate.complete();
+    await starting;
+    gateway.emit(NetworkStatus.offline);
+    await pumpEventQueue();
+
+    expect(statuses, isEmpty);
+    expect(monitor.status, NetworkStatus.unknown);
+    await subscription.cancel();
     await gateway.dispose();
   });
 

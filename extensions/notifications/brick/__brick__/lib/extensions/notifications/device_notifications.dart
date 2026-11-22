@@ -20,18 +20,27 @@ final class DeviceNotifications implements Notifications {
   final NotificationPermissionFlow permissionFlow;
   final NotificationsConfig config;
   bool _initialized = false;
+  bool _disposed = false;
 
   @override
   Future<void> initialize() async {
-    if (_initialized) {
+    if (_initialized || _disposed) {
       return;
     }
     await _guard(() async {
       await gateway.initialize();
+      // Bootstrap can time out and dispose the module while the plugin is
+      // starting; do not attach the tap hub afterwards.
+      if (_disposed) {
+        return;
+      }
       tapHub.setLaunchPayload(gateway.launchPayload);
       await tapHub.start();
+      if (_disposed) {
+        return;
+      }
+      _initialized = true;
     });
-    _initialized = true;
   }
 
   @override
@@ -58,6 +67,10 @@ final class DeviceNotifications implements Notifications {
 
   @override
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await tapHub.dispose();
     await gateway.dispose();
   }

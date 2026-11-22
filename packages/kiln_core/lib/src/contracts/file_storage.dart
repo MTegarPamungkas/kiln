@@ -33,6 +33,14 @@ abstract interface class FileStorage {
 
   Future<List<int>> download(String path, {ProgressCallback? onProgress});
 
+  /// Returns a link to the file.
+  ///
+  /// [expiresIn] is a requested capability, not a hint. An implementation that
+  /// can issue signed links must honor it (or fail with
+  /// `validation.unsupported_value` when the requested lifetime is invalid).
+  /// An implementation that can only return a permanent or public link must
+  /// reject a non-null [expiresIn] with `validation.unsupported_value`; it must
+  /// never silently return a permanent link when the caller asked for expiry.
   Future<Uri> url(String path, {Duration? expiresIn});
 
   Future<void> delete(String path);

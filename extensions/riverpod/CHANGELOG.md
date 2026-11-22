@@ -4,6 +4,9 @@
 
 - The module orders itself after the logger and reports whether the
   provider observer is attached.
+- `NotesController` now handles stream errors, an empty completion before the
+  first value, and late mutation results after provider disposal instead of
+  leaving the UI loading or writing through a disposed notifier.
 
 ## 0.2.0
 

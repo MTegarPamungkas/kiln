@@ -25,7 +25,7 @@ final class SecureTokenStore implements TokenProvider {
   Future<String?> refreshToken() => storage.read(refreshTokenKey);
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) {
+  Future<String?> accessToken({bool forceRefresh = false, DateTime? deadline}) {
     return storage.read(accessTokenKey);
   }
 

@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:image_picker/image_picker.dart' as ip;
 import 'package:kiln_core/kiln_core.dart';
 
 import 'camera_permission_precheck.dart';
+import 'image_dimensions.dart';
 import 'image_picker_gateway.dart';
 import 'image_validator.dart';
 import 'media_failure_mapper.dart';
@@ -59,13 +62,37 @@ final class DeviceMediaPicker implements MediaPicker {
 
   /// Converts a picked file, detecting the type from its bytes.
   Future<PickedImage> fromFile(ip.XFile file) async {
-    final bytes = await file.readAsBytes();
+    // Reject an oversized file before allocating its full contents.
+    final length = await file.length();
+    if (length > config.maxBytes) {
+      throw Failure(
+        code: FailureCode.mediaInvalid,
+        message:
+            'Image size $length bytes exceeds the ${config.maxBytes} byte limit.',
+        kind: FailureKind.validation,
+      );
+    }
+    final buffer = BytesBuilder(copy: false);
+    await for (final chunk in file.openRead()) {
+      if (buffer.length + chunk.length > config.maxBytes) {
+        throw const Failure(
+          code: FailureCode.mediaInvalid,
+          message: 'Image contents exceed the configured byte limit.',
+          kind: FailureKind.validation,
+        );
+      }
+      buffer.add(chunk);
+    }
+    final bytes = buffer.takeBytes();
+    final dimensions = ImageDimensionsReader.read(bytes);
     final mime = MimeSniffer.detect(bytes) ?? file.mimeType;
     final image = PickedImage(
       path: file.path,
       name: _nameOf(file),
       bytes: bytes,
       mimeType: mime,
+      width: dimensions?.width,
+      height: dimensions?.height,
       sizeBytes: bytes.length,
     );
     final normalized = validator.ensureValid(image);
@@ -77,6 +104,8 @@ final class DeviceMediaPicker implements MediaPicker {
       name: image.name,
       bytes: image.bytes,
       mimeType: normalized,
+      width: image.width,
+      height: image.height,
       sizeBytes: image.sizeBytes,
     );
   }

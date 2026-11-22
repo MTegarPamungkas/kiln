@@ -8,6 +8,7 @@ exclusive: true
 provides:
   - navigation
 optional_requires:
+  - push_transport
   - deep_links
   - notifications
   - analytics

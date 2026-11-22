@@ -28,7 +28,15 @@ final class AppwriteAuth implements AuthRepository {
     required String password,
   }) {
     return _guard(() async {
-      final result = await account.signIn(email: email, password: password);
+      final revision = bridge.beginOperation();
+      final AppwriteAuthResult result;
+      try {
+        result = await account.signIn(email: email, password: password);
+      } catch (_) {
+        if (revision == bridge.revision) bridge.clear();
+        rethrow;
+      }
+      _ensureCurrent(revision);
       return bridge.establish(user: result.user, session: result.session);
     });
   }
@@ -40,18 +48,22 @@ final class AppwriteAuth implements AuthRepository {
     String? displayName,
   }) {
     return _guard(() async {
+      final revision = bridge.beginOperation();
       await account.signUp(
         email: email,
         password: password,
         displayName: displayName,
       );
+      _ensureCurrent(revision);
       final result = await account.signIn(email: email, password: password);
+      _ensureCurrent(revision);
       return bridge.establish(user: result.user, session: result.session);
     });
   }
 
   @override
   Future<void> signOut() async {
+    bridge.clear();
     Object? failure;
     StackTrace? failureStack;
     try {
@@ -59,15 +71,14 @@ final class AppwriteAuth implements AuthRepository {
     } on Object catch (error, stackTrace) {
       failure = error;
       failureStack = stackTrace;
-    } finally {
-      bridge.clear();
     }
     if (failure != null) {
-      throw _failures.map(
+      final mapped = _failures.map(
         failure,
         scope: AppwriteFailureScope.auth,
         stackTrace: failureStack,
       );
+      if (mapped.kind != FailureKind.network) throw mapped;
     }
   }
 
@@ -76,14 +87,17 @@ final class AppwriteAuth implements AuthRepository {
   /// Call this during the splash screen; a missing or expired session clears
   /// the local state instead of throwing.
   Future<void> restoreSession() async {
+    final revision = bridge.revision;
     try {
       final user = await account.currentUser();
+      if (revision != bridge.revision) return;
       if (user == null) {
         bridge.clear();
         return;
       }
       bridge.establish(user: user);
     } on Object catch (error, stackTrace) {
+      if (revision != bridge.revision) return;
       final failure = _failures.map(
         error,
         scope: AppwriteFailureScope.auth,
@@ -94,7 +108,18 @@ final class AppwriteAuth implements AuthRepository {
         bridge.clear();
         return;
       }
+      if (failure.details['localCleanupFailed'] == true) bridge.clear();
       throw failure;
+    }
+  }
+
+  void _ensureCurrent(int revision) {
+    if (revision != bridge.revision) {
+      throw const Failure(
+        code: FailureCode.authCancelled,
+        message: 'The authentication operation was superseded.',
+        kind: FailureKind.authentication,
+      );
     }
   }
 

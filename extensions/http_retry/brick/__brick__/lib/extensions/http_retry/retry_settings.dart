@@ -7,6 +7,7 @@ final class HttpRetrySettings {
     this.initialDelay = const Duration(milliseconds: 250),
     this.maxDelay = const Duration(seconds: 8),
     this.jitter = true,
+    this.totalBudget,
     this.retryableStatusCodes = const <int>{408, 429, 500, 502, 503, 504},
   });
 
@@ -21,7 +22,31 @@ final class HttpRetrySettings {
   final Duration initialDelay;
   final Duration maxDelay;
   final bool jitter;
+
+  /// Wall-clock ceiling for one request's whole retry sequence, including the
+  /// waits. Null leaves the sequence bounded only by [maxAttempts] and
+  /// [maxDelay]. A wait is clipped to the remaining budget, and no attempt is
+  /// started once the budget is spent.
+  final Duration? totalBudget;
   final Set<int> retryableStatusCodes;
+
+  HttpRetrySettings copyWith({
+    int? maxAttempts,
+    Duration? initialDelay,
+    Duration? maxDelay,
+    bool? jitter,
+    Duration? totalBudget,
+    Set<int>? retryableStatusCodes,
+  }) {
+    return HttpRetrySettings(
+      maxAttempts: maxAttempts ?? this.maxAttempts,
+      initialDelay: initialDelay ?? this.initialDelay,
+      maxDelay: maxDelay ?? this.maxDelay,
+      jitter: jitter ?? this.jitter,
+      totalBudget: totalBudget ?? this.totalBudget,
+      retryableStatusCodes: retryableStatusCodes ?? this.retryableStatusCodes,
+    );
+  }
 
   /// Returns null when valid, or a configuration [Failure] otherwise.
   Failure? validate() {
@@ -36,6 +61,13 @@ final class HttpRetrySettings {
       return const Failure(
         code: FailureCode.configurationInvalid,
         message: 'Retry delays cannot be negative.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (totalBudget != null && totalBudget!.isNegative) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Retry totalBudget cannot be negative.',
         kind: FailureKind.configuration,
       );
     }

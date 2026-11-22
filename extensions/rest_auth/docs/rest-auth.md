@@ -31,8 +31,11 @@ password reset and email verification.
 ## Tokens
 
 Tokens are stored in `SecureStorage` under keys prefixed with `rest_auth.`. The
-last user is also cached so the app can be opened offline; when online,
-`initialize()` reloads the profile from the me endpoint.
+stored set carries the configured backend identity (the `base_url` without a
+trailing slash); a session created for a different backend is discarded instead
+of being sent to the new origin. The last user is also cached so the app can be
+opened offline; when online, `initialize()` reloads the profile from the me
+endpoint.
 
 ## HTTP
 

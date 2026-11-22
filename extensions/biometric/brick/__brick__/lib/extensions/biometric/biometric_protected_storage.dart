@@ -14,14 +14,7 @@ final class BiometricProtectedStorage implements SecureStorage {
 
   @override
   Future<String?> read(String key) async {
-    final authenticated = await biometric.authenticate();
-    if (!authenticated) {
-      throw const Failure(
-        code: FailureCode.permissionDenied,
-        message: 'Biometric authentication is required to read data.',
-        kind: FailureKind.permission,
-      );
-    }
+    await _authenticate();
     return storage.read(key);
   }
 
@@ -31,9 +24,24 @@ final class BiometricProtectedStorage implements SecureStorage {
   @override
   Future<void> delete(String key) => storage.delete(key);
 
+  /// Authenticates once, then returns every protected value.
   @override
-  Future<Map<String, String>> readAll() => storage.readAll();
+  Future<Map<String, String>> readAll() async {
+    await _authenticate();
+    return storage.readAll();
+  }
 
   @override
   Future<void> clear() => storage.clear();
+
+  Future<void> _authenticate() async {
+    final authenticated = await biometric.authenticate();
+    if (!authenticated) {
+      throw const Failure(
+        code: FailureCode.permissionDenied,
+        message: 'Biometric authentication is required to read data.',
+        kind: FailureKind.permission,
+      );
+    }
+  }
 }

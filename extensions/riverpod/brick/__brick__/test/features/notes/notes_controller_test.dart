@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
@@ -10,6 +12,31 @@ import 'package:{{app_name}}/features/notes/presentation/providers/notes_control
 import 'package:{{app_name}}/features/notes/presentation/providers/notes_providers.dart';
 
 Future<void> _idle() => Future<void>.delayed(Duration.zero);
+
+final class _ControlledRepository implements NotesRepository {
+  _ControlledRepository(this.events, {this.onAdd});
+
+  final StreamController<List<Note>> events;
+  final Future<Note> Function(String body)? onAdd;
+
+  @override
+  Stream<List<Note>> watch() => events.stream;
+
+  @override
+  Future<Note> add(String body) {
+    final handler = onAdd;
+    if (handler != null) {
+      return handler(body);
+    }
+    return Future<Note>.value(Note(id: 'x', body: body));
+  }
+
+  @override
+  Future<Note> toggle(String id) async => Note(id: id, body: id, isDone: true);
+
+  @override
+  Future<void> remove(String id) async {}
+}
 
 ProviderContainer _container({NotesRepository? repository}) {
   return ProviderContainer(
@@ -108,6 +135,94 @@ void main() {
     await _idle();
 
     expect(_notes(container), hasLength(2));
+  });
+
+  test('a stream error before the first value becomes an AsyncError', () async {
+    final events = StreamController<List<Note>>();
+    final container = _container(
+      repository: _ControlledRepository(events),
+    );
+    addTearDown(() async {
+      await events.close();
+      container.dispose();
+    });
+
+    final future = container.read(notesControllerProvider.future);
+    events.addError(StateError('stream failed'));
+
+    await expectLater(future, throwsA(isA<Failure>()));
+    expect(container.read(notesControllerProvider).hasError, isTrue);
+  });
+
+  test('a completed empty stream becomes an AsyncError', () async {
+    final events = StreamController<List<Note>>();
+    final container = _container(
+      repository: _ControlledRepository(events),
+    );
+    addTearDown(() async {
+      await events.close();
+      container.dispose();
+    });
+
+    final future = container.read(notesControllerProvider.future);
+    await events.close();
+
+    await expectLater(
+      future,
+      throwsA(
+        isA<Failure>().having(
+          (failure) => failure.code,
+          'code',
+          FailureCode.unavailable,
+        ),
+      ),
+    );
+    expect(container.read(notesControllerProvider).hasError, isTrue);
+  });
+
+  test('a later stream error is surfaced and the stream keeps updating', () async {
+    final events = StreamController<List<Note>>();
+    final container = _container(
+      repository: _ControlledRepository(events),
+    );
+    addTearDown(() async {
+      await events.close();
+      container.dispose();
+    });
+
+    final future = container.read(notesControllerProvider.future);
+    events.add(const <Note>[Note(id: '1', body: 'one')]);
+    await future;
+
+    events.addError(StateError('later failure'));
+    await _idle();
+    expect(container.read(notesControllerProvider).hasError, isTrue);
+
+    events.add(const <Note>[Note(id: '2', body: 'two')]);
+    await _idle();
+    expect(_notes(container).single.id, '2');
+  });
+
+  test('a pending mutation does not write state after disposal', () async {
+    final events = StreamController<List<Note>>();
+    final addGate = Completer<Note>();
+    final container = _container(
+      repository: _ControlledRepository(
+        events,
+        onAdd: (_) => addGate.future,
+      ),
+    );
+    final future = container.read(notesControllerProvider.future);
+    events.add(const <Note>[]);
+    await future;
+    final controller = _controller(container);
+
+    final mutation = controller.add('pending');
+    container.dispose();
+    addGate.complete(const Note(id: 'x', body: 'pending'));
+
+    await mutation;
+    await events.close();
   });
 
   test('a registered repository replaces the sample store', () async {

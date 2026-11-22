@@ -11,6 +11,11 @@ final class RemoveCommand extends KilnCommand {
     argParser
       ..addFlag('dry-run', negatable: false)
       ..addFlag('force', negatable: false)
+      ..addFlag(
+        'verify',
+        negatable: false,
+        help: 'Run pub get and analyze after removal.',
+      )
       ..addFlag('yes', abbr: 'y', negatable: false)
       ..addFlag('json', negatable: false);
   }
@@ -39,45 +44,78 @@ final class RemoveCommand extends KilnCommand {
         !prompter
             .withAssumeYes(assumeYes)
             .confirm('Remove extension $id?', defaultValue: false)) {
-      logger.info('Dibatalkan.');
+      logger.info('Cancelled.');
       return ExitCodes.success;
     }
 
     final installer = ExtensionInstaller(
       projectRoot: project.root,
       available: extensionCatalog,
-    );
-    final result = await installer.remove(
-      id: id,
-      answers: project.extensionAnswers[id] ?? const <String, Object?>{},
-      options: RemoveOptions(
-        dryRun: dryRun,
-        force: argResults!['force'] == true,
+      verifier: Verifier(
+        runner: (executable, arguments, workingDirectory) => processRunner.run(
+          executable,
+          arguments,
+          workingDirectory: workingDirectory,
+        ),
       ),
     );
+    final lock = dryRun ? null : await ProjectLock.acquire(project.root);
+    final RemoveResult result;
+    try {
+      result = await installer.remove(
+        id: id,
+        answers: project.extensionAnswers[id] ?? const <String, Object?>{},
+        persistAnswers: true,
+        options: RemoveOptions(
+          dryRun: dryRun,
+          force: argResults!['force'] == true,
+          verify: argResults!['verify'] == true,
+        ),
+      );
+    } finally {
+      lock?.release();
+    }
+
+    final verification = result.verification;
+    final verificationFailed = verification != null && !verification.isSuccess;
 
     if (argResults!['json'] == true) {
       JsonReporter(logger.raw).write(<String, Object?>{
+        'status': verificationFailed
+            ? 'verification_failed'
+            : dryRun
+            ? 'preview'
+            : 'removed',
+        'committed': result.committed,
         'id': id,
         'deleted': result.deletedFiles,
         'skipped': result.skippedFiles,
         'patches': result.revertedPatches,
         'dependencies': result.removedDependencies,
         'warnings': result.warnings,
+        'verification': verification == null
+            ? null
+            : <String, Object?>{
+                'pub_get': verification.pubGetExitCode,
+                'analyze': verification.analyzeExitCode,
+              },
         'dry_run': result.dryRun?.toJson(),
       });
     } else if (dryRun) {
       logger.info(result.dryRun!.toText());
-    } else {
+    } else if (!verificationFailed) {
       printChanges(logger, result.changes);
       printWarnings(logger, result.warnings);
       logger.success('Extension $id removed');
     }
 
-    if (!dryRun) {
-      project.removeExtensionAnswer(id);
+    if (verificationFailed) {
+      logger.error('Verification failed; all changes were rolled back.');
+      logger.error(verification.output);
+      return ExitCodes.verification;
     }
-    if (result.skippedFiles.isNotEmpty) {
+
+    if (!dryRun && result.skippedFiles.isNotEmpty) {
       logger.warn(
         '${result.skippedFiles.length} files skipped because they were edited; '
         'use --force to remove them',

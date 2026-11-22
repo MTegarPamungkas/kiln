@@ -1,0 +1,163 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+
+import 'app/app_route.dart';
+import 'extensions/appwrite/appwrite_config.dart';
+import 'extensions/appwrite/appwrite_module.dart';
+import 'extensions/dio/dio_client.dart';
+import 'extensions/dio/dio_config.dart';
+import 'extensions/go_router/app_router.dart';
+import 'extensions/go_router/router_config.dart';
+import 'extensions/go_router/sign_in_page_builder.dart';
+
+const backend = String.fromEnvironment('KILN_PROBE_BACKEND',
+    defaultValue: 'http://127.0.0.1:8767');
+final status = ValueNotifier<String>('Starting functional probe');
+
+Widget screen() => Scaffold(body: Center(child: ValueListenableBuilder<String>(
+  valueListenable: status, builder: (_, value, _) => Text(value))));
+
+final class ProbeSignIn implements SignInPageBuilder {
+  @override
+  Widget build(BuildContext context) => screen();
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MaterialApp(initialRoute: '/', home: screen()));
+  unawaited(runProbe());
+}
+
+Future<void> runProbe() async {
+  final platform = kIsWeb ? 'web' : 'android';
+  final http = DioClient(config: const DioConfig(baseUrl: backend));
+  final checks = <String>[];
+  var phase = 'bootstrap';
+  var step = 'load_fixture';
+  void verify(bool condition, String label) {
+    step = label;
+    if (!condition) throw StateError(label);
+    checks.add(label);
+    status.value = '$platform / $phase: ${checks.length} checks passed';
+  }
+  Future<void> waitFor(bool Function() predicate) async {
+    final deadline = DateTime.now().add(const Duration(seconds: 10));
+    while (!predicate()) {
+      if (DateTime.now().isAfter(deadline)) throw TimeoutException(step);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+  }
+  try {
+    final fixtureResponse = await http.get(Uri.parse('/fixture?platform=$platform'));
+    if (fixtureResponse.statusCode != 200) throw StateError('Fixture unavailable');
+    final fixture = Map<String, Object?>.from(fixtureResponse.data as Map);
+    phase = fixture['phase'] as String;
+    step = 'bootstrap_appwrite';
+    final registry = await KilnBootstrap.run(modules: [AppwriteModule(
+      config: AppwriteConfig(endpoint: fixture['endpoint'] as String,
+        projectId: fixture['project'] as String),
+    )]);
+    final support = registry.read<SupportRegistry>()['appwrite']!;
+    if (!support.isSupported) throw StateError(support.message ?? support.state.name);
+    final auth = registry.read<AuthRepository>();
+    final sessions = registry.read<SessionController>();
+    registry.registerSingleton<SignInPageBuilder>(ProbeSignIn());
+    var protectedBuilds = 0;
+    registry.read<SlotRegistry>().open<AppRoute>(SlotNames.routerRoutes).add(
+      AppRoute(path: '/private', name: 'private', builder: (_) {
+        protectedBuilds++;
+        return screen();
+      }));
+    final originalStatus = sessions.status;
+    if (phase == 'login') sessions.markUnknown();
+    final router = AppRouter(registry: registry,
+      config: const AppRouterConfig(initialLocation: '/private?tab=items',
+        enableAuthRedirect: true));
+    runApp(MaterialApp.router(routerConfig: router.router));
+    String getPath() => router.router.routerDelegate.currentConfiguration.uri.path;
+    if (phase == 'login') {
+      step = 'restoration_loading_route';
+      await waitFor(() => getPath() == '/session-loading');
+      verify(protectedBuilds == 0, 'protected_page_hidden_during_restore');
+      sessions.markUnauthenticated();
+      await waitFor(() => getPath() == '/sign-in');
+      verify(originalStatus == SessionStatus.unauthenticated,
+        'initial_session_is_signed_out');
+      var rejected = false;
+      try {
+        await auth.signIn(email: fixture['email'] as String, password: 'WrongPassword9!');
+      } on Failure catch (failure) {
+        if (failure.kind != FailureKind.authentication) rethrow;
+        rejected = true;
+      }
+      verify(rejected && auth.currentSession == null, 'wrong_password_rejected');
+      step = 'valid_login';
+      final session = await auth.signIn(email: fixture['email'] as String,
+        password: fixture['password'] as String);
+      verify(session.userId == fixture['userId'] && sessions.isAuthenticated,
+        'login_updates_session_controller');
+      await waitFor(() => getPath() == '/private');
+      verify(router.router.routerDelegate.currentConfiguration.uri.queryParameters['tab'] == 'items',
+        'return_destination_and_query_preserved');
+    } else if (phase == 'restore') {
+      verify(auth.currentSession?.userId == fixture['userId'] && sessions.isAuthenticated,
+        'session_survives_application_restart');
+      await waitFor(() => getPath() == '/private');
+      verify(protectedBuilds > 0, 'restored_session_can_open_protected_page');
+    } else if (phase == 'signed-out') {
+      verify(auth.currentSession == null && !sessions.isAuthenticated,
+        'logout_survives_application_restart');
+      verify(await registry.read<TokenProvider>().accessToken() == null,
+        'signed_out_session_has_no_token');
+      await waitFor(() => getPath() == '/sign-in');
+      verify(protectedBuilds == 0, 'signed_out_session_cannot_open_protected_page');
+    } else {
+      throw StateError('Unknown phase');
+    }
+    if (phase != 'signed-out') {
+      step = 'create_user_jwt';
+      final jwt = await registry.read<TokenProvider>().accessToken(forceRefresh: true);
+      verify(jwt != null && jwt.isNotEmpty, 'user_jwt_created');
+      final headers = {'Authorization': 'Bearer $jwt'};
+      verify((await http.get(Uri.parse('/items'))).statusCode == 401,
+        'memory_backend_rejects_anonymous_requests');
+      final created = await http.post(Uri.parse('/items'), headers: headers,
+        body: {'title': '$platform test'});
+      verify(created.statusCode == 201, 'memory_backend_accepts_real_user_jwt');
+      final id = (created.data as Map)['id'];
+      verify((await http.get(Uri.parse('/items/$id'), headers: headers)).statusCode == 200,
+        'item_read');
+      final updated = await http.patch(Uri.parse('/items/$id'), headers: headers,
+        body: {'title': 'updated'});
+      verify((updated.data as Map)['title'] == 'updated', 'item_update');
+      verify((await http.delete(Uri.parse('/items/$id'), headers: headers)).statusCode == 200,
+        'item_delete');
+      verify((await http.get(Uri.parse('/items/$id'), headers: headers)).statusCode == 404,
+        'missing_item_returns_404');
+      if (phase == 'restore') {
+        step = 'logout';
+        await auth.signOut();
+        verify(auth.currentSession == null && !sessions.isAuthenticated,
+          'logout_clears_visible_session');
+        await waitFor(() => getPath() == '/sign-in');
+        verify((await http.get(Uri.parse('/items'), headers: headers)).statusCode == 401,
+          'logout_revokes_server_session');
+      }
+    }
+    status.value = '$platform / $phase: PASS (${checks.length} checks)';
+    await http.post(Uri.parse('/report'), body: {
+      'platform': platform, 'phase': phase, 'checks': checks,
+    });
+  } catch (error) {
+    final kind = error is Failure ? '${error.code.value}: ${error.message}'
+        : error is StateError ? error.message.toString() : error.runtimeType.toString();
+    status.value = '$platform / $phase: FAIL at $step ($kind)';
+    await http.post(Uri.parse('/report'), body: {'platform': platform,
+      'phase': phase, 'checks': checks, 'error': '$step: $kind'});
+  } finally {
+    http.close(force: true);
+  }
+}

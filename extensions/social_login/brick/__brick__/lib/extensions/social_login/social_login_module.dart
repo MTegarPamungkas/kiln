@@ -18,6 +18,14 @@ final class SocialLoginModule extends KilnModule {
   String get id => 'social_login';
 
   @override
+  Set<String> get platforms => const <String>{
+    'android',
+    'ios',
+    'macos',
+    'web',
+  };
+
+  @override
   Set<String> get provides => const <String>{'social_login'};
 
   @override
@@ -54,9 +62,13 @@ final class SocialLoginModule extends KilnModule {
 
     final auth = registry.readOrNull<AuthRepository>();
     if (auth != null) {
-      registry.registerSingleton<SocialSignOutListener>(
-        SocialSignOutListener(auth: auth, google: google),
-      );
+      final listener = SocialSignOutListener(auth: auth, google: google);
+      registry.registerSingleton<SocialSignOutListener>(listener);
+      // Disposed through the lifecycle so a late ready() cannot leave the
+      // sign-out listener attached after the application is gone.
+      registry
+          .readOrNull<LifecycleController>()
+          ?.addDisposeCallback(listener.dispose);
     }
   }
 

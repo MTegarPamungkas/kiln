@@ -175,6 +175,28 @@ void main() {
         ),
       );
     });
+
+    test('notifies listeners once and supports removal', () {
+      final token = HttpCancelToken();
+      var calls = 0;
+      final remove = token.onCancel(() => calls++);
+
+      token.cancel();
+      token.cancel();
+      remove();
+      token.cancel();
+
+      expect(calls, 1);
+    });
+
+    test('an already cancelled token notifies immediately', () {
+      final token = HttpCancelToken()..cancel();
+      var calls = 0;
+
+      token.onCancel(() => calls++);
+
+      expect(calls, 1);
+    });
   });
 
   group('HttpPipeline', () {
@@ -297,6 +319,80 @@ void main() {
             isTrue,
           ),
         ),
+      );
+    });
+  });
+
+  group('HttpRequest deadline', () {
+    final now = DateTime.utc(2026, 11, 21, 12);
+    final uri = Uri.parse('https://api.kiln.dev/items');
+
+    test('reports the remaining time and expiring state', () {
+      final request = HttpRequest(
+        method: HttpMethod.get,
+        uri: uri,
+        deadline: now.add(const Duration(seconds: 5)),
+      );
+
+      expect(request.remainingUntil(now), const Duration(seconds: 5));
+      expect(request.isDeadlineExceeded(now), isFalse);
+      expect(
+        request.isDeadlineExceeded(now.add(const Duration(seconds: 5))),
+        isTrue,
+      );
+      expect(
+        request.remainingUntil(now.add(const Duration(seconds: 6))),
+        Duration.zero,
+      );
+    });
+
+    test('no deadline means unbounded and never expired', () {
+      final request = HttpRequest(method: HttpMethod.get, uri: uri);
+
+      expect(request.remainingUntil(now), isNull);
+      expect(request.isDeadlineExceeded(now), isFalse);
+      request.throwIfDeadlineExceeded(now);
+    });
+
+    test('throws a typed deadline failure once expired', () {
+      final request = HttpRequest(
+        method: HttpMethod.get,
+        uri: uri,
+        deadline: now.subtract(const Duration(milliseconds: 1)),
+      );
+
+      expect(
+        () => request.throwIfDeadlineExceeded(now),
+        throwsA(
+          isA<Failure>()
+              .having(
+                (failure) => failure.code,
+                'code',
+                FailureCode.networkDeadlineExceeded,
+              )
+              .having(
+                (failure) => failure.kind,
+                'kind',
+                FailureKind.network,
+              ),
+        ),
+      );
+    });
+
+    test('copyWith keeps or replaces the deadline', () {
+      final deadline = now.add(const Duration(seconds: 2));
+      final request = HttpRequest(
+        method: HttpMethod.get,
+        uri: uri,
+        deadline: deadline,
+      );
+
+      expect(request.copyWith(headers: const <String, String>{}).deadline, deadline);
+      expect(
+        request
+            .copyWith(deadline: now.add(const Duration(seconds: 4)))
+            .deadline,
+        now.add(const Duration(seconds: 4)),
       );
     });
   });

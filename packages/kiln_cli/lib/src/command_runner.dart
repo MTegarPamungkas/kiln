@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:kiln_extension_sdk/kiln_extension_sdk.dart' show ProjectLock;
 
 import 'command_context.dart';
 import 'commands/add_command.dart';
@@ -17,6 +18,7 @@ import 'commands/list_command.dart';
 import 'commands/remove_command.dart';
 import 'commands/repair_command.dart';
 import 'commands/rollback_command.dart';
+import 'commands/setup_command.dart';
 import 'commands/store_command.dart';
 import 'commands/upgrade_command.dart';
 import 'commands/version_command.dart';
@@ -28,6 +30,7 @@ import 'infra/kiln_logger.dart';
 import 'infra/process_runner.dart';
 import 'infra/prompter.dart';
 import 'paths.dart';
+import 'project_context.dart';
 
 /// The `kiln` command runner.
 final class KilnCommandRunner extends CommandRunner<int> {
@@ -43,6 +46,7 @@ final class KilnCommandRunner extends CommandRunner<int> {
     addCommand(VersionCommand(context));
     addCommand(CreateCommand(context));
     addCommand(AddCommand(context));
+    addCommand(SetupCommand(context));
     addCommand(RemoveCommand(context));
     addCommand(RepairCommand(context));
     addCommand(ListCommand(context));
@@ -68,8 +72,28 @@ final class KilnCommandRunner extends CommandRunner<int> {
       verbose: topLevelResults['verbose'] == true,
       quiet: topLevelResults['quiet'] == true,
     );
+    final command = topLevelResults.command;
+    if (command != null &&
+        _mutatesProject(command) &&
+        !(command.options.contains('dry-run') && command['dry-run'] == true) &&
+        topLevelResults['help'] != true &&
+        !(command.options.contains('help') && command['help'] == true)) {
+      final root = ProjectContext.findRoot(context.cwd);
+      if (root != null) {
+        final lock = await ProjectLock.acquire(root);
+        return lock.run(() => super.runCommand(topLevelResults));
+      }
+    }
     return super.runCommand(topLevelResults);
   }
+
+  bool _mutatesProject(ArgResults command) => switch (command.name) {
+    'add' || 'remove' || 'upgrade' || 'repair' || 'rollback' => true,
+    'setup' => command.rest.isNotEmpty || command['all'] == true,
+    'doctor' => command['fix'] == true,
+    'store' => command.command?.name == 'install',
+    _ => false,
+  };
 
   @override
   Future<int> run(Iterable<String> args) async {

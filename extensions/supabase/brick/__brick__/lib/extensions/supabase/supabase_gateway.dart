@@ -207,8 +207,20 @@ final class SdkSupabaseGateway implements SupabaseGateway {
   Future<void> signOut() {
     return _guard(
       () async {
-        await _auth.signOut();
+        Object? remoteError;
+        StackTrace? remoteStack;
+        try {
+          await _auth.signOut();
+        } catch (error, stackTrace) {
+          // Signing out offline still has to clear the local SDK session.
+          remoteError = error;
+          remoteStack = stackTrace;
+          await _auth.signOut(scope: SignOutScope.local);
+        }
         _refreshedUser = null;
+        if (remoteError != null) {
+          Error.throwWithStackTrace(remoteError, remoteStack!);
+        }
       },
       code: FailureCode.authSessionExpired,
       kind: FailureKind.session,

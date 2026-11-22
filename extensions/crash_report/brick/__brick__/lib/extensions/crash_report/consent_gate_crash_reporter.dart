@@ -12,13 +12,16 @@ final class ConsentGateCrashReporter implements CrashReporter {
   const ConsentGateCrashReporter({
     required CrashReporter delegate,
     required ConsentController consent,
+    this.isActive,
   }) : _delegate = delegate,
        _consent = consent;
 
   final CrashReporter _delegate;
   final ConsentController _consent;
+  final bool Function()? isActive;
 
-  bool get isAllowed => _consent.isGranted(ConsentCategory.crashReports);
+  bool get isAllowed => (isActive?.call() ?? true) &&
+      _consent.isGranted(ConsentCategory.crashReports);
 
   @override
   Future<void> captureError(
@@ -60,7 +63,7 @@ final class ConsentGateCrashReporter implements CrashReporter {
 
   @override
   Future<void> setUser(String? userId) {
-    if (!isAllowed && userId != null) {
+    if (!(isActive?.call() ?? true) || (!isAllowed && userId != null)) {
       return Future<void>.value();
     }
     return _delegate.setUser(userId);

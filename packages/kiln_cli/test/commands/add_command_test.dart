@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:kiln_cli/kiln_cli.dart';
@@ -117,6 +118,69 @@ void main() {
         File(p.join(project.path, 'kiln.lock.yaml')).existsSync(),
         isFalse,
       );
+    });
+
+    test('a failed verification rolls back every managed change', () async {
+      final runner = buildTestRunner(
+        cwd: project,
+        captured: captured,
+        processRunner: FakeProcessRunner(
+          (executable, arguments, workingDirectory) async =>
+              ProcessResult(0, 1, 'analysis failed', ''),
+        ),
+      );
+
+      final code = await runner.run(<String>[
+        'add',
+        'dio',
+        '--answer',
+        'base_url=https://api.example.com',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.verification);
+      expect(captured.err.join('\n'), contains('rolled back'));
+      expect(
+        File(
+          p.join(project.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
+        ).existsSync(),
+        isFalse,
+      );
+      expect(File(p.join(project.path, 'kiln.lock.yaml')).existsSync(), isFalse);
+      expect(
+        File(p.join(project.path, 'pubspec.yaml')).readAsStringSync(),
+        isNot(contains('dio:')),
+      );
+      final config =
+          loadYaml(File(p.join(project.path, 'kiln.yaml')).readAsStringSync())
+              as YamlMap;
+      expect((config['extensions'] as YamlMap).containsKey('dio'), isFalse);
+    });
+
+    test('--json reports a rolled-back verification failure', () async {
+      final runner = buildTestRunner(
+        cwd: project,
+        captured: captured,
+        processRunner: FakeProcessRunner(
+          (executable, arguments, workingDirectory) async =>
+              ProcessResult(0, 1, 'analysis failed', ''),
+        ),
+      );
+
+      final code = await runner.run(<String>[
+        'add',
+        'dio',
+        '--answer',
+        'base_url=https://api.example.com',
+        '--json',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.verification);
+      final report =
+          jsonDecode(captured.out.join('\n').trim()) as Map<String, Object?>;
+      expect(report['status'], 'verification_failed');
+      expect(report['committed'], isFalse);
     });
 
     test('adding an installed extension is a no-op', () async {

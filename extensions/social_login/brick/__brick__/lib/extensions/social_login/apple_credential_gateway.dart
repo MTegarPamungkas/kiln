@@ -52,7 +52,8 @@ final class SdkAppleCredentialGateway implements AppleCredentialGateway {
       return SocialCredential(
         provider: SocialProvider.apple,
         idToken: idToken,
-        accessToken: credential.authorizationCode,
+        rawNonce: nonce,
+        authorizationCode: credential.authorizationCode,
         email: credential.email,
         displayName: name.isEmpty ? null : name,
       );

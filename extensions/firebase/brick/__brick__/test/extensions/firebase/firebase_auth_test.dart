@@ -93,6 +93,8 @@ void main() {
       expect(credential, isNotNull);
       expect(credential?.provider, SocialProvider.apple);
       expect(credential?.idToken, 'social-id-token');
+      expect(credential?.audience, SocialTokenAudience.backend);
+      expect(credential?.backendSessionToken, 'social-id-token');
       expect(credential?.accessToken, 'social-access-token');
       expect(credential?.email, 'social@kiln.dev');
       expect(gateway.calls, contains('provider:apple'));

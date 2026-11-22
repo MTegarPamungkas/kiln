@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../manifest/extension_manifest.dart';
 import '../manifest/prompt_spec.dart';
 
@@ -14,6 +16,7 @@ Map<String, dynamic> buildTemplateVars({
       if (prompt.defaultValue != null) prompt.name: prompt.defaultValue,
   };
   final validated = <String, Object?>{};
+  final expressions = <String, String>{};
   for (final prompt in manifest.prompts) {
     final answer = answers.containsKey(prompt.name)
         ? answers[prompt.name]
@@ -23,6 +26,13 @@ Map<String, dynamic> buildTemplateVars({
       throw PromptAnswerException(prompt, result.error!);
     }
     validated[prompt.name] = result.value;
+    if ((prompt.secret || prompt.type == PromptType.secret) &&
+        (result.value == null || result.value is String)) {
+      final value = result.value as String? ?? '';
+      expressions['${prompt.name}_dart'] = value.startsWith('env:')
+          ? 'const String.fromEnvironment(${_dartString(value.substring(4))})'
+          : _dartString(value);
+    }
   }
 
   final id = manifest.id;
@@ -43,7 +53,18 @@ Map<String, dynamic> buildTemplateVars({
     ...validated,
     ...answers,
     ...extra,
+    ...expressions,
   };
+}
+
+String _dartString(String value) {
+  final json = jsonEncode(value);
+  final escaped = json
+      .substring(1, json.length - 1)
+      .replaceAll(r'\"', '"')
+      .replaceAll("'", r"\'")
+      .replaceAll(r'$', r'\$');
+  return "'$escaped'";
 }
 
 /// A prompt answer that failed its declared type or range.

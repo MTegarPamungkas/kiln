@@ -10,6 +10,7 @@ import 'logger_support.dart';
 import 'log_level_controller.dart';
 import 'log_sink.dart';
 import 'memory_log_sink.dart';
+import 'record_size_limit.dart';
 import 'redacting_sink.dart';
 import 'sink_pipeline.dart';
 
@@ -71,9 +72,16 @@ final class LoggerModule extends KilnModule {
     }
 
     final redaction = effectiveConfig.redactionEnabled;
+    // The size cap is independent of redaction: a caller can disable redaction
+    // for local debugging and still must not fill a file or memory sink with a
+    // single huge record.
+    final limited = <LogSink>[
+      for (final sink in sinks)
+        LimitedSink(sink, maxTextLength: effectiveConfig.maxRecordTextLength),
+    ];
     final effectiveSinks = redaction
-        ? <LogSink>[for (final sink in sinks) RedactingSink(sink)]
-        : sinks;
+        ? <LogSink>[for (final sink in limited) RedactingSink(sink)]
+        : limited;
     final pipeline = SinkPipeline(effectiveSinks);
     final logger = PipelineLogger(
       pipeline: pipeline,

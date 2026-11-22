@@ -141,10 +141,11 @@ final class DeviceDeepLinks implements DeepLinks {
     if (accepted == null || _disposed) {
       return;
     }
-    if (_links.hasListener) {
+    if (_links.hasListener && !_pending.hasPending) {
       _links.add(accepted);
     } else {
       _pending.add(accepted);
+      if (_links.hasListener) _scheduleReplay();
     }
   }
 

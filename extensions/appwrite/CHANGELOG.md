@@ -2,6 +2,40 @@
 
 ## 0.3.1
 
+- Omit native OAuth redirect arguments so Appwrite returns the session
+  credentials expected by the Flutter SDK. Reject unsupported custom native
+  redirects before opening the provider browser.
+- Own web OAuth popups so closing a window cancels promptly and permits retry.
+  Validate callback origin, source window, path and a per-attempt identifier;
+  close pending popups on logout/disposal and detach timers/listeners. Native
+  OAuth continues to use the Appwrite SDK. Provider failures remain errors.
+- Map row cursors to Appwrite queries and reject empty cursors or cursor/offset
+  combinations. Revalidate client requests so browser storage reads cannot
+  return cached bytes after deletion or replacement at the same file ID.
+- Avoid introducing unused credential headers during session cleanup. A phantom
+  Authorization header after a 401 could block later browser login via CORS.
+- Declare Android API 24 and core library desugaring for the native/transitive
+  plugins, including installation into existing Flutter applications.
+
+- Realtime watches start when listened to and unsubscribe when their last
+  listener cancels. Missing rows emit an initial null; stale reads cannot
+  overwrite newer events, and equivalent nested payloads are deduplicated.
+- Synchronous realtime setup errors become typed stream failures.
+- Storage rejects unsupported URL expiry instead of silently ignoring it.
+- OAuth generates a same-origin web callback page and supports a redirect
+  override. Native browser cancellation returns null.
+- Isolated live service tests create and clean up only resources they own.
+
+- Session persistence is scoped to endpoint and project; unscoped legacy
+  cookies are not restored. Secure storage is used for Kiln's session copy
+  when the application's `SecureStorage` contract is available.
+- Login, restore, JWT requests, and revocation have bounded request times.
+  Native login follows the development-only self-signed certificate policy.
+- Logout clears application state before remote revocation. Old login,
+  restore, and JWT results cannot repopulate a cleared application session.
+- JWT requests share a cache-generation request and use an injectable clock.
+- Adapter lifecycle regression tests cover persistence, offline logout,
+  cookie parsing, timeouts, local cleanup failures, and late responses.
 - Sign-in works against Appwrite 2.7+, which URL-encodes the session cookie
   value. The extension now decodes it before sending `X-Appwrite-Session` and
   before seeding the SDK cookie jar.
@@ -18,6 +52,8 @@
 - Declares the `token_provider` and `account_management` capabilities the module already registers, so `kiln doctor` capability coverage and backend-swap guidance see them.
 
 ## 0.2.0
+
+- OAuth results now mark the Appwrite session JWT as a backend token and expose it through `backendSessionToken`; `accessToken` stays reserved for provider tokens.
 
 - New `functions` capability: the `CloudFunctions` contract invokes functions
   deployed on the Appwrite project through `Functions.createExecution`, with

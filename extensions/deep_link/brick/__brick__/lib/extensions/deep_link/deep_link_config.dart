@@ -3,6 +3,7 @@ final class DeepLinkConfig {
   const DeepLinkConfig({
     this.scheme = 'kiln',
     this.allowedHosts = const <String>[],
+    this.customSchemeHosts = const <String>[],
     this.pathPrefixes = const <String>[],
     this.stripTrackingParameters = true,
     this.trackingParameters = defaultTrackingParameters,
@@ -43,7 +44,13 @@ final class DeepLinkConfig {
   /// An empty list rejects every web link; the custom scheme keeps working.
   final List<String> allowedHosts;
 
-  /// Path prefixes accepted for `https` app links.
+  /// Optional host allowlist for custom schemes. The host is usually the first
+  /// route segment (`kiln://orders/42` routes to `/orders/42`), not a web domain.
+  /// An empty list accepts any custom host; [pathPrefixes] still apply.
+  final List<String> customSchemeHosts;
+
+  /// Route path prefixes accepted for HTTPS and custom-scheme links.
+  /// Custom links include their host as the first route segment.
   ///
   /// An empty list accepts every path on the allowed hosts.
   final List<String> pathPrefixes;
@@ -71,6 +78,6 @@ final class DeepLinkConfig {
   /// Whether `https` app links are accepted at all.
   bool get allowsUniversalLinks => allowedHosts.isNotEmpty;
 
-  /// Whether `https` app links must match a configured path prefix.
+  /// Whether incoming route paths must match a configured prefix.
   bool get restrictsPaths => pathPrefixes.isNotEmpty;
 }

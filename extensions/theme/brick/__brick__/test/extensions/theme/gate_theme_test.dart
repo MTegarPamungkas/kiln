@@ -16,7 +16,8 @@ void main() {
 
     final result = await gate.setThemeMode(ThemeMode.dark);
 
-    expect(result, isA<Ok<void>>());
+    expect(result, isA<Ok<PersistOutcome>>());
+    expect(result.valueOrNull, PersistOutcome.notConfigured);
     expect(gate.themeMode, ThemeMode.dark);
   });
 }

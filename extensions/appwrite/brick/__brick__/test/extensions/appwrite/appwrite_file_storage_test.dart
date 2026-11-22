@@ -5,6 +5,18 @@ import 'package:kiln_core/kiln_core.dart';
 import 'test_support.dart';
 
 void main() {
+  test('an expiry request never silently returns a permanent URL', () async {
+    final gateway = FakeAppwriteStorageGateway();
+    final storage = createFakeFileStorage(gateway: gateway);
+    await expectLater(
+      storage.url('private.txt', expiresIn: const Duration(minutes: 5)),
+      throwsA(
+        isA<Failure>().having((f) => f.kind, 'kind', FailureKind.unsupported),
+      ),
+    );
+    expect(gateway.calls, isEmpty);
+  });
+
   test('upload, download, link, and delete a file', () async {
     final gateway = FakeAppwriteStorageGateway();
     final storage = createFakeFileStorage(gateway: gateway);

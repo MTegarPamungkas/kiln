@@ -24,6 +24,22 @@ void main() {
     expect(calls, 1);
   });
 
+  test('reports waiting for consent without probing', () async {
+    var calls = 0;
+    final support = AnalyticsSupport(
+      config: _config(),
+      flavor: AppFlavor.production,
+      probe: () async => calls++,
+      isAllowed: () => false,
+    );
+
+    final info = await support.check();
+
+    expect(info.state, SupportState.notConfigured);
+    expect(info.message, contains('consent'));
+    expect(calls, 0);
+  });
+
   test('reports an empty API key as not configured', () async {
     final support = AnalyticsSupport(
       config: _config(apiKey: ''),

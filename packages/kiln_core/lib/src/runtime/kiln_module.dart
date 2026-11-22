@@ -18,6 +18,16 @@ abstract class KilnModule {
 
   Set<String> get optionalRequires => const <String>{};
 
+  /// Whether an unavailable support probe must abort application startup.
+  ///
+  /// Required modules stop bootstrap with the typed failure from their support
+  /// state. Optional features keep the default graceful-degradation policy: the
+  /// contracts stay registered, [ready] is skipped, and dependents that require
+  /// a missing capability skip [ready] too. [Future.timeout] only bounds the
+  /// wait; it cannot cancel a plugin call, so implementations must fence late
+  /// results after disposal.
+  bool get requiredForStartup => false;
+
   /// Platforms this module supports. Empty means every platform.
   ///
   /// `KilnBootstrap` skips a module when the current platform is not listed,

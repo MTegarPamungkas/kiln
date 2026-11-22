@@ -84,6 +84,44 @@ void main() {
       );
     });
 
+    test('a failed verified remove restores files and saved answers', () async {
+      final config = File(p.join(project.path, 'kiln.yaml'));
+      final configBefore = config.readAsStringSync();
+      expect(configBefore, contains('base_url'));
+      final runner = buildTestRunner(
+        cwd: project,
+        captured: captured,
+        processRunner: FakeProcessRunner(
+          (executable, arguments, workingDirectory) async =>
+              ProcessResult(0, 1, 'analysis failed', ''),
+        ),
+      );
+
+      final code = await runner.run(<String>[
+        'remove',
+        'dio',
+        '--verify',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.verification, reason: captured.err.join('\n'));
+      expect(
+        File(
+          p.join(project.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
+        ).existsSync(),
+        isTrue,
+      );
+      expect(
+        File(p.join(project.path, 'kiln.lock.yaml')).readAsStringSync(),
+        contains('dio'),
+      );
+      expect(
+        File(p.join(project.path, 'pubspec.yaml')).readAsStringSync(),
+        contains('dio:'),
+      );
+      expect(config.readAsStringSync(), configBefore);
+    });
+
     test('removing an unknown extension fails', () async {
       final runner = buildTestRunner(cwd: project, captured: captured);
 

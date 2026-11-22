@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'package:test/test.dart';
@@ -43,5 +45,65 @@ void main() {
       expect(File('${project.path}/a.txt').existsSync(), isFalse);
       await project.delete(recursive: true);
     });
+
+    test(
+      'a writer killed mid-transaction is recovered by the next process',
+      () async {
+        final project = await Directory.systemTemp.createTemp('kiln_rollback_');
+        final userFile = File('${project.path}/user.txt');
+        await userFile.writeAsString('user edit');
+        final ownedFile = File('${project.path}/owned.txt');
+        await ownedFile.writeAsString('original');
+
+        final config = await Isolate.packageConfig;
+        final helper = File('${project.path}/writer.dart');
+        await helper.writeAsString('''
+import 'dart:io';
+import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
+Future<void> main(List<String> args) async {
+  final project = Directory(args.single);
+  Transaction.begin(project)
+    ..writeText('owned.txt', 'half written')
+    ..writeText('new.txt', 'created by writer');
+  stdout.writeln('written');
+  await stdout.flush();
+  await stdin.first;
+}
+''');
+        final child = await Process.start(Platform.resolvedExecutable, [
+          '--packages=${config!.toFilePath()}',
+          helper.path,
+          project.path,
+        ]);
+        try {
+          final ready = await child.stdout
+              .transform(utf8.decoder)
+              .transform(const LineSplitter())
+              .first
+              .timeout(const Duration(seconds: 20));
+          expect(ready, 'written');
+          // The half-applied state is on disk while the writer is blocked.
+          expect(ownedFile.readAsStringSync(), 'half written');
+          child.kill();
+          await child.exitCode.timeout(const Duration(seconds: 10));
+        } finally {
+          child.kill();
+          await child.exitCode;
+        }
+
+        // A fresh process finds the interrupted journal and reverses it.
+        final interrupted = const Rollback().latestInterrupted(project);
+        expect(interrupted, isNotNull);
+        const Rollback().run(interrupted!);
+
+        expect(ownedFile.readAsStringSync(), 'original');
+        expect(File('${project.path}/new.txt').existsSync(), isFalse);
+        // An unrelated user file is never part of the journal, so it survives.
+        expect(userFile.readAsStringSync(), 'user edit');
+        expect(const Rollback().latestInterrupted(project), isNull);
+
+        await project.delete(recursive: true);
+      },
+    );
   });
 }

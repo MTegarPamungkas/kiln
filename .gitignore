@@ -25,6 +25,7 @@ coverage/
 .kiln/backups/
 .kiln/journal/
 .kiln/logs/
+.kiln/project.lock
 
 # Local environment files
 env/*.json

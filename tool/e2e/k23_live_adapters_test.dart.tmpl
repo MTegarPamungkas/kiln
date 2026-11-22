@@ -1,0 +1,217 @@
+// K23 live evidence: the real Appwrite adapters, not shared fakes.
+//
+// Runs inside the rendered Appwrite fixture, which already depends on
+// `package:appwrite`:
+//
+//   KILN_APPWRITE_ENDPOINT=... KILN_APPWRITE_PROJECT=... \
+//   KILN_APPWRITE_TEST_EMAIL=... KILN_APPWRITE_TEST_PASSWORD=... \
+//   KILN_APPWRITE_FUNCTION_ID=... KILN_APPWRITE_PUSH_PROVIDER=... \
+//   flutter test test/k23_live_adapters_test.dart
+//
+// Every value is optional; without them the suite reports an explicit skip
+// instead of a green pass, which is exactly the K23 complaint.
+import 'dart:io';
+
+import 'package:appwrite/appwrite.dart' as aw;
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kiln_core/kiln_core.dart' hide HttpClient;
+import 'package:e2e_appwrite/extensions/appwrite/appwrite_functions.dart';
+import 'package:e2e_appwrite/extensions/appwrite/appwrite_push_targets.dart';
+
+/// Turns on real sockets and platform answers for the live suite.
+///
+/// Two blockers, both from the test binding rather than the adapters:
+///
+/// * `flutter_test` installs `_MockHttpOverrides`, which answers every request
+///   with an empty 400. The SDK builds its own `HttpClient()`, so only a global
+///   override (cleared here) reaches it.
+/// * The Appwrite SDK calls `getApplicationDocumentsDirectory()` and
+///   `PackageInfo.fromPlatform()` while initialising. Without answers the call
+///   never completes, which is why the live suite here mocks `path_provider`
+///   too.
+bool _ready = false;
+
+void ensureLive() {
+  if (_ready) return;
+  _ready = true;
+  TestWidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = null;
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  for (final channel in const <String>[
+    'plugins.flutter.io/path_provider',
+    'dev.fluttercommunity.plus/package_info',
+  ]) {
+    messenger.setMockMethodCallHandler(MethodChannel(channel), (call) async {
+      switch (call.method) {
+        case 'getApplicationDocumentsDirectory':
+        case 'getApplicationSupportDirectory':
+          return Directory.systemTemp.createTempSync('k23_').path;
+        case 'getAll':
+          return <String, Object?>{
+            'appName': 'k23',
+            'packageName': 'dev.kiln.k23',
+            'version': '1.0.0',
+            'buildNumber': '1',
+            'buildSignature': '',
+          };
+        default:
+          return null;
+      }
+    });
+  }
+}
+
+void main() {
+  final environment = Platform.environment;
+  final endpoint = environment['KILN_APPWRITE_ENDPOINT'] ?? '';
+  final project = environment['KILN_APPWRITE_PROJECT'] ?? '';
+  final email = environment['KILN_APPWRITE_TEST_EMAIL'] ?? '';
+  final password = environment['KILN_APPWRITE_TEST_PASSWORD'] ?? '';
+  final functionId = environment['KILN_APPWRITE_FUNCTION_ID'] ?? '';
+  final provider = environment['KILN_APPWRITE_PUSH_PROVIDER'] ?? '';
+
+  final skipReason =
+      endpoint.isEmpty || project.isEmpty || email.isEmpty || password.isEmpty
+      ? 'Set KILN_APPWRITE_ENDPOINT, KILN_APPWRITE_PROJECT, '
+            'KILN_APPWRITE_TEST_EMAIL and KILN_APPWRITE_TEST_PASSWORD to run '
+            'against a live Appwrite server.'
+      : null;
+
+  aw.Client newClient() {
+    ensureLive();
+    return aw.Client()
+      ..setEndpoint(endpoint)
+      ..setProject(project);
+  }
+
+  Future<aw.Account> signIn(aw.Client client) async {
+    final account = aw.Account(client);
+    final session = await account.createEmailPasswordSession(
+      email: email,
+      password: password,
+    );
+    client.setSession(session.secret);
+    return account;
+  }
+
+  group('K23 live adapters', skip: skipReason, () {
+    test('AppwriteFunctions invokes a deployed function through the adapter',
+        () async {
+        final client = newClient();
+        final account = await signIn(client);
+        final functions = AppwriteFunctions(functions: aw.Functions(client));
+
+        final execution = await functions.invoke(functionId);
+
+        expect(execution.functionId, functionId);
+        expect(execution.status, isNotEmpty);
+        expect(execution.statusCode, 200);
+        expect(execution.body, contains('"ok":true'));
+        await account.deleteSessions();
+    });
+
+    test('AppwriteFunctions forwards the JSON body to the function', () async {
+        final client = newClient();
+        final account = await signIn(client);
+        final functions = AppwriteFunctions(functions: aw.Functions(client));
+
+        final execution = await functions.invoke(
+          functionId,
+          body: <String, Object?>{'name': 'Kiln', 'phase': 'k23'},
+        );
+
+        expect(execution.statusCode, 200);
+        expect(execution.body, contains('"name":"Kiln"'));
+        expect(execution.body, contains('"phase":"k23"'));
+        await account.deleteSessions();
+    });
+
+    test('AppwriteFunctions reports a missing function as a typed Failure',
+        () async {
+        final client = newClient();
+        final account = await signIn(client);
+        final functions = AppwriteFunctions(functions: aw.Functions(client));
+
+        await expectLater(
+          functions.invoke(
+            'kiln-missing-${DateTime.now().microsecondsSinceEpoch}',
+          ),
+          throwsA(isA<Failure>()),
+        );
+        await account.deleteSessions();
+    });
+
+    test('AppwriteFunctions rejects a non-HTTP method before sending', () async {
+        final client = newClient();
+        final account = await signIn(client);
+        final functions = AppwriteFunctions(functions: aw.Functions(client));
+
+        await expectLater(
+          functions.invoke(functionId, method: 'TRACE'),
+          throwsA(
+            isA<Failure>().having(
+              (failure) => failure.code,
+              'code',
+              FailureCode.validationInvalidInput,
+            ),
+          ),
+        );
+        await account.deleteSessions();
+    });
+
+    test('AppwritePushTargets registers, upserts, updates and removes a target',
+        () async {
+        final client = newClient();
+        final account = await signIn(client);
+        final targets = AppwritePushTargets(account: account);
+
+        final created = await targets.register(
+          token: 'kiln-probe-token',
+          providerId: provider,
+        );
+        expect(created.id, isNotEmpty);
+        expect(created.identifier, 'kiln-probe-token');
+        expect(created.providerId, provider);
+        expect(created.expired, isFalse);
+
+        // Registering again is an upsert, not a duplicate.
+        final again = await targets.register(
+          token: 'kiln-probe-token-rotated',
+          providerId: provider,
+        );
+        expect(again.id, created.id);
+        expect(again.identifier, 'kiln-probe-token-rotated');
+
+        final updated = await targets.update(
+          targetId: created.id,
+          token: 'kiln-probe-token-updated',
+        );
+        expect(updated.identifier, 'kiln-probe-token-updated');
+
+        await targets.unregister(targetId: created.id);
+
+        await account.deleteSessions();
+    });
+
+    test('AppwritePushTargets rejects empty input with typed failures',
+        () async {
+        final client = newClient();
+        final account = await signIn(client);
+        final targets = AppwritePushTargets(account: account);
+
+        await expectLater(targets.register(token: ''), throwsA(isA<Failure>()));
+        await expectLater(
+          targets.update(targetId: '', token: 'x'),
+          throwsA(isA<Failure>()),
+        );
+        await expectLater(
+          targets.unregister(targetId: ''),
+          throwsA(isA<Failure>()),
+        );
+
+        await account.deleteSessions();
+    });
+  });
+}

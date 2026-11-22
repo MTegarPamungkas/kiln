@@ -7,11 +7,33 @@ enum HttpMethod { get, post, put, patch, delete, head }
 /// Cooperative cancellation for one request.
 final class HttpCancelToken {
   bool _cancelled = false;
+  final List<void Function()> _listeners = <void Function()>[];
 
   bool get isCancelled => _cancelled;
 
   void cancel() {
+    if (_cancelled) {
+      return;
+    }
     _cancelled = true;
+    final listeners = List<void Function()>.of(_listeners);
+    _listeners.clear();
+    for (final listener in listeners) {
+      listener();
+    }
+  }
+
+  /// Notifies [listener] when cancelled. Returns a function that removes it.
+  ///
+  /// An already cancelled token notifies immediately, so transports that only
+  /// learn about the token later still abort.
+  void Function() onCancel(void Function() listener) {
+    if (_cancelled) {
+      listener();
+      return () {};
+    }
+    _listeners.add(listener);
+    return () => _listeners.remove(listener);
   }
 
   void throwIfCancelled() {
@@ -34,6 +56,7 @@ final class HttpRequest {
     this.body,
     this.queryParameters,
     this.cancelToken,
+    this.deadline,
   });
 
   final HttpMethod method;
@@ -42,6 +65,42 @@ final class HttpRequest {
   final Object? body;
   final Map<String, Object?>? queryParameters;
   final HttpCancelToken? cancelToken;
+
+  /// Absolute wall-clock deadline for the whole request, or null when unbounded.
+  ///
+  /// Middleware and adapters stop starting new work once the deadline passes
+  /// and report [FailureCode.networkDeadlineExceeded]. A cache hit may still be
+  /// returned because it needs no work. This does not abort an in-flight plugin
+  /// or transport call; cancellation remains cooperative through
+  /// [cancelToken]. A layer that builds a follow-up request (for example an auth
+  /// refresh) should copy this value so the caller's budget stays shared.
+  final DateTime? deadline;
+
+  /// Time left before [deadline], null when there is no deadline.
+  Duration? remainingUntil(DateTime now) {
+    final target = deadline;
+    if (target == null) {
+      return null;
+    }
+    final remaining = target.difference(now);
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  bool isDeadlineExceeded(DateTime now) {
+    final target = deadline;
+    return target != null && !now.isBefore(target);
+  }
+
+  /// Throws the typed deadline failure once [deadline] has passed.
+  void throwIfDeadlineExceeded(DateTime now) {
+    if (isDeadlineExceeded(now)) {
+      throw const Failure(
+        code: FailureCode.networkDeadlineExceeded,
+        message: 'Request deadline exceeded',
+        kind: FailureKind.network,
+      );
+    }
+  }
 
   Uri get resolvedUri {
     final query = queryParameters;
@@ -65,6 +124,7 @@ final class HttpRequest {
     Object? body,
     Map<String, Object?>? queryParameters,
     HttpCancelToken? cancelToken,
+    DateTime? deadline,
   }) {
     return HttpRequest(
       method: method ?? this.method,
@@ -73,6 +133,7 @@ final class HttpRequest {
       body: body ?? this.body,
       queryParameters: queryParameters ?? this.queryParameters,
       cancelToken: cancelToken ?? this.cancelToken,
+      deadline: deadline ?? this.deadline,
     );
   }
 }

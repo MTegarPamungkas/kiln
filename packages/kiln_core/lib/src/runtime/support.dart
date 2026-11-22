@@ -100,6 +100,8 @@ final class SupportRegistry {
   Stream<Map<String, SupportInfo>> get changes => _changes.stream;
 
   void record(String extensionId, SupportInfo info) {
+    // A timed-out platform probe can finish after bootstrap cleanup.
+    if (_changes.isClosed) return;
     _entries[extensionId] = info;
     _changes.add(all);
   }

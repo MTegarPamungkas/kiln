@@ -1,0 +1,98 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/appwrite/appwrite_config.dart';
+import 'package:{{app_name}}/extensions/appwrite/appwrite_module.dart';
+import 'package:{{app_name}}/extensions/appwrite_push/appwrite_push_module.dart';
+import 'package:{{app_name}}/extensions/appwrite_push/appwrite_push_transport.dart';
+
+// Filled in at render time from google-services.json / the run environment.
+const String probeEmail = '@EMAIL@';
+const String probePassword = '@PASSWORD@';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final status = ValueNotifier<String>('starting');
+  runApp(
+    MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: ValueListenableBuilder<String>(
+            valueListenable: status,
+            builder: (_, text, _) => Text(text),
+          ),
+        ),
+      ),
+    ),
+  );
+  unawaited(runProbe(status));
+}
+
+void log(String line) => debugPrint('KILNPROBE $line');
+
+String failureText(Object error) =>
+    error is Failure ? '${error.code.value} ${error.kind.name}' : '$error';
+
+Future<void> runProbe(ValueNotifier<String> status) async {
+  final Registry registry;
+  try {
+    registry = await KilnBootstrap.run(
+      modules: [
+        AppwriteModule(
+          config: const AppwriteConfig(
+            endpoint: '@ENDPOINT@',
+            projectId: '@PROJECT@',
+          ),
+        ),
+        AppwritePushModule(),
+      ],
+      onError: (error, stackTrace) =>
+          log('bootstrap_error ${failureText(error)}'),
+    );
+  } catch (error) {
+    log('bootstrap_failed ${failureText(error)}');
+    status.value = 'bootstrap failed';
+    return;
+  }
+
+  final support = registry.read<SupportRegistry>();
+  log(
+    'support appwrite=${support['appwrite']?.state.name} '
+    'push=${support['appwrite_push']?.state.name}',
+  );
+
+  final auth = registry.read<AuthRepository>();
+  try {
+    if (auth.currentSession == null) {
+      await auth.signIn(email: probeEmail, password: probePassword);
+    }
+    log('session user=${auth.currentSession?.userId}');
+  } on Object catch (error) {
+    log('signin_failure ${failureText(error)}');
+    return;
+  }
+
+  final transport = registry.read<AppwritePushTransport>();
+  // The module already initialized at ready(); a second call is a no-op that
+  // surfaces the token for the log.
+  try {
+    await transport.initialize();
+    log('transport initialized');
+  } on Object catch (error) {
+    log('transport_failure ${failureText(error)}');
+    return;
+  }
+
+  final subscription = transport.foreground.listen(
+    (envelope) {
+      log('foreground title=${envelope.title} data=${envelope.data}');
+      status.value = 'received: ${envelope.title}';
+    },
+    onError: (Object error) => log('foreground_error ${failureText(error)}'),
+  );
+  log('probe_ready');
+  status.value = 'ready: waiting for push';
+  await Future<void>.delayed(const Duration(minutes: 10));
+  await subscription.cancel();
+}

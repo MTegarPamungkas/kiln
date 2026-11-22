@@ -10,7 +10,13 @@ Provides `PushTransport` from `kiln_core`:
 - Background messages are posted by the Appwrite SDK; taps surface on
   `opened`, including the tap that launched the app.
 - `errors` and `lastError` report subscription failures that happen outside an
-  awaited call.
+  awaited call. A failed subscription is retried with exponential backoff;
+  `retryNow()` skips the wait, and `start()` is bounded by `subscribeTimeout`.
+- A tap on the same notification is delivered once (`tapDedupeWindow`,
+  `duplicateTapsIgnored`).
+- Implements `PushDeliveryControls`: `status()`, `setForeground()`,
+  `requestExactAlarms()` and `requestIgnoreBatteryOptimizations()` for the
+  Android background-reliability decisions.
 
 ## Install
 
@@ -44,7 +50,13 @@ push.errors.listen((error) => debugPrint('push error: $error'));
 ## Limits
 
 - Android keeps delivering while the app is closed through the SDK's background
-  service; exact alarms and battery optimisation change its latency.
+  service; exact alarms and battery optimisation change its latency. Delivery
+  while the app is closed is best effort, and `force-stop` clears the app's
+  notifications until it is opened again.
 - iOS shows background notifications through APNs and needs the
-  remote-notification background mode.
+  remote-notification background mode (the installer adds it). iOS delivery has
+  not been verified on a device here.
+- Notification action buttons are not supported: the SDK builds its own
+  single-tap notification. Use one notification per action with a distinct
+  `data.route`.
 - Offline devices replay missed messages for up to 7 days (newest five).

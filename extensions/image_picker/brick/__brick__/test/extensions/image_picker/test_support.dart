@@ -62,3 +62,121 @@ final class FakeImagePickerGateway implements ImagePickerGateway {
     return lost;
   }
 }
+
+/// A structurally valid PNG whose IHDR declares [width] x [height].
+///
+/// The CRC is not recomputed: header readers stop at the dimensions.
+List<int> pngWithSize(int width, int height) {
+  final bytes = List<int>.of(tinyPng);
+  bytes[16] = (width >> 24) & 0xFF;
+  bytes[17] = (width >> 16) & 0xFF;
+  bytes[18] = (width >> 8) & 0xFF;
+  bytes[19] = width & 0xFF;
+  bytes[20] = (height >> 24) & 0xFF;
+  bytes[21] = (height >> 16) & 0xFF;
+  bytes[22] = (height >> 8) & 0xFF;
+  bytes[23] = height & 0xFF;
+  return bytes;
+}
+
+/// Minimal JPEG with an SOF0 frame header for [width] x [height].
+List<int> jpegWithSize(int width, int height) {
+  return <int>[
+    0xFF,
+    0xD8,
+    0xFF,
+    0xC0,
+    0x00,
+    0x11,
+    0x08,
+    (height >> 8) & 0xFF,
+    height & 0xFF,
+    (width >> 8) & 0xFF,
+    width & 0xFF,
+    0x03,
+    0x01,
+    0x11,
+    0x00,
+    0x02,
+    0x11,
+    0x01,
+    0x03,
+    0x11,
+    0x01,
+    0xFF,
+    0xD9,
+  ];
+}
+
+List<int> gifWithSize(int width, int height) {
+  return <int>[
+    ...'GIF89a'.codeUnits,
+    width & 0xFF,
+    (width >> 8) & 0xFF,
+    height & 0xFF,
+    (height >> 8) & 0xFF,
+    0x00,
+    0x00,
+    0x00,
+  ];
+}
+
+List<int> webpVp8x(int width, int height) {
+  final canvasWidth = width - 1;
+  final canvasHeight = height - 1;
+  return <int>[
+    ...'RIFF'.codeUnits,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    ...'WEBP'.codeUnits,
+    ...'VP8X'.codeUnits,
+    0x0A,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    canvasWidth & 0xFF,
+    (canvasWidth >> 8) & 0xFF,
+    (canvasWidth >> 16) & 0xFF,
+    canvasHeight & 0xFF,
+    (canvasHeight >> 8) & 0xFF,
+    (canvasHeight >> 16) & 0xFF,
+  ];
+}
+
+List<int> avifWithSize(int width, int height) {
+  return <int>[
+    0x00,
+    0x00,
+    0x00,
+    0x10,
+    ...'ftyp'.codeUnits,
+    ...'avif'.codeUnits,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x14,
+    ...'ispe'.codeUnits,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    (width >> 24) & 0xFF,
+    (width >> 16) & 0xFF,
+    (width >> 8) & 0xFF,
+    width & 0xFF,
+    (height >> 24) & 0xFF,
+    (height >> 16) & 0xFF,
+    (height >> 8) & 0xFF,
+    height & 0xFF,
+  ];
+}

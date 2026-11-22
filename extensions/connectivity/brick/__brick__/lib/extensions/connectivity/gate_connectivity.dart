@@ -14,5 +14,5 @@ extension GateConnectivityX on Gate {
   /// configured or the server responds successfully; a failure or timeout is
   /// `Ok(false)`.
   Future<Result<bool>> networkReachable() =>
-      call(deviceNetwork.probeReachability);
+      call(() => deviceNetwork.probeReachability());
 }

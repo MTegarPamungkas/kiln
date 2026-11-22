@@ -14,8 +14,9 @@ final class FakeHttpClient implements HttpClient {
   HttpResponse defaultResponse;
   Failure? failure;
 
-  /// Throws a [Failure] for non-2xx responses, matching dio's default
-  /// behavior. Disabled by default so response-shape tests can inspect them.
+  /// Throws a [Failure] for non-2xx responses, emulating a transport that
+  /// rejects statuses. Disabled by default so response-shape tests can inspect
+  /// them, matching [DioClient]'s status contract.
   final bool throwOnError;
 
   int get callCount => requests.length;

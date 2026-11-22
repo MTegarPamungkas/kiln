@@ -24,4 +24,21 @@ void main() {
 
     await bridge.dispose();
   });
+
+  test('start after dispose leaves the session controller untouched', () async {
+    final harness = AuthHarness();
+    final controller = SessionController();
+    final bridge = RestSessionBridge(auth: harness.auth, session: controller);
+
+    await bridge.dispose();
+    await bridge.start();
+    await harness.auth.signIn(
+      email: 'user@kiln.dev',
+      password: 'password123',
+    );
+
+    expect(controller.isAuthenticated, isFalse);
+    await bridge.dispose();
+    await controller.dispose();
+  });
 }

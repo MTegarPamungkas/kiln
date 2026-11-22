@@ -3,6 +3,13 @@
 The contract covers JSON requests. Dio-specific helpers cover streaming uploads
 and downloads; they still map every failure to `Failure`.
 
+## HTTP statuses
+
+`HttpClient` returns every response the server sent, including 401, 404, 429,
+and 5xx; inspect `response.statusCode` or `response.isSuccessful`. Only
+transport failures throw `Failure`. Middleware such as REST auth, retry, cache,
+and logging sees the same response and applies its own status policy.
+
 ## Cancel when a screen closes
 
 ```dart
@@ -29,9 +36,9 @@ class _SearchPageState extends State<SearchPage>
 ```
 
 `HttpCancelTokenOwner` cancels on dispose. You can also cancel manually with
-`token.cancel()`. A cancelled request becomes `Failure(cancelled)`; the transport
-stops before reading the response. Do not show an error dialog for
-`failure.isCancelled`.
+`token.cancel()`. A cancelled request becomes `Failure(cancelled)`; the
+transport aborts an in-flight request and ignores a response that arrives after
+cancellation. Do not show an error dialog for `failure.isCancelled`.
 
 ## Multipart upload
 
@@ -82,6 +89,12 @@ flutter run --dart-define=KILN_API_KEY=secret
 The extension adds the key to the configured header, or to the query parameter
 when `api_key_query` is set. `api_key_prefix` supports values like `Bearer `.
 The key is not stored in `kiln.yaml`; keep it out of source control.
+
+## Shutdown
+
+`DioClient.close(force: true)` closes the underlying `Dio` only when the client
+created it. When you inject a `Dio`, you keep ownership and must close it
+yourself. The module closes its own transport during shutdown.
 
 ## Timeouts and relative URLs
 

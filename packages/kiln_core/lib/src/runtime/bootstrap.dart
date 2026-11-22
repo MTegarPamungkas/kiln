@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import '../errors/failure.dart';
+import '../errors/failure_codes.dart';
+import '../gate/gate.dart';
 import '../privacy/consent.dart';
 import '../session/session_controller.dart';
 import '../util/clock.dart';
@@ -27,6 +30,7 @@ abstract final class KilnBootstrap {
     BootstrapErrorHandler? onError,
     void Function(KilnModule module)? onModuleReady,
     Set<String> capabilities = const <String>{},
+    Set<String> requiredCapabilities = const <String>{},
     String? platform,
   }) async {
     final registry = GetItRegistry();
@@ -44,6 +48,10 @@ abstract final class KilnBootstrap {
     registry.registerSingleton<Lifecycle>(lifecycle);
     registry.registerSingleton<Clock>(clock ?? const SystemClock());
     registry.registerSingleton<SupportRegistry>(support);
+    registry.registerSingleton<Gate>(Gate(registry));
+    // Added first so reverse-order disposal runs it last, after modules have
+    // released the resources they own.
+    lifecycle.addDisposeCallback(registry.dispose);
     lifecycle
       ..addDisposeCallback(support.dispose)
       ..addDisposeCallback(slots.dispose)
@@ -53,6 +61,12 @@ abstract final class KilnBootstrap {
     try {
       for (final module in modules) {
         if (!module.supportsPlatform(activePlatform)) {
+          if (module.requiredForStartup) {
+            throw StateError(
+              'Required module ${module.id} does not support '
+              '$activePlatform.',
+            );
+          }
           support.record(
             module.id,
             SupportInfo.unsupported(
@@ -72,16 +86,54 @@ abstract final class KilnBootstrap {
             .where((module) => module.supportsPlatform(activePlatform))
             .toList(growable: false),
       ).resolve(availableCapabilities: capabilities);
+      final available = <String>{...capabilities};
       for (final module in ordered) {
         lifecycle.addDisposeCallback(module.dispose);
         module.register(registry);
-        final info = await _probeSupport(module, registry, supportTimeout);
+        final missing = module.requires.difference(available);
+        final info = missing.isEmpty
+            ? await _probeSupport(module, registry, supportTimeout)
+            : SupportInfo.unsupported(
+                SupportState.unavailable,
+                message:
+                    '${module.id} requires unavailable capabilities: '
+                    '${missing.join(', ')}.',
+                details: <String, Object?>{
+                  'missing_capabilities': missing.toList(),
+                },
+              );
         support.record(module.id, info);
         if (info.isSupported) {
           await Future<void>.sync(() => module.ready(registry))
               .timeout(timeout);
         }
-        onModuleReady?.call(module);
+        // ready() may downgrade support after an initialization failure.
+        final effective = support[module.id] ?? info;
+        if (effective.isSupported) {
+          available.addAll(module.provides);
+          onModuleReady?.call(module);
+        } else if (module.requiredForStartup) {
+          // A required module must stop startup with the typed reason instead of
+          // leaving an invalid backend looking ready.
+          throw effective.toFailure(
+            message:
+                'Required module ${module.id} is unavailable: '
+                '${effective.message}',
+          );
+        }
+      }
+      final missingRequired = requiredCapabilities.difference(available);
+      if (missingRequired.isNotEmpty) {
+        throw Failure(
+          code: FailureCode.unavailable,
+          message:
+              'Required startup capabilities are unavailable: '
+              '${missingRequired.join(', ')}.',
+          kind: FailureKind.unavailable,
+          details: <String, Object?>{
+            'missing_capabilities': missingRequired.toList(growable: false),
+          },
+        );
       }
       await lifecycle.onReady();
       return registry;

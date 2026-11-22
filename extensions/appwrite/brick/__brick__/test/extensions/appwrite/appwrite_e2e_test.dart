@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 // kiln_core also exports an `HttpClient` contract; the live overrides below
 // need dart:io's.
 import 'package:kiln_core/kiln_core.dart' hide HttpClient;
@@ -75,17 +76,23 @@ void main() {
   /// suite does not touch the binding in [tearDownAll].
   var bindingInitialized = false;
 
-  Future<GetItRegistry> buildRegistry({bool signIn = false}) async {
+  Future<GetItRegistry> buildRegistry({
+    bool signIn = false,
+    bool preservePreferences = false,
+  }) async {
     TestWidgetsFlutterBinding.ensureInitialized();
     bindingInitialized = true;
     // flutter_test installs overrides that answer every HttpClient with an
     // empty 400 to keep tests offline; the live suite needs real sockets.
     HttpOverrides.global = _LiveHttpOverrides();
     final reuseSession = signIn && cachedSessionCookie != null;
-    SharedPreferences.setMockInitialValues(<String, Object>{
-      if (reuseSession)
-        SdkAppwriteAccount.sessionCookieKey: cachedSessionCookie!,
-    });
+    if (!preservePreferences) {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        if (reuseSession)
+          SdkAppwriteAccount.sessionCookieKeyFor(endpoint, projectId):
+              cachedSessionCookie!,
+      });
+    }
     final supportDirectory = await Directory.systemTemp.createTemp(
       'kiln_appwrite_e2e_',
     );
@@ -111,12 +118,13 @@ void main() {
     // `users` role; the auth suite manages its own sessions instead.
     if (signIn) {
       if (cachedSessionCookie == null) {
-        await registry
-            .read<AuthRepository>()
-            .signIn(email: validEmail, password: validPassword);
-        cachedSessionCookie =
-            (await SharedPreferences.getInstance())
-                .getString(SdkAppwriteAccount.sessionCookieKey);
+        await registry.read<AuthRepository>().signIn(
+          email: validEmail,
+          password: validPassword,
+        );
+        cachedSessionCookie = (await SharedPreferences.getInstance()).getString(
+          SdkAppwriteAccount.sessionCookieKeyFor(endpoint, projectId),
+        );
       } else {
         expect(
           registry.read<AuthRepository>().currentSession,
@@ -171,14 +179,44 @@ void main() {
       final token = await tokens.accessToken();
       expect(token, isNotNull);
       expect(token, isNotEmpty);
-      expect(
-        await tokens.accessToken(forceRefresh: true),
-        isNotEmpty,
-      );
+      expect(await tokens.accessToken(forceRefresh: true), isNotEmpty);
 
       await tokens.clear();
       expect(await tokens.accessToken(), isNotNull);
     });
+
+    test(
+      'session survives a restart and stays signed out after logout',
+      () async {
+        final initial = await buildRegistry(signIn: true);
+        expect(initial.read<AuthRepository>().currentSession, isNotNull);
+        final restored = await buildRegistry(signIn: true);
+        expect(
+          restored.read<AuthRepository>().currentSession?.email,
+          validEmail,
+        );
+        final cookie = cachedSessionCookie!;
+        await restored.read<AuthRepository>().signOut();
+        expect(restored.read<AuthRepository>().currentSession, isNull);
+        final restarted = await buildRegistry(preservePreferences: true);
+        expect(restarted.read<AuthRepository>().currentSession, isNull);
+        final response = await http
+            .get(
+              Uri.parse('${endpoint.replaceFirst(RegExp(r'/+$'), '')}/account'),
+              headers: {
+                'X-Appwrite-Project': projectId,
+                'X-Appwrite-Session': cookie,
+              },
+            )
+            .timeout(const Duration(seconds: 15));
+        expect(
+          response.statusCode,
+          401,
+          reason: 'the old server session must be revoked',
+        );
+        cachedSessionCookie = null;
+      },
+    );
 
     test('push target register and unregister round trip', () async {
       final registry = await buildRegistry(signIn: true);
@@ -216,6 +254,18 @@ void main() {
 
       expect(execution.status, 'completed');
       expect(execution.body, isNotEmpty);
+    });
+
+    test('watch emits null for a missing row', () async {
+      final registry = await buildRegistry(signIn: true);
+      final database = registry.read<RemoteDatabase>();
+      expect(
+        await database
+            .watch('users', 'missing')
+            .first
+            .timeout(const Duration(seconds: 10)),
+        isNull,
+      );
     });
 
     test('watch emits null after the row is deleted', () async {

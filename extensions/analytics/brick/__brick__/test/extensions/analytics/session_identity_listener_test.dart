@@ -96,6 +96,28 @@ void main() {
       await sessions.dispose();
     });
 
+    test('syncCurrentSession identifies a session after a later start', () async {
+      final sessions = SessionController(
+        initialSession: const AuthSession(userId: 'user-3'),
+      );
+      final analytics = FakeAnalytics();
+      final listener = SessionIdentityListener(
+        sessions: sessions,
+        analytics: analytics,
+      )..start();
+      await listener.idle;
+      expect(analytics.identities, hasLength(1));
+
+      listener.syncCurrentSession();
+      await listener.idle;
+
+      expect(analytics.identities, hasLength(2));
+      expect(analytics.identities.last.userId, 'user-3');
+
+      await listener.dispose();
+      await sessions.dispose();
+    });
+
     test('analytics errors do not escape the listener', () async {
       final sessions = SessionController();
       final analytics = _ThrowingAnalytics();

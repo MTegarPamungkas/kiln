@@ -8,6 +8,8 @@ absorbs them so the app only sees `Result`s.
 Keychain items can survive an app uninstall. A fresh install may therefore read
 stale secrets left by a previous one. `FirstRunWipe` clears that leftover data on
 the very first launch after install (a marker key guards it so it runs once).
+Cleanup is limited to keys with the configured prefix; unrelated Keychain
+entries are never deleted.
 
 ## Android
 

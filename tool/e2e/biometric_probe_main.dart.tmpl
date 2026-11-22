@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/biometric/biometric.dart';
+import 'package:{{app_name}}/extensions/biometric/biometric_module.dart';
+import 'package:{{app_name}}/extensions/biometric/biometric_protected_storage.dart';
+import 'package:{{app_name}}/extensions/secure_storage/secure_storage_module.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const MaterialApp(
+      home: Scaffold(body: Center(child: Text('Kiln biometric probe'))),
+    ),
+  );
+  await runProbe();
+}
+
+void log(String line) => debugPrint('KILNPROBE $line');
+
+String failureText(Object error) => error is Failure
+    ? '${error.code.value} ${error.kind.name}'
+    : error.runtimeType.toString();
+
+Future<void> runProbe() async {
+  final Registry registry;
+  try {
+    registry = await KilnBootstrap.run(
+      modules: [SecureStorageModule(), BiometricModule()],
+      onError: (error, stackTrace) => log('bootstrap_error ${failureText(error)}'),
+    );
+  } catch (error) {
+    log('bootstrap_failed ${failureText(error)}');
+    return;
+  }
+
+  final info = registry.read<SupportRegistry>()['biometric'];
+  log('support biometric ${info?.state.name} ${info?.message}');
+  final biometric = registry.read<Biometric>();
+  log('enrolled ${(await biometric.availableBiometrics()).join(',')}');
+
+  final protected = registry.read<BiometricProtectedStorage>();
+  // Writing is intentionally not gated; seed two values so a bulk read has
+  // something to leak if the authentication were skipped.
+  await protected.write('probe.alpha', 'alpha-value');
+  await protected.write('probe.beta', 'beta-value');
+  log('seeded');
+
+  try {
+    final values = await protected.readAll();
+    final keys = values.keys.toList()..sort();
+    log('readAll ok ${values.length} $keys');
+  } on Object catch (error) {
+    log('readAll_failure ${failureText(error)}');
+  }
+  log('probe_done');
+}

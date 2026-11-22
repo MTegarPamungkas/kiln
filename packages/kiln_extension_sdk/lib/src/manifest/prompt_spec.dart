@@ -53,6 +53,15 @@ final class PromptSpec {
       return PromptValidation.valid(defaultValue);
     }
 
+    if ((secret || type == PromptType.secret) &&
+        input is String &&
+        input.startsWith('env:')) {
+      if (!RegExp(r'^env:[A-Za-z_][A-Za-z0-9_]*$').hasMatch(input)) {
+        return PromptValidation.invalid('$name requires env:VARIABLE_NAME');
+      }
+      return PromptValidation.valid(input);
+    }
+
     switch (type) {
       case PromptType.string:
       case PromptType.secret:

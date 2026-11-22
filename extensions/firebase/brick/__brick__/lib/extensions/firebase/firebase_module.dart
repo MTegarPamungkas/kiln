@@ -42,6 +42,7 @@ final class FirebaseModule extends KilnModule {
 
   FirebaseSessionBridge? _bridge;
   FirebaseAppInitializer? _initializer;
+  bool _disposed = false;
 
   @override
   String get id => 'firebase';
@@ -52,6 +53,17 @@ final class FirebaseModule extends KilnModule {
     'social_auth',
     'remote_database',
     'file_storage',
+    'token_provider',
+    'account_management',
+  };
+
+  @override
+  Set<String> get platforms => const <String>{
+    'android',
+    'ios',
+    'macos',
+    'web',
+    'windows',
   };
 
   @override
@@ -137,9 +149,20 @@ final class FirebaseModule extends KilnModule {
         _initializer ?? FirebaseBootstrap(config: config, options: options);
     try {
       await appInitializer.initialize();
+      // Bootstrap may have timed out and disposed this module while
+      // initializeApp was running; do not configure or subscribe afterwards.
+      if (_disposed) {
+        return;
+      }
       await registry.read<FirebaseEmulator>().configure(flavor);
+      if (_disposed) {
+        return;
+      }
       registry.read<FirebaseSessionBridge>().start();
     } on Object catch (error) {
+      if (_disposed) {
+        return;
+      }
       supportRegistry?.record(
         id,
         SupportInfo.unsupported(
@@ -153,6 +176,10 @@ final class FirebaseModule extends KilnModule {
 
   @override
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     final bridge = _bridge;
     _bridge = null;
     await bridge?.dispose();

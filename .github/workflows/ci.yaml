@@ -63,3 +63,8 @@ jobs:
       # Renders every extension brick into a fixture app and runs its own
       # test suite (flutter test), which plain `dart test` never reaches.
       - run: dart run tool/verify_extensions.dart --test
+      # Composes one representative per capability and checks randomized
+      # bootstrap order and registration.
+      - run: dart run tool/verify_composed.dart --analyze --test
+      - name: Verify composed HTTP adapters against a local server
+        run: dart run tool/verify_http_stack.dart

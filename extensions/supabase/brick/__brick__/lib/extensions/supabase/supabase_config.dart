@@ -25,7 +25,7 @@ final class SupabaseConfig {
   /// Values rendered from the extension prompts.
   static const SupabaseConfig defaults = SupabaseConfig(
     url: '{{{url}}}',
-    anonKey: '{{{anon_key}}}',
+    anonKey: {{#anon_key_dart}}{{{anon_key_dart}}}{{/anon_key_dart}}{{^anon_key_dart}}'{{{anon_key}}}'{{/anon_key_dart}},
     schema: '{{{schema}}}',
   );
 

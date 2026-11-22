@@ -51,6 +51,25 @@ void main() {
     expect(uri.toString(), contains('report.pdf'));
   });
 
+  test('url rejects a requested expiry instead of returning a permanent link', () async {
+    final gateway = InMemoryFirebaseStorageGateway();
+    final storage = FirebaseFileStorage(gateway: gateway);
+    await storage.upload(const FileUpload(path: 'docs/report.pdf', bytes: [1]));
+
+    await expectLater(
+      storage.url('docs/report.pdf', expiresIn: const Duration(minutes: 5)),
+      throwsA(
+        isA<Failure>()
+            .having(
+              (value) => value.code,
+              'code',
+              FailureCode.validationUnsupportedValue,
+            )
+            .having((value) => value.kind, 'kind', FailureKind.unsupported),
+      ),
+    );
+  });
+
   test('a missing file is a fileNotFound Failure', () async {
     final storage = FirebaseFileStorage(
       gateway: InMemoryFirebaseStorageGateway(),

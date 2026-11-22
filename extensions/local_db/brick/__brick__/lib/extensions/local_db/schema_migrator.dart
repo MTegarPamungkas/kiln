@@ -32,11 +32,9 @@ final class SchemaMigrator {
         await migration(database);
       }
     }
-    await database.put(
-      metadataCollection,
-      versionKey,
-      <String, Object?>{'value': targetVersion},
-    );
+    await database.put(metadataCollection, versionKey, <String, Object?>{
+      'value': targetVersion,
+    });
     return targetVersion;
   }
 }

@@ -9,18 +9,32 @@ void main() {
   test('module registers DeepLinks, its config, and the builder', () {
     final registry = GetItRegistry();
 
-    const DeepLinkModule().register(registry);
+    DeepLinkModule().register(registry);
 
     expect(registry.read<DeepLinks>(), isA<DeviceDeepLinks>());
     expect(registry.read<DeepLinkConfig>().scheme, '{{scheme}}');
     expect(registry.read<AppLinkBuilder>(), isA<AppLinkBuilder>());
   });
 
+  test('module disposes the device links once', () async {
+    final registry = GetItRegistry();
+    final module = DeepLinkModule()..register(registry);
+    final links = registry.read<DeepLinks>() as DeviceDeepLinks;
+    var done = false;
+    links.links.listen(null, onDone: () => done = true);
+
+    await module.dispose();
+    await module.dispose();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(done, isTrue);
+  });
+
   test('module uses the registered clock', () {
     final clock = FixedClock.at(2026, 11, 2, 9);
     final registry = GetItRegistry()..registerSingleton<Clock>(clock);
 
-    const DeepLinkModule().register(registry);
+    DeepLinkModule().register(registry);
 
     final links = registry.read<DeepLinks>();
     expect(links, isA<DeviceDeepLinks>());

@@ -6,7 +6,7 @@ final class CompletionCommand extends KilnCommand {
   CompletionCommand(super.context);
 
   static const _commands =
-      'create add remove upgrade rollback list info graph doctor config '
+      'create add setup remove upgrade rollback list info graph doctor config '
       'cache store completion ext version';
 
   @override

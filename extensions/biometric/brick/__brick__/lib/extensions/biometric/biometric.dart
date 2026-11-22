@@ -21,16 +21,22 @@ final class Biometric {
   final bool isWeb;
 
   Future<BiometricAvailability> availability() async {
-    final supported = await gateway.isDeviceSupported();
-    final canCheck = supported && await gateway.canCheckBiometrics();
-    final methods = canCheck
+    // `canCheckBiometrics` maps to the platform's hardware probe
+    // (Android `deviceCanSupportBiometrics`), which stays true when the
+    // hardware exists but nothing is enrolled. `isDeviceSupported` is broader:
+    // it is also true for a device with only a screen-lock credential, and
+    // false for a user profile with neither, so it cannot tell "no hardware"
+    // from "hardware, nothing enrolled".
+    final hasHardware = await gateway.canCheckBiometrics();
+    final supported = hasHardware || await gateway.isDeviceSupported();
+    final methods = hasHardware
         ? await gateway.availableBiometrics()
         : const <BiometricMethod>[];
     return resolveBiometricAvailability(
       platform: platform,
       isWeb: isWeb,
       supported: supported,
-      canCheck: canCheck,
+      canCheck: hasHardware,
       hasMethods: methods.isNotEmpty,
     );
   }

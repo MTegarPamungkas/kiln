@@ -74,6 +74,8 @@ final class ErrorPresenter {
     if (code == 'hooks.untrusted' ||
         code == 'remove.dependents' ||
         code == 'install.conflict' ||
+        code == 'upgrade.conflict' ||
+        code == 'setup.conflict' ||
         code == 'store.untrusted' ||
         code == 'store.checksum_mismatch') {
       return ExitCodes.conflict;
@@ -84,6 +86,7 @@ final class ErrorPresenter {
       return ExitCodes.network;
     }
     if (code.startsWith('manifest.') ||
+        code.startsWith('setup.') ||
         code.startsWith('prompt.') ||
         code.startsWith('catalog.') ||
         code.startsWith('create.') ||

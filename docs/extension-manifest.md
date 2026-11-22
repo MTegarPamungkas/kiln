@@ -47,6 +47,7 @@ android:
   allow_backup: false
   min_sdk: 24
   compile_sdk: 37
+  core_library_desugaring: true
   receivers:
     - name: com.example.BootReceiver
       exported: false
@@ -101,6 +102,9 @@ compatibility:
   native setup.
 - `android.compile_sdk` raises the project value only when it is lower; the
   patch is recorded and reverted with the extension.
+- `android.core_library_desugaring: true` enables Java API desugaring and adds
+  its Gradle dependency. Shared patch ownership keeps it installed while another
+  extension still needs it. Appwrite and notifications declare this requirement.
 - `manual_steps` are tracked by `kiln doctor`.
 
 ## Runtime support

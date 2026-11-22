@@ -129,9 +129,9 @@ $coreBlock
         final report =
             jsonDecode(captured.out.join('\n').trim()) as Map<String, Object?>;
         final checks = report['checks'] as List<Object?>;
-        return checks
-            .cast<Map<String, Object?>>()
-            .firstWhere((check) => check['id'] == 'core.source');
+        return checks.cast<Map<String, Object?>>().firstWhere(
+          (check) => check['id'] == 'core.source',
+        );
       }
 
       test('warns when kiln_core comes from a local path', () async {
@@ -199,8 +199,7 @@ $coreBlock
       }
 
       Map<String, dynamic>? capabilityCheck(List<String> output) {
-        final report =
-            jsonDecode(output.join('\n')) as Map<String, dynamic>;
+        final report = jsonDecode(output.join('\n')) as Map<String, dynamic>;
         final checks = report['checks'] as List<dynamic>;
         for (final entry in checks) {
           final check = entry as Map<String, dynamic>;
@@ -240,7 +239,7 @@ final class SwapProbe {
             '--answer',
             'endpoint=https://appwrite.example.com/v1',
             '--answer',
-            'project_id=kiln_demo',
+            'project_id=test_project',
             '--answer',
             'database_id=kiln',
             '--answer',
@@ -268,16 +267,19 @@ final class SwapProbe {
         },
       );
 
-      test('reports no usage when feature code never touches a capability', () async {
-        final runner = buildTestRunner(cwd: project, captured: captured);
-        final code = await runner.run(<String>['doctor', '--json']);
+      test(
+        'reports no usage when feature code never touches a capability',
+        () async {
+          final runner = buildTestRunner(cwd: project, captured: captured);
+          final code = await runner.run(<String>['doctor', '--json']);
 
-        expect(code, ExitCodes.success);
-        final check = capabilityCheck(captured.out);
-        expect(check, isNotNull);
-        expect(check!['status'], 'ok');
-        expect(check['message'], contains('No backend capability usage'));
-      });
+          expect(code, ExitCodes.success);
+          final check = capabilityCheck(captured.out);
+          expect(check, isNotNull);
+          expect(check!['status'], 'ok');
+          expect(check['message'], contains('No backend capability usage'));
+        },
+      );
     });
   });
 }

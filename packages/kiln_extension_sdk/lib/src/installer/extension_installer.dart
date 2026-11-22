@@ -60,6 +60,7 @@ final class InstallResult {
     this.dryRun,
     this.verification,
     this.lockfile,
+    this.committed = false,
   });
 
   final ResolutionPlan plan;
@@ -72,6 +73,9 @@ final class InstallResult {
   final DryRunReport? dryRun;
   final VerificationResult? verification;
   final Lockfile? lockfile;
+
+  /// Whether the planned changes and saved answers were committed to disk.
+  final bool committed;
 
   bool get hasConflicts =>
       changes.any((change) => change.kind == FileChangeKind.conflict);
@@ -104,6 +108,7 @@ final class RemoveResult {
     required this.warnings,
     this.dryRun,
     this.verification,
+    this.committed = false,
   });
 
   final String id;
@@ -116,6 +121,9 @@ final class RemoveResult {
   final DryRunReport? dryRun;
   final VerificationResult? verification;
 
+  /// Whether the planned changes and saved answers were committed to disk.
+  final bool committed;
+
   bool get success => verification?.isSuccess ?? true;
 }
 
@@ -124,6 +132,22 @@ final class _PlannedFile {
 
   final List<int> bytes;
   final String owner;
+}
+
+/// A configuration batch is staged and verified as one transaction.
+final class ConfigurationResult {
+  const ConfigurationResult({
+    required this.changedExtensions,
+    required this.changes,
+    this.hasConflicts = false,
+    this.verification,
+  });
+
+  final List<String> changedExtensions;
+  final List<FileChange> changes;
+  final bool hasConflicts;
+  final VerificationResult? verification;
+  bool get success => !hasConflicts && (verification?.isSuccess ?? true);
 }
 
 /// Applies extensions to a project through a reversible activeTransaction.
@@ -153,6 +177,7 @@ final class ExtensionInstaller {
         const <String, Map<String, Object?>>{},
     InstallOptions options = const InstallOptions(),
     Transaction? transaction,
+    bool persistAnswers = false,
     Set<String> hostCapabilities = const <String>{},
     Set<String> hostSlots = const <String>{'app.wrappers'},
   }) async {
@@ -355,9 +380,13 @@ final class ExtensionInstaller {
     }
 
     final newLockfile = Lockfile(
-      core: lockfile.core, extensions: newEntries,
+      core: lockfile.core,
+      extensions: newEntries,
       ownedDependencies: {...lockfile.ownedDependencies, ...dependencies},
-      ownedDevDependencies: {...lockfile.ownedDevDependencies, ...devDependencies},
+      ownedDevDependencies: {
+        ...lockfile.ownedDevDependencies,
+        ...devDependencies,
+      },
       ownedFlutterGenerate: ownedGenerate,
     );
     final codegen = const ExtensionsCodegen();
@@ -393,9 +422,16 @@ final class ExtensionInstaller {
     // claim transaction metadata or a parent of another output file.
     for (final path in plannedFiles.keys) {
       if (nativeFiles.changes.containsKey(path) ||
-          const {'pubspec.yaml', 'kiln.yaml', 'kiln.lock.yaml', ExtensionsCodegen.relativePath}.contains(path) ||
+          const {
+            'pubspec.yaml',
+            'kiln.yaml',
+            'kiln.lock.yaml',
+            ExtensionsCodegen.relativePath,
+          }.contains(path) ||
           path.startsWith('.kiln/') ||
-          plannedFiles.keys.any((other) => other != path && other.startsWith('$path/'))) {
+          plannedFiles.keys.any(
+            (other) => other != path && other.startsWith('$path/'),
+          )) {
         _recordChange(changes, path, FileChangeKind.conflict);
         warnings.add('Multiple output owners for "$path"');
       }
@@ -431,7 +467,9 @@ final class ExtensionInstaller {
       );
     }
 
+    final ownsTransaction = transaction == null;
     final activeTransaction = transaction ?? Transaction.begin(projectRoot);
+    VerificationResult? verification;
     try {
       for (final entry in plannedFiles.entries) {
         activeTransaction.writeFile(entry.key, entry.value.bytes);
@@ -447,17 +485,33 @@ final class ExtensionInstaller {
       if (editedPubspec != pubspecSource) {
         activeTransaction.writeText('pubspec.yaml', editedPubspec);
       }
-      activeTransaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
+      activeTransaction.writeText(
+        ExtensionsCodegen.relativePath,
+        codegenSource,
+      );
       activeTransaction.writeText('kiln.lock.yaml', lockSource);
-      if (transaction == null) activeTransaction.commit();
+      if (persistAnswers && plan.added.isNotEmpty) {
+        _updateSavedAnswers(activeTransaction, <String, Map<String, Object?>>{
+          for (final extension in plan.added)
+            extension.id: answers[extension.id] ?? const <String, Object?>{},
+        });
+      }
+      if (ownsTransaction && options.verify) {
+        // pub get rewrites the lock outside the managed-file writes.
+        activeTransaction.capture('pubspec.lock');
+      }
+      verification = options.verify ? await verifier.verify(projectRoot) : null;
+      if (ownsTransaction) {
+        if (verification != null && !verification.isSuccess) {
+          activeTransaction.rollback();
+        } else {
+          activeTransaction.commit();
+        }
+      }
     } catch (_) {
-      if (transaction == null) activeTransaction.rollback();
+      if (ownsTransaction) activeTransaction.rollback();
       rethrow;
     }
-
-    final verification = options.verify
-        ? await verifier.verify(projectRoot)
-        : null;
 
     return InstallResult(
       plan: plan,
@@ -469,6 +523,7 @@ final class ExtensionInstaller {
       warnings: List<String>.unmodifiable(warnings),
       verification: verification,
       lockfile: newLockfile,
+      committed: ownsTransaction && (verification?.isSuccess ?? true),
     );
   }
 
@@ -476,6 +531,7 @@ final class ExtensionInstaller {
     required String id,
     RemoveOptions options = const RemoveOptions(),
     Transaction? transaction,
+    bool persistAnswers = false,
     Map<String, Object?> answers = const <String, Object?>{},
   }) async {
     final lockStore = LockfileStore(projectRoot);
@@ -608,15 +664,24 @@ final class ExtensionInstaller {
     void removeUnneeded(Map<String, Object?> owned, {required bool dev}) {
       final current = dev ? pubspec.devDependencies : pubspec.dependencies;
       for (final entry in owned.entries.toList()) {
-        final needed = remaining.values.any((extension) =>
-            (dev ? extension.devDependencies : extension.dependencies)
-                ?.contains(entry.key) ?? true);
+        final needed = remaining.values.any(
+          (extension) =>
+              (dev ? extension.devDependencies : extension.dependencies)
+                  ?.contains(entry.key) ??
+              true,
+        );
         if (needed) continue;
         // A constraint changed by the user is no longer ours to delete.
         if (current.containsKey(entry.key) &&
-            const DeepCollectionEquality().equals(current[entry.key], entry.value)) {
+            const DeepCollectionEquality().equals(
+              current[entry.key],
+              entry.value,
+            )) {
           editedPubspec = dev
-              ? pubspecWriter.editedWithoutDevDependency(editedPubspec, entry.key)
+              ? pubspecWriter.editedWithoutDevDependency(
+                  editedPubspec,
+                  entry.key,
+                )
               : pubspecWriter.editedWithoutDependency(editedPubspec, entry.key);
           removedDependencies.add(entry.key);
         }
@@ -628,7 +693,9 @@ final class ExtensionInstaller {
     removeUnneeded(ownedDevDependencies, dev: true);
     var ownedGenerate = lockfile.ownedFlutterGenerate;
     if (ownedGenerate.isNotEmpty &&
-        !remaining.values.any((extension) => extension.flutterGenerate != false)) {
+        !remaining.values.any(
+          (extension) => extension.flutterGenerate != false,
+        )) {
       final editor = YamlEditor(editedPubspec);
       final root = loadYaml(editedPubspec);
       final flutter = root is Map ? root['flutter'] : null;
@@ -643,7 +710,8 @@ final class ExtensionInstaller {
       ownedGenerate = const <String, Object?>{};
     }
     final newLockfile = Lockfile(
-      core: lockfile.core, extensions: remaining,
+      core: lockfile.core,
+      extensions: remaining,
       ownedDependencies: ownedDependencies,
       ownedDevDependencies: ownedDevDependencies,
       ownedFlutterGenerate: ownedGenerate,
@@ -687,7 +755,9 @@ final class ExtensionInstaller {
       );
     }
 
+    final ownsTransaction = transaction == null;
     final activeTransaction = transaction ?? Transaction.begin(projectRoot);
+    VerificationResult? verification;
     try {
       for (final entry in nativeFiles.changes.entries) {
         final content = entry.value;
@@ -703,18 +773,31 @@ final class ExtensionInstaller {
       if (editedPubspec != pubspecSource) {
         activeTransaction.writeText('pubspec.yaml', editedPubspec);
       }
-      activeTransaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
+      activeTransaction.writeText(
+        ExtensionsCodegen.relativePath,
+        codegenSource,
+      );
       activeTransaction.writeText('kiln.lock.yaml', lockSource);
-      if (transaction == null) activeTransaction.commit();
-      _removeEmptiedDirectories(deleted);
+      if (persistAnswers) {
+        _removeSavedAnswer(activeTransaction, id);
+      }
+      if (ownsTransaction && options.verify) {
+        // pub get rewrites the lock outside the managed-file writes.
+        activeTransaction.capture('pubspec.lock');
+      }
+      verification = options.verify ? await verifier.verify(projectRoot) : null;
+      if (ownsTransaction) {
+        if (verification != null && !verification.isSuccess) {
+          activeTransaction.rollback();
+        } else {
+          activeTransaction.commit();
+          _removeEmptiedDirectories(deleted);
+        }
+      }
     } catch (_) {
-      if (transaction == null) activeTransaction.rollback();
+      if (ownsTransaction) activeTransaction.rollback();
       rethrow;
     }
-
-    final verification = options.verify
-        ? await verifier.verify(projectRoot)
-        : null;
 
     return RemoveResult(
       id: id,
@@ -725,7 +808,204 @@ final class ExtensionInstaller {
       removedDependencies: List<String>.unmodifiable(removedDependencies),
       warnings: List<String>.unmodifiable(warnings),
       verification: verification,
+      committed: ownsTransaction && (verification?.isSuccess ?? true),
     );
+  }
+
+  /// Configures installed extensions together, without changing their versions.
+  /// Hooks are never run; customized owned files are never overwritten.
+  Future<ConfigurationResult> configure({
+    required Map<String, Map<String, Object?>> answers,
+    required Map<String, Map<String, Object?>> previousAnswers,
+    required Map<String, Object?> project,
+    InstallOptions options = const InstallOptions(),
+    Set<String> hostCapabilities = const <String>{},
+    Set<String> hostSlots = const <String>{'app.wrappers'},
+  }) async {
+    final before = LockfileStore(projectRoot).read();
+    final catalog = {for (final entry in available) entry.id: entry};
+    final changed = <String>[];
+    for (final entry in answers.entries) {
+      final locked = before.extensions[entry.key];
+      final extension = catalog[entry.key];
+      if (locked == null || extension == null) {
+        throw KilnException(
+          'Extension "${entry.key}" is not available for setup.',
+          code: 'setup.not_installed',
+        );
+      }
+      if (locked.version != extension.manifest.version) {
+        throw KilnException(
+          'The installed ${entry.key} version does not match this CLI catalog.',
+          code: 'setup.version_mismatch',
+        );
+      }
+      buildTemplateVars(
+        extension: extension,
+        answers: entry.value,
+        project: project,
+      );
+      final saved = previousAnswers[entry.key] ?? const <String, Object?>{};
+      final effectivePrevious = <String, Object?>{
+        for (final prompt in extension.manifest.prompts)
+          prompt.name: saved.containsKey(prompt.name)
+              ? saved[prompt.name]
+              : prompt.defaultValue,
+      };
+      final effectiveNext = <String, Object?>{
+        for (final prompt in extension.manifest.prompts)
+          prompt.name: entry.value.containsKey(prompt.name)
+              ? entry.value[prompt.name]
+              : prompt.defaultValue,
+      };
+      if (const DeepCollectionEquality().equals(
+        effectivePrevious,
+        effectiveNext,
+      )) {
+        continue;
+      }
+      changed.add(entry.key);
+      for (final file in locked.files.entries) {
+        final target = File(RootPath(projectRoot).resolve(file.key));
+        if (target.existsSync() &&
+            (file.value.isEmpty ||
+                const FileOwnership().hashFile(target) != file.value)) {
+          throw KilnException(
+            'Setup would replace edited file "${file.key}".',
+            code: 'setup.conflict',
+            suggestion: 'Back up customized files and restore their generated versions before running setup again.',
+          );
+        }
+      }
+    }
+    if (changed.isEmpty) {
+      return const ConfigurationResult(changedExtensions: [], changes: []);
+    }
+    final stage = await Directory.systemTemp.createTemp('kiln_setup_');
+    try {
+      _copyForUpgrade(projectRoot, stage);
+      final stagedTransaction = Transaction.begin(stage);
+      final staged = ExtensionInstaller(
+        projectRoot: stage,
+        available: available,
+        renderer: renderer,
+        nativeSetup: nativeSetup,
+        verifier: verifier,
+        collisionResolver: collisionResolver,
+        hookPolicy: hookPolicy,
+      );
+      for (final id in changed) {
+        await staged.remove(
+          id: id,
+          answers: previousAnswers[id] ?? const <String, Object?>{},
+          transaction: stagedTransaction,
+          options: const RemoveOptions(force: true),
+        );
+        final installed = await staged.add(
+          requested: [id],
+          project: project,
+          answers: {id: answers[id]!},
+          transaction: stagedTransaction,
+          hostCapabilities: hostCapabilities,
+          hostSlots: hostSlots,
+          options: const InstallOptions(
+            verify: false,
+            collisionPolicy: CollisionPolicy.ask,
+          ),
+        );
+        if (installed.hasConflicts) {
+          return ConfigurationResult(
+            changedExtensions: changed,
+            changes: installed.changes,
+            hasConflicts: true,
+          );
+        }
+      }
+      final config = File(RootPath(stage).resolve('kiln.yaml'));
+      final editor = YamlEditor(config.readAsStringSync());
+      if (editor.parseAt([]) is! YamlMap) {
+        throw const KilnException(
+          'kiln.yaml must be a map.',
+          code: 'setup.config_invalid',
+        );
+      }
+      final root = editor.parseAt([]) as YamlMap;
+      if (!root.containsKey('extensions')) {
+        editor.update(['extensions'], <String, Object?>{});
+      }
+      for (final id in changed) {
+        editor.update(['extensions', id], answers[id]);
+      }
+      stagedTransaction.writeText('kiln.yaml', editor.toString());
+      final paths = stagedTransaction.journal.operations
+          .map((op) => op.path)
+          .toSet();
+      final delta = <FileChange>[];
+      for (final path in paths) {
+        final source = File(RootPath(projectRoot).resolve(path));
+        final target = File(RootPath(stage).resolve(path));
+        if (!source.existsSync() && !target.existsSync()) continue;
+        if (source.existsSync() &&
+            target.existsSync() &&
+            const ListEquality<int>().equals(
+              source.readAsBytesSync(),
+              target.readAsBytesSync(),
+            )) {
+          continue;
+        }
+        delta.add(
+          FileChange(
+            path,
+            !target.existsSync()
+                ? FileChangeKind.delete
+                : source.existsSync()
+                ? FileChangeKind.overwrite
+                : FileChangeKind.create,
+          ),
+        );
+      }
+      if (options.dryRun) {
+        return ConfigurationResult(changedExtensions: changed, changes: delta);
+      }
+      final transaction = Transaction.begin(projectRoot);
+      VerificationResult? verification;
+      try {
+        for (final path in {
+          ...paths,
+          'pubspec.lock',
+          for (final extension in before.extensions.values)
+            ...extension.files.keys,
+        }) {
+          transaction.capture(path);
+        }
+        for (final path in paths) {
+          final file = File(RootPath(stage).resolve(path));
+          if (file.existsSync()) {
+            transaction.writeFile(path, file.readAsBytesSync());
+          } else {
+            transaction.deleteFile(path);
+          }
+        }
+        verification = options.verify
+            ? await verifier.verify(projectRoot)
+            : null;
+        if (verification != null && !verification.isSuccess) {
+          transaction.rollback();
+        } else {
+          transaction.commit();
+        }
+      } catch (_) {
+        transaction.rollback();
+        rethrow;
+      }
+      return ConfigurationResult(
+        changedExtensions: changed,
+        changes: delta,
+        verification: verification,
+      );
+    } finally {
+      await stage.delete(recursive: true);
+    }
   }
 
   /// Stage the entire upgrade before touching the project, then publish its
@@ -745,20 +1025,31 @@ final class ExtensionInstaller {
     final before = LockfileStore(projectRoot).read();
     final locked = before.extensions[id];
     if (locked == null) {
-      throw KilnException('Extension "$id" is not installed', code: 'upgrade.not_installed');
+      throw KilnException(
+        'Extension "$id" is not installed',
+        code: 'upgrade.not_installed',
+      );
     }
-    const MigrationRunner().validate(projectRoot: projectRoot, migrations: migrations);
+    const MigrationRunner().validate(
+      projectRoot: projectRoot,
+      migrations: migrations,
+    );
     final removal = await remove(
-      id: id, answers: previousAnswers,
+      id: id,
+      answers: previousAnswers,
       options: const RemoveOptions(dryRun: true, force: true),
     );
     if (!force) {
       for (final entry in locked.files.entries) {
         final file = File(RootPath(projectRoot).resolve(entry.key));
         if (file.existsSync() &&
-            (entry.value.isEmpty || const FileOwnership().hashFile(file) != entry.value)) {
-          throw KilnException('Upgrade would replace edited file "${entry.key}"',
-              code: 'upgrade.conflict', suggestion: 'Use --force to replace edited files.');
+            (entry.value.isEmpty ||
+                const FileOwnership().hashFile(file) != entry.value)) {
+          throw KilnException(
+            'Upgrade would replace edited file "${entry.key}"',
+            code: 'upgrade.conflict',
+            suggestion: 'Use --force to replace edited files.',
+          );
         }
       }
     }
@@ -767,9 +1058,13 @@ final class ExtensionInstaller {
       _copyForUpgrade(projectRoot, stage);
       final stagedTransaction = Transaction.begin(stage);
       final staged = ExtensionInstaller(
-        projectRoot: stage, available: available, renderer: renderer,
-        nativeSetup: nativeSetup, verifier: verifier,
-        collisionResolver: collisionResolver, hookPolicy: hookPolicy,
+        projectRoot: stage,
+        available: available,
+        renderer: renderer,
+        nativeSetup: nativeSetup,
+        verifier: verifier,
+        collisionResolver: collisionResolver,
+        hookPolicy: hookPolicy,
       );
       // Guard migration destinations too: a rename must not clobber a new user
       // file merely because the migration runs before rendered-file planning.
@@ -778,25 +1073,39 @@ final class ExtensionInstaller {
           if (action is RenameFileAction && !force) {
             final target = File(RootPath(stage).resolve(action.to));
             if (target.existsSync() && !locked.files.containsKey(action.to)) {
-              throw KilnException('Migration would overwrite "${action.to}"', code: 'upgrade.conflict');
+              throw KilnException(
+                'Migration would overwrite "${action.to}"',
+                code: 'upgrade.conflict',
+              );
             }
           }
         }
       }
       const MigrationRunner().run(
-        projectRoot: stage, migrations: migrations, transaction: stagedTransaction,
+        projectRoot: stage,
+        migrations: migrations,
+        transaction: stagedTransaction,
       );
       await staged.remove(
-        id: id, answers: previousAnswers, transaction: stagedTransaction,
+        id: id,
+        answers: previousAnswers,
+        transaction: stagedTransaction,
         options: const RemoveOptions(force: true),
       );
       final result = await staged.add(
-        requested: [id], project: project, answers: {id: answers},
-        hostCapabilities: hostCapabilities, hostSlots: hostSlots,
+        requested: [id],
+        project: project,
+        answers: {id: answers},
+        hostCapabilities: hostCapabilities,
+        hostSlots: hostSlots,
         transaction: stagedTransaction,
         options: InstallOptions(
-          verify: false, collisionPolicy: force ? CollisionPolicy.overwrite : CollisionPolicy.ask,
-          runHooks: options.runHooks, approveHooks: options.approveHooks,
+          verify: false,
+          collisionPolicy: force
+              ? CollisionPolicy.overwrite
+              : CollisionPolicy.ask,
+          runHooks: options.runHooks,
+          approveHooks: options.approveHooks,
         ),
       );
       if (result.hasConflicts) return result;
@@ -805,13 +1114,20 @@ final class ExtensionInstaller {
         final editor = YamlEditor(config.readAsStringSync());
         final root = editor.parseAt([]);
         if (root is! YamlMap) {
-          throw const KilnException('kiln.yaml must be a map', code: 'upgrade.config_invalid');
+          throw const KilnException(
+            'kiln.yaml must be a map',
+            code: 'upgrade.config_invalid',
+          );
         }
-        if (!root.containsKey('extensions')) editor.update(['extensions'], <String, Object?>{});
+        if (!root.containsKey('extensions')) {
+          editor.update(['extensions'], <String, Object?>{});
+        }
         editor.update(['extensions', id], answers);
         stagedTransaction.writeText('kiln.yaml', editor.toString());
       }
-      final paths = stagedTransaction.journal.operations.map((op) => op.path).toSet();
+      final paths = stagedTransaction.journal.operations
+          .map((op) => op.path)
+          .toSet();
       for (final path in paths) {
         RootPath(projectRoot).resolve(path);
         RootPath(stage).resolve(path);
@@ -822,8 +1138,10 @@ final class ExtensionInstaller {
       try {
         // Include unchanged managed files and pub's lock in the verifier snapshot.
         for (final path in {
-          ...paths, 'pubspec.lock',
-          for (final extension in before.extensions.values) ...extension.files.keys,
+          ...paths,
+          'pubspec.lock',
+          for (final extension in before.extensions.values)
+            ...extension.files.keys,
         }) {
           transaction.capture(path);
         }
@@ -835,7 +1153,9 @@ final class ExtensionInstaller {
             transaction.deleteFile(path);
           }
         }
-        verification = options.verify ? await verifier.verify(projectRoot) : null;
+        verification = options.verify
+            ? await verifier.verify(projectRoot)
+            : null;
         if (verification != null && !verification.isSuccess) {
           transaction.rollback();
         } else {
@@ -847,20 +1167,39 @@ final class ExtensionInstaller {
         rethrow;
       }
       return InstallResult(
-        plan: result.plan, changes: result.changes, patches: result.patches,
-        dependencies: result.dependencies, devDependencies: result.devDependencies,
-        manualSteps: result.manualSteps, warnings: result.warnings,
-        verification: verification, lockfile: result.lockfile,
+        plan: result.plan,
+        changes: result.changes,
+        patches: result.patches,
+        dependencies: result.dependencies,
+        devDependencies: result.devDependencies,
+        manualSteps: result.manualSteps,
+        warnings: result.warnings,
+        verification: verification,
+        lockfile: result.lockfile,
+        committed: verification == null || verification.isSuccess,
       );
     } finally {
       await stage.delete(recursive: true);
     }
   }
 
-  void _copyForUpgrade(Directory source, Directory destination, [String prefix = '']) {
+  void _copyForUpgrade(
+    Directory source,
+    Directory destination, [
+    String prefix = '',
+  ]) {
     for (final entity in source.listSync(followLinks: false)) {
       final relative = '$prefix${p.basename(entity.path)}';
-      if (const {'.git', '.dart_tool', 'build', '.kiln/backups', '.kiln/journal'}.contains(relative)) continue;
+      if (const {
+        '.git',
+        '.dart_tool',
+        'build',
+        '.kiln/backups',
+        '.kiln/journal',
+        '.kiln/project.lock',
+      }.contains(relative)) {
+        continue;
+      }
       RootPath(projectRoot).resolve(relative);
       final target = p.join(destination.path, p.basename(entity.path));
       if (entity is Directory) {
@@ -890,10 +1229,8 @@ final class ExtensionInstaller {
 
     final deepestFirst = candidates.toList()
       ..sort(
-        (left, right) => p.posix
-            .split(right)
-            .length
-            .compareTo(p.posix.split(left).length),
+        (left, right) =>
+            p.posix.split(right).length.compareTo(p.posix.split(left).length),
       );
     for (final relative in deepestFirst) {
       final directory = Directory(RootPath(projectRoot).resolve(relative));
@@ -904,6 +1241,55 @@ final class ExtensionInstaller {
         directory.deleteSync();
       }
     }
+  }
+
+  /// Writes saved answers for installed extensions through [transaction], so
+  /// they share the same rollback boundary as generated files.
+  void _updateSavedAnswers(
+    Transaction transaction,
+    Map<String, Map<String, Object?>> answers,
+  ) {
+    if (answers.isEmpty) {
+      return;
+    }
+    final config = File(RootPath(projectRoot).resolve('kiln.yaml'));
+    if (!config.existsSync()) {
+      return;
+    }
+    final editor = YamlEditor(config.readAsStringSync());
+    final root = editor.parseAt(<Object>[]);
+    if (root is! YamlMap) {
+      throw const KilnException(
+        'kiln.yaml must be a map.',
+        code: 'config.invalid',
+      );
+    }
+    if (!root.containsKey('extensions')) {
+      editor.update(<Object>['extensions'], <String, Object?>{});
+    }
+    for (final entry in answers.entries) {
+      editor.update(<Object>['extensions', entry.key], entry.value);
+    }
+    transaction.writeText('kiln.yaml', editor.toString());
+  }
+
+  /// Removes a saved-answer entry through [transaction] during removal.
+  void _removeSavedAnswer(Transaction transaction, String id) {
+    final config = File(RootPath(projectRoot).resolve('kiln.yaml'));
+    if (!config.existsSync()) {
+      return;
+    }
+    final editor = YamlEditor(config.readAsStringSync());
+    final root = editor.parseAt(<Object>[]);
+    if (root is! YamlMap || !root.containsKey('extensions')) {
+      return;
+    }
+    final extensions = editor.parseAt(<Object>['extensions']);
+    if (extensions is! YamlMap || !extensions.containsKey(id)) {
+      return;
+    }
+    editor.remove(<Object>['extensions', id]);
+    transaction.writeText('kiln.yaml', editor.toString());
   }
 
   /// Documentation files for [extension], as `(app-relative path, bytes)`
@@ -926,18 +1312,14 @@ final class ExtensionInstaller {
     final files = <(String, List<int>)>[];
     final readme = File(p.join(root, 'README.md'));
     if (readme.existsSync()) {
-      files.add((
-        'lib/extensions/$id/README.md',
-        readme.readAsBytesSync(),
-      ));
+      files.add(('lib/extensions/$id/README.md', readme.readAsBytesSync()));
     }
     final docs = Directory(p.join(root, 'docs'));
     if (!docs.existsSync()) {
       return files;
     }
-    final docFiles =
-        docs.listSync(recursive: true).whereType<File>().toList()
-          ..sort((left, right) => left.path.compareTo(right.path));
+    final docFiles = docs.listSync(recursive: true).whereType<File>().toList()
+      ..sort((left, right) => left.path.compareTo(right.path));
     for (final doc in docFiles) {
       final relative = p.relative(doc.path, from: root).replaceAll('\\', '/');
       files.add(('lib/extensions/$id/$relative', doc.readAsBytesSync()));

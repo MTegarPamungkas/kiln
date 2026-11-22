@@ -1,8 +1,8 @@
 import 'package:kiln_core/kiln_core.dart';
 
 import 'cache_control_parser.dart';
-import 'cache_settings.dart';
 import 'cache_key.dart';
+import 'cache_settings.dart';
 
 /// Decides whether a response may be stored and for how long.
 final class HttpCachePolicy {
@@ -12,21 +12,38 @@ final class HttpCachePolicy {
     if (request.method != HttpMethod.get && request.method != HttpMethod.head) {
       return false;
     }
-    if (request.headers.keys.any((name) =>
-        const {'authorization', 'cookie', 'proxy-authorization'}
-            .contains(name.toLowerCase()))) {
+    if (_hasHeader(request, const <String>{'range', 'if-range'})) {
+      // Partial responses have no range-aware key or validation yet, so a
+      // partial payload must never occupy the full-response cache key.
+      return false;
+    }
+    if (_hasHeader(request, const <String>{
+      'authorization',
+      'cookie',
+      'proxy-authorization',
+    })) {
       return false;
     }
     return !requestControl(request).noStore;
   }
 
-  CacheControl requestControl(HttpRequest request) =>
-      const CacheControlParser().parse(request.headers.entries
-          .where((entry) => entry.key.toLowerCase() == 'cache-control')
-          .map((entry) => entry.value)
-          .join(','));
+  bool _hasHeader(HttpRequest request, Set<String> names) {
+    return request.headers.keys.any(
+      (name) => names.contains(name.toLowerCase()),
+    );
+  }
 
-  String responseHeader(HttpResponse response, String name) => response.headers.entries
+  CacheControl requestControl(HttpRequest request) =>
+      const CacheControlParser().parse(
+        request.headers.entries
+            .where((entry) => entry.key.toLowerCase() == 'cache-control')
+            .map((entry) => entry.value)
+            .join(','),
+      );
+
+  String responseHeader(HttpResponse response, String name) => response
+      .headers
+      .entries
       .where((entry) => entry.key.toLowerCase() == name.toLowerCase())
       .expand((entry) => entry.value)
       .join(',');
@@ -41,28 +58,48 @@ final class HttpCachePolicy {
     if (!allowsRequest(request) || control.noStore || control.isPrivate) {
       return false;
     }
+    if (response.statusCode == 206 ||
+        responseHeader(response, 'content-range').isNotEmpty) {
+      // Defense in depth for a custom status set that includes 206.
+      return false;
+    }
     if (!settings.cacheableStatusCodes.contains(response.statusCode)) {
       return false;
     }
-    if (response.headers.keys.any((name) =>
-        const {'set-cookie', 'www-authenticate', 'proxy-authenticate'}
-            .contains(name.toLowerCase()))) {
+    if (response.headers.keys.any(
+      (name) => const {
+        'set-cookie',
+        'www-authenticate',
+        'proxy-authenticate',
+      }.contains(name.toLowerCase()),
+    )) {
       return false;
     }
-    final keyedHeaders = keyBuilder.varyHeaders.map((name) => name.toLowerCase()).toSet();
+    final keyedHeaders = keyBuilder.varyHeaders
+        .map((name) => name.toLowerCase())
+        .toSet();
     final vary = responseHeader(response, 'vary').split(',');
-    return vary.every((name) => name.trim().isEmpty ||
-        (name.trim() != '*' && keyedHeaders.contains(name.trim().toLowerCase())));
+    return vary.every(
+      (name) =>
+          name.trim().isEmpty ||
+          (name.trim() != '*' &&
+              keyedHeaders.contains(name.trim().toLowerCase())),
+    );
   }
 
   bool canServeOnError(CacheEntry entry, CacheControl control, DateTime now) {
     final window = control.staleIfError;
     final ttl = entry.ttl;
-    if (control.noCache || control.mustRevalidate || control.noStore ||
-        window == null || window <= Duration.zero || ttl == null) {
+    if (control.noCache ||
+        control.mustRevalidate ||
+        control.noStore ||
+        window == null ||
+        window <= Duration.zero ||
+        ttl == null) {
       return false;
     }
-    return !entry.isFresh(now) && now.isBefore(entry.storedAt.add(ttl + window));
+    return !entry.isFresh(now) &&
+        now.isBefore(entry.storedAt.add(ttl + window));
   }
 
   bool isTransient(Failure failure) =>

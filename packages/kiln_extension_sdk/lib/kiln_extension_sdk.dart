@@ -20,6 +20,7 @@ export 'src/installer/ownership/patch_journal.dart';
 export 'src/installer/pubspec_reader.dart';
 export 'src/installer/pubspec_writer.dart';
 export 'src/installer/transaction/journal.dart';
+export 'src/installer/transaction/project_lock.dart';
 export 'src/installer/transaction/rollback.dart';
 export 'src/installer/transaction/snapshot.dart';
 export 'src/installer/transaction/transaction.dart';

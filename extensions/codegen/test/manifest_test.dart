@@ -33,11 +33,9 @@ void main() {
       'linux',
     ]);
 
-    final generators = manifest.promptsByName['generators'];
-    expect(generators, isNotNull);
-    expect(generators!.isMulti, isTrue);
-    expect(generators.options, <String>['json_serializable', 'freezed']);
-    expect(generators.required, isTrue);
+    // Both generators are always installed together; there is no selection
+    // prompt that would imply otherwise.
+    expect(manifest.promptsByName['generators'], isNull);
 
     expect(manifest.compatibility.kiln, '>=0.1.0 <0.2.0');
     expect(manifest.compatibility.dart, '>=3.9.0');

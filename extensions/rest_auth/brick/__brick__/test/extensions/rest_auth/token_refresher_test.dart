@@ -21,7 +21,7 @@ void main() {
     final refresher = TokenRefresher(
       store: store,
       clock: clock,
-      exchange: (_) async {
+      exchange: (_, _) async {
         calls++;
         return null;
       },
@@ -42,11 +42,13 @@ void main() {
       ),
     );
     var calls = 0;
+    DateTime? capturedDeadline;
     final refresher = TokenRefresher(
       store: store,
       clock: clock,
-      exchange: (refreshToken) async {
+      exchange: (refreshToken, deadline) async {
         calls++;
+        capturedDeadline = deadline;
         await Future<void>.delayed(const Duration(milliseconds: 5));
         return AuthTokens(
           accessToken: makeJwt(expiresAt: DateTime.utc(2026, 11, 2, 10)),
@@ -55,12 +57,14 @@ void main() {
       },
     );
 
+    final deadline = clock.now().add(const Duration(seconds: 30));
     final results = await Future.wait(<Future<String?>>[
-      refresher.accessToken(forceRefresh: true),
-      refresher.accessToken(forceRefresh: true),
+      refresher.accessToken(forceRefresh: true, deadline: deadline),
+      refresher.accessToken(forceRefresh: true, deadline: deadline),
     ]);
 
     expect(calls, 1);
+    expect(capturedDeadline, deadline);
     expect(results.first, results.last);
     expect(await store.refreshToken(), 'refresh-rotated');
   });
@@ -70,7 +74,7 @@ void main() {
     var calls = 0;
     final refresher = TokenRefresher(
       store: store,
-      exchange: (_) async {
+      exchange: (_, _) async {
         calls++;
         return null;
       },
@@ -83,7 +87,7 @@ void main() {
   test('clear removes stored tokens', () async {
     final store = RestTokenStore(storage: InMemorySecureStorage());
     await store.save(const AuthTokens(accessToken: 'a', refreshToken: 'b'));
-    final refresher = TokenRefresher(store: store, exchange: (_) async => null);
+    final refresher = TokenRefresher(store: store, exchange: (_, _) async => null);
 
     await refresher.clear();
 

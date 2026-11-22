@@ -16,7 +16,9 @@ import 'localized_core_copy.dart';
 
 /// Registers ARB-backed localizations, locale control, and failure messages.
 final class L10nModule extends KilnModule {
-  const L10nModule();
+  L10nModule();
+
+  LocaleController? _controller;
 
   @override
   String get id => 'l10n';
@@ -33,6 +35,7 @@ final class L10nModule extends KilnModule {
     final storage = registry.readOrNull<Storage>();
     final store = storage == null ? null : LocaleStore(storage);
     final controller = LocaleController(config: config, store: store);
+    _controller = controller;
     final messages = L10nFailureMessages(
       config: config,
       resolveLocale: () =>
@@ -78,5 +81,12 @@ final class L10nModule extends KilnModule {
     } on Object {
       // A missing preference must not block startup.
     }
+  }
+
+  @override
+  Future<void> dispose() async {
+    final controller = _controller;
+    _controller = null;
+    controller?.dispose();
   }
 }

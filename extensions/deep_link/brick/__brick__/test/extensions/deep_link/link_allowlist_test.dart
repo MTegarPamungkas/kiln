@@ -12,13 +12,40 @@ void main() {
   );
 
   test('accepts the configured scheme regardless of case', () {
-    expect(allowlist.allows(Uri.parse('kiln://profile/42')), isTrue);
-    expect(allowlist.allows(Uri.parse('KILN://profile/42')), isTrue);
+    expect(allowlist.allows(Uri.parse('kiln://app/profile/42')), isTrue);
+    expect(allowlist.allows(Uri.parse('KILN://app/profile/42')), isTrue);
   });
 
   test('rejects unknown schemes', () {
     expect(allowlist.allows(Uri.parse('otherapp://profile/42')), isFalse);
     expect(allowlist.allows(Uri.parse('mailto:hello@kiln.dev')), isFalse);
+  });
+
+  test('reserved web schemes cannot bypass HTTPS host checks', () {
+    final webScheme = LinkAllowlist(config: const DeepLinkConfig(scheme: 'https'));
+    expect(webScheme.allows(Uri.parse('https://evil.test/app')), isFalse);
+    final insecure = LinkAllowlist(config: const DeepLinkConfig(scheme: 'http'));
+    expect(insecure.allows(Uri.parse('http://evil.test/app')), isFalse);
+  });
+
+  test('rejects encoded traversal and nested encoded separators', () {
+    expect(allowlist.allows(Uri.parse('kiln:///app/%2e%2e/admin')), isFalse);
+    expect(allowlist.allows(Uri.parse('kiln://app/%252e%252e/admin')), isFalse);
+    expect(allowlist.allows(Uri.parse('https://kiln.dev/app/%255cadmin')), isFalse);
+  });
+
+  test('custom schemes obey route prefixes and optional custom hosts', () {
+    expect(allowlist.allows(Uri.parse('kiln://profile/42')), isFalse);
+    expect(allowlist.allows(Uri.parse('kiln://application/42')), isFalse);
+    expect(allowlist.allows(Uri.parse('kiln:///app/42')), isTrue);
+    final restricted = LinkAllowlist(config: const DeepLinkConfig(
+      scheme: 'kiln', customSchemeHosts: ['orders'], pathPrefixes: ['/orders'],
+    ));
+    expect(restricted.allows(Uri.parse('kiln://orders/42')), isTrue);
+    expect(restricted.allows(Uri.parse('kiln://other/orders/42')), isFalse);
+    expect(restricted.allows(Uri.parse('kiln://user@orders/42')), isFalse);
+    expect(restricted.allows(Uri.parse('kiln://orders:1234/42')), isFalse);
+    expect(restricted.allows(Uri.parse('kiln:orders/42')), isFalse);
   });
 
   test('accepts https links on allowed hosts and paths', () {

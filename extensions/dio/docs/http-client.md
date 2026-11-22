@@ -15,6 +15,27 @@ final response = await client.post(
 Failures are always `Failure`. Access denied, timeouts, offline devices, and
 server errors carry stable `FailureCode` values.
 
+## Deadlines
+
+`HttpRequest.deadline` bounds the whole exchange. `DioClient` rejects an already
+expired request before touching the transport, clamps connect/send/receive
+timeouts to the remaining time, and cancels the Dio call when the deadline
+passes. The result is `Failure(network.deadline_exceeded)`. A request without a
+deadline keeps the configured timeouts. Cancellation via `HttpCancelToken` keeps
+working independently; a deadline never turns a successful in-flight response
+into a failure retroactively.
+
+```dart
+await client.send(
+  HttpRequest(
+    method: HttpMethod.get,
+    uri: Uri.parse('/users'),
+    deadline: DateTime.now().add(const Duration(seconds: 5)),
+  ),
+);
+```
+
+
 ## Gate
 
 Requests are also available as one-call `Result` verbs:

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:appwrite/appwrite.dart' as sdk;
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
@@ -52,6 +54,9 @@ void main() {
 
     module.register(registry);
 
+    expect(registry.read<sdk.Client>().getHeaders()['Cache-Control'],
+      'no-cache, no-store', reason: 'Contract reads must revalidate deleted/replaced files.');
+
     expect(registry.read<AppwriteConfig>(), same(config));
     expect(registry.read<AppwriteSupport>(), isA<AppwriteSupport>());
     expect(registry.read<AuthRepository>(), isA<AppwriteAuth>());
@@ -82,6 +87,6 @@ void main() {
       'account_management',
       'push_targets',
     });
-    expect(module.optionalRequires, isEmpty);
+    expect(module.optionalRequires, {'secure_storage'});
   });
 }

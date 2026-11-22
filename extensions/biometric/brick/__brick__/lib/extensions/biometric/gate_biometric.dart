@@ -15,11 +15,11 @@ extension GateBiometricX on Gate {
   AppLock get appLock => use<AppLock>();
 
   Future<Result<BiometricAvailability>> biometricAvailability() =>
-      call(biometric.availability);
+      call(() => biometric.availability());
 
   Future<Result<bool>> biometricAuthenticate({String? reason}) =>
       call(() => biometric.authenticate(reason: reason));
 
   /// Unlocks the app lock. `Ok(false)` means the biometric challenge failed.
-  Future<Result<bool>> biometricUnlock() => call(appLock.unlock);
+  Future<Result<bool>> biometricUnlock() => call(() => appLock.unlock());
 }

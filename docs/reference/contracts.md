@@ -23,7 +23,7 @@ result.fold(
 ```
 
 A contract is a capability, not a package name. `RemoteDatabase` can be backed
-by Appwrite, Supabase, Firebase, or Neon; `HttpClient` can be Dio or a test fake.
+by Appwrite, Supabase, or Firebase; `HttpClient` can be Dio or a test fake.
 Feature code never imports the provider.
 
 ## Contract map
@@ -35,6 +35,8 @@ Feature code never imports the provider.
 | Backend compute | `CloudFunctions` |
 | Network | `HttpClient`, `HttpPipeline`, `HttpCache` |
 | Device and platform | `NetworkMonitor`, `Permissions`, `Notifications`, `DeepLinks`, `MediaPicker`, `ShareService`, `CalendarService`, `LocationProvider` |
+| Push | `PushTransport`, optional `PushNotificationOpens` and `PushDeliveryControls`, `PushTargets` |
+| Concurrency | `MutationLock` |
 | Observability and config | `AppLogger`, `Analytics`, `CrashReporter`, `RemoteConfig`, `Env`, `AppFlavor` |
 
 Cross-cutting values live in the same package: `AuthSession`, `Failure`,
@@ -76,13 +78,23 @@ and `updateDisplayName`.
 ```dart
 final credential = await gate.socialSignIn(SocialProvider.google);
 if (credential != null) {
-  // credential.idToken, accessToken, email, displayName
+  // credential.idToken, accessToken, rawNonce, authorizationCode,
+  // backendSessionToken, email, displayName, audience
 }
 ```
 
 `SocialProvider` is `google` or `apple`. A null result means the user cancelled.
 `SocialLogin` is the higher-level service supplied by `social_login`; both
 implement the same contract, and `signOut()` clears provider state.
+
+`SocialCredential.audience` says which layer issued `idToken`:
+`SocialTokenAudience.provider` for a native provider identity token, and
+`SocialTokenAudience.backend` when the adapter established its own backend
+session. A backend session token belongs in `backendSessionToken`, never in
+`accessToken` (provider access token) and never under a provider audience.
+`rawNonce` is the unhashed nonce a backend must verify when it exchanges an
+Apple identity token; `authorizationCode` carries the provider code for a
+server-side exchange.
 
 ## Data and storage
 
@@ -111,6 +123,15 @@ strings; encode structured data at the boundary.
 `LocalQuery` supports `where`, `orderBy`, `descending`, `limit`, and `offset`.
 The Gate currently exposes `localGet` and `localPut`; use the contract for
 queries and streams.
+
+### `MutationLock`
+
+`runExclusive(action)` runs `action` while holding the lock and releases it when
+the action completes or throws. The core `SerialMutationLock` serializes callers
+in one isolate; an implementation that also excludes another isolate, engine or
+process (for example the `local_db` extension's `FileMutationLock`) satisfies the
+same contract. `SyncQueue.flush`, `BackupExport.import` and `StorageMigrator` take
+an optional lock.
 
 ### `RemoteDatabase`
 
@@ -153,6 +174,12 @@ for exact semantics.
 `ProgressCallback` reports `0..1`. A missing object on download is
 `file.not_found`; deleting an absent object is provider-defined.
 
+`expiresIn` is a requested capability. Backends that issue signed links honor
+it; a backend that can only return a permanent or public link rejects a non-null
+`expiresIn` with `validation.unsupported_value` instead of silently returning a
+permanent link (Firebase and Appwrite client storage behave this way). Supabase
+issues signed links with the requested (or configured default) lifetime.
+
 ### `CloudFunctions`
 
 | Member | Result |
@@ -184,8 +211,21 @@ optional query parameters, and a `HttpCancelToken`. `HttpRequest` is
 backend-neutral; `HttpResponse` exposes `statusCode`, `data`, `headers`,
 `requestUri`, `duration`, `fromCache`, and case-insensitive `header(name)`.
 
-Relative URIs are resolved by the provider (Dio uses `baseUrl`). Cancellation
-throws `Failure(cancelled)`; timeouts become `network.timeout`.
+Relative URIs are resolved by the provider (Dio uses `baseUrl`). Every HTTP
+response received from the server is returned as an `HttpResponse`, including
+4xx and 5xx statuses; auth, retry, cache, and logging middleware apply their
+own status policies to that exchange. Only transport failures throw `Failure`:
+timeouts become `network.timeout`, connection errors become `network.*`, and
+cancellation becomes `Failure(cancelled)`. A cancel token aborts an in-flight
+request, not just a request that has not started.
+
+`HttpRequest.deadline` is an optional absolute wall-clock deadline for the whole
+request. Middleware and adapters stop starting new work once it passes and
+report `network.deadline_exceeded`; retry waits are clipped to the remaining
+time. A cache hit may still be served because it needs no work, and an in-flight
+transport call is not forcibly aborted unless the provider honours the deadline
+(Dio cancels it). A layer that builds a follow-up request, such as an auth
+refresh, should copy the same deadline so the caller's budget is shared.
 
 ### `HttpPipeline` and `HttpMiddleware`
 
@@ -235,6 +275,22 @@ title, body, optional payload, and channel id.
 
 `initialLink` is the cold-start URI; `links` streams later links; `dispose`
 cancels listeners. Invalid links fail with `deep_link.invalid`.
+
+### `PushTransport` and notification taps
+
+A `PushTransport` exposes `token()`, the `foreground` stream, and `dispose()`.
+A transport may additionally implement two optional interfaces:
+
+- `PushNotificationOpens` — `notificationTaps` streams `NotificationTap`
+  payloads for taps on background notifications, including the tap that launched
+  the app (retained until the first consumer subscribes). Foreground receipt
+  does not imply a tap. `go_router` consumes this interface automatically.
+- `PushDeliveryControls` — `status()`, `setForeground()`,
+  `requestExactAlarms()` and `requestIgnoreBatteryOptimizations()` describe and
+  improve background-delivery guarantees on Android; `status()` returns null
+  where the platform cannot describe them.
+
+Existing transports do not need either interface; both are additive.
 
 ### `MediaPicker`
 

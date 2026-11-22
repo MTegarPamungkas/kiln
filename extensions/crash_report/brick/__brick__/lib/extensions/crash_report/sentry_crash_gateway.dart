@@ -12,7 +12,11 @@ final class SdkSentryCrashGateway implements CrashReportGateway {
   SdkSentryCrashGateway();
 
   @override
-  Future<void> init(CrashReportConfig config, {String? environment}) async {
+  Future<void> init(
+    CrashReportConfig config, {
+    String? environment,
+    required bool Function() isAllowed,
+  }) async {
     config.validate();
     await Sentry.init((options) {
       options.dsn = config.dsn;
@@ -23,6 +27,8 @@ final class SdkSentryCrashGateway implements CrashReportGateway {
       }
       options.sampleRate = config.sampleRate;
       options.sendDefaultPii = config.sendDefaultPii;
+      // Automatic errors and queued events still pass through this boundary.
+      options.beforeSend = (event, hint) => isAllowed() ? event : null;
     });
   }
 

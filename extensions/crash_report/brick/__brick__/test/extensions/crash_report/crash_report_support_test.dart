@@ -18,6 +18,22 @@ void main() {
       expect(info.isSupported, isFalse);
     });
 
+    test('waits for consent without probing', () async {
+      var calls = 0;
+      final support = CrashReportSupport(
+        config: CrashReportConfig(dsn: 'https://key@sentry.example.com/1'),
+        flavor: AppFlavor.production,
+        probe: () async => calls++,
+        isAllowed: () => false,
+      );
+
+      final info = await support.check();
+
+      expect(info.state, SupportState.notConfigured);
+      expect(info.message, contains('consent'));
+      expect(calls, 0);
+    });
+
     test('is supported when active and the probe succeeds', () async {
       final support = CrashReportSupport(
         config: CrashReportConfig(dsn: 'https://key@sentry.example.com/1'),

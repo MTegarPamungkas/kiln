@@ -25,8 +25,25 @@ through extensions. A generated application only knows the contracts in
 5. `KilnApp` exposes the Registry through `RegistryScope`.
 6. `AppShell` reads the `AppThemeConfig`, `AppLocalizationsConfig`, and
    `RouterConfig` seams, plus the `app.wrappers` slot.
-7. Features read contracts (`RegistryScope.read<HttpClient>()`), not
-   implementations.
+7. Features use `RegistryScope.read<Gate>(context)` and call typed verbs such
+   as `gate.httpGet(uri)`. For advanced wiring, they can read contracts directly
+   from the Registry, without importing provider implementations.
+
+Bootstrap registers the Gate before module initialization. Each bootstrap has
+its own registry and Gate; there is no global instance.
+
+Optional modules can report unavailable support and allow startup to continue.
+A module that overrides `requiredForStartup` to `true` instead aborts startup
+when unavailable; the environment module uses this policy so missing required
+configuration cannot silently bypass validation. A module's hard capability
+dependencies must be available before its `ready()` runs. Applications can also
+pass `requiredCapabilities: {'auth', 'database'}` to bootstrap to require those
+capabilities before the application starts. `onModuleReady` runs only for modules
+that completed readiness with supported status.
+
+Readiness timeouts trigger cleanup but cannot forcibly cancel arbitrary plugin
+work. Module implementations must invalidate late results and release resources
+created after a timeout; the timeout alone is not a cancellation guarantee.
 
 There is no static facade or global registry. Every service access goes through
 the Registry that is passed explicitly.

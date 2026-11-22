@@ -9,6 +9,9 @@ final class FailureCode {
   final String value;
 
   static const networkTimeout = FailureCode('network.timeout');
+  static const networkDeadlineExceeded = FailureCode(
+    'network.deadline_exceeded',
+  );
   static const networkOffline = FailureCode('network.offline');
   static const networkUnreachable = FailureCode('network.unreachable');
   static const networkServer = FailureCode('network.server');
@@ -107,6 +110,7 @@ final class FailureCode {
   /// Every code that ships with `kiln_core`.
   static const List<FailureCode> known = [
     networkTimeout,
+    networkDeadlineExceeded,
     networkOffline,
     networkUnreachable,
     networkServer,

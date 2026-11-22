@@ -377,49 +377,80 @@ final class StoreCommand extends KilnCommand {
       final installer = ExtensionInstaller(
         projectRoot: project.root,
         available: <AvailableExtension>[available],
-      );
-      final result = await installer.add(
-        requested: <String>[id],
-        project: project.projectForTemplates,
-        answers: <String, Map<String, Object?>>{id: answers},
-        options: InstallOptions(
-          dryRun: argResults!['dry-run'] == true,
-          verify: argResults!['no-verify'] != true,
-          collisionPolicy: argResults!['force'] == true
-              ? CollisionPolicy.overwrite
-              : CollisionPolicy.ask,
-          runHooks: runHooks,
-          approveHooks: argResults!['yes'] == true && runHooks,
+        verifier: Verifier(
+          runner: (executable, arguments, workingDirectory) => processRunner
+              .run(executable, arguments, workingDirectory: workingDirectory),
         ),
-        hostCapabilities: const <String>{'app_basic'},
       );
+      final lock = argResults!['dry-run'] == true
+          ? null
+          : await ProjectLock.acquire(project.root);
+      final InstallResult result;
+      try {
+        result = await installer.add(
+          requested: <String>[id],
+          project: project.projectForTemplates,
+          answers: <String, Map<String, Object?>>{id: answers},
+          persistAnswers: true,
+          options: InstallOptions(
+            dryRun: argResults!['dry-run'] == true,
+            verify: argResults!['no-verify'] != true,
+            collisionPolicy: argResults!['force'] == true
+                ? CollisionPolicy.overwrite
+                : CollisionPolicy.ask,
+            runHooks: runHooks,
+            approveHooks: argResults!['yes'] == true && runHooks,
+          ),
+          hostCapabilities: const <String>{'app_basic'},
+        );
+      } finally {
+        lock?.release();
+      }
+
+      final dryRun = argResults!['dry-run'] == true;
+      final verification = result.verification;
+      final verificationFailed =
+          verification != null && !verification.isSuccess;
 
       if (argResults!['json'] == true) {
         JsonReporter(logger.raw).write(<String, Object?>{
+          'status': result.hasConflicts
+              ? 'conflict'
+              : verificationFailed
+              ? 'verification_failed'
+              : dryRun
+              ? 'preview'
+              : 'installed',
+          'committed': result.committed,
           'id': id,
           'version': available.manifest.version,
           'changes': result.changes.map((change) => change.toJson()).toList(),
           'patches': result.patches,
           'warnings': result.warnings,
+          'verification': verification == null
+              ? null
+              : <String, Object?>{
+                  'pub_get': verification.pubGetExitCode,
+                  'analyze': verification.analyzeExitCode,
+                },
           'dry_run': result.dryRun?.toJson(),
         });
       } else if (result.dryRun != null) {
         logger.info(result.dryRun!.toText());
-      } else {
+      } else if (!verificationFailed) {
         printChanges(logger, result.changes);
         printWarnings(logger, result.warnings);
         printManualSteps(logger, result.manualSteps);
+        if (!dryRun) {
+          logger.success('Installed $id ${available.manifest.version}');
+        }
       }
       if (result.hasConflicts) {
         return ExitCodes.conflict;
       }
-      if (argResults!['dry-run'] != true) {
-        project.updateExtensionAnswers(id, answers);
-        logger.success('Installed $id ${available.manifest.version}');
-      }
-      if (result.verification != null && !result.verification!.isSuccess) {
-        logger.error('Verification failed.');
-        logger.info(result.verification!.output);
+      if (verificationFailed) {
+        logger.error('Verification failed; all changes were rolled back.');
+        logger.error(verification.output);
         return ExitCodes.verification;
       }
       return ExitCodes.success;

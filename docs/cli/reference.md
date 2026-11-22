@@ -23,6 +23,7 @@ Exit codes are stable; see [exit codes](#exit-codes).
 | --- | --- |
 | `kiln create <name>` | Create a project from `app_basic`; `l10n` is installed automatically |
 | `kiln add <extension...>` | Install one or more extensions transactionally |
+| `kiln setup [extension...]` | Review installed extension settings; `--all` configures a batch |
 | `kiln remove <extension>` | Remove an extension; edited files are skipped |
 | `kiln repair [extension...]` | Restore generated files and `extensions.g.dart` |
 | `kiln list` | Installed and available extensions |
@@ -89,6 +90,48 @@ optionally runs `pub get`/`analyze`.
 
 Hooks run only when hooks are enabled by the extension and the trust decision
 allows/confirms them.
+
+## setup
+
+```bash
+kiln setup
+kiln setup dio http_retry
+kiln setup --all
+kiln setup appwrite
+kiln setup appwrite --answer project_id=my_project --yes
+kiln setup appwrite --answer project_id=my_project --dry-run --json
+```
+
+Supports every installed extension in the bundled catalog. Without names,
+lists local setup status without writing. Interactive setup reviews manifest
+prompts; explicit answers override saved values. Extensions without prompts
+show their manual steps. Installed versions must match the bundled catalog.
+
+| Flag | Meaning |
+| --- | --- |
+| `--answer` | Setting as `name=value` or `extension.name=value`; qualify ambiguous names |
+| `--all` | Review every installed extension; cannot be combined with extension names |
+| `--yes`, `-y` | Use saved values and explicit answers without prompting |
+| `--dry-run` | Stage and render changes without writing project files |
+| `--no-verify` | Skip `pub get` and analysis |
+| `--json` | Non-interactive JSON result, including whether verification ran |
+
+Setup applies settings, rendered source, native patches, and ownership hashes
+in a single transaction for the selected batch. Changed settings cannot
+overwrite edited extension files. Verification runs once for a changed batch
+and rolls back the whole batch on failure. Unchanged settings do not regenerate
+files or run verification. Setup does not execute extension hooks.
+
+Marked values are masked during input and omitted from reports. Bundled client
+credentials accept [build-variable references](client-values.md), for example
+`env:CLIENT_ANALYTICS_KEY`; only the reference is saved. Literal answers still
+remain in `kiln.yaml` and may be present in generated source. Doctor checks
+saved prompt types, ranges, required values, and supported local prerequisites.
+Local configuration does not verify connections, device support, or external
+service settings.
+
+See [Configure installed extensions](../guides/configure-extensions.md) or the
+[Appwrite walkthrough](../guides/setup-appwrite.md).
 
 ## remove
 

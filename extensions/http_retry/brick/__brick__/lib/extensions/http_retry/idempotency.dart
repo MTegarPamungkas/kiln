@@ -7,6 +7,9 @@ final class Idempotency {
   static const String headerName = 'Idempotency-Key';
 
   bool isIdempotent(HttpRequest request) {
+    if (!isReplayable(request)) {
+      return false;
+    }
     switch (request.method) {
       case HttpMethod.get:
       case HttpMethod.head:
@@ -15,9 +18,23 @@ final class Idempotency {
         return true;
       case HttpMethod.post:
       case HttpMethod.patch:
-        return request.headers.keys.any(
-          (key) => key.toLowerCase() == headerName.toLowerCase(),
-        );
+        return _idempotencyKey(request) != null;
     }
+  }
+
+  /// Whether the body can be sent again unchanged.
+  bool isReplayable(HttpRequest request) {
+    final body = request.body;
+    return body == null || body is String || body is List<int> || body is Map;
+  }
+
+  String? _idempotencyKey(HttpRequest request) {
+    for (final entry in request.headers.entries) {
+      if (entry.key.toLowerCase() == headerName.toLowerCase()) {
+        final value = entry.value.trim();
+        return value.isEmpty ? null : value;
+      }
+    }
+    return null;
   }
 }

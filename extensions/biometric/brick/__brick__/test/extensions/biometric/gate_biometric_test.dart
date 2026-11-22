@@ -9,6 +9,18 @@ import 'package:{{app_name}}/extensions/biometric/gate_biometric.dart';
 import 'test_support.dart';
 
 void main() {
+  test('missing biometric services return Err instead of throwing', () async {
+    final gate = Gate(GetItRegistry());
+
+    final availability = await gate.biometricAvailability();
+    final authenticated = await gate.biometricAuthenticate();
+    final unlocked = await gate.biometricUnlock();
+
+    expect(availability.failureOrNull?.code, FailureCode.configurationMissing);
+    expect(authenticated.failureOrNull?.code, FailureCode.configurationMissing);
+    expect(unlocked.failureOrNull?.code, FailureCode.configurationMissing);
+  });
+
   test('gate exposes biometric one-call results', () async {
     final biometric = createBiometric();
     final registry = GetItRegistry()

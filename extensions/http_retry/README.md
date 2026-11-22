@@ -12,6 +12,7 @@ Features:
 - exponential backoff with jitter,
 - `Retry-After` in seconds or as an HTTP date,
 - retry budget per time window,
+- optional total time budget for one request's retry sequence,
 - retry/give-up event callbacks.
 
 ```bash

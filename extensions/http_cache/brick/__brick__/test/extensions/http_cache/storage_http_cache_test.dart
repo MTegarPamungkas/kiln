@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
+import 'package:{{app_name}}/extensions/http_cache/cache_settings.dart';
 import 'package:{{app_name}}/extensions/http_cache/storage_http_cache.dart';
 
 final class _MemoryStorage implements Storage {
@@ -29,6 +30,26 @@ final class _MemoryStorage implements Storage {
 }
 
 void main() {
+  test('evicts the oldest entry when the cache is full', () async {
+    final storage = _MemoryStorage();
+    final clock = FixedClock(DateTime.utc(2026, 11, 1, 12));
+    final cache = StorageHttpCache(
+      storage: storage,
+      clock: clock,
+      settings: const HttpCacheSettings(maxEntries: 2),
+    );
+
+    await cache.write('first', const HttpResponse(statusCode: 200, data: 'a'));
+    clock.advance(const Duration(minutes: 1));
+    await cache.write('second', const HttpResponse(statusCode: 200, data: 'b'));
+    clock.advance(const Duration(minutes: 1));
+    await cache.write('third', const HttpResponse(statusCode: 200, data: 'c'));
+
+    expect(await cache.read('first'), isNull);
+    expect((await cache.read('second'))?.response.data, 'b');
+    expect((await cache.read('third'))?.response.data, 'c');
+  });
+
   test('round-trips a response through Storage', () async {
     final storage = _MemoryStorage();
     final cache = StorageHttpCache(storage: storage);

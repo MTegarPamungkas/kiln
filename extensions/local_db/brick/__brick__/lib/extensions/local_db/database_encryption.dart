@@ -24,10 +24,7 @@ final class DatabaseEncryption {
     final encrypter = encrypt.Encrypter(
       encrypt.AES(encrypt.Key.fromBase64(keyBase64), mode: encrypt.AESMode.gcm),
     );
-    return SembastCodec(
-      signature: 'aes-gcm',
-      codec: _AesGcmCodec(encrypter),
-    );
+    return SembastCodec(signature: 'aes-gcm', codec: _AesGcmCodec(encrypter));
   }
 }
 

@@ -66,6 +66,40 @@ void main() {
     );
   });
 
+  test('reports not enrolled when hardware exists but nothing is enrolled',
+      () async {
+    // Android: isDeviceSupported() is false for a user without a screen-lock
+    // credential, but canCheckBiometrics() still reports the hardware.
+    final biometric = createBiometric(
+      gateway: FakeBiometricGateway()
+        ..supported = false
+        ..canCheck = true
+        ..methods = <BiometricMethod>[],
+    );
+
+    expect(await biometric.availability(), BiometricAvailability.notEnrolled);
+    expect(
+      (await biometric.support()).state,
+      SupportState.permissionDenied,
+    );
+  });
+
+  test('reports missing hardware only when the hardware probe is false',
+      () async {
+    final biometric = createBiometric(
+      gateway: FakeBiometricGateway()
+        ..supported = false
+        ..canCheck = false
+        ..methods = <BiometricMethod>[],
+    );
+
+    expect(await biometric.availability(), BiometricAvailability.noHardware);
+    expect(
+      (await biometric.support()).state,
+      SupportState.unsupportedDevice,
+    );
+  });
+
   test('uses the configured reason and fallback policy', () async {
     final gateway = FakeBiometricGateway();
     final biometric = createBiometric(

@@ -6,6 +6,19 @@ import 'package:{{app_name}}/extensions/deep_link/deep_link_config.dart';
 import 'test_support.dart';
 
 void main() {
+  test('a warm link cannot overtake an early buffered link', () async {
+    final gateway = FakeAppLinksGateway();
+    final links = createDeviceDeepLinks(gateway: gateway);
+    await links.start();
+    gateway.emit(Uri.parse('kiln://orders/first'));
+    final received = <Uri>[];
+    final subscription = links.links.listen(received.add);
+    gateway.emit(Uri.parse('kiln://orders/second'));
+    await pumpEventQueue();
+    expect(received, [Uri.parse('kiln://orders/first'), Uri.parse('kiln://orders/second')]);
+    await subscription.cancel();
+    await links.dispose();
+  });
   test('forwards gateway links to listeners', () async {
     final gateway = FakeAppLinksGateway();
     final links = createDeviceDeepLinks(gateway: gateway);

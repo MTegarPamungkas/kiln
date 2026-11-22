@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
 import 'package:{{app_name}}/extensions/crash_report/crash_report_config.dart';
@@ -33,6 +35,7 @@ final class RecordedCrashBreadcrumb {
 final class FakeCrashReportGateway implements CrashReportGateway {
   final List<CrashReportConfig> inits = <CrashReportConfig>[];
   final List<String?> environments = <String?>[];
+  final List<bool> initConsent = <bool>[];
   final List<RecordedCrashError> errors = <RecordedCrashError>[];
   final List<RecordedCrashMessage> messages = <RecordedCrashMessage>[];
   final List<RecordedCrashBreadcrumb> breadcrumbs =
@@ -44,6 +47,7 @@ final class FakeCrashReportGateway implements CrashReportGateway {
   int flushCalls = 0;
   int closeCalls = 0;
   Object? failure;
+  Completer<void>? initGate;
 
   RecordedCrashError? get lastError => errors.isEmpty ? null : errors.last;
 
@@ -54,11 +58,17 @@ final class FakeCrashReportGateway implements CrashReportGateway {
       breadcrumbs.isEmpty ? null : breadcrumbs.last;
 
   @override
-  Future<void> init(CrashReportConfig config, {String? environment}) async {
+  Future<void> init(
+    CrashReportConfig config, {
+    String? environment,
+    required bool Function() isAllowed,
+  }) async {
     initCalls++;
+    await initGate?.future;
     _maybeFail();
     inits.add(config);
     environments.add(environment);
+    initConsent.add(isAllowed());
   }
 
   @override

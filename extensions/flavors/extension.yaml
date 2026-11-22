@@ -7,6 +7,8 @@ tier: official
 exclusive: true
 provides:
   - flavor
+optional_requires:
+  - logger
 prompts:
   - name: flavors
     type: multi

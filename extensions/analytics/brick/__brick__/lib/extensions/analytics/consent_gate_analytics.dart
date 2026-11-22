@@ -11,13 +11,16 @@ final class ConsentGateAnalytics implements Analytics {
   const ConsentGateAnalytics({
     required Analytics delegate,
     required ConsentController consent,
+    this.isActive,
   }) : _delegate = delegate,
        _consent = consent;
 
   final Analytics _delegate;
   final ConsentController _consent;
+  final bool Function()? isActive;
 
-  bool get isAllowed => _consent.isGranted(ConsentCategory.analytics);
+  bool get isAllowed => (isActive?.call() ?? true) &&
+      _consent.isGranted(ConsentCategory.analytics);
 
   @override
   Future<void> capture(
@@ -42,5 +45,6 @@ final class ConsentGateAnalytics implements Analytics {
   }
 
   @override
-  Future<void> reset() => _delegate.reset();
+  Future<void> reset() => (isActive?.call() ?? true)
+      ? _delegate.reset() : Future<void>.value();
 }

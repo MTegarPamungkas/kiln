@@ -17,7 +17,10 @@ final class AppwriteClientFactory {
   }) {
     config.validate();
     final client = Client(endPoint: config.endpoint)
-      ..setProject(config.projectId);
+      ..setProject(config.projectId)
+      // Contract reads must revalidate server state, including downloads after
+      // deletion/replacement. Browser HTTP caches can otherwise return old bytes.
+      ..addHeader('Cache-Control', 'no-cache, no-store');
     if (flavor == AppFlavor.development) {
       client.setSelfSigned(status: true);
     }

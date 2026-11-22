@@ -61,8 +61,16 @@ await gateway.updateUser(password: 'new-password');
 ```
 
 For OAuth, call `SocialAuth.signIn(SocialProvider.google)`. The extension opens
-the browser, waits for the session from the callback, and returns `null` if the
-user cancels or the wait times out.
+the browser, waits for a session produced by that flow (a session that already
+existed before the launch never counts as its result), and returns `null` if the
+user cancels or the wait times out. The returned credential uses
+`SocialTokenAudience.backend` and exposes the Supabase access token in
+`backendSessionToken`.
+
+When you acquire a native Google or Apple credential yourself, pass a
+`SupabaseCredentialSource` to `SupabaseSocialAuth`; its `rawNonce` and
+`authorizationCode` are forwarded to `signInWithIdToken`, and the result keeps
+the provider `idToken` separate from the Supabase session token.
 
 ## 5. Observing callback failures
 

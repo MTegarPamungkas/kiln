@@ -20,7 +20,8 @@ final registry = await KilnBootstrap.run(
 
 1. Creates a private `GetItRegistry`, `SlotRegistry`, `SessionController`,
    `ConsentController`, `LifecycleController`, `SupportRegistry`, and `Clock`.
-2. Registers those core services in the registry.
+2. Registers those core services and a `Gate` bound to this registry, available
+   to modules and application code as `registry.read<Gate>()`.
 3. Records `unsupportedPlatform` for modules whose `platforms` do not match the
    current platform, then removes them from the graph.
 4. Resolves `requires`/`optionalRequires` capabilities with `ModuleGraph`.
@@ -46,6 +47,21 @@ Options:
 A support probe never blocks startup. Timeouts and probe errors become
 `SupportState.unavailable`; `ready()` is skipped for that module.
 
+### Unavailable modules
+
+- A module with `requiredForStartup: true` stops bootstrap with the typed
+  `Failure` from its support state (`configuration.missing` for
+  `notConfigured`, `unavailable`, or the matching `support.*` code). Registered
+  modules are disposed in reverse order before the error is rethrown.
+- An optional module keeps its registered contracts, loses its capabilities, and
+  skips `ready`. A dependent that requires a missing capability also skips
+  `ready` and records the missing capability in its support details. Unrelated
+  modules still start.
+- `Future.timeout` only stops waiting. It cannot cancel a plugin or transport
+  call, so `support`/`ready` implementations must ignore late completions after
+  disposal; cancellation is cooperative through the contracts that expose it.
+
+
 ## Registry
 
 ```dart
@@ -60,14 +76,24 @@ final isPresent = registry.isRegistered<AuthRepository>();
 | `readOrNull<T>()` | Returns `null` when missing |
 | `isRegistered<T>()` | Probe without resolving a lazy singleton |
 | `registerSingleton<T>(value)` | One instance for the container lifetime |
+| `registerOwned<T>(value, dispose:)` | Same, but the registry disposes it on shutdown |
 | `registerLazySingleton<T>(factory)` | Creates on first read |
 | `registerFactory<T>(factory)` | Creates a new instance per read |
 | `unregister<T>()` | Removes the registration |
+| `dispose()` | Runs owned disposal callbacks once in reverse order, then clears |
 | `isReady` | Always true for the container implementation |
 
 A missing registration is a programming error. Application features should use
 `Gate.has<T>()` or `readOrNull<T>()` when a capability is optional. A service
-lookup performed outside `Gate.call` can throw; the Gate wraps it.
+lookup performed outside `Gate.call` can throw. Gate verbs wrap lookup and
+invocation together; for custom operations use
+`gate.call(() => gate.use<MyContract>().operation())`.
+
+`registerOwned` is for resources the registry owns. Pass a callback, or let it
+infer `dispose()` from a `Disposable`. `KilnBootstrap` adds `registry.dispose()`
+to the lifecycle, so it runs after module disposal. Do not mark an instance that
+a module already disposes as owned: the second disposal would be a double close.
+`registerSingleton` remains manual and is never disposed by the registry.
 
 `GetItRegistry` accepts an optional `GetIt` container, which tests can preload.
 

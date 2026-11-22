@@ -37,16 +37,20 @@ final class ThemeModeStore {
     }
   }
 
-  /// Writes [mode]; failures are ignored because the preference is optional.
-  Future<void> write(ThemeMode mode) async {
+  /// Writes [mode] and reports whether it is durable.
+  ///
+  /// A storage failure never blocks switching the theme: the mode still applies
+  /// for this session and the caller is told it will not survive a restart.
+  Future<PersistOutcome> write(ThemeMode mode) async {
     final storage = _storage;
     if (storage == null) {
-      return;
+      return PersistOutcome.notConfigured;
     }
     try {
       await storage.write(key, encode(mode));
+      return PersistOutcome.persisted;
     } on Object {
-      // A storage failure must not block switching the theme.
+      return PersistOutcome.sessionOnly;
     }
   }
 

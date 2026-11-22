@@ -19,6 +19,7 @@ final class FakePushTransport
   final StreamController<PushEnvelope> _controller =
       StreamController<PushEnvelope>.broadcast();
 
+  @override
   void emit(PushEnvelope envelope) {
     _controller.add(envelope);
   }

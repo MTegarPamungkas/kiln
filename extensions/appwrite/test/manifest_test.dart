@@ -24,7 +24,7 @@ void main() {
       'account_management',
       'push_targets',
     ]);
-    expect(manifest.optionalRequires, isEmpty);
+    expect(manifest.optionalRequires, ['secure_storage']);
     expect(manifest.dependencies, contains('appwrite'));
     expect(manifest.prompts.map((prompt) => prompt.name), <String>[
       'endpoint',

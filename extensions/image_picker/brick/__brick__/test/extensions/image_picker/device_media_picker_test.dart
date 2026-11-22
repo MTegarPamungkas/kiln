@@ -19,6 +19,18 @@ XFile _jpegFile({String path = '/tmp/photo.jpg'}) {
 }
 
 void main() {
+  test(
+    'bounds streamed contents even when file length under-reports',
+    () async {
+      final picker = DeviceMediaPicker(
+        gateway: FakeImagePickerGateway(),
+        config: const MediaPickerConfig(maxBytes: 4),
+      );
+      final file = _GrowingFile();
+      await expectLater(picker.fromFile(file), throwsA(isA<Failure>()));
+      expect(file.reads, 2);
+    },
+  );
   test('picks a gallery image with the configured options', () async {
     final gateway = FakeImagePickerGateway()..file = _jpegFile();
     final picker = DeviceMediaPicker(gateway: gateway);
@@ -110,4 +122,57 @@ void main() {
 
     expect((await picker.pickImage())!.mimeType, 'image/jpeg');
   });
+
+  test('reports the decoded size from the encoded header', () async {
+    final gateway = FakeImagePickerGateway()
+      ..file = XFile.fromData(
+        Uint8List.fromList(pngWithSize(640, 480)),
+        path: '/tmp/photo.png',
+        mimeType: 'image/png',
+      );
+    final picker = DeviceMediaPicker(gateway: gateway);
+
+    final picked = await picker.pickImage();
+
+    expect(picked!.width, 640);
+    expect(picked.height, 480);
+  });
+
+  test('rejects a bitmap above the decode limit', () async {
+    final gateway = FakeImagePickerGateway()
+      ..file = XFile.fromData(
+        Uint8List.fromList(pngWithSize(9000, 9000)),
+        path: '/tmp/huge.png',
+        mimeType: 'image/png',
+      );
+    final picker = DeviceMediaPicker(
+      gateway: gateway,
+      config: const MediaPickerConfig(maxDecodedPixels: 16000000),
+    );
+
+    await expectLater(
+      picker.pickImage(),
+      throwsA(
+        isA<Failure>()
+            .having((failure) => failure.code, 'code', FailureCode.mediaInvalid)
+            .having((failure) => failure.details['pixels'], 'pixels', 81000000),
+      ),
+    );
+  });
+}
+
+final class _GrowingFile extends XFile {
+  _GrowingFile() : super('/tmp/growing.jpg');
+  int reads = 0;
+  @override
+  Future<int> length() async => 1;
+  @override
+  Stream<Uint8List> openRead([int? start, int? end]) async* {
+    reads++;
+    yield Uint8List.fromList(jpegSignature);
+    reads++;
+    yield Uint8List(4);
+    reads++;
+    yield Uint8List(4);
+  }
 }

@@ -6,6 +6,10 @@ The Kiln command line interface.
 kiln create my_app --with dio --answer base_url=https://api.example.com
 kiln create starter_app --template app
 kiln add dio
+kiln setup dio
+kiln add appwrite
+kiln setup appwrite
+kiln setup --all
 kiln doctor
 kiln remove dio --yes
 ```

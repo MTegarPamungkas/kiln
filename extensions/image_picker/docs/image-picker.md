@@ -24,9 +24,25 @@ The `max_bytes` and `allowed_types` prompts are rendered into
 `MediaPickerConfig.defaults`.
 
 - `maxWidth`, `maxHeight`, and `imageQuality` are the default values; the
-  `pickImage` arguments override them.
-- `maxBytes` is checked after the file is read.
+  `pickImage` arguments override them. They are downscaling targets, not reject
+  limits.
+- `maxBytes` is checked against the reported length before the file is read, and
+  again against the streamed contents in case the length lies.
 - `allowedTypes` contains MIME types. Image types not in the list are rejected.
+- `maxDecodedWidth`, `maxDecodedHeight`, and `maxDecodedPixels` reject an image
+  whose encoded header declares a bitmap larger than the limit, before a decoder
+  allocates it. Defaults are 20000 x 20000 and 50 megapixels; pass smaller values
+  when the app only needs thumbnails.
+
+```dart
+const config = MediaPickerConfig(maxDecodedPixels: 16000000);
+```
+
+The check reads only the header (PNG `IHDR`, JPEG frame header, GIF screen
+descriptor, WebP `VP8X`/`VP8 `/`VP8L`, and the AVIF/HEIC `ispe` box) and skips
+formats it cannot measure, because such a payload cannot be decoded into a
+bitmap either. The measured size is also exposed on `PickedImage.width` and
+`PickedImage.height`.
 
 ## Image types
 
