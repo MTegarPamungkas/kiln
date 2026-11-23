@@ -17,7 +17,7 @@
     "test/extensions/http_retry/idempotency_test.dart": "82c267320badc66f8018f75f0ec83ef245a1d0bd0a0815e0ef366a6d86a3916c",
     "test/extensions/http_retry/retry_after_parser_test.dart": "0f0c9e690f95d5202479a772ec3b3db6008b6c1350a55cb2db735a95d824d34a",
     "test/extensions/http_retry/retry_budget_test.dart": "2a80b60f613dcc3d8851b4e26ef6d77bdfd6aafdd145a999a2b5561221e1f693",
-    "test/extensions/http_retry/retry_middleware_test.dart": "e1c6b682dc21295b547f6a0ed1e55e04d6af29e7ab0628ed99fd3120cb2ac663",
+    "test/extensions/http_retry/retry_middleware_test.dart": "ec0b158c1677d2590ca5573958dcf89b2360a753b9dcf2b9ec756df484e79d42",
     "test/extensions/http_retry/retry_settings_test.dart": "e62fdd8de882a64526b4aba8387e63eccada169282e0c9d551a980081aaccd28"
   }
 }

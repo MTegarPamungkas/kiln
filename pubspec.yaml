@@ -46,6 +46,11 @@ workspace:
   - packages/kiln_cli
   - packages/kiln_store
   - packages/kiln_testing
+  # packages/kiln_lints is deliberately NOT a workspace member: its
+  # custom_lint_builder dependency pins analyzer ^8, while the Flutter SDK's
+  # test_api needs analyzer ^14, and a workspace resolves one version for all
+  # members. It resolves on its own (`dart pub get` in that folder, own
+  # pubspec.lock). Add it back once custom_lint supports analyzer 14.
 
 dev_dependencies:
   analyzer: ^14.0.0

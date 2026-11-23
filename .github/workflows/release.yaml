@@ -19,6 +19,11 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # kiln_lints sits outside the workspace (see its pubspec); resolve it
+      # before the root `dart analyze`, which also analyzes that package.
+      - name: Resolve kiln_lints
+        working-directory: packages/kiln_lints
+        run: dart pub get
       - run: dart analyze
       - run: dart run tool/lint_extensions.dart
       - run: dart run tool/bundle.dart --check
