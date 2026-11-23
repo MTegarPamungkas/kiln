@@ -16,7 +16,7 @@ void main() {
     });
     final clock = FixedClock(DateTime.utc(2026, 2, 3, 4, 5, 6));
     final memory = MemoryLogSink();
-    memory.write(
+    await memory.write(
       LogRecord(
         level: LogLevel.info,
         message: 'memory andi@example.com',
@@ -50,14 +50,14 @@ void main() {
   });
 
   test('exports memory only when no file sink is attached', () async {
-    final memory = MemoryLogSink()
-      ..write(
-        LogRecord(
-          level: LogLevel.info,
-          message: 'only memory',
-          timestamp: DateTime.utc(2026, 1, 1),
-        ),
-      );
+    final memory = MemoryLogSink();
+    await memory.write(
+      LogRecord(
+        level: LogLevel.info,
+        message: 'only memory',
+        timestamp: DateTime.utc(2026, 1, 1),
+      ),
+    );
     final exporter = LogExporter(memory: memory);
 
     final report = await exporter.export();

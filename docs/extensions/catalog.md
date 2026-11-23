@@ -14,7 +14,7 @@ This catalog is generated from extension manifests by
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
 | `codegen` | Codegen | 0.1.0 | codegen | official | `codegen` |
 | `connectivity` | Connectivity | 0.1.2 | connectivity | official | `connectivity` |
-| `crash_report` | Crash Report | 0.1.0 | crash | official | `crash_reporter` |
+| `crash_report` | Crash Report | 0.1.1 | crash | official | `crash_reporter` |
 | `deep_link` | Deep links | 0.1.2 | deep_link | official | `deep_links` |
 | `dio` | Dio HTTP client | 0.1.3 | network | official | `http_client`, `http_pipeline` |
 | `env` | Environment | 0.1.0 | config | official | `env` |
@@ -27,7 +27,7 @@ This catalog is generated from extension manifests by
 | `image_picker` | Image picker | 0.1.0 | media | official | `media` |
 | `l10n` | Localization | 0.1.0 | l10n | official | `l10n` |
 | `local_db` | Local database | 0.1.0 | database | official | `local_db` |
-| `logger` | Logger | 0.1.0 | logging | official | `logger` |
+| `logger` | Logger | 0.1.1 | logging | official | `logger` |
 | `notifications` | Notifications | 0.1.1 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.0 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.2 | config | official | `remote_config` |

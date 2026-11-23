@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T13:50:09.866267Z",
+  "generated_at": "2026-11-23T14:17:52.595381Z",
   "extensions": [
     {
       "id": "analytics",
@@ -219,13 +219,13 @@
       "name": "Crash Report",
       "description": "Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.",
       "category": "crash",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
-          "version": "0.1.0",
-          "url": "archives/crash_report-0.1.0.tgz",
-          "sha256": "4751fc055ab92ca0d1013a74f376a244464ee6756d6781e4a58e3fd4abd5ace1",
+          "version": "0.1.1",
+          "url": "archives/crash_report-0.1.1.tgz",
+          "sha256": "5d167a5b21dc2c055e36b38f5db4a0d2001cfaf0bd04b65da62214ff656a59d6",
           "provides": [
             "crash_reporter"
           ],
@@ -269,7 +269,7 @@
         {
           "version": "0.1.3",
           "url": "archives/dio-0.1.3.tgz",
-          "sha256": "e0c6165ccf700703a7431f86fc2eb4861cfb7ea67224075dabe5d34bb9af7545",
+          "sha256": "6b767e1784fddbdb53bf80ba675e01da7717ea54364cec541b355359275f1831",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -434,7 +434,7 @@
         {
           "version": "0.1.0",
           "url": "archives/http_retry-0.1.0.tgz",
-          "sha256": "2a7c437284f9b27721be649214a5dc847d5193e97a361c90d859f47664f1fec3",
+          "sha256": "5f0638cd91a300a9a4635eab35c2c0f6ce41f7ccaa80c23a529cf0b15a17db3c",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -517,13 +517,13 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
-          "version": "0.1.0",
-          "url": "archives/logger-0.1.0.tgz",
-          "sha256": "0338e48c1c099f21da204eb4a166ac2ef14d1ad1c8320bbd7fb071ff7cf4b7a8",
+          "version": "0.1.1",
+          "url": "archives/logger-0.1.1.tgz",
+          "sha256": "3be08d3cf00ed584fef61a088036e3c342e1fbd1dd1987ddfb4b94906766e617",
           "provides": [
             "logger"
           ],
@@ -589,7 +589,7 @@
         {
           "version": "0.1.2",
           "url": "archives/remote_config-0.1.2.tgz",
-          "sha256": "ccd6fd60cb6f0bbce66d84c4ca5ba0d6444dbce9c5d8d76cbe6af10d9b362a80",
+          "sha256": "901e08aa6292cc50873510a20f5217e567dc8b752bc3cd99c906b61cb2808cbc",
           "provides": [
             "remote_config"
           ],

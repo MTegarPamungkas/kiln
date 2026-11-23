@@ -24,16 +24,16 @@
     "test/extensions/logger/file_log_sink_test.dart": "f9dd5f49771de8d30d3c6e96a625758d1b5fd80ed67ea66f07a38c2853f758ad",
     "test/extensions/logger/gate_logger_test.dart": "50eb2927908e927bf92b7b2078f4b1cb039fa6e4eb92eaeba3373d7392835a55",
     "test/extensions/logger/http_log_middleware_test.dart": "5ab077526769db67f9c3df42668af84df8b2345d339feb33f828b44e75a2f447",
-    "test/extensions/logger/log_exporter_test.dart": "bc3ba9fbc0e886360ff27c6393cfaeb66105c285989bee03d5e0815e4766f003",
+    "test/extensions/logger/log_exporter_test.dart": "262fff0ebd2d08b79e9b1a7803d69e4e7e71374125402f1f0acbf9d6f443920a",
     "test/extensions/logger/log_formatter_test.dart": "f23a2b0a41020332114dded4d294fec32e353be65bc6f42c6541e24a2649ea99",
     "test/extensions/logger/log_level_controller_test.dart": "db5fe2766addaa1c615730eb514db727c803e9afac35f14cd06bfb376c788e6b",
     "test/extensions/logger/logger_config_test.dart": "d8d90d6e49a443888000849f84647cd1577936e5e6ea2286def9cecd3800a5ba",
     "test/extensions/logger/logger_contract_test.dart": "a9405a30d4f36c1d23d9b2384740c43c4f0cff2272762b2b8359c456fea0d41f",
     "test/extensions/logger/logger_module_test.dart": "cdf077ac5ac6b9bb50f6ae92cd532de01e15a65c1f8378845d95feb7da433775",
     "test/extensions/logger/logger_support_test.dart": "aa916bdac14655f46d928bbaff05f64b7ad97e906e555842f6c5805dafebeb8a",
-    "test/extensions/logger/memory_log_sink_test.dart": "5bd6f31b19bbfb1b30067d99a0b80e4f66c5198be2c51eb25695aedeb764f8e3",
+    "test/extensions/logger/memory_log_sink_test.dart": "d803a94b252feffb808faa8d933da66fd72653e169d1d92f93a00786c8a90668",
     "test/extensions/logger/record_size_limit_test.dart": "3d3139d5cebec2aa965e20ebb1b48cff480c95004314f4164f33975872a5438a",
     "test/extensions/logger/redacting_sink_test.dart": "541f9c07dd2c6dcfb77641a472ac4d0eb1f34faf6438a51e650467254191be23",
-    "test/extensions/logger/sink_pipeline_test.dart": "cb4a9bcd03ed5f34195cb0f7fa3c8e3b56b4a4caa2383c16fa69be3dbd450cbe"
+    "test/extensions/logger/sink_pipeline_test.dart": "c77ac15963b14abd47f7eeb1f6b04d01901a441808e9d62ecc0bed910aeb24ec"
   }
 }

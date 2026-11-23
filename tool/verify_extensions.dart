@@ -166,7 +166,9 @@ Future<bool> _analyzeExtension({
     final testing = p
         .join(root.path, 'packages', 'kiln_testing')
         .replaceAll('\\', '/');
-    final dependencies = StringBuffer('  flutter:\n    sdk: flutter\n');
+    final dependencies = StringBuffer(
+      '  flutter:\n    sdk: flutter\n  material_ui: ^1.11.1\n',
+    );
     if (!manifest.dependencies.containsKey('kiln_core')) {
       dependencies.writeln('  kiln_core:\n    path: $core');
     }

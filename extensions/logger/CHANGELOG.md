@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Await `FutureOr<void>` sink `write` calls in logger brick tests to satisfy `unawaited_futures`.
+
 ## 0.1.0
 
 - Records are size-capped before every sink: message, error, stack trace and

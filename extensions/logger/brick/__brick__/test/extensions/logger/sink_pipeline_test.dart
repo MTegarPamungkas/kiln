@@ -21,7 +21,7 @@ void main() {
       },
     );
 
-    pipeline.write(_record());
+    await pipeline.write(_record());
     await pipeline.flush();
 
     expect(memory.records, hasLength(1));
@@ -35,7 +35,7 @@ void main() {
     final memory = MemoryLogSink();
     final pipeline = SinkPipeline(<LogSink>[memory], enabled: false);
 
-    pipeline.write(_record());
+    await pipeline.write(_record());
     await pipeline.flush();
 
     expect(memory.records, isEmpty);
@@ -46,9 +46,9 @@ void main() {
     final pipeline = SinkPipeline(<LogSink>[]);
 
     pipeline.add(memory);
-    pipeline.write(_record());
+    await pipeline.write(_record());
     expect(pipeline.remove(memory), isTrue);
-    pipeline.write(_record());
+    await pipeline.write(_record());
     await pipeline.flush();
 
     expect(memory.records, hasLength(1));

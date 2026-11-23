@@ -7,7 +7,7 @@ void main() {
     final sink = MemoryLogSink(capacity: 3);
 
     for (var index = 0; index < 5; index++) {
-      sink.write(_record('entry $index'));
+      await sink.write(_record('entry $index'));
     }
 
     expect(sink.records.map((record) => record.message), <String>[
@@ -20,7 +20,8 @@ void main() {
   });
 
   test('clear empties the buffer', () async {
-    final sink = MemoryLogSink(capacity: 2)..write(_record('one'));
+    final sink = MemoryLogSink(capacity: 2);
+    await sink.write(_record('one'));
 
     sink.clear();
 
