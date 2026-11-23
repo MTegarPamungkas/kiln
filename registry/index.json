@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T14:38:35.991649Z",
+  "generated_at": "2026-11-23T16:31:04.111007Z",
   "extensions": [
     {
       "id": "analytics",
@@ -1012,7 +1012,7 @@
       "name": "Localization",
       "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
       "category": "l10n",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -1031,6 +1031,18 @@
           "version": "0.1.1",
           "url": "archives/l10n-0.1.1.tgz",
           "sha256": "d836a3928ef54a098e2c22fbb9c2844b22c72167ff5e74673dd47a1e24ce0ed3",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/l10n-0.1.2.tgz",
+          "sha256": "bcff7bfbc1c10c7cd7e4483f99782b201d9a4a0890f54f0edce634be70880852",
           "provides": [
             "l10n"
           ],

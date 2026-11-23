@@ -1,6 +1,8 @@
 import 'dart:ui' show PlatformDispatcher;
 
+import 'package:flutter/widgets.dart' show LocalizationsDelegate;
 import 'package:kiln_core/kiln_core.dart';
+import 'package:material_ui/material_ui.dart' show GlobalMaterialLocalizations;
 import 'package:minimal/core/error/failure_presenter.dart';
 import 'package:minimal/core/l10n/app_localizations_config.dart';
 import 'package:minimal/core/l10n/core_copy.dart';
@@ -49,7 +51,10 @@ final class L10nModule extends KilnModule {
       ..registerSingleton<CoreCopy>(const LocalizedCoreCopy())
       ..registerSingleton<AppLocalizationsConfig>(
         AppLocalizationsConfig(
-          delegates: AppLocalizations.localizationsDelegates,
+          delegates: <LocalizationsDelegate<dynamic>>[
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
           supportedLocales: config.supportedLocales,
           locale: controller.locale,
           localeListenable: controller.localeListenable,

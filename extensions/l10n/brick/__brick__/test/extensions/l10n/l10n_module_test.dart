@@ -1,9 +1,9 @@
 import 'dart:ui' show PlatformDispatcher;
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:{{app_name}}/core/error/failure_presenter.dart';
 import 'package:{{app_name}}/core/l10n/app_localizations_config.dart';
 import 'package:{{app_name}}/core/l10n/core_copy.dart';
@@ -32,9 +32,31 @@ void main() {
     expect(app.currentLocale, isNull);
     expect(app.localeListenable, same(controller.localeListenable));
     expect(app.delegates, contains(AppLocalizations.delegate));
+    expect(app.delegates, contains(GlobalMaterialLocalizations.delegate));
     expect(registry.read<FailureMessages>(), isA<L10nFailureMessages>());
     expect(registry.read<L10nSupport>(), isA<L10nSupport>());
     expect(registry.read<CoreCopy>(), isA<LocalizedCoreCopy>());
+  });
+
+  testWidgets('provides material_ui MaterialLocalizations for non-English locales', (
+    tester,
+  ) async {
+    final registry = GetItRegistry();
+    L10nModule().register(registry);
+    final app = registry.read<AppLocalizationsConfig>();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('id'),
+        supportedLocales: app.supportedLocales,
+        localizationsDelegates: app.delegates,
+        home: Scaffold(appBar: AppBar(title: const Text('Uji'))),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Uji'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   test('module disposes its controller once', () async {

@@ -25,7 +25,7 @@ This catalog is generated from extension manifests by
 | `http_cache` | HTTP cache | 0.1.2 | network | official | `http_cache` |
 | `http_retry` | HTTP retry | 0.1.1 | network | official |  |
 | `image_picker` | Image picker | 0.1.1 | media | official | `media` |
-| `l10n` | Localization | 0.1.1 | l10n | official | `l10n` |
+| `l10n` | Localization | 0.1.2 | l10n | official | `l10n` |
 | `local_db` | Local database | 0.1.1 | database | official | `local_db` |
 | `logger` | Logger | 0.1.1 | logging | official | `logger` |
 | `notifications` | Notifications | 0.1.2 | notifications | official | `notifications` |

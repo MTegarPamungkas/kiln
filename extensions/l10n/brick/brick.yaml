@@ -1,6 +1,6 @@
 name: l10n
 description: Localized strings, locale selection, and formatting for Kiln.
-version: 0.1.1
+version: 0.1.2
 environment:
   mason: ">=0.1.0 <0.2.0"
 vars:
