@@ -1,6 +1,6 @@
 name: kiln_image_picker_extension
 description: Tests and tooling for the image_picker Kiln extension.
-version: 0.1.0
+version: 0.1.1
 publish_to: none
 
 environment:

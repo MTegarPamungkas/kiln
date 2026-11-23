@@ -1,6 +1,6 @@
 id: http_retry
 name: HTTP retry
-version: 0.1.0
+version: 0.1.1
 description: Retries temporary HTTP failures with backoff and a retry budget.
 category: network
 tier: official

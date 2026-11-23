@@ -82,6 +82,10 @@ void main() {
       final second = packer.pack(root);
 
       expect(first, equals(second));
+      // RFC 1952 header: zero MTIME (bytes 4..7) and unknown OS (byte 9 = 0xff)
+      // keep archives byte-identical across Windows, macOS, and Linux.
+      expect(first.sublist(4, 8), equals(<int>[0, 0, 0, 0]));
+      expect(first[9], equals(0xff));
     });
 
     test('round-trips through ArchiveUnpacker', () {

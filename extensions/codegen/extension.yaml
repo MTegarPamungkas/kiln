@@ -1,6 +1,6 @@
 id: codegen
 name: Codegen
-version: 0.1.0
+version: 0.1.1
 description: JSON model code generation with json_serializable and freezed, wired through build_runner.
 category: codegen
 tier: official

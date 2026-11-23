@@ -74,7 +74,21 @@ final class ArchivePacker {
     }
 
     final tar = TarEncoder().encodeBytes(archive);
-    return GZipEncoder().encodeBytes(tar, level: 9);
+    // Use the pure-Dart GZip encoder rather than dart:io's native ZLibCodec:
+    // native zlib writes a platform-specific OS header byte (10 on Windows vs
+    // 3 on Linux) and can vary across system zlib builds, breaking cross-OS
+    // `registry.dart --check`. Zero the RFC 1952 MTIME header (bytes 4..7)
+    // because GZipEncoderWeb stamps DateTime.now() there.
+    final gzip = Uint8List.fromList(
+      const GZipEncoderWeb().encodeBytes(tar, level: 9),
+    );
+    if (gzip.length >= 10) {
+      gzip[4] = 0;
+      gzip[5] = 0;
+      gzip[6] = 0;
+      gzip[7] = 0;
+    }
+    return gzip;
   }
 
   static bool _shouldSkip(String relativePath) {

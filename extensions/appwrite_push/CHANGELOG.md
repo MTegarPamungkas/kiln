@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Repack archive with deterministic cross-OS gzip and without root `test/`.
+
 ## 0.1.1
 
 - The transport stops between awaits if the module was disposed during

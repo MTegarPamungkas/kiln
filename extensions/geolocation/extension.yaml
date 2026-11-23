@@ -1,6 +1,6 @@
 id: geolocation
 name: Geolocation
-version: 0.1.0
+version: 0.1.1
 description: Device location with permission-aware reads and streaming updates.
 category: location
 tier: official

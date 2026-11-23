@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T14:17:52.595381Z",
+  "generated_at": "2026-11-23T14:38:35.991649Z",
   "extensions": [
     {
       "id": "analytics",
@@ -11,9 +11,21 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/analytics-0.1.0.tgz",
+          "sha256": "0ca7dddfe63d46e079a7955e693994918a0b198894084c8d896e7019b6b20a5f",
+          "provides": [
+            "analytics"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/analytics-0.1.1.tgz",
-          "sha256": "ad8e5235d4d152606a095481b6c90e2fb67219d0c561647857e7e201a2884ebf",
+          "sha256": "f8207193bf66ee91670ce6c49bfc7dc69870b745fa61c80df798d8b4660edff2",
           "provides": [
             "analytics"
           ],
@@ -33,9 +45,115 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/appwrite-0.1.0.tgz",
+          "sha256": "8f97466bf0c7113f7b20a4e119b7514f569eda645c73d9eab52dde41f2d52428",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/appwrite-0.1.1.tgz",
+          "sha256": "3bf88b90d3d10c7fe7419ac72db6f2a62ecceb202228203eb243d8c6c996b94b",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/appwrite-0.2.1.tgz",
+          "sha256": "ee5fd20da03744b55c020ae2aa0d6d6b2747ddb9759d7bdec90844099f5448d4",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.0",
+          "url": "archives/appwrite-0.3.0.tgz",
+          "sha256": "dd6b5e9cb6fcc67ed6bb57b808edb563e980b7acbe2538b720389561a3ddd7ba",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.1",
+          "url": "archives/appwrite-0.3.1.tgz",
+          "sha256": "adaad97281760aa3cca04df248534c64b95cfdaebcce2468419c7c99a93ff25a",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.3.2",
+          "url": "archives/appwrite-0.3.2.tgz",
+          "sha256": "d7d31f968b71c4845abc793499b77e4040748526263dacc7e37ebb698cc504a5",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets",
+            "appwrite_client"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.3.3",
           "url": "archives/appwrite-0.3.3.tgz",
-          "sha256": "205f86e5b7b214a4dd3d547fecfbaa8fa8fb821e10bc6c77289beee662ad726a",
+          "sha256": "e1c2f3e1a009d58439ba255eef4713558c930004e9844ac2932ce47795bb637a",
           "provides": [
             "auth",
             "social_auth",
@@ -59,13 +177,43 @@
       "name": "Appwrite Push",
       "description": "Push transport bridging Firebase Cloud Messaging into the push_targets capability on Appwrite.",
       "category": "notifications",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/appwrite_push-0.1.0.tgz",
+          "sha256": "32a411c04f60dad15d4214e74c2de04941870706cedc96db365b881bb6d79911",
+          "requires": [
+            "push_targets"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/appwrite_push-0.1.1.tgz",
-          "sha256": "ec58df18b98bc94c39e2a5e2113f21fe305710ce0f7ba6165f95c249bb52848f",
+          "sha256": "93b916e3ab0efdfddda848803b435ad87b269d4e3dd4731c716804310c673892",
+          "requires": [
+            "push_targets"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/appwrite_push-0.1.2.tgz",
+          "sha256": "717499aa444d8982967372b1d8c4b9a2268b080b49ddbdb26c1086d4e1059307",
           "requires": [
             "push_targets"
           ],
@@ -88,9 +236,54 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/appwrite_push_native-0.1.0.tgz",
+          "sha256": "daa3a27a9872abd14e365a4acc36636c209261999f937b745ca6247e464532e6",
+          "requires": [
+            "auth"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/appwrite_push_native-0.2.0.tgz",
+          "sha256": "879e4e61a1ca5366d17253d6e706421c82a492ba4ae9a6a46c7fd4f54b5ccc1c",
+          "requires": [
+            "auth"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/appwrite_push_native-0.2.1.tgz",
+          "sha256": "a2c3824cf4a38a49178bbef6baba0622c0670a493e13389cd39ab95f66b5abdd",
+          "requires": [
+            "appwrite_client"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.2.2",
           "url": "archives/appwrite_push_native-0.2.2.tgz",
-          "sha256": "487b17e6b2e4e971a0f711c1470d0a8bcfc16d9c14666ebd7c7f3c36f40f7460",
+          "sha256": "d4edb1c6bd17f63fb863d0f234da24aef1b98afab0bd214e8434f005394b4fb7",
           "requires": [
             "appwrite_client"
           ],
@@ -109,13 +302,37 @@
       "name": "Biometric",
       "description": "Biometric authentication, app lock state, and protected storage.",
       "category": "security",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/biometric-0.1.0.tgz",
+          "sha256": "75ace96da70b3b63d65631b108439ab8e8c154be3713f11f4fdb487b880ddd79",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/biometric-0.1.1.tgz",
-          "sha256": "df1d93e48ee4f1f938a679e2decbc1eed0bef8522294b32eea1f1ee5be2d5cd7",
+          "sha256": "86841c93da8403e45c2e7254da9da5e162027acafad3a03b9c49624ce6ac798d",
+          "provides": [
+            "biometric"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/biometric-0.1.2.tgz",
+          "sha256": "b4dafbbab5501531c0610fb5e18dc3a380bfa9d1a2fe5601a2c44667e90189ef",
           "provides": [
             "biometric"
           ],
@@ -135,9 +352,45 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/bloc-0.1.0.tgz",
+          "sha256": "496cad2285641799f50d14a8224b8ca525fdbbf6bfe824967a94fb4f3bc1b8fe",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/bloc-0.2.0.tgz",
+          "sha256": "13b093fecd0904bd12ebd173797fe8d44e6a42cb38ade739d6d24de1aefcbd31",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/bloc-0.2.1.tgz",
+          "sha256": "2d42e0af1036bbdadb669ee99af59415539d38cc0cce7bd9f294a9ef4253865f",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.2.2",
           "url": "archives/bloc-0.2.2.tgz",
-          "sha256": "f47253bcada6acb5f80f858ba97960ee7fabeff83c7a7d7c994c23094f536716",
+          "sha256": "d2da651ae3f3f3bad3e58978ebe8b0a30cd107172c7175b6fba6ce72d4eece17",
           "provides": [
             "state_bloc"
           ],
@@ -153,13 +406,25 @@
       "name": "Calendar",
       "description": "Add events to the device calendar through the native calendar UI.",
       "category": "calendar",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/calendar-0.1.0.tgz",
-          "sha256": "29b9e33a4fd5c946d533a12a7b58faf7d849975ac6e0430c4b7b65cec950cdff",
+          "sha256": "061bd8231102057f8bbba0282564501f1fcdbf7a7bbd57b5c5a7ed89d5c2e06d",
+          "provides": [
+            "calendar"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/calendar-0.1.1.tgz",
+          "sha256": "0e11c68d565d000bbb06ee2abcae1a0656f0b876123cf8e7990a0f0aa180fd34",
           "provides": [
             "calendar"
           ],
@@ -175,13 +440,25 @@
       "name": "Codegen",
       "description": "JSON model code generation with json_serializable and freezed, wired through build_runner.",
       "category": "codegen",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/codegen-0.1.0.tgz",
-          "sha256": "b7fc294c6b8c8402aa120151a90368ee025e31e2153b29cd316cff8369e80bb3",
+          "sha256": "3966f23749795a7485b09b611c659e89862e28f147c3a522867e2e86baafd74a",
+          "provides": [
+            "codegen"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/codegen-0.1.1.tgz",
+          "sha256": "bef70b1be66c0ed1d1d8e6a2988d313e20c6703c0b6416ded6a7fd02825b254f",
           "provides": [
             "codegen"
           ],
@@ -197,13 +474,49 @@
       "name": "Connectivity",
       "description": "Network status monitoring and an offline guard middleware.",
       "category": "connectivity",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/connectivity-0.1.0.tgz",
+          "sha256": "413ea6c4811e1ae3243c46b7975dbc72c1b2b6844034ee0b7c271cafd05859e9",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/connectivity-0.1.1.tgz",
+          "sha256": "d6956691373fd7395e335df3e95ff85a6b284756ec5654ab39af8ceff91fde3d",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.2",
           "url": "archives/connectivity-0.1.2.tgz",
-          "sha256": "8ce9d3b18f31373839c4b592ec733c35fa8a1dbcbae03716af97e69b194aa384",
+          "sha256": "2c16a3703c4fa6e3c92191c3553334d559a706b50988ed3b45d09958166eabfe",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/connectivity-0.1.3.tgz",
+          "sha256": "50f8abe1b5e9cf214d5e79848c67b78aaeaa40d403d73d06a0b2948316331d55",
           "provides": [
             "connectivity"
           ],
@@ -223,9 +536,21 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/crash_report-0.1.0.tgz",
+          "sha256": "7a51060c843c6e8f5bd1f31d97fbbfc15220eb35f3413199c869247abf3088b4",
+          "provides": [
+            "crash_reporter"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/crash_report-0.1.1.tgz",
-          "sha256": "5d167a5b21dc2c055e36b38f5db4a0d2001cfaf0bd04b65da62214ff656a59d6",
+          "sha256": "6f030993f34f69a590d69498d328db137c5fdcade23e80690846088c67c49093",
           "provides": [
             "crash_reporter"
           ],
@@ -245,9 +570,33 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/deep_link-0.1.0.tgz",
+          "sha256": "966a42062100b80eaed69f6230c1da603ee2d1f5d193bc0df49b50185a429362",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/deep_link-0.1.1.tgz",
+          "sha256": "0f8d45a0a09010803af11ceba0b163c059fb76867c04348f1508c8b89b3242be",
+          "provides": [
+            "deep_links"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.2",
           "url": "archives/deep_link-0.1.2.tgz",
-          "sha256": "792277c23b206f35db0a4ad3e68ea3d79caea6fb7ae5902b26c591d5988fc04e",
+          "sha256": "eea083321cf7cce99b94fae9f41a8126312a0cc72aecb9b0decd2d2b989821bd",
           "provides": [
             "deep_links"
           ],
@@ -267,9 +616,48 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/dio-0.1.0.tgz",
+          "sha256": "1046eea342effe6982cb35d3751fd5f8514888cd10c1ffec676646e61b9eb3a9",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/dio-0.1.1.tgz",
+          "sha256": "33b2b68445e56de3775c68aaebcba7f79d69be6d3dcc6f9bac9e7cdb6ae9b1b1",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/dio-0.1.2.tgz",
+          "sha256": "ee50702e180c560a1074bec54fdfc64d6629578fba6e89ed76ff15d604615ebf",
+          "provides": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.3",
           "url": "archives/dio-0.1.3.tgz",
-          "sha256": "6b767e1784fddbdb53bf80ba675e01da7717ea54364cec541b355359275f1831",
+          "sha256": "619e4aede722164528521aa7b5d44ce60db2a28ec13ecb2f265858fda1499838",
           "provides": [
             "http_client",
             "http_pipeline"
@@ -286,13 +674,25 @@
       "name": "Environment",
       "description": "Typed build-time configuration from --dart-define values.",
       "category": "config",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/env-0.1.0.tgz",
-          "sha256": "c78041aa093549326b73d24940c4726aa05e1f5ebba8d120eee6cea0c08049bd",
+          "sha256": "fb7e35ff811ac7cf487d3e25720f7d540af7ac6560b3fb6c9a35b4160a31e624",
+          "provides": [
+            "env"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/env-0.1.1.tgz",
+          "sha256": "9d1828aaf86b607396d26d9a7df236344790b7d28521ca3fd3b01b75e6979f6b",
           "provides": [
             "env"
           ],
@@ -308,13 +708,47 @@
       "name": "Firebase",
       "description": "Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/firebase-0.1.0.tgz",
+          "sha256": "30c99f3a22c5db8a1bd4ea7010ad6a15e5f5d9e25c60f27da813903661e8997f",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/firebase-0.1.1.tgz",
-          "sha256": "3d85aa6e89925f22980e54826c2545f393691a7816421348e9a08c82170cb91a",
+          "sha256": "3ca5f8c07744eb1240533d4e7057de9aa5acea3dd66a00c2cc648dbffcdb254d",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "token_provider",
+            "account_management"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/firebase-0.1.2.tgz",
+          "sha256": "7923b80ac35a75a861130159a2821d494daeae5d531c55eca5ee526e13f721b5",
           "provides": [
             "auth",
             "social_auth",
@@ -340,9 +774,33 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/flavors-0.1.0.tgz",
+          "sha256": "e9987de5cae0dcdded9fb461ce1c5bc009d5762c30335bc503507fa8d11d2009",
+          "provides": [
+            "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/flavors-0.1.1.tgz",
+          "sha256": "19631acb001908ccb53ac390e420019a59e69c78a1089e48c443d872d168ed38",
+          "provides": [
+            "flavor"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.2",
           "url": "archives/flavors-0.1.2.tgz",
-          "sha256": "d0f16dbcb6cb647d3fc7d23ec48ccb98da335c095a96e1cba344681faefb5025",
+          "sha256": "fdb839109d26e2bd84c2c70a1c60686f0dc5c73b90435b5d3620b0c292485117",
           "provides": [
             "flavor"
           ],
@@ -358,13 +816,25 @@
       "name": "Geolocation",
       "description": "Device location with permission-aware reads and streaming updates.",
       "category": "location",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/geolocation-0.1.0.tgz",
-          "sha256": "13a8ce673b1bf9d9044b269a6744b7e81536026fb13d56a0bfff62039a5abd28",
+          "sha256": "579db9d06041bd82849ae911c8ef17a4928d02bd816cdca2a1f5a155fc6171f5",
+          "provides": [
+            "location"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/geolocation-0.1.1.tgz",
+          "sha256": "83b3e03ac700895e5e452ff93e25f0d038d45b07563212311f28d915f7a00363",
           "provides": [
             "location"
           ],
@@ -384,9 +854,21 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/go_router-0.1.0.tgz",
+          "sha256": "e9b7a3664ce53965283ef788bfcfbff2a305734450c318efa0e060e0afb5e76a",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/go_router-0.1.1.tgz",
-          "sha256": "c52e824884273ec6039a4883531d4a48b5943ed1bdc5f72dd946a2f164c65169",
+          "sha256": "6af5a923d0004bb7443248c7a37eb86746ce5dab1ad979d1310ea4e160786cda",
           "provides": [
             "navigation"
           ],
@@ -402,13 +884,45 @@
       "name": "HTTP cache",
       "description": "Caches HTTP responses with TTL, ETag, and invalidation.",
       "category": "network",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/http_cache-0.1.0.tgz",
+          "sha256": "8143d0daadb37a441b8a53e9878c2885decf60f4fc307210f12bccff710d801c",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/http_cache-0.1.1.tgz",
-          "sha256": "5bfe2b49d5ddce2fb23a0f36a3bf0a636112dcdfa8e9aecb67976fd28b57addc",
+          "sha256": "eb17aab64614e29d57f98c7522563b6de9b118bcda64d4d6805be1a56f8d47dd",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/http_cache-0.1.2.tgz",
+          "sha256": "eb5aadaa3d6917466c7eb2089509158e24e2915b48d07bdb3bf9bf3bac0f780e",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -428,13 +942,26 @@
       "name": "HTTP retry",
       "description": "Retries temporary HTTP failures with backoff and a retry budget.",
       "category": "network",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/http_retry-0.1.0.tgz",
-          "sha256": "5f0638cd91a300a9a4635eab35c2c0f6ce41f7ccaa80c23a529cf0b15a17db3c",
+          "sha256": "223df9f8ae2c21945ae737b54cccc0469dc4921d3f7ddb30cf25fbc89a7dc554",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/http_retry-0.1.1.tgz",
+          "sha256": "de05d623066f4e883204f762dbfe7943ce99249706062deeabde87f86426fd3e",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -451,13 +978,25 @@
       "name": "Image picker",
       "description": "Camera and gallery image picking with validation and upload handoff.",
       "category": "media",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/image_picker-0.1.0.tgz",
-          "sha256": "b873017703e1670a104ec650ac7a4d89d91fd32ba689c2a7fb2945bb079ea2f4",
+          "sha256": "b0f656331d6797f4ee9e99d715eb41fb505e98af8a2228118557763ba9ebc448",
+          "provides": [
+            "media"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/image_picker-0.1.1.tgz",
+          "sha256": "fdea426ec20ba95acd535794e924458fed0cb0461f3ee72bee3fc6fa9147c1fd",
           "provides": [
             "media"
           ],
@@ -473,13 +1012,25 @@
       "name": "Localization",
       "description": "ARB-based localizations with gen-l10n, locale selection, plurals, and formatting.",
       "category": "l10n",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/l10n-0.1.0.tgz",
-          "sha256": "ea27e55b5550711db55f798c911875d117533b809f6afcf4d607b254df5cdfc7",
+          "sha256": "9acac7ec8bab1c222b3a6b138b717da8bd48e8da186e3ef9c2725db151a20f55",
+          "provides": [
+            "l10n"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/l10n-0.1.1.tgz",
+          "sha256": "d836a3928ef54a098e2c22fbb9c2844b22c72167ff5e74673dd47a1e24ce0ed3",
           "provides": [
             "l10n"
           ],
@@ -495,13 +1046,25 @@
       "name": "Local database",
       "description": "Offline-first document database backed by Sembast.",
       "category": "database",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/local_db-0.1.0.tgz",
-          "sha256": "5acabe3e9ca8e32233fef7b6466c58dd787ab5900cd9eb16da45454b537547a6",
+          "sha256": "a6c3158ce4bd0c6ef8cb6cf4b42be922a2d3c150e1053766d1b5cf6b7b8314a1",
+          "provides": [
+            "local_db"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/local_db-0.1.1.tgz",
+          "sha256": "7ad96032fb2893614ec127fc35dba71172682b9241904764bc9199eb61b65eba",
           "provides": [
             "local_db"
           ],
@@ -521,9 +1084,21 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/logger-0.1.0.tgz",
+          "sha256": "5ae07790411255c98625fed3de87d2c3a40c3a52afd9ca31d6a3b2c2f138f26c",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/logger-0.1.1.tgz",
-          "sha256": "3be08d3cf00ed584fef61a088036e3c342e1fbd1dd1987ddfb4b94906766e617",
+          "sha256": "5de84ee472d8a8d62430a47d3c592f099a537a3757a3e0d2004f24b7b0e29a9b",
           "provides": [
             "logger"
           ],
@@ -539,13 +1114,37 @@
       "name": "Notifications",
       "description": "Local notifications with channels, scheduling, and tap routing.",
       "category": "notifications",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/notifications-0.1.0.tgz",
+          "sha256": "05ec911afcffbe51b353c594961b5e6199af866ad1b4b4ce5855c9c7eb93d8ec",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.1",
           "url": "archives/notifications-0.1.1.tgz",
-          "sha256": "7c700fd805f99679b3883baecb7a7eddc0c3223de8cd36120b95de027d66a661",
+          "sha256": "192ea06753b41f997f9b2aa8b7691d3e3cf6c71e8b11b1268e9566fb28543dcc",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/notifications-0.1.2.tgz",
+          "sha256": "47973971a513e1c6e0ff38bbd9ddc61f5ad69e8b416d9afa6a3b8f2f59a88203",
           "provides": [
             "notifications"
           ],
@@ -561,13 +1160,25 @@
       "name": "Permission",
       "description": "Typed permission checks and requests with rationale flow.",
       "category": "platform",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/permission-0.1.0.tgz",
-          "sha256": "ee732b4742b372275aeeda454b828b569755c6854a5eb552272fd6aaa4d8d9b8",
+          "sha256": "719f2ac6e1c084e0eefd36b49cf261110d91c5f48063f6f3deb7afa685f13d01",
+          "provides": [
+            "permission"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/permission-0.1.1.tgz",
+          "sha256": "ae741ebfa36855f4a0070507e323949a96e7a89b77c51ed4ad23bc376d36248b",
           "provides": [
             "permission"
           ],
@@ -587,9 +1198,33 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/remote_config-0.1.0.tgz",
+          "sha256": "482ad214f374845eb3392273e57fdaef57f99e903193956c291ff15b75e0ce93",
+          "provides": [
+            "remote_config"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/remote_config-0.1.1.tgz",
+          "sha256": "cfda424fbb3c807be619baed40405b2ba16bfea3fa7adde2f1085d1f81d5fb17",
+          "provides": [
+            "remote_config"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.2",
           "url": "archives/remote_config-0.1.2.tgz",
-          "sha256": "901e08aa6292cc50873510a20f5217e567dc8b752bc3cd99c906b61cb2808cbc",
+          "sha256": "74b6fdc5ec32bc08893008301c46525b728255cce5dd5ab52d225e783a8084fd",
           "provides": [
             "remote_config"
           ],
@@ -605,13 +1240,63 @@
       "name": "REST auth",
       "description": "Email and password authentication against a REST API.",
       "category": "auth",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/rest_auth-0.1.0.tgz",
+          "sha256": "36327993e1a65da49d16d16bb692943f96e73be5a8364625a1e33f975bbfcc0d",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/rest_auth-0.1.1.tgz",
+          "sha256": "33b665896800f7dcdfacd48986324e5bb8b58d83ab1d6cfd389696991669ef9d",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.2",
           "url": "archives/rest_auth-0.1.2.tgz",
-          "sha256": "997184bb69cac5773793f80423357847c46330e46cbde3ee52fcb851f8db4db8",
+          "sha256": "01beaf1c27f3e4c77ca11df99e38ed4edd7b876e402e806e10574d80e08210f3",
+          "requires": [
+            "http_client",
+            "secure_storage"
+          ],
+          "provides": [
+            "auth",
+            "token_provider",
+            "account_management"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/rest_auth-0.1.3.tgz",
+          "sha256": "8772895831a535e084c05abf9237a7369eb7ae70ce45b6438eb3880137f49d30",
           "requires": [
             "http_client",
             "secure_storage"
@@ -637,9 +1322,45 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/riverpod-0.1.0.tgz",
+          "sha256": "5981896b3d3ed77e5abde056e049362c3d7ea75b015242d5f31f4c2ff035f7da",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.0",
+          "url": "archives/riverpod-0.2.0.tgz",
+          "sha256": "b51afd6587fe5f441732da551774f6f326864c0f3dbca0d401277f3fa5d4e297",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/riverpod-0.2.1.tgz",
+          "sha256": "ccf5820a510144372968b42143dcf722bab5578472065631f6c35fb16a95f8f1",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.2.2",
           "url": "archives/riverpod-0.2.2.tgz",
-          "sha256": "078b7e0ab6674973ce99db7e99942171ecaa37b9bce183c4a167e5bdefcff744",
+          "sha256": "c1b9ef8a557c2906cbdf1bf806b10cec71a7d690d1f9a67d1985a6656c03748f",
           "provides": [
             "state_riverpod"
           ],
@@ -655,13 +1376,25 @@
       "name": "Secure storage",
       "description": "Keychain and Keystore storage for secrets and tokens.",
       "category": "storage",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/secure_storage-0.1.0.tgz",
-          "sha256": "817bb4f691c45c91c8ff38d415240a7a4071c490b990bd2646176f1c98df9185",
+          "sha256": "f70bf971077d7159ee2408510cd0e2eb55a3fd9c4ac78cffaa9b9c6498e7054b",
+          "provides": [
+            "secure_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/secure_storage-0.1.1.tgz",
+          "sha256": "f2649e0cd7467990127da95d48106cff38256f8f661353cefc6614528e26c69e",
           "provides": [
             "secure_storage"
           ],
@@ -677,13 +1410,25 @@
       "name": "Share",
       "description": "Native share sheet for text, links, and files.",
       "category": "share",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/share-0.1.0.tgz",
-          "sha256": "55542d3005b2ea20170b16c4ab3160e1ba248d84cd0f4f45d4a8fcf2f67856f4",
+          "sha256": "5e9790b3a3b3d54f3fd9d3e71f2c513a2e01b17f44b3f02d803c8f71e7e345ce",
+          "provides": [
+            "share"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/share-0.1.1.tgz",
+          "sha256": "b88133efac8f01920d3ccd8b387166b6b0089c15c33ef4d88e5dcea578a85044",
           "provides": [
             "share"
           ],
@@ -699,13 +1444,28 @@
       "name": "Social login",
       "description": "Google and Apple credential sign-in for a social auth backend.",
       "category": "social",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/social_login-0.1.0.tgz",
-          "sha256": "dde9d00644895070ac53936c3bc0e8d2b683a0ad423364e98ae0ee1985f2a5a3",
+          "sha256": "10b4c4e1aa71cb4de1d83f5411e7184c70df53c2b861e6991b689cf0c78643b5",
+          "requires": [
+            "social_auth"
+          ],
+          "provides": [
+            "social_login"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/social_login-0.1.1.tgz",
+          "sha256": "52f59f1a11f1453fa545dee02dd0e70dfcffaea44d788907b7a37c518343d75f",
           "requires": [
             "social_auth"
           ],
@@ -724,13 +1484,25 @@
       "name": "Key-value storage",
       "description": "Persistent key-value storage backed by shared_preferences.",
       "category": "storage",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/storage-0.1.0.tgz",
-          "sha256": "115007514f30e3b43c6170052aabd773afdcf7a1b907922e9e52e8123eba09b8",
+          "sha256": "e47ad7d0bfc2076638ccdc8950ea8d073f88e51c5b4eaedadefc47edea92172a",
+          "provides": [
+            "storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/storage-0.1.1.tgz",
+          "sha256": "fcb5ae152ff58192efbb37acd32b1e175ca45fa7cd010f590681ce071eb2021a",
           "provides": [
             "storage"
           ],
@@ -746,13 +1518,28 @@
       "name": "Supabase",
       "description": "Supabase auth, PostgREST database, realtime, and storage for Kiln.",
       "category": "auth",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "tier": "official",
       "versions": [
         {
           "version": "0.1.0",
           "url": "archives/supabase-0.1.0.tgz",
-          "sha256": "229bf57704c5ce72735588d22d2c026173a7b871ee934a5a518cb3c710c21032",
+          "sha256": "22f6b7d0a6b4863930b780e274e6b3b7930c74def57f5ecde6e2fe0d03a09223",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/supabase-0.1.1.tgz",
+          "sha256": "6cfc5205bf186c16555fe38918ccf40351f4d5065396c7f9fa8efeb58a7b22ec",
           "provides": [
             "auth",
             "social_auth",
@@ -775,9 +1562,33 @@
       "tier": "official",
       "versions": [
         {
+          "version": "0.1.0",
+          "url": "archives/theme-0.1.0.tgz",
+          "sha256": "cca2a63d740f545d0b9ba1aa764a188309b31b9bd6abce32c848b0a05909d320",
+          "provides": [
+            "theme"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.1",
+          "url": "archives/theme-0.1.1.tgz",
+          "sha256": "d297bf9c494c8183f549d1975029eb52e849af677428cf3e39126fa1d49acebd",
+          "provides": [
+            "theme"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
           "version": "0.1.2",
           "url": "archives/theme-0.1.2.tgz",
-          "sha256": "5ebf4ea6666c13b3dec63a962bcdf2f2ed0e6e6f464a5bcdea5a3c055a5c0a84",
+          "sha256": "b8f3b8dfefe43c7731085cd0a8c6671eb0dfa47acfe323af7404eb6c39f237b9",
           "provides": [
             "theme"
           ],

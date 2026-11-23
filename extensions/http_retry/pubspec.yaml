@@ -1,6 +1,6 @@
 name: kiln_http_retry_extension
 description: Tests and tooling for the http_retry Kiln extension.
-version: 0.1.0
+version: 0.1.1
 publish_to: none
 
 environment:

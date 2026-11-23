@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Repack archive with deterministic cross-OS gzip and without root `test/`.
+
 ## 0.1.1
 
 - `ready()` no longer configures the emulator or starts the session bridge
