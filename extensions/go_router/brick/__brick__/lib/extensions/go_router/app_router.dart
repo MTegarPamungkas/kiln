@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:{{app_name}}/app/app_route.dart';

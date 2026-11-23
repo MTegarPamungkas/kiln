@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- `repair` writes inside a transaction and preserves `owned_dependencies`,
+  `owned_dev_dependencies`, and `owned_flutter_generate`, so a later `remove`
+  still reclaims the pubspec entries Kiln inserted.
+- `create --force` acquires the target project's lock before rewriting it. The
+  command runner only locks the working directory's project, so an in-place
+  rewrite could previously run alongside another operation.
+- Add `tool/check_workflows.dart` to CI, which fails when the extension test
+  matrix is hand-listed or an extension lacks a manifest, pubspec, or suite.
+
 ## 0.1.1
 
 - Retry transient Windows sharing errors when publishing a staged project and preserve the original error if cleanup fails.

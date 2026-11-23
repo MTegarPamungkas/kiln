@@ -46,6 +46,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   share_plus: ^13.3.1
   kiln_core: $coreDependency
 dev_dependencies:

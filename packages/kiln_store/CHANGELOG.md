@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Exclude an extension's own root `test/` directory from release archives.
+  Installing an extension reads only `extension.yaml`, `brick/`, and `docs/`,
+  so the suite was dead weight that also made every test-only edit change the
+  archive digest and trip the immutable-version guard. The rendered suite under
+  `brick/__brick__/test/` is still packed, because it ships to applications.
+
 ## 0.1.1
 
 - Keep published archive checksums and URLs stable per version. Repeated

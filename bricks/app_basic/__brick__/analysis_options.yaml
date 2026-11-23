@@ -8,6 +8,11 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    # `flutter gen-l10n` still emits `GlobalMaterialLocalizations` from
+    # package:flutter_localizations, which Flutter 3.50 deprecated in favour of
+    # package:material_ui. The file is generated, so the finding is not
+    # actionable here; drop this exclusion once gen-l10n emits material_ui.
+    - "lib/l10n/generated/**"
 
 linter:
   rules:

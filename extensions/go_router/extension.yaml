@@ -1,6 +1,6 @@
 id: go_router
 name: GoRouter
-version: 0.1.0
+version: 0.1.1
 description: Declarative routing with route slots, guards, and deep link mapping.
 category: navigation
 tier: official

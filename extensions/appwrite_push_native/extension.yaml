@@ -1,6 +1,6 @@
 id: appwrite_push_native
 name: Appwrite Native Push
-version: 0.2.1
+version: 0.2.2
 description: Push transport over Appwrite Push (MQTT), without Firebase or device tokens.
 category: notifications
 tier: official

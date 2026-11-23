@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:kiln_cli/kiln_cli.dart';
+import 'package:kiln_extension_sdk/kiln_extension_sdk.dart'
+    show Lockfile, ProjectLock;
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
@@ -349,6 +351,80 @@ void main() {
       );
     });
 
+    test('repair preserves lockfile ownership metadata', () async {
+      final createRunner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+      expect(
+        await createRunner.run(<String>[
+          'create',
+          'owned_app',
+          '--core-path',
+          corePath,
+          '--with',
+          'dio',
+          '--yes',
+          '--answer',
+          'base_url=https://api.example.com',
+        ]),
+        ExitCodes.success,
+        reason: captured.err.join('\n'),
+      );
+
+      final target = Directory(p.join(workspace.path, 'owned_app'));
+      final lock = File(p.join(target.path, 'kiln.lock.yaml'));
+      final before = Lockfile.fromYaml(lock.readAsStringSync());
+      expect(
+        before.ownedDependencies,
+        isNotEmpty,
+        reason: 'dio installs packages Kiln owns',
+      );
+
+      // Damage a generated file so repair has something to restore.
+      final generated = File(
+        p.join(target.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
+      );
+      generated.writeAsStringSync('// broken\n');
+
+      final repairRunner = buildTestRunner(
+        cwd: target,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+      expect(
+        await repairRunner.run(<String>['repair', 'dio', '--yes']),
+        ExitCodes.success,
+        reason: captured.err.join('\n'),
+      );
+
+      final after = Lockfile.fromYaml(lock.readAsStringSync());
+      expect(
+        after.ownedDependencies,
+        before.ownedDependencies,
+        reason: 'repair must not drop dependency ownership',
+      );
+      expect(after.ownedDevDependencies, before.ownedDevDependencies);
+      expect(after.ownedFlutterGenerate, before.ownedFlutterGenerate);
+      expect(generated.readAsStringSync(), isNot(contains('// broken')));
+
+      // The ownership trail must still drive remove after repair.
+      expect(
+        await repairRunner.run(<String>['remove', 'dio', '--yes']),
+        ExitCodes.success,
+        reason: captured.err.join('\n'),
+      );
+      final pubspec = File(
+        p.join(target.path, 'pubspec.yaml'),
+      ).readAsStringSync();
+      expect(
+        pubspec,
+        isNot(contains('dio:')),
+        reason: 'remove must reclaim the packages repair kept tracked',
+      );
+    });
+
     test('rejects an invalid application name', () async {
       final runner = buildTestRunner(
         cwd: workspace,
@@ -489,6 +565,32 @@ void main() {
         File(p.join(project.path, 'lib', 'main.dart')).existsSync(),
         isTrue,
       );
+    });
+
+    test('--force rejects an independently held lock on the target', () async {
+      final project = Directory(p.join(workspace.path, 'locked_app'));
+      await Directory(p.join(project.path, 'lib')).create(recursive: true);
+      final marker = File(p.join(project.path, 'lib', 'main.dart'));
+      await marker.writeAsString('user main');
+      final lock = await ProjectLock.acquire(project);
+      try {
+        final runner = buildTestRunner(
+          cwd: workspace,
+          captured: captured,
+          processRunner: FakeProcessRunner(_fakeFlutter),
+        );
+        expect(
+          await runner.run(['create', 'locked_app', '--force', '--yes']),
+          isNot(0),
+        );
+        expect(
+          captured.err.join('\n'),
+          contains('modifying this project'),
+        );
+        expect(await marker.readAsString(), 'user main');
+      } finally {
+        lock.release();
+      }
     });
 
     test('falls back to the public repository without a checkout', () async {

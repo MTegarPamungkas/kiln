@@ -9,6 +9,16 @@ records release-level changes for the monorepo.
 
 ## Unreleased
 
+- Move to Flutter 3.50.1 / Dart 3.14.0 and `package:material_ui`, which Flutter
+  3.50 made the replacement for `package:flutter/material.dart`. The app
+  template, extension bricks, examples, and `kiln_testing` were migrated.
+- Resolve the analyzer conflict that made the workspace uninstallable on Flutter
+  3.50: `custom_lint_builder` still pins `analyzer ^8` while the SDK's `test_api`
+  requires `analyzer ^14`. `kiln_lints` now resolves outside the workspace with
+  its own lockfile, and the root pins `analyzer ^14`.
+- Stop packing an extension's own `test/` directory into release archives, so a
+  test-only edit no longer forces a version bump. The rendered suite under
+  `brick/__brick__/test/` is still shipped.
 - New `appwrite_push_native` extension 0.1.0: a `push_transport` over Appwrite
   Push (MQTT subscriptions) with no Firebase project or device token. It follows
   the signed-in session, re-subscribes when the user changes, replays the launch

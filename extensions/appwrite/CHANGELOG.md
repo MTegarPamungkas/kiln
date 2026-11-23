@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+- Update the manifest and render golden tests for the shared Appwrite client
+  capability and the web OAuth redirect URL, so the suite verifies the shipped
+  brick again.
+
 ## 0.3.2
 
 - Advertise the shared Appwrite client so dependent transports require the actual backend.

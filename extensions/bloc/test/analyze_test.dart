@@ -56,6 +56,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   bloc: ^9.2.1
   flutter_bloc: ^9.1.1
   bloc_concurrency: ^0.3.0

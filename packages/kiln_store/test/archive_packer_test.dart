@@ -52,6 +52,29 @@ void main() {
       ]);
     });
 
+    test('excludes the extension root suite but keeps the rendered one', () {
+      final root = _createExtension(temp);
+      // The extension's own development suite.
+      _write(root, 'test/manifest_test.dart', 'dev suite');
+      _write(root, 'test/goldens/rendered.json', '{}');
+      // The suite that renders into user applications.
+      _write(root, 'brick/__brick__/test/app_test.dart', 'rendered suite');
+
+      final names = _entryNames(packer.pack(root));
+
+      expect(names, [
+        'brick/__brick__/test/app_test.dart',
+        'brick/brick.yaml',
+        'extension.yaml',
+        'lib/demo_module.dart',
+      ]);
+      expect(
+        names.where((name) => name.startsWith('test/')),
+        isEmpty,
+        reason: 'a test-only edit must not change the archive digest',
+      );
+    });
+
     test('is deterministic for the same tree', () {
       final root = _createExtension(temp);
 

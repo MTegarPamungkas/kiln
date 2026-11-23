@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Keep a verified commit when post-commit history bookkeeping fails. Pruning can
+  raise `KilnException` for an unusable backup id or a linked backups directory,
+  which previously escaped into the installer's rollback path and reverted an
+  install that had already passed verification.
+- Retry the journal-to-history rename on transient Windows sharing errors, as
+  `Journal.save()` already did.
+- Make transaction ids unique when two transactions start within the same
+  microsecond, and skip ids that already have a journal or snapshot directory.
+
 ## 0.1.1
 
 - Retry transient Windows sharing errors when atomically replacing a transaction journal.

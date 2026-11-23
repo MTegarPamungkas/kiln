@@ -47,6 +47,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   flutter_local_notifications: ^22.3.3
   flutter_timezone: ^5.1.1
   timezone: ^0.11.2

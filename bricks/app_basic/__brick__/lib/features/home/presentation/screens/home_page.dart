@@ -1,5 +1,5 @@
 {{#minimal}}
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:{{name}}/app/registry_scope.dart';
 import 'package:{{name}}/core/l10n/core_copy.dart';
 

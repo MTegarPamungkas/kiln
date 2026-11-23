@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Update the rendered config golden for the session-identity and consent
+  settings added in the previous release.
+
 ## 0.1.0
 
 - A consent revoke no longer leaves traffic behind: the SDK sends one event per

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+
+- Assert the `appwrite_client` requirement in the manifest test, matching the
+  capability the module actually consumes.
+
 ## 0.2.1
 
 - Require the Appwrite client capability and report missing registrations through typed support.

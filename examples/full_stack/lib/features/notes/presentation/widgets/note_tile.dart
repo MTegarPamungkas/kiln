@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:full_stack/features/notes/domain/entities/note.dart';
 
 /// One row of the notes list.

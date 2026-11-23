@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Import package:material_ui instead of the package:flutter/material.dart entry point, which Flutter 3.50 deprecated.
+
 ## 0.2.1
 
 - The manifest declares the optional `logger` dependency the module already

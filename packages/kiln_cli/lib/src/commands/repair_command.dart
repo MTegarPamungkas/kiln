@@ -207,23 +207,37 @@ final class RepairCommand extends KilnCommand {
       return ExitCodes.success;
     }
 
-    for (final action in actions) {
-      final target = File(p.join(project.root.path, action.path));
-      if (action.bytes == null) {
-        if (target.existsSync()) {
-          target.deleteSync();
+    // Repair writes managed files, so it uses the same journal and rollback
+    // boundary as every other mutating command, and it must carry the lock's
+    // ownership metadata forward instead of dropping it.
+    final transaction = Transaction.begin(project.root);
+    try {
+      for (final action in actions) {
+        if (action.bytes == null) {
+          transaction.deleteFile(action.path);
+        } else {
+          transaction.writeFile(action.path, action.bytes!);
         }
-        continue;
       }
-      target.parent.createSync(recursive: true);
-      target.writeAsBytesSync(action.bytes!);
+      if (codegenChanged) {
+        transaction.writeText(ExtensionsCodegen.relativePath, codegenSource);
+        logger.info('  sync       ${ExtensionsCodegen.relativePath}');
+      }
+      transaction.writeText(
+        'kiln.lock.yaml',
+        Lockfile(
+          core: lockfile.core,
+          extensions: updated,
+          ownedDependencies: lockfile.ownedDependencies,
+          ownedDevDependencies: lockfile.ownedDevDependencies,
+          ownedFlutterGenerate: lockfile.ownedFlutterGenerate,
+        ).toYaml(),
+      );
+      transaction.commit();
+    } catch (_) {
+      transaction.rollback();
+      rethrow;
     }
-    if (codegenChanged) {
-      codegenFile.parent.createSync(recursive: true);
-      codegenFile.writeAsStringSync(codegenSource);
-      logger.info('  sync       ${ExtensionsCodegen.relativePath}');
-    }
-    lockStore.write(Lockfile(core: lockfile.core, extensions: updated));
     logger.success(
       'Repaired ${actions.length} file(s) across '
       '${requested.length} extension(s).',

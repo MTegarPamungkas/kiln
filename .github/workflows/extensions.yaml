@@ -6,45 +6,51 @@ on:
     paths:
       - "extensions/**"
       - "packages/**"
+      - ".github/workflows/extensions.yaml"
   pull_request:
     paths:
       - "extensions/**"
       - "packages/**"
+      - ".github/workflows/extensions.yaml"
 
 jobs:
+  # Derive the matrix from the checkout instead of a hand-maintained list, so a
+  # new extension cannot be added without its suite running here.
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      extensions: ${{ steps.list.outputs.extensions }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        name: List extension suites
+        run: |
+          set -euo pipefail
+          entries=()
+          for dir in extensions/*/; do
+            name="${dir#extensions/}"
+            name="${name%/}"
+            if [ -f "$dir/extension.yaml" ] && [ -f "$dir/pubspec.yaml" ]; then
+              entries+=("\"$name\"")
+            fi
+          done
+          if [ "${#entries[@]}" -eq 0 ]; then
+            echo "No extension suites found; refusing to report success." >&2
+            exit 1
+          fi
+          matrix="[$(IFS=,; echo "${entries[*]}")]"
+          echo "Discovered ${#entries[@]} extension suites: $matrix"
+          echo "extensions=$matrix" >> "$GITHUB_OUTPUT"
+
   matrix:
+    needs: discover
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        extension:
-          - analytics
-          - appwrite
-          - biometric
-          - bloc
-          - connectivity
-          - deep_link
-          - dio
-          - env
-          - firebase
-          - flavors
-          - go_router
-          - http_cache
-          - http_retry
-          - image_picker
-          - l10n
-          - local_db
-          - logger
-          - notifications
-          - permission
-          - rest_auth
-          - riverpod
-          - secure_storage
-          - social_login
-          - storage
-          - supabase
-          - theme
+        extension: ${{ fromJSON(needs.discover.outputs.extensions) }}
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2

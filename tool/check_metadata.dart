@@ -191,7 +191,8 @@ _ModuleMetadata? _moduleMetadata(String source) {
 }
 
 Expression? _getterExpression(ClassDeclaration declaration, String name) {
-  for (final member in declaration.members.whereType<MethodDeclaration>()) {
+  // analyzer 14 moved class members onto the body node.
+  for (final member in declaration.body.members.whereType<MethodDeclaration>()) {
     if (!member.isGetter || member.name.lexeme != name) {
       continue;
     }

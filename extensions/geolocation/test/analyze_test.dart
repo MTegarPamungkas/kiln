@@ -46,6 +46,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   geolocator: ^14.0.1
   kiln_core: $coreDependency
 dev_dependencies:

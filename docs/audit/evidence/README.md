@@ -34,3 +34,8 @@ Use the [audit backlog](../current-status.md) for current work, and the
 - [Android geolocation and deep links](geolocation-deeplink-device-2026-11-22.md)
 - [Browser telemetry consent](analytics-crash-live-sdk-2026-11-22.md)
 - [Android telemetry consent](k09-native-device-2026-11-22.md)
+
+## Audit remediation
+
+- [Post-audit verification sweep](post-audit-sweep-2026-11-23.md)
+

@@ -56,6 +56,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   go_router: ^18.1.2
   kiln_core: $coreDependency
 dev_dependencies:

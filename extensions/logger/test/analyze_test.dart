@@ -50,6 +50,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   path_provider: ^2.1.6
   kiln_core: $coreDependency
 dev_dependencies:

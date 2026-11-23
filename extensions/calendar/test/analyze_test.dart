@@ -48,6 +48,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   add_2_calendar: ^3.1.1
   kiln_core: $coreDependency
 dev_dependencies:

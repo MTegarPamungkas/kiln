@@ -70,6 +70,9 @@ final class GetItRegistry implements Registry {
 
   @override
   void unregister<T extends Object>({String? instanceName}) {
+    // Mutating a disposed container would race the owned-disposal pass and the
+    // reset that clears it; every other mutator is gated the same way.
+    _ensureOpen();
     _getIt.unregister<T>(instanceName: instanceName);
   }
 

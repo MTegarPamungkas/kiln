@@ -46,10 +46,9 @@ workspace:
   - packages/kiln_cli
   - packages/kiln_store
   - packages/kiln_testing
-  - packages/kiln_lints
 
 dev_dependencies:
-  analyzer: ^8.4.0
+  analyzer: ^14.0.0
   crypto: ^3.0.8
   http: ^1.6.0
   kiln_extension_sdk: ^0.1.0

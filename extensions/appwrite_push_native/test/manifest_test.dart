@@ -16,7 +16,7 @@ void main() {
     expect(manifest.tier, ExtensionTier.official);
     expect(manifest.exclusive, isTrue);
     expect(manifest.provides, ['push_transport']);
-    expect(manifest.requires, ['auth']);
+    expect(manifest.requires, ['appwrite_client']);
     expect(manifest.optionalRequires, isEmpty);
     expect(manifest.dependencies, contains('appwrite'));
     expect(manifest.platformSetup.supports('android'), isTrue);

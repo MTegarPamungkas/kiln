@@ -61,6 +61,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   flutter_riverpod: ^3.4.3
   kiln_core: $coreDependency
 dev_dependencies:

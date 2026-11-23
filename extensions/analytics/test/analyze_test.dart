@@ -50,6 +50,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   posthog_flutter: ^5.58.3
   kiln_core: $coreDependency
 dev_dependencies:

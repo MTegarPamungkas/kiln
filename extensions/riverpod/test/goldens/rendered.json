@@ -21,14 +21,14 @@
     "lib/features/notes/feature.dart": "a14434230a8467949f8f0ba511870fd254a4a73a7ab5eaf5f306334bf9868431",
     "lib/features/notes/presentation/providers/notes_controller.dart": "b35c1c11202d5b370e9cc0667292a2a9773ca1c03077f013544db8d96bff508a",
     "lib/features/notes/presentation/providers/notes_providers.dart": "4a2b959b4b1034e1df32f801a9e33aab126374cb70f1a375d0c70e9dc56a3f12",
-    "lib/features/notes/presentation/screens/notes_page.dart": "1551c2360fe82b14e6b05cfd54614236ce897630dc86d6eee488a9cb78655835",
-    "lib/features/notes/presentation/widgets/note_tile.dart": "886830aafd4820e679b5e38f0c8666c9484b11d073668f0299eb5bad9378bd9c",
+    "lib/features/notes/presentation/screens/notes_page.dart": "8699023c240daa726725afe0b653fbc49a257b6642817d0f46384e0901e15bf0",
+    "lib/features/notes/presentation/widgets/note_tile.dart": "2595e95a256d3c11a64ae97408152dfb1114872576075339ef053303703be195",
     "test/extensions/riverpod/core/riverpod/async_value_x_test.dart": "a8550bee98af8487a1288cd28ff1ba5050609a1629da6bd2199021365917f671",
     "test/extensions/riverpod/core/riverpod/kiln_providers_test.dart": "0c9323034f950ecfee008162744279521774127c5cb297eb6db661d4a990b194",
     "test/extensions/riverpod/core/riverpod/session_notifier_test.dart": "c1574d5aebb9d1119cbb071fac470befe4928f07bd3cfb9d879567005a63b699",
     "test/extensions/riverpod/riverpod_bootstrap_test.dart": "c602ab25fca967231ab8757b10e17300232d95cbedda389a91be98cfafbf2b64",
     "test/extensions/riverpod/riverpod_module_test.dart": "9f30c71d084cdc51dade9edcd9df253c797b9e3a20f560befa1b21fc5bc054f8",
     "test/features/notes/notes_controller_test.dart": "3ad5eb1cc4ab54a199c560bd381194a285dfd42373b3fc61edd42324399e1c4b",
-    "test/features/notes/notes_page_test.dart": "4c9fb4c7e879e6e285cac54c40e37bbaa6090451598e061532cea5f403ea865f"
+    "test/features/notes/notes_page_test.dart": "fc1abd3eb9a6cfd19039a8a3d9e0c0c9f7f861ea68163f0a94e57bc7f6cb0357"
   }
 }

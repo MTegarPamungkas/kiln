@@ -16,10 +16,17 @@ in the [release](../../CHANGELOG.md),
 [development audit](sdk-development-audit-2026-11-23.md) describe the original
 baseline and acceptance criteria.
 
+A [verification sweep](evidence/post-audit-sweep-2026-11-23.md) then checked the
+remediation against the full catalog. It fixed five stale extension test suites,
+a transaction commit that could roll back a verified install, a `repair` command
+that discarded lockfile ownership, and four smaller lifecycle defects, and it
+replaced the hand-maintained CI matrix with one derived from the checkout.
+
 ## Pending acceptance and product decisions
 
 | Area | Next evidence or decision |
 | --- | --- |
+| CI availability | [Sweep](evidence/post-audit-sweep-2026-11-23.md) · The billing lock is cleared and a manual dispatch confirmed runners execute again, but no workflow has run against this work yet. |
 | Biometric and secure storage | [K06/K07](findings.md#k06-and-k07--biometric-and-keychain) · Lockout behavior and iOS Keychain reinstall with a custom namespace. |
 | Notifications and media | [K08/K28](findings.md#k08-and-k28--notification-launch-and-media-on-ios) · iOS cold-launch tap, picker, and HEIC. |
 | Telemetry | [K09](findings.md#k09--telemetry-consent-on-ios) · Native iOS consent and queued/automatic traffic. |

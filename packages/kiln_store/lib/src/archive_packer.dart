@@ -21,10 +21,19 @@ final class ArchivePacker {
     '.kiln',
   };
 
+  /// The extension's own suite is development-only: installing an extension
+  /// reads `extension.yaml`, `brick/`, and `docs/` only. Shipping it made every
+  /// test-only edit change the archive digest, which the immutable-version
+  /// guard then rejects for an already-published version. Only the root
+  /// `test/` is excluded; `brick/__brick__/test/` is the suite rendered into
+  /// user applications and must stay.
+  static const String _excludedRootDirectory = 'test';
+
   /// Packs [extensionRoot] into a gzip-compressed tar archive.
   ///
-  /// Skips `.dart_tool`, `.git`, `build`, `.kiln`, and generated `.tgz` or
-  /// `.tar.gz` archives. Symbolic links are not followed.
+  /// Skips `.dart_tool`, `.git`, `build`, `.kiln`, the root `test/` directory,
+  /// and generated `.tgz` or `.tar.gz` archives. Symbolic links are not
+  /// followed.
   Uint8List pack(Directory extensionRoot) {
     if (!extensionRoot.existsSync()) {
       throw KilnStoreException(
@@ -70,6 +79,11 @@ final class ArchivePacker {
 
   static bool _shouldSkip(String relativePath) {
     final segments = relativePath.split('/');
+    // Only the extension's own root-level suite; a nested test/ directory is
+    // part of the rendered brick.
+    if (segments.first == _excludedRootDirectory && segments.length > 1) {
+      return true;
+    }
     for (final segment in segments) {
       if (_excludedDirectories.contains(segment)) {
         return true;

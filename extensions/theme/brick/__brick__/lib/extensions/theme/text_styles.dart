@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Builds the typography scale applied to every generated theme.
 abstract final class AppTextStyles {

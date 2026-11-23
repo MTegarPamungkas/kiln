@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Cover the optional `storage` requirement and the `cacheTtl`/`refreshOnResume`
+  settings in the manifest and render tests.
+
 ## 0.1.1
 
 - Persist every successful fetch when the `storage` extension is installed, and

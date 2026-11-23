@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+
+import 'package:path/path.dart' as p;
 
 import 'root_path.dart';
 
@@ -51,11 +54,39 @@ final class Journal {
 
   factory Journal.create(Directory projectRoot) {
     return Journal(
-      id: DateTime.now().toUtc().microsecondsSinceEpoch.toString(),
+      id: _newId(projectRoot),
       projectRoot: projectRoot,
       startedAt: DateTime.now().toUtc(),
     );
   }
+
+  /// A transaction id that cannot collide with a journal or snapshot directory
+  /// already on disk.
+  ///
+  /// Microsecond timestamps alone repeat when two transactions start in the
+  /// same tick, which would make the second journal overwrite the first one's
+  /// recovery record. A per-process counter and a random suffix make the id
+  /// unique, and the existence probe covers a leftover from another process.
+  static String _newId(Directory projectRoot) {
+    while (true) {
+      final candidate =
+          '${DateTime.now().toUtc().microsecondsSinceEpoch}'
+          '-${_sequence++}'
+          '-${_random.nextInt(0x10000).toRadixString(16).padLeft(4, '0')}';
+      final journal = File(
+        p.join(projectRoot.path, '.kiln', 'journal', '$candidate.json'),
+      );
+      final snapshots = Directory(
+        p.join(projectRoot.path, '.kiln', 'backups', candidate),
+      );
+      if (!journal.existsSync() && !snapshots.existsSync()) {
+        return candidate;
+      }
+    }
+  }
+
+  static int _sequence = 0;
+  static final Random _random = Random();
 
   final String id;
   final Directory projectRoot;
