@@ -23,6 +23,13 @@ Future<void> main(List<String> arguments) async {
       ),
   ]..sort((left, right) => left.id.compareTo(right.id));
 
+  final readme = File(p.join(root.path, 'README.md'));
+  final readmeSource = readme.readAsStringSync();
+  final countHeading = RegExp(r'^### Extensions \(\d+\)', multiLine: true);
+  final updatedReadme = readmeSource.replaceFirst(
+    countHeading,
+    '### Extensions (${manifests.length})',
+  );
   final content = _render(manifests);
   final file = File(p.join(root.path, 'docs', 'extensions', 'catalog.md'));
   if (check) {
@@ -31,8 +38,13 @@ Future<void> main(List<String> arguments) async {
       stderr.writeln('docs/extensions/catalog.md is out of date');
       exitCode = 1;
     }
+    if (!countHeading.hasMatch(readmeSource) || updatedReadme != readmeSource) {
+      stderr.writeln('README.md extension count is out of date');
+      exitCode = 1;
+    }
     return;
   }
+  if (updatedReadme != readmeSource) readme.writeAsStringSync(updatedReadme);
   file.parent.createSync(recursive: true);
   file.writeAsStringSync(content);
   stdout.writeln('wrote docs/extensions/catalog.md');

@@ -57,6 +57,7 @@ final class AppwriteModule extends KilnModule {
     'token_provider',
     'account_management',
     'push_targets',
+    'appwrite_client',
   };
 
   @override

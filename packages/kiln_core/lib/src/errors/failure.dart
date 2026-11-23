@@ -26,7 +26,8 @@ enum FailureKind {
 ///
 /// Contracts throw a [Failure]; feature code may convert it into a
 /// `Result` with `Result.guard`. A [Failure] is a value: two failures with the
-/// same code, message, kind, and details are equal.
+/// same code, message, kind, and retryability are equal. Diagnostic details,
+/// causes, and stack traces do not participate in equality.
 final class Failure implements Exception {
   const Failure({
     required this.code,

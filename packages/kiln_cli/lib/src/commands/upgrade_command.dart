@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'package:kiln_store/kiln_store.dart';
 import 'package:path/path.dart' as p;
-import 'package:pub_semver/pub_semver.dart';
 
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
+import '../infra/host_compatibility.dart';
 import '../infra/json_reporter.dart';
+import '../infra/project_catalog.dart';
 import '../infra/registry_support.dart';
 import '../project_context.dart';
 import 'command_helpers.dart';
@@ -44,16 +45,15 @@ final class UpgradeCommand extends KilnCommand {
     }
 
     final index = await support.index();
-    final coreVersion = Version.parse(project.lockfile.core);
+    final host = HostCompatibility(processRunner);
     final candidates = <_Upgrade>[];
     for (final entry in project.lockfile.extensions.entries) {
       final extension = index.find(entry.key);
       if (extension == null) {
         continue;
       }
-      final version = VersionResolver().resolve(
+      final version = await host.select(
         extension,
-        kilnVersion: coreVersion,
         installedVersion: entry.value.version,
       );
       if (version != null) {
@@ -106,6 +106,8 @@ final class UpgradeCommand extends KilnCommand {
         ProjectContext.load(project.root),
         support,
         candidate,
+        index,
+        host,
       );
       if (!applied) {
         failures.add(candidate.id);
@@ -122,6 +124,8 @@ final class UpgradeCommand extends KilnCommand {
     ProjectContext project,
     RegistrySupport support,
     _Upgrade candidate,
+    RegistryIndex index,
+    HostCompatibility host,
   ) async {
     final package = await support.fetch(candidate.id, candidate.version);
     try {
@@ -132,18 +136,19 @@ final class UpgradeCommand extends KilnCommand {
         installed: candidate.from,
         target: candidate.version.version,
       );
+      final catalog = ProjectCatalog(context, project);
       return await _applyUpgrade(
         project: project,
         id: candidate.id,
         from: candidate.from,
         to: candidate.version.version,
         available: available,
-        // Installed extensions must stay resolvable while the candidate is
-        // validated; otherwise every other installed id looks unknown.
-        availableCatalog: <AvailableExtension>[
-          ...extensionCatalog.where((entry) => entry.id != available.id),
+        previousExtension: await catalog.installed(candidate.id),
+        availableCatalog: await catalog.withRegistryDependencies(
           available,
-        ],
+          index,
+          host,
+        ),
         migrations: selected,
         hasHooks: Directory(p.join(package.directory.path, 'brick', 'hooks'))
             .existsSync(),
@@ -154,7 +159,7 @@ final class UpgradeCommand extends KilnCommand {
   }
 
   Future<int> _runBundled(ProjectContext project) async {
-    final candidates = _bundledCandidates(project);
+    final candidates = await _bundledCandidates(project);
     final json = argResults!['json'] == true;
     final dryRun = argResults!['dry-run'] == true;
 
@@ -209,32 +214,32 @@ final class UpgradeCommand extends KilnCommand {
     return ExitCodes.success;
   }
 
-  List<UpgradeCandidate> _bundledCandidates(ProjectContext project) {
+  Future<List<UpgradeCandidate>> _bundledCandidates(
+    ProjectContext project,
+  ) async {
     final versions = <String, String>{
       for (final entry in project.lockfile.extensions.entries)
-        entry.key: entry.value.version,
+        if (entry.value.source == ExtensionSource.bundled)
+          entry.key: entry.value.version,
     };
     final candidates = UpgradePlanner(available: extensionCatalog)
         .plan(installedVersions: versions, all: argResults!['all'] != false);
-    final Version core;
-    try {
-      core = Version.parse(project.lockfile.core);
-    } on FormatException {
-      return candidates;
-    }
-    return candidates
-        .where(
-          (candidate) => candidate.available.manifest.compatibility
-              .problems(kilnVersion: core.toString())
-              .isEmpty,
-        )
-        .toList(growable: false);
+    final host = HostCompatibility(processRunner);
+    return [
+      for (final candidate in candidates)
+        if ((await host.problems(candidate.available.manifest)).isEmpty &&
+            (project.platforms.isEmpty ||
+                project.platforms.any(
+                  candidate.available.manifest.platformSetup.supports,
+                )))
+          candidate,
+    ];
   }
 
   Future<bool> _upgradeBundled(
     ProjectContext project,
     UpgradeCandidate candidate,
-  ) {
+  ) async {
     // Bundled Dart catalogs do not embed migration files. Every bundled
     // extension currently ships without migrations; a registry upgrade still
     // loads migrations from the downloaded archive.
@@ -244,7 +249,10 @@ final class UpgradeCommand extends KilnCommand {
       from: candidate.from,
       to: candidate.to,
       available: candidate.available,
-      availableCatalog: extensionCatalog,
+      availableCatalog: await ProjectCatalog(context, project).available(
+        replacements: {candidate.id: candidate.available},
+        requireExact: false,
+      ),
       migrations: const <Migration>[],
       hasHooks: candidate.available.bundle.hooks.isNotEmpty,
     );
@@ -257,9 +265,16 @@ final class UpgradeCommand extends KilnCommand {
     required String to,
     required AvailableExtension available,
     required List<AvailableExtension> availableCatalog,
+    AvailableExtension? previousExtension,
     required List<Migration> migrations,
     required bool hasHooks,
   }) async {
+    final plan = ExtensionResolver(availableCatalog).resolve(
+      installed: project.lockfile.ids.difference({id}),
+      requested: {id},
+      hostCapabilities: const {'app_basic'},
+    );
+    await HostCompatibility(processRunner).check(plan.added, project.platforms);
     final decision = const TrustPolicy().evaluate(
       available.manifest,
       hasHooks: hasHooks,
@@ -277,9 +292,9 @@ final class UpgradeCommand extends KilnCommand {
     }
 
     // Resolve required answers before migrations or any installed-file writes.
-    final answers = answerForExtension(
-      available,
-      saved: project.extensionAnswers[id] ?? const <String, Object?>{},
+    final answers = answersForPlan(
+      plan.added,
+      saved: project.extensionAnswers,
       provided: parseAnswerOptions(
         (argResults!['answer'] as List<String>).cast<String>(),
       ),
@@ -292,7 +307,9 @@ final class UpgradeCommand extends KilnCommand {
     final result = await installer.upgrade(
       id: id,
       project: project.projectForTemplates,
-      answers: answers,
+      answers: answers[id] ?? const {},
+      dependencyAnswers: answers,
+      previousExtension: previousExtension,
       previousAnswers:
           project.extensionAnswers[id] ?? const <String, Object?>{},
       migrations: migrations,

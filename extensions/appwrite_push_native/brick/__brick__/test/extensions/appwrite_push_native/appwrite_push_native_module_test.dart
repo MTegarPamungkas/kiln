@@ -7,7 +7,7 @@ void main() {
 
     expect(module.id, 'appwrite_push_native');
     expect(module.provides, <String>{'push_transport'});
-    expect(module.requires, <String>{'auth'});
+    expect(module.requires, <String>{'appwrite_client'});
     expect(module.platforms, <String>{'android', 'ios'});
   });
 

@@ -2,6 +2,14 @@
 
 ## 0.1.1
 
+- Keep published archive checksums and URLs stable per version. Repeated
+  publishing can accept identical content.
+- Apply Dart and Flutter constraints when selecting registry candidates.
+
+- Limit archive entry count and per-entry size before extraction. Loopback
+  tests cover registry request timeouts, streaming size limits, and successful
+  index parsing.
+
 - Enforce download size limits while consuming HTTP/file streams and bound
   gzip expansion before parsing tar entries. Abort timed-out HTTP requests.
 

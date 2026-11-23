@@ -1,7 +1,7 @@
 # Decoded image dimension limits
 
 Date: 2026-11-20 (Asia/Jakarta). Completes the remaining scope of K28 in
-[findings](findings.md).
+[findings](../findings.md).
 
 ## Context
 

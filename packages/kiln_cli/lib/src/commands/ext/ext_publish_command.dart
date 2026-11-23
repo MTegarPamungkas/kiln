@@ -15,7 +15,11 @@ final class ExtPublishCommand extends KilnCommand {
       ..addOption('registry', help: 'Local registry directory.')
       ..addOption('archive-base-url')
       ..addFlag('dry-run', negatable: false)
-      ..addFlag('force', negatable: false)
+      ..addFlag(
+        'force',
+        negatable: false,
+        help: 'Allow an identical published version.',
+      )
       ..addFlag('json', negatable: false);
   }
 
@@ -63,7 +67,8 @@ final class ExtPublishCommand extends KilnCommand {
       throw const KilnException(
         'Registry is not configured.',
         code: 'store.not_configured',
-        suggestion: 'Add --registry=<folder> or run kiln config --registry=<folder>',
+        suggestion:
+            'Add --registry=<folder> or run kiln config --registry=<folder>',
       );
     }
     final registryRoot = _localDirectory(rawRegistry);
@@ -128,7 +133,8 @@ final class ExtPublishCommand extends KilnCommand {
       throw KilnException(
         'Publish only supports a local folder registry, got "$raw".',
         code: 'store.remote_publish',
-        suggestion: 'Publish to a registry folder, then push that folder with Git',
+        suggestion:
+            'Publish to a registry folder, then push that folder with Git',
       );
     }
     if (uri.scheme == 'file') {

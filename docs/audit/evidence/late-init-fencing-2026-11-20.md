@@ -1,7 +1,7 @@
 # Late-initialization fencing after bootstrap disposal
 
 Date: 2026-11-20 (Asia/Jakarta). Addresses K10/K13 in
-[findings](findings.md) and the status board in [current-status](current-status.md).
+[findings](../findings.md) and the status board in [current-status](../current-status.md).
 
 ## The hazard
 

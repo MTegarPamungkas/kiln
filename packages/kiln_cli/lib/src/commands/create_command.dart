@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import '../bundles/app_basic_bundle.dart';
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
+import '../infra/host_compatibility.dart';
 import '../project_context.dart';
 import '../version.dart';
 import 'command_helpers.dart';
@@ -36,10 +37,7 @@ final class CreateCommand extends KilnCommand {
         splitCommas: false,
         help: 'Prompt answer as name=value.',
       )
-      ..addOption(
-        'core-path',
-        help: 'Local path to the kiln_core package.',
-      )
+      ..addOption('core-path', help: 'Local path to the kiln_core package.')
       ..addOption(
         'core-git',
         help:
@@ -79,7 +77,9 @@ final class CreateCommand extends KilnCommand {
       usageException('The application name is required.');
     }
     if (!RegExp(r'^[a-z][a-z0-9_]*$').hasMatch(name)) {
-      usageException('The application name must be snake_case, for example my_app.');
+      usageException(
+        'The application name must be snake_case, for example my_app.',
+      );
     }
 
     final force = argResults!['force'] == true;
@@ -115,11 +115,11 @@ final class CreateCommand extends KilnCommand {
       'minimal',
       'app',
     ]);
-    final state = selectedArg(
-      'state',
-      'State management:',
-      const <String>['none', 'bloc', 'riverpod'],
-    );
+    final state = selectedArg('state', 'State management:', const <String>[
+      'none',
+      'bloc',
+      'riverpod',
+    ]);
     final org = enteredArg('org', 'Organization:');
     final description = enteredArg('description', 'Description:');
 
@@ -133,7 +133,14 @@ final class CreateCommand extends KilnCommand {
         : canAsk
         ? await prompter.selectMany(
             'Platforms:',
-            const <String>['android', 'ios', 'web', 'windows', 'linux', 'macos'],
+            const <String>[
+              'android',
+              'ios',
+              'web',
+              'windows',
+              'linux',
+              'macos',
+            ],
             defaults: const <String>{'android', 'ios', 'web'},
           )
         : parseCsv(argResults!['platforms'] as String);
@@ -153,7 +160,7 @@ final class CreateCommand extends KilnCommand {
 
     final corePathOption = argResults!['core-path'] as String?;
     final coreGitOption = argResults!['core-git'] as String?;
-    final coreRef = argResults!['core-ref'] as String?;
+    var coreRef = argResults!['core-ref'] as String?;
     if (coreGitOption != null && corePathOption != null) {
       throw KilnException(
         'Pass either --core-path or --core-git, not both',
@@ -191,8 +198,9 @@ final class CreateCommand extends KilnCommand {
     // compiled CLI works on a machine without the workspace.
     if (corePath == null && coreGit == null && defaultCoreGitUrl.isNotEmpty) {
       coreGit = defaultCoreGitUrl;
+      coreRef = defaultCoreGitRef;
       logger.info(
-        'Resolving kiln_core from $coreGit '
+        'Resolving kiln_core from $coreGit at $coreRef '
         '(pass --core-path for the local checkout)',
       );
     }
@@ -206,6 +214,10 @@ final class CreateCommand extends KilnCommand {
             '--core-path <checkout>/packages/kiln_core, or --core-git <url> '
             'to resolve it from the Kiln repository.',
       );
+    }
+
+    if (corePath != null) {
+      corePath = p.normalize(p.join(context.cwd.path, corePath));
     }
 
     final target = Directory(
@@ -224,146 +236,171 @@ final class CreateCommand extends KilnCommand {
       ...withExtensions,
       if (state != 'none') state,
     };
-    if (requested.isNotEmpty) {
-      for (final id in requested) {
-        if (findAvailableExtension(id) == null) {
-          throw KilnException(
-            'Extension "$id" is not available in the bundled catalog',
-            code: 'catalog.missing',
-            suggestion:
-                'Available: ${extensionCatalog.map((e) => e.id).join(', ')}',
-          );
-        }
-      }
-    }
-
-    final createResult = await processRunner.flutter(<String>[
-      'create',
-      '--project-name',
-      name,
-      '--org',
-      org,
-      '--platforms',
-      platforms.join(','),
-      '--no-pub',
-      target.path,
-    ]);
-    if (createResult.exitCode != 0) {
-      throw KilnException(
-        'flutter create failed',
-        code: 'create.flutter_failed',
-        details: <String, Object?>{
-          'stdout': createResult.stdout,
-          'stderr': createResult.stderr,
-        },
-      );
-    }
-
-    _applyCreatePatches(target);
-
-    final rendered = await const BrickRenderer().render(
-      bundle: appBasicBundle,
-      vars: <String, dynamic>{
-        'name': name,
-        'description': description,
-        'org': org,
-        'state': state,
-        'platforms': platforms,
-        'minimal': template == 'minimal',
-      },
+    final plan = ExtensionResolver(extensionCatalog).resolve(
+      installed: const <String>{},
+      requested: requested,
+      hostCapabilities: const <String>{'app_basic'},
     );
-    for (final file in rendered) {
-      fileSystem.writeAsBytes(
-        p.join(target.path, file.relativePath),
-        file.bytes,
-      );
-    }
-    final generatedWidgetTest = p.join(target.path, 'test', 'widget_test.dart');
-    if (fileSystem.fileExists(generatedWidgetTest)) {
-      fileSystem.delete(generatedWidgetTest);
-    }
+    await HostCompatibility(processRunner).check(plan.added, platforms);
+    final answers = answersForPlan(
+      plan.added,
+      saved: const <String, Map<String, Object?>>{},
+      provided: parseAnswerOptions(
+        (argResults!['answer'] as List<String>).cast<String>(),
+      ),
+      prompter: prompter.withAssumeYes(assumeYes),
+    );
 
-    _writePubspec(target, corePath: corePath, coreGit: coreGit, coreRef: coreRef);
+    await target.parent.create(recursive: true);
+    final workspace = await target.parent.createTemp('.kiln-create-');
+    final staged = Directory(p.join(workspace.path, name));
+    final existing = target.existsSync();
+    final preserveWidgetTest = File(
+      p.join(target.path, 'test', 'widget_test.dart'),
+    ).existsSync();
+    try {
+      if (existing && force) {
+        LockfileStore(target).read();
+        _copyExisting(target, staged);
+      }
+      final createResult = await processRunner.flutter(<String>[
+        'create',
+        '--project-name',
+        name,
+        '--org',
+        org,
+        '--platforms',
+        platforms.join(','),
+        '--no-pub',
+        staged.path,
+      ]);
+      if (createResult.exitCode != 0) {
+        throw KilnException(
+          'flutter create failed',
+          code: 'create.flutter_failed',
+          details: <String, Object?>{
+            'stdout': createResult.stdout,
+            'stderr': createResult.stderr,
+          },
+        );
+      }
 
-    if (requested.isNotEmpty) {
-      final resolver = ExtensionResolver(extensionCatalog);
-      final plan = resolver.resolve(
-        installed: const <String>{},
-        requested: requested,
-        hostCapabilities: const <String>{'app_basic'},
-      );
-      final answers = answersForPlan(
-        plan.added,
-        saved: const <String, Map<String, Object?>>{},
-        provided: parseAnswerOptions(
-          (argResults!['answer'] as List<String>).cast<String>(),
-        ),
-        prompter: prompter.withAssumeYes(assumeYes),
-      );
+      _applyCreatePatches(staged);
 
-      final installer = ExtensionInstaller(
-        projectRoot: target,
-        available: extensionCatalog,
-      );
-      final result = await installer.add(
-        requested: requested.toList(growable: false),
-        project: <String, Object?>{
+      final rendered = await const BrickRenderer().render(
+        bundle: appBasicBundle,
+        vars: <String, dynamic>{
           'name': name,
+          'description': description,
           'org': org,
           'state': state,
           'platforms': platforms,
+          'minimal': template == 'minimal',
         },
-        answers: answers,
-        options: const InstallOptions(
-          verify: false,
-          collisionPolicy: CollisionPolicy.ask,
-        ),
-        hostCapabilities: const <String>{'app_basic'},
       );
-      if (result.hasConflicts) {
-        throw KilnException(
-          'Files conflict while installing extensions',
-          code: 'install.conflict',
-          suggestion: result.warnings.join('\n'),
+      for (final file in rendered) {
+        fileSystem.writeAsBytes(
+          p.join(staged.path, file.relativePath),
+          file.bytes,
         );
       }
+      final generatedWidgetTest = p.join(
+        staged.path,
+        'test',
+        'widget_test.dart',
+      );
+      if (!preserveWidgetTest && fileSystem.fileExists(generatedWidgetTest)) {
+        fileSystem.delete(generatedWidgetTest);
+      }
 
-      final project = ProjectContext.find(target);
-      if (project != null) {
-        for (final extension in result.plan.added) {
-          project.updateExtensionAnswers(
-            extension.id,
-            answers[extension.id] ?? const <String, Object?>{},
+      _writePubspec(
+        staged,
+        corePath: corePath,
+        coreGit: coreGit,
+        coreRef: coreRef,
+      );
+
+      if (requested.isNotEmpty) {
+        final installer = ExtensionInstaller(
+          projectRoot: staged,
+          available: extensionCatalog,
+        );
+        final result = await installer.add(
+          requested: requested.toList(growable: false),
+          project: <String, Object?>{
+            'name': name,
+            'org': org,
+            'state': state,
+            'platforms': platforms,
+          },
+          answers: answers,
+          options: const InstallOptions(
+            verify: false,
+            collisionPolicy: CollisionPolicy.ask,
+          ),
+          hostCapabilities: const <String>{'app_basic'},
+        );
+        if (result.hasConflicts) {
+          throw KilnException(
+            'Files conflict while installing extensions',
+            code: 'install.conflict',
+            suggestion: result.warnings.join('\n'),
+          );
+        }
+
+        final project = ProjectContext.find(staged);
+        if (project != null) {
+          for (final extension in result.plan.added) {
+            project.updateExtensionAnswers(
+              extension.id,
+              answers[extension.id] ?? const <String, Object?>{},
+            );
+          }
+        }
+        if (result.plan.added.isNotEmpty) {
+          logger.info(
+            'Installed extension(s): ${result.plan.added.map((e) => e.id).join(', ')}',
           );
         }
       }
-      if (result.plan.added.isNotEmpty) {
-        logger.info(
-          'Installed extension(s): ${result.plan.added.map((e) => e.id).join(', ')}',
-        );
-      }
-    }
 
-    if (runPub) {
-      final pubResult = await processRunner.flutter(<String>[
-        'pub',
-        'get',
-      ], workingDirectory: target.path);
-      if (pubResult.exitCode != 0) {
-        throw KilnException(
-          'flutter pub get failed in the new project',
-          code: 'verification.pub_get',
-          suggestion: coreGit != null
-              ? 'Check that $coreGit is reachable and that --core-ref exists'
-              : corePath == null
-              ? 'kiln_core has no published release yet; pass '
-                    '--core-path <checkout>/packages/kiln_core or '
-                    '--core-git <url>'
-              : null,
-          details: <String, Object?>{
-            'stdout': pubResult.stdout,
-            'stderr': pubResult.stderr,
-          },
+      if (runPub) {
+        final pubResult = await processRunner.flutter(<String>[
+          'pub',
+          'get',
+        ], workingDirectory: staged.path);
+        if (pubResult.exitCode != 0) {
+          throw KilnException(
+            'flutter pub get failed in the new project',
+            code: 'verification.pub_get',
+            suggestion: coreGit != null
+                ? 'Check that $coreGit is reachable and that --core-ref exists'
+                : corePath == null
+                ? 'kiln_core has no published release yet; pass '
+                      '--core-path <checkout>/packages/kiln_core or '
+                      '--core-git <url>'
+                : null,
+            details: <String, Object?>{
+              'stdout': pubResult.stdout,
+              'stderr': pubResult.stderr,
+            },
+          );
+        }
+      }
+
+      if (existing && force) {
+        _publishExisting(staged, target);
+      } else {
+        // Non-recursive removal preserves a target populated concurrently.
+        if (existing) await target.delete();
+        await _retryWindowsSharing(() => staged.rename(target.path));
+      }
+    } finally {
+      try {
+        await _retryWindowsSharing(() => workspace.delete(recursive: true));
+      } on FileSystemException {
+        logger.warn(
+          'Could not remove temporary scaffold at ${workspace.path}.',
         );
       }
     }
@@ -373,6 +410,70 @@ final class CreateCommand extends KilnCommand {
     logger.info('  cd ${p.relative(target.path, from: context.cwd.path)}');
     logger.info(requested.isEmpty ? '  kiln add dio' : '  flutter run');
     return ExitCodes.success;
+  }
+
+  Future<void> _retryWindowsSharing(
+    Future<FileSystemEntity> Function() action,
+  ) async {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        await action();
+        return;
+      } on FileSystemException catch (error) {
+        final code = error.osError?.errorCode;
+        if (!Platform.isWindows ||
+            (code != 5 && code != 32 && code != 33) ||
+            attempt == 15) {
+          rethrow;
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+      }
+    }
+  }
+
+  bool _skipUserDirectory(String path) =>
+      const {'.git', '.kiln', '.dart_tool', 'build'}.contains(p.basename(path));
+
+  void _copyExisting(Directory from, Directory to) {
+    to.createSync(recursive: true);
+    for (final entry in from.listSync(followLinks: false)) {
+      final destination = p.join(to.path, p.basename(entry.path));
+      if (entry is Directory && !_skipUserDirectory(entry.path)) {
+        _copyExisting(entry, Directory(destination));
+      } else if (entry is File) {
+        entry.copySync(destination);
+      }
+    }
+  }
+
+  void _publishExisting(Directory staged, Directory target) {
+    final transaction = Transaction.begin(target);
+    const ownership = FileOwnership();
+
+    void publish(Directory directory) {
+      for (final entry in directory.listSync(followLinks: false)) {
+        if (entry is Directory && !_skipUserDirectory(entry.path)) {
+          publish(entry);
+        } else if (entry is File) {
+          final relative = p
+              .split(p.relative(entry.path, from: staged.path))
+              .join('/');
+          final destination = File(p.join(target.path, relative));
+          if (!destination.existsSync() ||
+              ownership.hashFile(destination) != ownership.hashFile(entry)) {
+            transaction.writeFile(relative, entry.readAsBytesSync());
+          }
+        }
+      }
+    }
+
+    try {
+      publish(staged);
+      transaction.commit();
+    } catch (_) {
+      transaction.rollback();
+      rethrow;
+    }
   }
 
   void _writePubspec(
@@ -455,9 +556,9 @@ final class CreateCommand extends KilnCommand {
   /// asset and font examples that follow then become invalid YAML as soon as an
   /// app uncomments one. Writing the section last keeps the document valid.
   String _appendOverrides(String source, Map<String, Object?> core) {
-    final stripped = PubspecWriter(
-      File(''),
-    ).editedWithoutSection(source, 'dependency_overrides').trimRight();
+    final stripped = PubspecWriter(File(''))
+        .editedWithoutSection(source, 'dependency_overrides')
+        .trimRight();
     final buffer = StringBuffer(stripped)
       ..writeln()
       ..writeln()

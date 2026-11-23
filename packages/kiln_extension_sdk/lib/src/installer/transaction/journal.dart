@@ -77,11 +77,23 @@ final class Journal {
     final target = file;
     target.parent.createSync(recursive: true);
     final temp = File('${target.path}.tmp-$pid');
-    temp.writeAsStringSync(jsonEncode(toJson()));
-    if (target.existsSync()) {
-      target.deleteSync();
+    temp.writeAsStringSync(jsonEncode(toJson()), flush: true);
+    for (var attempt = 0; ; attempt++) {
+      try {
+        temp.renameSync(target.path);
+        return;
+      } on FileSystemException catch (error) {
+        final code = error.osError?.errorCode;
+        // Windows scanners can briefly open either file without delete sharing.
+        // Retry the replacement without exposing a gap in the journal.
+        if (!Platform.isWindows ||
+            (code != 5 && code != 32 && code != 33) ||
+            attempt == 7) {
+          rethrow;
+        }
+        sleep(Duration(milliseconds: 25 * (attempt + 1)));
+      }
     }
-    temp.renameSync(target.path);
   }
 
   void markCommitted() {

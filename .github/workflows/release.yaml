@@ -31,10 +31,30 @@ jobs:
         run: |
           mkdir -p dist
           tar -czf "dist/kiln-registry-${GITHUB_REF_NAME}.tgz" registry
-          tar -czf "dist/kiln-monorepo-sources-${GITHUB_REF_NAME}.tgz" \
-            packages extensions bricks schemas tool registry docs
+          git archive --format=tar.gz --output="dist/kiln-monorepo-sources-${GITHUB_REF_NAME}.tgz" HEAD
+      - name: Verify source archive and build CLI
+        run: |
+          source_dir="$(mktemp -d)"
+          cli_dir="$(mktemp -d)"
+          tar -xzf "dist/kiln-monorepo-sources-${GITHUB_REF_NAME}.tgz" -C "$source_dir"
+          release_commit="$(git rev-parse HEAD)"
+          (
+            cd "$source_dir"
+            flutter pub get
+            dart compile exe -DKILN_CORE_GIT_REF="$release_commit" \
+              packages/kiln_cli/bin/kiln.dart -o "$cli_dir/kiln"
+          )
+          (
+            cd "$cli_dir"
+            ./kiln version
+            ./kiln create release_smoke --platforms web --yes
+            cd release_smoke
+            flutter analyze
+          )
+          cp "$cli_dir/kiln" dist/kiln-linux-x64
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
             dist/*.tgz
+            dist/kiln-linux-x64

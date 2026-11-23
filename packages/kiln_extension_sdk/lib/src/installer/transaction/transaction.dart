@@ -35,9 +35,13 @@ final class Transaction {
     final target = File(RootPath(projectRoot).resolve(relativePath));
     final existed = target.existsSync();
     if (existed) snapshots.backup(relativePath);
-    journal.add(JournalOperation(
-      type: JournalOperationType.write, path: relativePath, existed: existed,
-    ));
+    journal.add(
+      JournalOperation(
+        type: JournalOperationType.write,
+        path: relativePath,
+        existed: existed,
+      ),
+    );
   }
 
   void writeText(String relativePath, String content) {
@@ -87,7 +91,7 @@ final class Transaction {
     target.deleteSync();
   }
 
-  /// Marks the transaction complete and keeps its backups for `kiln rollback`.
+  /// Marks the transaction complete and retains the latest ten rollback entries.
   void commit({bool keepHistory = true}) {
     journal.markCommitted();
     if (!keepHistory) {
@@ -99,6 +103,11 @@ final class Transaction {
     final history = File(p.join(snapshots.directory.path, 'journal.json'));
     if (journal.file.existsSync()) {
       journal.file.renameSync(history.path);
+    }
+    try {
+      const Rollback().pruneHistory(projectRoot, keep: 10);
+    } on FileSystemException {
+      // Retention is best effort after the transaction is already committed.
     }
   }
 

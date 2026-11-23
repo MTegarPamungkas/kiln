@@ -9,14 +9,17 @@ compatibility:
   flutter: ">=3.35.0"
 ```
 
-`kiln doctor` checks these ranges against the running CLI and Dart versions. The
-resolver can also reject unsupported platforms through `platforms`.
+`compatibility.kiln` refers to the running CLI. Install, upgrade, and doctor use
+that version and the running Dart and Flutter toolchains. Explicit registry
+versions obey the same constraints as automatic selection. Installation
+rejects extensions that support none of the project targets. The generated
+app and its dependencies can impose a higher minimum than an extension.
 
 Version rules:
 
 - Extensions use semver.
 - The lockfile records the exact version installed.
-- Multi-version upgrade and the migration runner wait on the registry catalog.
+- Registry upgrades can select earlier compatible versions and run migrations from the selected archive.
 - An extension's dependency constraints are written in `dependencies` and added
   to the user project's `pubspec.yaml`.
 

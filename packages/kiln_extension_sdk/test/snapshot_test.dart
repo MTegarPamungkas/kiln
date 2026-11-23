@@ -24,7 +24,7 @@ void main() {
       snapshots.backup('lib/file.txt');
       expect(snapshots.hasBackup('lib/file.txt'), isTrue);
 
-      file.writeAsString('after');
+      file.writeAsStringSync('after');
       snapshots.restore('lib/file.txt');
       expect(file.readAsStringSync(), 'before');
     });

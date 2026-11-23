@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:test/test.dart';
 
@@ -88,6 +90,25 @@ void main() {
       expect(registry.readOrNull<String>(), isNull);
     });
 
+    test('concurrent disposal shares cleanup and its error', () async {
+      final release = Completer<void>();
+      final failure = StateError('cleanup failed');
+      registry.registerOwned<String>(
+        'owned',
+        dispose: () async {
+          await release.future;
+          throw failure;
+        },
+      );
+      final first = registry.dispose();
+      final second = registry.dispose();
+      expect(first, same(second));
+      final observed = expectLater(second, throwsA(same(failure)));
+      release.complete();
+      await observed;
+      expect(registry.isRegistered<String>(), isFalse);
+    });
+
     test('owned registrations dispose once in reverse order', () async {
       final events = <String>[];
       final thing = _DisposableThing(events);
@@ -113,10 +134,7 @@ void main() {
     test('registration after disposal is rejected', () async {
       await registry.dispose();
 
-      expect(
-        () => registry.registerOwned<String>('late'),
-        throwsStateError,
-      );
+      expect(() => registry.registerOwned<String>('late'), throwsStateError);
     });
 
     test('a failing owned callback does not skip the rest', () async {

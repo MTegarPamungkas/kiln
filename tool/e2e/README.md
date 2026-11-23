@@ -1,7 +1,7 @@
 # End-to-end extension run
 
 For the minimal Android/web Appwrite auth + in-memory backend probe, see
-[the functional run and reproduction guide](../../docs/audit/android-web-auth-2026-11-19.md).
+[the functional run and reproduction guide](../../docs/audit/evidence/android-web-auth-2026-11-19.md).
 It exercises actual auth/JWT/session persistence while keeping backend CRUD in
 memory; it does not provision an Appwrite database or bucket.
 
@@ -177,7 +177,7 @@ written into the repository or the log. The host must be running before the prob
 is relaunched, otherwise the app reports a startup failure.
 
 For the device acceptance procedure and recorded results, see
-[the push routing report](../../docs/audit/appwrite-push-routing-2026-11-20.md).
+[the push routing report](../../docs/audit/evidence/appwrite-push-routing-2026-11-20.md).
 
 ## Supabase local RLS and browser OAuth
 

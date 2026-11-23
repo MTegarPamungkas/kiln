@@ -85,7 +85,7 @@ and `extensions.g.dart`); and generated projects pass `flutter analyze` and
 `flutter test`. `kiln remove`, `doctor`, `list`, `graph`, `rollback`, `config`,
 `cache`, `store`, `completion`, and `ext new/validate/test/pack` are available.
 
-### Extensions (35)
+### Extensions (34)
 
 | Group | Extensions |
 | --- | --- |
@@ -197,8 +197,8 @@ dart run packages/kiln_cli/bin/kiln.dart create my_app \
 
 `kiln_core` is not published on pub.dev. Inside the workspace `kiln create` uses
 the local checkout; anywhere else it resolves the SDK from the public repository
-at `github.com/MTegarPamungkas/kiln`, so a machine with only the compiled CLI can
-create a project with no extra flags. Override the source with `--core-git`, and
+at `github.com/MTegarPamungkas/kiln` pinned to a commit, so a machine with only
+the compiled CLI can create a project with no extra flags. Override the source with `--core-git`, and
 pin a revision with `--core-ref`:
 
 ```bash

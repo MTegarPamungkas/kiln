@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
@@ -20,6 +21,8 @@ final class RegistrySupport {
   final LocalCache cache;
   final bool offline;
 
+  String get identity => sha256Hex(utf8.encode(client.config.identity));
+
   static RegistrySupport? from(
     KilnContext context, {
     Map<String, Object?>? projectConfig,
@@ -33,37 +36,28 @@ final class RegistrySupport {
     final mirror =
         (projectRegistry['mirror'] as String?) ?? context.globalConfig.mirror;
     final offline =
-        (projectRegistry['offline'] as bool?) ??
-        context.globalConfig.offline;
+        (projectRegistry['offline'] as bool?) ?? context.globalConfig.offline;
     final config = RegistryConfig(
-      url: url, mirror: mirror, ref: projectRegistry['ref'] as String? ?? 'main',
+      url: url,
+      mirror: mirror,
+      ref: projectRegistry['ref'] as String? ?? 'main',
     );
     final cache = LocalCache(
       Directory(p.join(Paths.globalCache(context.home), 'registry')),
       registry: config,
     );
     return RegistrySupport._(
-      client: RegistryClient(
-        config: config,
-        cache: cache,
-      ),
+      client: RegistryClient(config: config, cache: cache),
       cache: cache,
       offline: offline,
     );
   }
 
   Future<RegistryIndex> index() {
-    return OfflineMode(
-      client: client,
-      cache: cache,
-      offline: offline,
-    ).index();
+    return OfflineMode(client: client, cache: cache, offline: offline).index();
   }
 
-  Future<RegistryPackage> fetch(
-    String id,
-    RegistryVersion version,
-  ) async {
+  Future<RegistryPackage> fetch(String id, RegistryVersion version) async {
     final bytes = await OfflineMode(
       client: client,
       cache: cache,
@@ -83,6 +77,12 @@ final class RegistrySupport {
         manifestFile.readAsStringSync(),
         rootPath: directory.path,
       );
+      if (manifest.id != id || manifest.version != version.version) {
+        throw const KilnException(
+          'Registry archive does not match the selected extension and version.',
+          code: 'store.invalid_extension',
+        );
+      }
       final brick = Directory(p.join(directory.path, 'brick'));
       if (!brick.existsSync()) {
         throw const KilnException(
@@ -95,6 +95,11 @@ final class RegistrySupport {
           manifest: manifest,
           bundle: createBundle(brick),
           source: ExtensionSource.store,
+          artifact: RegistryArtifact(
+            registry: identity,
+            sha256: version.sha256,
+          ),
+          docs: _readDocs(directory),
         ),
         directory: directory,
       );
@@ -102,6 +107,17 @@ final class RegistrySupport {
       await directory.delete(recursive: true);
       rethrow;
     }
+  }
+
+  Map<String, List<int>> _readDocs(Directory directory) {
+    final readme = File(p.join(directory.path, 'README.md'));
+    final docs = Directory(p.join(directory.path, 'docs'));
+    return {
+      if (readme.existsSync()) 'README.md': readme.readAsBytesSync(),
+      if (docs.existsSync())
+        for (final file in docs.listSync(recursive: true).whereType<File>())
+          p.relative(file.path, from: directory.path): file.readAsBytesSync(),
+    };
   }
 
   static Map<String, Object?> _map(Object? value) {

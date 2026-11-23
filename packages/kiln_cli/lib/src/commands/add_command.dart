@@ -2,7 +2,9 @@ import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
+import '../infra/host_compatibility.dart';
 import '../infra/json_reporter.dart';
+import '../infra/project_catalog.dart';
 import 'command_helpers.dart';
 
 /// Installs one or more extensions transactionally.
@@ -38,12 +40,14 @@ final class AddCommand extends KilnCommand {
     }
 
     final project = loadProject();
-    final resolver = ExtensionResolver(extensionCatalog);
+    final catalog = await ProjectCatalog(context, project).available();
+    final resolver = ExtensionResolver(catalog);
     final plan = resolver.resolve(
       installed: project.lockfile.ids,
       requested: requested.toSet(),
       hostCapabilities: const <String>{'app_basic'},
     );
+    await HostCompatibility(processRunner).check(plan.added, project.platforms);
     final provided = parseAnswerOptions(
       (argResults!['answer'] as List<String>).cast<String>(),
     );
@@ -57,7 +61,7 @@ final class AddCommand extends KilnCommand {
 
     final installer = ExtensionInstaller(
       projectRoot: project.root,
-      available: extensionCatalog,
+      available: catalog,
       verifier: Verifier(
         runner: (executable, arguments, workingDirectory) => processRunner.run(
           executable,

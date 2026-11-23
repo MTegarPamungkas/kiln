@@ -1,7 +1,7 @@
 # Contract decisions: HTTP deadline, startup policy, registry ownership
 
 Date: 2026-11-21 (Asia/Jakarta). No commit or deployment was made. Implements the
-three open decisions from [status](current-status.md): K19, K13, K10.
+three open decisions from [status](../current-status.md): K19, K13, K10.
 
 ## K19 - shared request deadline
 

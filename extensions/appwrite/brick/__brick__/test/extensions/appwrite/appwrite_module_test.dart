@@ -86,6 +86,7 @@ void main() {
       'token_provider',
       'account_management',
       'push_targets',
+      'appwrite_client',
     });
     expect(module.optionalRequires, {'secure_storage'});
   });

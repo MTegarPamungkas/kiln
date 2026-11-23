@@ -6,26 +6,15 @@ Kiln documentation, grouped by what you are trying to do.
 
 - [Getting started](getting-started.md) — install, create your first app, add an
   extension, and run the tests.
-- [Status](audit/current-status.md) — the one-page answer to what is done, what
-  is left (and what it needs), plus the special notes and every K01–K33 row.
+- [Audit backlog](audit/current-status.md) — open engineering work and
+  pending device and provider acceptance.
 - [Architecture](architecture.md) — how contracts, the registry, modules, slots,
   and the Gate fit together.
 - [Repository layout](folder-structure.md) — where packages, extensions, tooling
   and generated artifacts live.
 - [Roadmap](roadmap.md) — what is built and what is still planned.
-- [Findings](audit/findings.md) — the K01–K33 definitions and their dated
-  implementation paragraphs.
-
-Dated evidence reports, one per acceptance pass (read them only when you need
-the raw evidence; the status page links the relevant one):
-
-- [Android/web auth](audit/android-web-auth-2026-11-19.md)
-- [Appwrite services and Android push](audit/appwrite-services-push-2026-11-20.md)
-- [Push routing on a physical phone](audit/appwrite-push-routing-2026-11-20.md)
-- [Late-initialization fencing](audit/late-init-fencing-2026-11-20.md)
-- [Cross-handle durability](audit/cross-handle-durability-2026-11-20.md)
-- [Media dimension limits](audit/media-dimension-limits-2026-11-20.md)
-- [Dio + HTTP cache composition](audit/dio-cache-composition-2026-11-20.md)
+- [Release changelog](../CHANGELOG.md) — completed changes and release notes.
+- [Audit evidence](audit/evidence/README.md) — dated test and device reports.
 
 ## API reference
 

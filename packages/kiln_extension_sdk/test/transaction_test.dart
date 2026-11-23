@@ -64,6 +64,72 @@ void main() {
       expect(transaction.journal.id, isNotEmpty);
     });
 
+    test('missing snapshot prevents all restoration and keeps the journal', () {
+      final transaction = Transaction.begin(project)
+        ..writeText('lib/existing.dart', 'new')
+        ..deleteFile('lib/deleted.dart');
+      transaction.snapshots.backupFile('lib/existing.dart').deleteSync();
+      expect(
+        transaction.rollback,
+        throwsA(
+          isA<KilnException>().having(
+            (error) => error.code,
+            'code',
+            'rollback.snapshot_missing',
+          ),
+        ),
+      );
+      expect(existing.readAsStringSync(), 'new');
+      expect(deleted.existsSync(), isFalse);
+      expect(transaction.journal.file.existsSync(), isTrue);
+    });
+
+    test('recovers a committed journal before the history rename', () {
+      Transaction.begin(project)
+        ..writeText('lib/existing.dart', 'old history')
+        ..commit();
+      final interrupted = Transaction.begin(project)
+        ..writeText('lib/existing.dart', 'new');
+      interrupted.journal.markCommitted();
+      const rollback = Rollback();
+      final pending = rollback.latestInterrupted(project);
+      expect(pending?.id, interrupted.journal.id);
+      expect(
+        rollback.latestCommitted(project)?.id,
+        isNot(interrupted.journal.id),
+      );
+      rollback.run(pending!);
+      expect(existing.readAsStringSync(), 'old history');
+      expect(rollback.latestInterrupted(project), isNull);
+    });
+
+    test('retains ten commits and leaves unfinished snapshots alone', () {
+      final pending = Transaction.begin(project)
+        ..writeText('lib/existing.dart', 'pending');
+      for (var count = 0; count < 12; count++) {
+        Transaction.begin(project)
+          ..writeText('lib/deleted.dart', '$count')
+          ..commit();
+      }
+      final entries = Directory('${project.path}/.kiln/backups').listSync();
+      expect(entries, hasLength(11));
+      expect(pending.snapshots.directory.existsSync(), isTrue);
+      expect(const Rollback().latestCommitted(project), isNotNull);
+    });
+
+    test(
+      'future lockfile versions reject mutations without rewriting metadata',
+      () {
+        final file = File('${project.path}/kiln.lock.yaml')
+          ..writeAsStringSync(
+            'lock_version: 3\ncore: 0.1.1\nextensions: {}\nfuture: true\n',
+          );
+        final before = file.readAsStringSync();
+        expect(LockfileStore(project).read, throwsA(isA<KilnException>()));
+        expect(file.readAsStringSync(), before);
+      },
+    );
+
     test('commit can discard history', () {
       Transaction.begin(project)
         ..writeText('lib/existing.dart', 'final')

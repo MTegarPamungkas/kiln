@@ -24,6 +24,14 @@
         "properties": {
           "version": { "type": "string" },
           "source": { "enum": ["bundled", "store"] },
+          "artifact": {
+            "type": "object", "additionalProperties": false,
+            "required": ["registry", "sha256"],
+            "properties": {
+              "registry": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            }
+          },
           "dependencies": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
           "dev_dependencies": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
           "flutter_generate": { "type": "boolean" },

@@ -204,6 +204,26 @@ final class ExtensionManifest {
   }
 }
 
+/// Archive provenance for an installed registry extension.
+final class RegistryArtifact {
+  const RegistryArtifact({required this.registry, required this.sha256});
+
+  final String registry;
+  final String sha256;
+
+  Map<String, Object?> toJson() => {'registry': registry, 'sha256': sha256};
+
+  static RegistryArtifact? fromMap(Object? value) {
+    if (value case {
+      'registry': final String registry,
+      'sha256': final String sha256,
+    }) {
+      return RegistryArtifact(registry: registry, sha256: sha256);
+    }
+    return null;
+  }
+}
+
 /// A manifest together with the Mason bundle the CLI ships for it.
 final class AvailableExtension {
   const AvailableExtension({
@@ -211,6 +231,7 @@ final class AvailableExtension {
     required this.bundle,
     this.docs = const <String, List<int>>{},
     this.source = ExtensionSource.bundled,
+    this.artifact,
   });
 
   final ExtensionManifest manifest;
@@ -223,6 +244,7 @@ final class AvailableExtension {
   final Map<String, List<int>> docs;
 
   final ExtensionSource source;
+  final RegistryArtifact? artifact;
 
   String get id => manifest.id;
 }

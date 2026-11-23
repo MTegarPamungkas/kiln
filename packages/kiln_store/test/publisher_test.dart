@@ -106,7 +106,7 @@ void main() {
       );
     });
 
-    test('force replaces the archive and the index entry', () async {
+    test('force preserves the archive and rejects changed content', () async {
       final extension = _createExtension(temp, id: 'demo_ext');
       final publisher = Publisher();
       final first = await publisher.publish(
@@ -115,22 +115,30 @@ void main() {
       );
       File(p.join(extension.path, 'extra.txt')).writeAsStringSync('changed');
 
-      final second = await publisher.publish(
-        extensionRoot: extension,
-        registryRoot: registry,
-        force: true,
+      await expectLater(
+        publisher.publish(
+          extensionRoot: extension,
+          registryRoot: registry,
+          force: true,
+        ),
+        throwsA(
+          isA<KilnStoreException>().having(
+            (e) => e.code,
+            'code',
+            'store.immutable_version',
+          ),
+        ),
       );
 
-      expect(second.sha256, isNot(first.sha256));
-      expect(File(second.archivePath).lengthSync(), greaterThan(0));
+      expect(File(first.archivePath).lengthSync(), greaterThan(0));
       final index = RegistryIndex.parse(
         File(p.join(registry.path, 'index.json')).readAsStringSync(),
       );
       expect(index.find('demo_ext')!.versions, hasLength(1));
-      expect(index.find('demo_ext')!.versions.single.sha256, second.sha256);
+      expect(index.find('demo_ext')!.versions.single.sha256, first.sha256);
       expect(
-        sha256Hex(File(second.archivePath).readAsBytesSync()),
-        second.sha256,
+        sha256Hex(File(first.archivePath).readAsBytesSync()),
+        first.sha256,
       );
     });
 

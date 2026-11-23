@@ -59,38 +59,45 @@ abstract final class KilnBootstrap {
       ..addDisposeCallback(session.dispose);
 
     try {
+      final activeModules = <KilnModule>[];
+      final platformBlocked = <String>{};
       for (final module in modules) {
-        if (!module.supportsPlatform(activePlatform)) {
-          if (module.requiredForStartup) {
-            throw StateError(
-              'Required module ${module.id} does not support '
-              '$activePlatform.',
-            );
-          }
-          support.record(
-            module.id,
-            SupportInfo.unsupported(
-              SupportState.unsupportedPlatform,
-              message: '${module.id} is not supported on $activePlatform.',
-              details: <String, Object?>{
-                'platform': activePlatform,
-                'supported_platforms': module.platforms.toList(growable: false),
-              },
-            ),
-          );
+        if (module.supportsPlatform(activePlatform)) {
+          activeModules.add(module);
+          continue;
         }
+        final info = SupportInfo.unsupported(
+          SupportState.unsupportedPlatform,
+          message: '${module.id} is not supported on $activePlatform.',
+          details: <String, Object?>{
+            'platform': activePlatform,
+            'supported_platforms': module.platforms.toList(growable: false),
+          },
+        );
+        if (module.requiredForStartup) {
+          throw info.toFailure();
+        }
+        support.record(module.id, info);
+        platformBlocked.addAll(module.provides);
       }
+      platformBlocked.removeAll(
+        activeModules.expand((module) => module.provides),
+      );
 
-      final ordered = ModuleGraph(
-        modules
-            .where((module) => module.supportsPlatform(activePlatform))
-            .toList(growable: false),
-      ).resolve(availableCapabilities: capabilities);
+      final ordered = ModuleGraph(activeModules).resolve(
+        availableCapabilities: capabilities,
+        unavailableCapabilities: platformBlocked,
+      );
       final available = <String>{...capabilities};
       for (final module in ordered) {
-        lifecycle.addDisposeCallback(module.dispose);
-        module.register(registry);
         final missing = module.requires.difference(available);
+        if (missing.intersection(platformBlocked).isEmpty) {
+          lifecycle.addDisposeCallback(module.dispose);
+          module.register(registry);
+        } else {
+          // A filtered provider has no registrations for dependents to read.
+          platformBlocked.addAll(module.provides);
+        }
         final info = missing.isEmpty
             ? await _probeSupport(module, registry, supportTimeout)
             : SupportInfo.unsupported(

@@ -60,7 +60,7 @@ kiln create starter --template app --state bloc
 | `--core-git` | Resolve `kiln_core`/`kiln_testing` from a Git repository |
 | `--core-ref` | Branch, tag, or commit with `--core-git` |
 | `--output` | Parent directory (default `.`) |
-| `--force` | Write into an existing target |
+| `--force` | Publish the generated changes into an existing target after staging and verification |
 | `--[no-]pub` | Run `flutter pub get` (default on) |
 
 `--core-path` and `--core-git` are mutually exclusive. Without either, the CLI
@@ -102,10 +102,10 @@ kiln setup appwrite --answer project_id=my_project --yes
 kiln setup appwrite --answer project_id=my_project --dry-run --json
 ```
 
-Supports every installed extension in the bundled catalog. Without names,
-lists local setup status without writing. Interactive setup reviews manifest
-prompts; explicit answers override saved values. Extensions without prompts
-show their manual steps. Installed versions must match the bundled catalog.
+Supports installed bundled and registry extensions. Without names, setup lists
+local status without writing. Interactive setup reviews manifest prompts.
+Explicit answers override saved values. Extensions without prompts show their
+manual steps. Registry maintenance uses the locked version and archive checksum.
 
 | Flag | Meaning |
 | --- | --- |

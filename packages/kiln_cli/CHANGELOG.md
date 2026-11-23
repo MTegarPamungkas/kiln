@@ -2,6 +2,16 @@
 
 ## 0.1.1
 
+- Retry transient Windows sharing errors when publishing a staged project and preserve the original error if cleanup fails.
+- Preflight scaffolding and publish the project after Flutter dependency
+  resolution. Fresh projects use the CLI release commit when resolving Kiln from Git.
+- Resolve registry and bundled extensions together and use locked archives for
+  installed registry extensions during maintenance.
+- Check CLI, Dart, Flutter, and project platform compatibility during planning.
+
+- Add and store install report unsuccessful verification as rolled back.
+  Remove can verify with `--verify` and reports cancellation in English.
+
 - Setup documents and preserves env:NAME client-value references; bundled
   analytics, crash reporting and Supabase render build-variable expressions.
 

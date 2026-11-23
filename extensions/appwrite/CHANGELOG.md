@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2
+
+- Advertise the shared Appwrite client so dependent transports require the actual backend.
+
 ## 0.3.1
 
 - Omit native OAuth redirect arguments so Appwrite returns the session

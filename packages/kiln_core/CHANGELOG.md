@@ -2,13 +2,21 @@
 
 ## 0.1.1
 
+- Report dependent modules as unavailable when their provider is filtered by
+  platform. Required startup modules receive typed support failures.
+- Concurrent registry disposal callers share completion and cleanup errors.
+- Document the fields that participate in `Failure` equality.
+
+- Expose `PersistOutcome` so preference APIs can distinguish a persisted
+  setting from a setting applied for the current session.
+
 - Add an optional `HttpRequest.deadline` with a typed
   `network.deadline_exceeded` failure. `TokenProvider.accessToken` accepts the
   same deadline so a refresh can carry the caller's budget.
 - Add `Registry.registerOwned` and `Registry.dispose` for opt-in ownership;
-  `KilnBootstrap` disposes owned services after module disposal. Required
-  modules and missing required capabilities now fail bootstrap with a typed
-  `Failure` instead of a `StateError`.
+  `KilnBootstrap` disposes owned services after module disposal. An unavailable
+  support result for a required module, or missing required startup
+  capabilities, produces a typed `Failure`.
 - Add the optional `MutationLock` contract and the in-isolate
   `SerialMutationLock`, so a queue, migration or import can declare the exclusion
   it needs without depending on a platform package.

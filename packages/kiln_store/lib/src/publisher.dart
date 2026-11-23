@@ -46,8 +46,8 @@ final class Publisher {
   /// Packs [extensionRoot], writes `archives/<id>-<version>.tgz`, and updates
   /// `registryRoot/index.json`.
   ///
-  /// A duplicate version is refused unless [force] is true, in which case the
-  /// archive and index entry are replaced. Other extensions and versions are
+  /// A duplicate version is refused unless [force] is true and the published
+  /// checksum matches. Other extensions and versions are
   /// preserved, extensions are sorted by id and versions by ascending semver.
   Future<PublishResult> publish({
     required Directory extensionRoot,
@@ -86,12 +86,12 @@ final class Publisher {
             extensions: const <RegistryExtension>[],
           );
     final previous = existing.find(manifest.id);
-    final isDuplicate = previous?.findVersion(manifest.version) != null;
-    if (isDuplicate && !force) {
+    final publishedVersion = previous?.findVersion(manifest.version);
+    if (publishedVersion != null && !force) {
       throw KilnStoreException(
         '${manifest.id} ${manifest.version} is already published.',
         code: 'store.duplicate_version',
-        suggestion: 'Bump the version or publish with force to replace it.',
+        suggestion: 'Bump the version to publish different content.',
         details: <String, Object?>{
           'id': manifest.id,
           'version': manifest.version,
@@ -105,6 +105,29 @@ final class Publisher {
     final archiveFile = File(
       p.joinAll(<String>[registryRoot.path, ...relativeArchive.split('/')]),
     );
+    if (publishedVersion != null) {
+      if (publishedVersion.sha256 != digest) {
+        throw KilnStoreException(
+          'Published version ${manifest.id} ${manifest.version} has different content.',
+          code: 'store.immutable_version',
+          suggestion:
+              'Bump the extension version and keep the released archive.',
+        );
+      }
+      if (!archiveFile.existsSync()) {
+        archiveFile.parent.createSync(recursive: true);
+        archiveFile.writeAsBytesSync(archiveBytes);
+      } else {
+        const ChecksumVerifier().verify(archiveFile.readAsBytesSync(), digest);
+      }
+      return PublishResult(
+        id: manifest.id,
+        version: manifest.version,
+        sha256: digest,
+        archivePath: archiveFile.path,
+        indexPath: indexFile.path,
+      );
+    }
     archiveFile.parent.createSync(recursive: true);
     archiveFile.writeAsBytesSync(archiveBytes);
 

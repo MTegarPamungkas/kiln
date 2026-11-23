@@ -29,6 +29,9 @@ The publisher:
 
 `tool/registry.dart` rebuilds the entire registry from `extensions/` in one pass.
 
+A published extension version is immutable. Bump the version when the archive
+contents change. `--force` only makes publishing identical bytes idempotent.
+
 ## Install-side guarantees
 
 `kiln_store` verifies the archive checksum and applies the trust policy before

@@ -5,11 +5,11 @@ import 'package:path/path.dart' as p;
 
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
+import '../infra/host_compatibility.dart';
 import '../infra/json_reporter.dart';
+import '../infra/project_catalog.dart';
 import '../project_context.dart';
 import '../setup/extension_setup.dart';
-import '../version.dart';
-import 'command_helpers.dart';
 
 enum DoctorStatus { ok, warn, fail }
 
@@ -51,6 +51,8 @@ final class DoctorCommand extends KilnCommand {
   @override
   Future<int> run() async {
     final project = loadProject();
+    final catalog = ProjectCatalog(context, project);
+    final host = HostCompatibility(processRunner);
     final fix = argResults!['fix'] == true;
     final checks = <DoctorCheck>[];
     final ownership = const FileOwnership();
@@ -124,7 +126,7 @@ final class DoctorCommand extends KilnCommand {
     for (final entry in project.lockfile.extensions.entries) {
       final id = entry.key;
       final locked = entry.value;
-      final available = findAvailableExtension(id);
+      final available = await catalog.installed(id);
       if (available == null) {
         checks.add(
           DoctorCheck(
@@ -136,7 +138,19 @@ final class DoctorCommand extends KilnCommand {
         continue;
       }
       final manifest = available.manifest;
-      providedCapabilities.addAll(manifest.provides);
+      if (manifest.version == locked.version) {
+        providedCapabilities.addAll(manifest.provides);
+      } else {
+        checks.add(
+          DoctorCheck(
+            id: 'extension.$id.version',
+            status: DoctorStatus.warn,
+            message:
+                'Installed $id ${locked.version} differs from the available manifest ${manifest.version}',
+            suggestion: 'Use matching metadata or upgrade $id.',
+          ),
+        );
+      }
 
       {
         final setup = ExtensionSetup(manifest);
@@ -236,10 +250,7 @@ final class DoctorCommand extends KilnCommand {
         }
       }
 
-      final compatibility = manifest.compatibility.problems(
-        kilnVersion: kilnVersion,
-        dartVersion: Platform.version.split(' ').first,
-      );
+      final compatibility = await host.problems(manifest);
       for (final problem in compatibility) {
         checks.add(
           DoctorCheck(

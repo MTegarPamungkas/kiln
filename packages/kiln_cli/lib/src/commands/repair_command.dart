@@ -5,9 +5,10 @@ import 'package:path/path.dart' as p;
 
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
+import '../infra/project_catalog.dart';
 import 'command_helpers.dart';
 
-/// Restores generated extension files from the bundled version.
+/// Restores generated extension files from the installed version.
 ///
 /// ARB files are treated as user content and are preserved unless `--force`.
 final class RepairCommand extends KilnCommand {
@@ -24,7 +25,7 @@ final class RepairCommand extends KilnCommand {
 
   @override
   String get description =>
-      'Restore generated extension files from the bundled version.';
+      'Restore generated extension files from the installed version.';
 
   @override
   String get invocation => 'kiln repair [extension...] [arguments]';
@@ -32,6 +33,7 @@ final class RepairCommand extends KilnCommand {
   @override
   Future<int> run() async {
     final project = loadProject();
+    final catalog = ProjectCatalog(context, project);
     final lockStore = LockfileStore(project.root);
     final lockfile = lockStore.read();
     if (lockfile.extensions.isEmpty) {
@@ -65,7 +67,7 @@ final class RepairCommand extends KilnCommand {
     final updated = <String, LockedExtension>{...lockfile.extensions};
 
     for (final id in requested) {
-      final available = findAvailableExtension(id);
+      final available = await catalog.installed(id);
       final locked = lockfile.extensions[id]!;
       if (available == null) {
         warnings.add('$id: manifest is not available; skipped');

@@ -11,7 +11,7 @@ final class GetItRegistry implements Registry {
 
   final GetIt _getIt;
   final List<FutureOr<void> Function()> _owned = <FutureOr<void> Function()>[];
-  bool _disposed = false;
+  Future<void>? _disposeFuture;
 
   @override
   bool get isReady => true;
@@ -74,11 +74,9 @@ final class GetItRegistry implements Registry {
   }
 
   @override
-  Future<void> dispose() async {
-    if (_disposed) {
-      return;
-    }
-    _disposed = true;
+  Future<void> dispose() => _disposeFuture ??= Future<void>.microtask(_dispose);
+
+  Future<void> _dispose() async {
     Object? firstError;
     StackTrace? firstStackTrace;
     for (final callback in _owned.reversed) {
@@ -106,7 +104,7 @@ final class GetItRegistry implements Registry {
   }
 
   void _ensureOpen() {
-    if (_disposed) {
+    if (_disposeFuture != null) {
       throw StateError('The registry has been disposed.');
     }
   }

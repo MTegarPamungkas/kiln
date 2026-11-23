@@ -24,6 +24,39 @@ records release-level changes for the monorepo.
   new `CloudFunctions` contract (`Functions.createExecution`), with live e2e
   coverage against a deployed function.
 
+### Fixed
+
+- Release archives include the workspace root and the release workflow verifies
+  the extracted CLI and scaffolds a standalone test app.
+- The README count tracks the 34 active extensions. The registry checks archive
+  references and retains the historical Neon archive explicitly.
+
+- Codegen installs both json_serializable and Freezed. The wizard removes
+  the generator picker because it did not change the generated setup.
+- Remote config uses caller fallbacks for invalid boolean values and refreshes
+  on resume after the configured interval. Apps can opt out with
+  `refreshOnResume: false`.
+- Geolocation maps service, permission, timeout, and stream errors to typed
+  failures and rejects negative distance filters.
+- HTTP logging strips URL fragments before applying the configured redaction.
+- Theme and locale serialize preference writes and report whether the selected
+  value was persisted. The selection still applies for the current session.
+
+### Removed
+
+- The active catalog drops Neon. Existing archived artifacts retain their
+  historical paths.
+
+### Verification
+
+- Manifest metadata is checked against module declarations. A rendered
+  27-module fixture exercises dependency ordering and registration.
+  [Composition evidence](docs/audit/evidence/composed-fixture-2026-11-21.md)
+- The Supabase adapter passed same-project RLS and browser OAuth checks. Its
+  signed URLs were verified on a local Storage service.
+  [RLS and OAuth](docs/audit/supabase-local-rls-2026-11-22.md)
+  · [Signed URLs](docs/audit/supabase-signed-urls-2026-11-22.md)
+
 ## 0.1.0
 
 - Initial release of the Kiln Flutter application framework: the `kiln_core`

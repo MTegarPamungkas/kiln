@@ -1,7 +1,7 @@
 # Cross-handle and cross-process durability
 
 Date: 2026-11-20 (Asia/Jakarta). Addresses the remaining scope of K17 and K18 in
-[findings](findings.md).
+[findings](../findings.md).
 
 ## The hazard
 

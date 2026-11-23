@@ -1,7 +1,7 @@
 # Composed Dio + HTTP cache against a loopback server
 
 Date: 2026-11-21 (Asia/Jakarta). Closes the "required fixture 1" note for K30/K31
-in [findings](findings.md).
+in [findings](../findings.md).
 
 ## Why a separate fixture
 

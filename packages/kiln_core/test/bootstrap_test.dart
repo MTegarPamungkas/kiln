@@ -125,35 +125,38 @@ void main() {
       expect(events, ['register:env', 'dispose:env']);
     });
 
-    test('a required module with invalid config fails with its typed reason', () async {
-      await expectLater(
-        KilnBootstrap.run(
-          modules: [
-            _TrackedModule(
-              'env',
-              requiredForStartup: true,
-              supportInfo: const SupportInfo.unsupported(
-                SupportState.notConfigured,
-                message: 'Missing API key',
+    test(
+      'a required module with invalid config fails with its typed reason',
+      () async {
+        await expectLater(
+          KilnBootstrap.run(
+            modules: [
+              _TrackedModule(
+                'env',
+                requiredForStartup: true,
+                supportInfo: const SupportInfo.unsupported(
+                  SupportState.notConfigured,
+                  message: 'Missing API key',
+                ),
               ),
-            ),
-          ],
-        ),
-        throwsA(
-          isA<Failure>()
-              .having(
-                (failure) => failure.code,
-                'code',
-                FailureCode.configurationMissing,
-              )
-              .having(
-                (failure) => failure.kind,
-                'kind',
-                FailureKind.configuration,
-              ),
-        ),
-      );
-    });
+            ],
+          ),
+          throwsA(
+            isA<Failure>()
+                .having(
+                  (failure) => failure.code,
+                  'code',
+                  FailureCode.configurationMissing,
+                )
+                .having(
+                  (failure) => failure.kind,
+                  'kind',
+                  FailureKind.configuration,
+                ),
+          ),
+        );
+      },
+    );
 
     test('unavailable capabilities prevent dependent readiness', () async {
       final events = <String>[];
@@ -187,6 +190,35 @@ void main() {
       );
       expect(ready, ['independent']);
     });
+
+    test(
+      'platform-filtered capabilities disable transitive dependents',
+      () async {
+        final events = <String>[];
+        final registry = await KilnBootstrap.run(
+          platform: 'android',
+          modules: [
+            _TrackedModule('web', platforms: {'web'}, provides: {'database'}),
+            _TrackedModule(
+              'consumer',
+              requires: {'database'},
+              provides: {'feature'},
+              events: events,
+            ),
+            _TrackedModule('transitive', requires: {'feature'}, events: events),
+            _TrackedModule('independent', events: events),
+          ],
+        );
+        addTearDown(registry.read<Lifecycle>().dispose);
+        expect(events, isNot(contains('register:consumer')));
+        expect(events, isNot(contains('register:transitive')));
+        expect(events, contains('ready:independent'));
+        final support = registry.read<SupportRegistry>();
+        expect(support['web']?.state, SupportState.unsupportedPlatform);
+        expect(support['consumer']?.state, SupportState.unavailable);
+        expect(support['transitive']?.state, SupportState.unavailable);
+      },
+    );
 
     test('apps can require a backend capability explicitly', () async {
       await expectLater(

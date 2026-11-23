@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-22T17:20:47.440767Z",
+  "generated_at": "2026-11-23T08:13:50.957038Z",
   "extensions": [
     {
       "id": "analytics",
@@ -29,7 +29,7 @@
       "name": "Appwrite",
       "description": "Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.",
       "category": "auth",
-      "latest": "0.3.1",
+      "latest": "0.3.2",
       "tier": "official",
       "versions": [
         {
@@ -117,6 +117,26 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.3.2",
+          "url": "archives/appwrite-0.3.2.tgz",
+          "sha256": "d7d31f968b71c4845abc793499b77e4040748526263dacc7e37ebb698cc504a5",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets",
+            "appwrite_client"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -165,7 +185,7 @@
       "name": "Appwrite Native Push",
       "description": "Push transport over Appwrite Push (MQTT), without Firebase or device tokens.",
       "category": "notifications",
-      "latest": "0.2.0",
+      "latest": "0.2.1",
       "tier": "official",
       "versions": [
         {
@@ -189,6 +209,21 @@
           "sha256": "879e4e61a1ca5366d17253d6e706421c82a492ba4ae9a6a46c7fd4f54b5ccc1c",
           "requires": [
             "auth"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.1",
+          "url": "archives/appwrite_push_native-0.2.1.tgz",
+          "sha256": "a2c3824cf4a38a49178bbef6baba0622c0670a493e13389cd39ab95f66b5abdd",
+          "requires": [
+            "appwrite_client"
           ],
           "provides": [
             "push_transport"

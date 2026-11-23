@@ -3,6 +3,7 @@ import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
 import '../infra/json_reporter.dart';
+import '../infra/project_catalog.dart';
 import 'command_helpers.dart';
 
 /// Removes one extension and only deletes files that were not edited.
@@ -50,7 +51,10 @@ final class RemoveCommand extends KilnCommand {
 
     final installer = ExtensionInstaller(
       projectRoot: project.root,
-      available: extensionCatalog,
+      available: await ProjectCatalog(
+        context,
+        project,
+      ).available(requireExact: false),
       verifier: Verifier(
         runner: (executable, arguments, workingDirectory) => processRunner.run(
           executable,

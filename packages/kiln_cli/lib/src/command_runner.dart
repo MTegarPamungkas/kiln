@@ -91,7 +91,7 @@ final class KilnCommandRunner extends CommandRunner<int> {
     'add' || 'remove' || 'upgrade' || 'repair' || 'rollback' => true,
     'setup' => command.rest.isNotEmpty || command['all'] == true,
     'doctor' => command['fix'] == true,
-    'store' => command.command?.name == 'install',
+    'store' => command.rest.firstOrNull == 'install',
     _ => false,
   };
 

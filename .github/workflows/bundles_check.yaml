@@ -11,9 +11,21 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
       - run: flutter pub get
       - run: dart run tool/bundle.dart --check
+      - name: Preserve published registry archives
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ -n "$BASE_SHA" && "$BASE_SHA" != "0000000000000000000000000000000000000000" ]]; then
+            git show "$BASE_SHA:registry/index.json" > "$RUNNER_TEMP/registry-baseline.json"
+            dart run tool/registry.dart --check --baseline "$RUNNER_TEMP/registry-baseline.json"
+          else
+            dart run tool/registry.dart --check
+          fi

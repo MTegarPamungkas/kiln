@@ -1,7 +1,7 @@
 # Composed extension fixture and log record bounds
 
 Date: 2026-11-21 (Asia/Jakarta). No commit or deployment was made. Closes the
-local test work in [status](current-status.md): K12 and K20.
+local test work in [status](../current-status.md): K12 and K20.
 
 ## K12 - composed multi-extension fixture
 

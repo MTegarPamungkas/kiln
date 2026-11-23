@@ -209,83 +209,83 @@ void main() {
 
       final target = Directory(p.join(workspace.path, 'created_app'));
       expect(code, ExitCodes.success, reason: captured.err.join('\n'));
-      final pubspec = File(
-        p.join(target.path, 'pubspec.yaml'),
-      ).readAsStringSync();
+      final pubspec = File(p.join(target.path, 'pubspec.yaml'))
+          .readAsStringSync();
       expect(pubspec, contains('path:'));
       expect(pubspec, contains('packages/kiln_core'));
       expect(pubspec, contains('dependency_overrides:'));
     });
 
-    test('asks for the options one by one on an interactive terminal', () async {
-      final extensionOptions =
-          extensionCatalog
-              .map((extension) => extension.id)
-              .where(
-                (id) => id != 'l10n' && id != 'bloc' && id != 'riverpod',
-              )
-              .toList()
-            ..sort();
-      final answers = <String>[
-        '2', // template: app
-        '3', // state: riverpod
-        'com.kiln.demo',
-        'A demo application.',
-        '', // platforms: keep the checked defaults
-        '${extensionOptions.indexOf('dio') + 1}', // extensions: check dio
-        'en', // l10n supported locales
-      ];
-      var index = 0;
-      final runner = buildTestRunner(
-        cwd: workspace,
-        captured: captured,
-        processRunner: FakeProcessRunner(_fakeFlutter),
-        prompter: Prompter(readLine: (_) => answers[index++], write: (_) {}),
-      );
+    test(
+      'asks for the options one by one on an interactive terminal',
+      () async {
+        final extensionOptions =
+            extensionCatalog
+                .map((extension) => extension.id)
+                .where((id) => id != 'l10n' && id != 'bloc' && id != 'riverpod')
+                .toList()
+              ..sort();
+        final answers = <String>[
+          '2', // template: app
+          '3', // state: riverpod
+          'com.kiln.demo',
+          'A demo application.',
+          '', // platforms: keep the checked defaults
+          '${extensionOptions.indexOf('dio') + 1}', // extensions: check dio
+          'en', // l10n supported locales
+        ];
+        var index = 0;
+        final runner = buildTestRunner(
+          cwd: workspace,
+          captured: captured,
+          processRunner: FakeProcessRunner(_fakeFlutter),
+          prompter: Prompter(readLine: (_) => answers[index++], write: (_) {}),
+        );
 
-      final code = await runner.run(<String>[
-        'create',
-        'asked_app',
-        '--core-path',
-        corePath,
-        '--answer',
-        'base_url=https://api.example.com',
-      ]);
+        final code = await runner.run(<String>[
+          'create',
+          'asked_app',
+          '--core-path',
+          corePath,
+          '--answer',
+          'base_url=https://api.example.com',
+        ]);
 
-      final target = Directory(p.join(workspace.path, 'asked_app'));
-      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
-      expect(
-        File(p.join(target.path, 'lib', 'app', 'app_shell.dart'))
-            .readAsStringSync(),
-        contains('StarterHome'),
-      );
-      expect(
-        File(
-          p.join(
-            target.path,
-            'lib',
-            'extensions',
-            'riverpod',
-            'riverpod_module.dart',
-          ),
-        ).existsSync(),
-        isTrue,
-      );
-      expect(
-        File(
-          p.join(target.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
-        ).existsSync(),
-        isTrue,
-      );
-      expect(
-        File(p.join(target.path, 'lib', 'l10n', 'app_en.arb')).existsSync(),
-        isTrue,
-      );
-      expect(
-        File(p.join(target.path, 'kiln.yaml')).readAsStringSync(),
-        contains('riverpod'),
-      );
-    });
+        final target = Directory(p.join(workspace.path, 'asked_app'));
+        expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+        expect(
+          File(p.join(target.path, 'lib', 'app', 'app_shell.dart'))
+              .readAsStringSync(),
+          contains('StarterHome'),
+        );
+        expect(
+          File(
+            p.join(
+              target.path,
+              'lib',
+              'extensions',
+              'riverpod',
+              'riverpod_module.dart',
+            ),
+          ).existsSync(),
+          isTrue,
+        );
+        expect(
+          File(
+            p.join(target.path, 'lib', 'extensions', 'dio', 'dio_module.dart'),
+          ).existsSync(),
+          isTrue,
+        );
+        expect(
+          File(p.join(target.path, 'lib', 'l10n', 'app_en.arb')).existsSync(),
+          isTrue,
+        );
+        expect(
+          File(p.join(target.path, 'kiln.yaml')).readAsStringSync(),
+          contains('riverpod'),
+        );
+      },
+    );
 
     test('repair restores generated files and preserves edited ARBs', () async {
       final createRunner = buildTestRunner(
@@ -335,22 +335,14 @@ void main() {
       expect(arb.readAsStringSync(), '$arbSource\n');
       expect(codegen.readAsStringSync(), codegenSource);
       expect(
-        File(
-          p.join(target.path, 'lib', 'extensions', 'l10n', 'README.md'),
-        ).existsSync(),
+        File(p.join(target.path, 'lib', 'extensions', 'l10n', 'README.md'))
+            .existsSync(),
         isTrue,
         reason: 'repair must keep the extension README',
       );
       expect(
         File(
-          p.join(
-            target.path,
-            'lib',
-            'extensions',
-            'l10n',
-            'docs',
-            'l10n.md',
-          ),
+          p.join(target.path, 'lib', 'extensions', 'l10n', 'docs', 'l10n.md'),
         ).existsSync(),
         isTrue,
         reason: 'repair must keep extension docs',
@@ -388,9 +380,8 @@ void main() {
       ]);
 
       expect(code, ExitCodes.success, reason: captured.err.join('\n'));
-      final source = File(
-        p.join(workspace.path, 'git_app', 'pubspec.yaml'),
-      ).readAsStringSync();
+      final source = File(p.join(workspace.path, 'git_app', 'pubspec.yaml'))
+          .readAsStringSync();
       final pubspec = loadYaml(source) as YamlMap;
 
       final dependencies = pubspec['dependencies'] as YamlMap;
@@ -421,8 +412,81 @@ void main() {
         source.indexOf('dependency_overrides:'),
         greaterThan(source.indexOf('uses-material-design:')),
       );
+      expect((pubspec['flutter'] as YamlMap)['uses-material-design'], isTrue);
+    });
+
+    test(
+      'failed pub resolution leaves a new target available for retry',
+      () async {
+        final runner = buildTestRunner(
+          cwd: workspace,
+          captured: captured,
+          processRunner: FakeProcessRunner((executable, arguments, cwd) async {
+            if (arguments.firstOrNull == 'pub') {
+              return ProcessResult(0, 1, '', 'failure');
+            }
+            return _fakeFlutter(executable, arguments, cwd);
+          }),
+        );
+        expect(await runner.run(['create', 'retry_app', '--yes']), isNot(0));
+        expect(
+          Directory(p.join(workspace.path, 'retry_app')).existsSync(),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'incompatible Appwrite push pairing fails before scaffolding',
+      () async {
+        final runner = buildTestRunner(
+          cwd: workspace,
+          captured: captured,
+          processRunner: FakeProcessRunner((_, _, _) async {
+            fail('Flutter must not run before the extension plan is valid.');
+          }),
+        );
+        expect(
+          await runner.run([
+            'create',
+            'invalid_push',
+            '--platforms',
+            'android',
+            '--with',
+            'rest_auth,appwrite_push_native',
+            '--yes',
+          ]),
+          isNot(0),
+        );
+        expect(captured.err.join('\n'), contains('exclusive'));
+        expect(
+          Directory(p.join(workspace.path, 'invalid_push')).existsSync(),
+          isFalse,
+        );
+      },
+    );
+
+    test('force preserves unrelated files and user widget tests', () async {
+      final project = Directory(p.join(workspace.path, 'existing_app'));
+      await Directory(p.join(project.path, 'test')).create(recursive: true);
+      final userTest = File(p.join(project.path, 'test', 'widget_test.dart'));
+      await userTest.writeAsString('user test');
+      final userFile = File(p.join(project.path, 'notes.txt'));
+      await userFile.writeAsString('user data');
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
       expect(
-        (pubspec['flutter'] as YamlMap)['uses-material-design'],
+        await runner.run(['create', 'existing_app', '--force', '--yes']),
+        0,
+        reason: captured.err.join('\n'),
+      );
+      expect(await userTest.readAsString(), 'user test');
+      expect(await userFile.readAsString(), 'user data');
+      expect(
+        File(p.join(project.path, 'lib', 'main.dart')).existsSync(),
         isTrue,
       );
     });
@@ -438,9 +502,8 @@ void main() {
       final code = await runner.run(<String>['create', 'pub_app', '--yes']);
 
       expect(code, ExitCodes.success, reason: captured.err.join('\n'));
-      final source = File(
-        p.join(workspace.path, 'pub_app', 'pubspec.yaml'),
-      ).readAsStringSync();
+      final source = File(p.join(workspace.path, 'pub_app', 'pubspec.yaml'))
+          .readAsStringSync();
       final pubspec = loadYaml(source) as YamlMap;
       final dependencies = pubspec['dependencies'] as YamlMap;
       final core = dependencies['kiln_core'] as YamlMap;
@@ -448,7 +511,7 @@ void main() {
 
       expect(git['url'], defaultCoreGitUrl);
       expect(git['path'], 'packages/kiln_core');
-      expect(git['ref'], isNull, reason: 'the default branch is followed');
+      expect(git['ref'], defaultCoreGitRef);
       expect(core.containsKey('path'), isFalse);
       expect(
         captured.out.join('\n'),
@@ -472,10 +535,7 @@ void main() {
       ]);
 
       expect(code, ExitCodes.project);
-      expect(
-        captured.err.join('\n'),
-        contains('--core-ref needs --core-git'),
-      );
+      expect(captured.err.join('\n'), contains('--core-ref needs --core-git'));
     });
 
     test('--core-path and --core-git cannot be combined', () async {

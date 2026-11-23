@@ -29,9 +29,13 @@ final class ModuleGraph {
 
   List<KilnModule> resolve({
     Set<String> availableCapabilities = const <String>{},
+    Set<String> unavailableCapabilities = const <String>{},
   }) {
     final providers = _buildProviderIndex();
-    _validateRequirements(providers, availableCapabilities);
+    _validateRequirements(providers, <String>{
+      ...availableCapabilities,
+      ...unavailableCapabilities,
+    });
 
     final ordered = <KilnModule>[];
     final state = <String, int>{};

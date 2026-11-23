@@ -30,16 +30,19 @@ final class AppwritePushNativeModule extends KilnModule {
   Set<String> get provides => const <String>{'push_transport'};
 
   @override
-  Set<String> get requires => const <String>{'auth'};
+  Set<String> get requires => const <String>{'appwrite_client'};
 
   @override
   Set<String> get platforms => const <String>{'android', 'ios'};
 
   @override
   void register(Registry registry) {
+    final client = registry.readOrNull<appwrite.Client>();
+    final auth = registry.readOrNull<AuthRepository>();
+    if (client == null || auth == null) return;
     final transport = AppwritePushNativeTransport(
-      client: registry.read<appwrite.Client>(),
-      auth: registry.read<AuthRepository>(),
+      client: client,
+      auth: auth,
       pushEndpoint: config.pushEndpoint,
       notificationTitle: config.notificationTitle,
       background: config.background,
@@ -49,6 +52,14 @@ final class AppwritePushNativeModule extends KilnModule {
       ..registerSingleton<AppwritePushNativeTransport>(transport)
       ..registerSingleton<PushTransport>(transport);
   }
+
+  @override
+  SupportInfo support(Registry registry) => _transport == null
+      ? const SupportInfo.unsupported(
+          SupportState.unavailable,
+          message: 'Appwrite native push requires a configured Appwrite client and auth repository.',
+        )
+      : const SupportInfo.supported();
 
   @override
   Future<void> ready(Registry registry) async {

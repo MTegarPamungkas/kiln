@@ -11,15 +11,18 @@ final class SnapshotStore {
 
   Directory get directory {
     RootPath.validateId(transactionId);
-    return Directory(RootPath(projectRoot).resolve('.kiln/backups/$transactionId'));
+    return Directory(
+      RootPath(projectRoot).resolve('.kiln/backups/$transactionId'),
+    );
   }
 
   File backupFile(String relativePath) {
     RootPath.validateId(transactionId);
     RootPath(projectRoot).resolve(relativePath);
-    return File(RootPath(projectRoot).resolve(
-      '.kiln/backups/$transactionId/$relativePath',
-    ));
+    return File(
+      RootPath(projectRoot)
+          .resolve('.kiln/backups/$transactionId/$relativePath'),
+    );
   }
 
   bool hasBackup(String relativePath) => backupFile(relativePath).existsSync();
@@ -38,13 +41,10 @@ final class SnapshotStore {
   }
 
   void restore(String relativePath) {
-    final backup = backupFile(relativePath);
-    if (!backup.existsSync()) {
-      return;
-    }
+    final bytes = backupFile(relativePath).readAsBytesSync();
     final target = File(RootPath(projectRoot).resolve(relativePath));
     target.parent.createSync(recursive: true);
-    target.writeAsBytesSync(backup.readAsBytesSync());
+    target.writeAsBytesSync(bytes);
   }
 
   void deleteAll() {

@@ -10,7 +10,9 @@ Every `add`/`remove` runs inside a `Transaction`:
 5. On failure: `rollback()` restores the snapshot and deletes new files.
 
 `kiln rollback` cancels an interrupted transaction first, then the last
-completed one. `kiln doctor` reports journals that are still open as interrupted
-operations.
+completed one. A journal still in the active directory remains discoverable
+if the process stops while publishing commit history. Rollback validates
+required snapshots before restoring any file and keeps recovery data if a
+snapshot is missing. Kiln keeps the ten most recent completed backups.
 
 `.kiln/journal`, `.kiln/backups`, and `.kiln/logs` are ignored by Git.

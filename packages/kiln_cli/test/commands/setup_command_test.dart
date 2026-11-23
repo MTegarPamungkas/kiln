@@ -411,10 +411,14 @@ void main() {
     'rejects catalog version mismatch without rewriting the extension',
     () async {
       final lock = File(p.join(project.path, 'kiln.lock.yaml'));
+      final current = ProjectContext.load(project)
+          .lockfile
+          .extensions['appwrite']!
+          .version;
       lock.writeAsStringSync(
         lock.readAsStringSync().replaceFirst(
-          'version: "0.3.1"',
-          'version: "0.3.0"',
+          'version: "$current"',
+          'version: "9.9.9"',
         ),
       );
       final before = _files(project);

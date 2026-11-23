@@ -1,7 +1,8 @@
 # Lockfile and ownership
 
 `kiln.lock.yaml` records each extension's version, source, dependencies, files
-with their SHA-256 hashes, native patches, and manual steps.
+with their SHA-256 hashes, native patches, and manual steps. Registry installs
+also record a registry identity hash and the selected archive SHA-256.
 
 ```yaml
 lock_version: 2

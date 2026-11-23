@@ -1,13 +1,11 @@
-import 'dart:io';
-
 import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import 'package:kiln_store/kiln_store.dart';
-import 'package:path/path.dart' as p;
-import 'package:pub_semver/pub_semver.dart';
 
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
+import '../infra/host_compatibility.dart';
 import '../infra/json_reporter.dart';
+import '../infra/project_catalog.dart';
 import '../infra/registry_support.dart';
 import '../project_context.dart';
 import 'command_helpers.dart';
@@ -314,43 +312,55 @@ final class StoreCommand extends KilnCommand {
     }
 
     final requestedVersion = argResults!['version'] as String?;
-    final version = requestedVersion == null
-        ? VersionResolver().resolve(
-            extension,
-            kilnVersion: Version.parse(project.lockfile.core),
-          )
-        : extension.findVersion(requestedVersion);
+    final host = HostCompatibility(processRunner);
+    final version = await host.select(
+      extension,
+      requestedVersion: requestedVersion,
+    );
     if (version == null) {
       throw KilnException(
         requestedVersion == null
             ? 'No compatible version of extension "$id" was found.'
-            : 'Version $requestedVersion of extension "$id" was not found.',
+            : 'Version $requestedVersion of extension "$id" is unavailable or incompatible.',
         code: 'store.version_missing',
       );
     }
 
     final package = await support.fetch(id, version);
     try {
-      final hooks = Directory(p.join(package.directory.path, 'brick', 'hooks'))
-          .existsSync();
-      final decision = const TrustPolicy().evaluate(
-        package.available.manifest,
-        hasHooks: hooks,
+      final available = package.available;
+      final catalog = await ProjectCatalog(
+        context,
+        project,
+      ).withRegistryDependencies(available, index, host);
+      final plan = ExtensionResolver(catalog).resolve(
+        installed: project.lockfile.ids,
+        requested: {id},
+        hostCapabilities: const {'app_basic'},
       );
-      if (!decision.allowed) {
-        throw KilnException(
-          'Extension "$id" is not allowed: ${decision.reason}',
-          code: 'store.untrusted',
+      await host.check(plan.added, project.platforms);
+      for (final candidate in plan.added.where(
+        (item) => item.source == ExtensionSource.store,
+      )) {
+        final decision = const TrustPolicy().evaluate(
+          candidate.manifest,
+          hasHooks: candidate.bundle.hooks.isNotEmpty,
         );
+        if (!decision.allowed) {
+          throw KilnException(
+            'Extension "${candidate.id}" is not allowed: ${decision.reason}',
+            code: 'store.untrusted',
+          );
+        }
+        if (decision.requiresConfirmation &&
+            !prompter
+                .withAssumeYes(argResults!['yes'] == true)
+                .confirm(decision.reason, defaultValue: false)) {
+          logger.info('Installation cancelled.');
+          return ExitCodes.success;
+        }
       }
       final runHooks = argResults!['run-hooks'] == true;
-      if (decision.requiresConfirmation &&
-          !prompter
-              .withAssumeYes(argResults!['yes'] == true)
-              .confirm(decision.reason, defaultValue: false)) {
-        logger.info('Installation cancelled.');
-        return ExitCodes.success;
-      }
       if (runHooks && argResults!['yes'] != true && !prompter.interactive) {
         throw const KilnException(
           'Hooks require interactive confirmation or --yes.',
@@ -358,7 +368,6 @@ final class StoreCommand extends KilnCommand {
         );
       }
 
-      final available = package.available;
       if (argResults!['dry-run'] != true) {
         logger.info(
           'Installing ${available.manifest.name} '
@@ -366,9 +375,9 @@ final class StoreCommand extends KilnCommand {
         );
         logger.blank();
       }
-      final answers = answerForExtension(
-        available,
-        saved: project.extensionAnswers[id] ?? const <String, Object?>{},
+      final answers = answersForPlan(
+        plan.added,
+        saved: project.extensionAnswers,
         provided: parseAnswerOptions(
           (argResults!['answer'] as List<String>).cast<String>(),
         ),
@@ -376,7 +385,7 @@ final class StoreCommand extends KilnCommand {
       );
       final installer = ExtensionInstaller(
         projectRoot: project.root,
-        available: <AvailableExtension>[available],
+        available: catalog,
         verifier: Verifier(
           runner: (executable, arguments, workingDirectory) => processRunner
               .run(executable, arguments, workingDirectory: workingDirectory),
@@ -390,7 +399,7 @@ final class StoreCommand extends KilnCommand {
         result = await installer.add(
           requested: <String>[id],
           project: project.projectForTemplates,
-          answers: <String, Map<String, Object?>>{id: answers},
+          answers: answers,
           persistAnswers: true,
           options: InstallOptions(
             dryRun: argResults!['dry-run'] == true,

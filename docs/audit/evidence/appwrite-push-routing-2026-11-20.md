@@ -129,7 +129,7 @@ Fixture host: a loopback HTTP endpoint on `127.0.0.1:8768` (reached from the pho
 through `adb reverse tcp:8768 tcp:8768`) served `/fixture` and appended `/report`
 bodies to a file, holding the Appwrite key in memory only. The earlier retry used
 an ad-hoc Node REPL for this role, so the host was rewritten as the committed
-[`tool/e2e/push_routing_host.mjs`](../../tool/e2e/push_routing_host.mjs) with its
+[`tool/e2e/push_routing_host.mjs`](../../../tool/e2e/push_routing_host.mjs) with its
 state under `.dart_tool/push_routing_host/`. It reads configuration and credentials
 from the environment and never logs them.
 

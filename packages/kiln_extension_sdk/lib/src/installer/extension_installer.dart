@@ -310,6 +310,7 @@ final class ExtensionInstaller {
       newEntries[manifest.id] = LockedExtension(
         version: manifest.version,
         source: extension.source,
+        artifact: extension.artifact,
         dependencies: manifest.dependencies.keys.toList(growable: false),
         devDependencies: manifest.devDependencies.keys.toList(growable: false),
         flutterGenerate: _wantsFlutterGenerate(manifest),
@@ -1016,6 +1017,8 @@ final class ExtensionInstaller {
     required Map<String, Object?> project,
     Map<String, Object?> answers = const <String, Object?>{},
     Map<String, Object?> previousAnswers = const <String, Object?>{},
+    Map<String, Map<String, Object?>> dependencyAnswers = const {},
+    AvailableExtension? previousExtension,
     List<Migration> migrations = const <Migration>[],
     InstallOptions options = const InstallOptions(),
     bool force = false,
@@ -1086,7 +1089,17 @@ final class ExtensionInstaller {
         migrations: migrations,
         transaction: stagedTransaction,
       );
-      await staged.remove(
+      final remover = previousExtension == null
+          ? staged
+          : ExtensionInstaller(
+              projectRoot: stage,
+              available: [
+                ...available.where((extension) => extension.id != id),
+                previousExtension,
+              ],
+              nativeSetup: nativeSetup,
+            );
+      await remover.remove(
         id: id,
         answers: previousAnswers,
         transaction: stagedTransaction,
@@ -1095,7 +1108,8 @@ final class ExtensionInstaller {
       final result = await staged.add(
         requested: [id],
         project: project,
-        answers: {id: answers},
+        answers: {...dependencyAnswers, id: answers},
+        persistAnswers: true,
         hostCapabilities: hostCapabilities,
         hostSlots: hostSlots,
         transaction: stagedTransaction,

@@ -6,9 +6,9 @@ This catalog is generated from extension manifests by
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
 | `analytics` | Analytics | 0.1.0 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.3.1 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets` |
+| `appwrite` | Appwrite | 0.3.2 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`, `appwrite_client` |
 | `appwrite_push` | Appwrite Push | 0.1.1 | notifications | official | `push_transport` |
-| `appwrite_push_native` | Appwrite Native Push | 0.2.0 | notifications | official | `push_transport` |
+| `appwrite_push_native` | Appwrite Native Push | 0.2.1 | notifications | official | `push_transport` |
 | `biometric` | Biometric | 0.1.1 | security | official | `biometric` |
 | `bloc` | Bloc state management | 0.2.1 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.0 | calendar | official | `calendar` |
@@ -53,7 +53,7 @@ PostHog product analytics with consent gating and PII scrubbing.
 
 Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.
 
-- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`
+- Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`, `appwrite_client`
 - Prompts: endpoint, project_id, database_id, bucket_id
 - Dependencies: `appwrite: ^28.2.0`, `http: ^1.6.0`, `shared_preferences: ^2.3.0`, `web: ^1.1.1`
 - Platforms: android, ios, macos, web, windows, linux
@@ -72,7 +72,7 @@ Push transport bridging Firebase Cloud Messaging into the push_targets capabilit
 Push transport over Appwrite Push (MQTT), without Firebase or device tokens.
 
 - Provides: `push_transport`
-- Requires: `auth`
+- Requires: `appwrite_client`
 - Prompts: push_endpoint, background, notification_title, background_reliability
 - Dependencies: `appwrite: ^28.2.0`
 - Platforms: android, ios

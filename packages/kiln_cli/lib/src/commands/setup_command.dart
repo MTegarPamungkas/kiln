@@ -3,6 +3,7 @@ import 'package:kiln_extension_sdk/kiln_extension_sdk.dart';
 import '../command_context.dart';
 import '../infra/exit_codes.dart';
 import '../infra/json_reporter.dart';
+import '../infra/project_catalog.dart';
 import '../setup/extension_setup.dart';
 import 'command_helpers.dart';
 
@@ -18,7 +19,7 @@ final class SetupCommand extends KilnCommand {
       ..addFlag(
         'all',
         negatable: false,
-        help: 'Review all installed bundled extensions.',
+        help: 'Review all installed extensions.',
       )
       ..addFlag(
         'yes',
@@ -56,6 +57,7 @@ final class SetupCommand extends KilnCommand {
   @override
   Future<int> run() async {
     final project = loadProject();
+    final catalog = ProjectCatalog(context, project);
     final all = argResults!['all'] == true;
     final requested = argResults!.rest.toSet();
     if (all && requested.isNotEmpty) {
@@ -71,7 +73,7 @@ final class SetupCommand extends KilnCommand {
       }
       final entries = <Map<String, Object?>>[];
       for (final id in project.lockfile.ids.toList()..sort()) {
-        final available = findAvailableExtension(id);
+        final available = await catalog.installed(id);
         if (available == null) {
           entries.add({
             'id': id,
@@ -125,7 +127,7 @@ final class SetupCommand extends KilnCommand {
         : requested.toList();
     final selected = <AvailableExtension>[];
     for (final id in ids) {
-      final extension = findAvailableExtension(id);
+      final extension = await catalog.installed(id);
       if (extension == null) {
         throw const KilnException(
           'The extension is not in this CLI catalog.',
@@ -219,7 +221,7 @@ final class SetupCommand extends KilnCommand {
     final result =
         await ExtensionInstaller(
           projectRoot: project.root,
-          available: extensionCatalog,
+          available: await catalog.available(),
           verifier: Verifier(
             runner: (executable, arguments, workingDirectory) => processRunner
                 .run(executable, arguments, workingDirectory: workingDirectory),

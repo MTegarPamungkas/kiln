@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- Require the Appwrite client capability and report missing registrations through typed support.
+
 ## 0.2.0
 
 - Bound `start()` with `subscribeTimeout` so a broker that never acknowledges

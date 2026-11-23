@@ -1,7 +1,7 @@
 # Product decisions: remote-config cadence, migration limits, preference durability
 
 Date: 2026-11-22 (Asia/Jakarta). Resolves the three open "design decision" items
-from [status](current-status.md): K16, K17, K27. No commit or deployment was
+from [status](../current-status.md): K16, K17, K27. No commit or deployment was
 made. The guiding rule was "what makes the SDK better long-term": a small,
 dependency-free behaviour change where it removes a footgun, and a documented
 boundary where a change would add cost or risk without paying it back.

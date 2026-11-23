@@ -2,6 +2,19 @@
 
 ## 0.1.1
 
+- Retry transient Windows sharing errors when atomically replacing a transaction journal.
+- Validate recovery snapshots before rollback and discover interrupted commit
+  journals. Retain ten completed backups and keep pending recovery data.
+- Reject unsupported lockfile versions before mutation. Record registry artifact
+  identity and checksum in new store installs.
+
+- Add and verified remove commit only after verification succeeds. Saved
+  answers and `pubspec.lock` participate in the same rollback.
+- Bound verifier subprocesses with a timeout. Recover a running journal after
+  an interrupted writer, preserving files outside the transaction.
+- Render `env:NAME` client-value references as constant String expressions so
+  generated configuration also compiles in constructor defaults.
+
 - Support the Android core_library_desugaring manifest flag, using the existing
   shared native-patch ownership and reversible Gradle patch.
 
