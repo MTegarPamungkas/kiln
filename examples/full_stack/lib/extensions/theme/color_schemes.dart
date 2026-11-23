@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Builds Material color schemes from the brand seed.
 abstract final class ColorSchemes {

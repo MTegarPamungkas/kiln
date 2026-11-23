@@ -137,6 +137,14 @@ void main() {
       expect(() => registry.registerOwned<String>('late'), throwsStateError);
     });
 
+    test('unregistration after disposal is rejected', () async {
+      registry.registerSingleton<String>('value');
+      await registry.dispose();
+
+      // Mutating a disposed container would race the owned-disposal pass.
+      expect(() => registry.unregister<String>(), throwsStateError);
+    });
+
     test('a failing owned callback does not skip the rest', () async {
       final events = <String>[];
       registry.registerOwned<String>(

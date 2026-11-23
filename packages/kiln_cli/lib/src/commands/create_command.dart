@@ -230,7 +230,32 @@ final class CreateCommand extends KilnCommand {
         suggestion: 'Use another name or add --force',
       );
     }
+    // The runner only locks the project containing the working directory.
+    // `--force` rewrites an existing project at the target, so it needs that
+    // project's lock even though the target is a subdirectory.
+    if (target.existsSync() && force) {
+      final lock = await ProjectLock.acquire(target);
+      return lock.run(() => _scaffold(name: name, target: target, force: force, state: state, platforms: platforms, withExtensions: withExtensions, org: org, description: description, template: template, corePath: corePath, coreGit: coreGit, coreRef: coreRef, runPub: runPub, assumeYes: assumeYes));
+    }
+    return _scaffold(name: name, target: target, force: force, state: state, platforms: platforms, withExtensions: withExtensions, org: org, description: description, template: template, corePath: corePath, coreGit: coreGit, coreRef: coreRef, runPub: runPub, assumeYes: assumeYes);
+  }
 
+  Future<int> _scaffold({
+    required String name,
+    required Directory target,
+    required bool force,
+    required String state,
+    required List<String> platforms,
+    required List<String> withExtensions,
+    required String org,
+    required String description,
+    required String template,
+    required String? corePath,
+    required String? coreGit,
+    required String? coreRef,
+    required bool runPub,
+    required bool assumeYes,
+  }) async {
     final requested = <String>{
       if (findAvailableExtension('l10n') != null) 'l10n',
       ...withExtensions,

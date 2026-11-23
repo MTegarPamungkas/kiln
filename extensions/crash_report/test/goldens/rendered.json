@@ -13,7 +13,7 @@
     "lib/extensions/crash_report/noop_crash_reporter.dart": "8905f7c1ab6031da88e153b14291a9e63aac04eb3de7093317443abd99beea17",
     "lib/extensions/crash_report/pii_scrubbing_crash_reporter.dart": "d45c40da33ab07c9fc7c3f9f5c26f7e973349f646f853fdddaea49aabca88f9c",
     "lib/extensions/crash_report/safe_crash_reporter.dart": "4d6790dcfe1036215e7407750717a64fc1cbe3b199e7d260aada54c56c55e631",
-    "lib/extensions/crash_report/sentry_crash_gateway.dart": "0b92271ac5a8e8b3968d15eb737dd590c5d7008b8fee8a3d86d3a34510b07c23",
+    "lib/extensions/crash_report/sentry_crash_gateway.dart": "188354df5102c92a7ad7c41ef6772e0131cf3f59c384307f64fdaddb2a0f8ad8",
     "lib/extensions/crash_report/sentry_crash_reporter.dart": "fdc2b816027b045b8177d3e94cc0105510926a48fd7f970d9a28a37fdce21bb6",
     "test/extensions/crash_report/consent_gate_crash_reporter_test.dart": "90e92eac980ce44a0c375897d1f4f1080e87c061aa4ff7ceaba2f443e1451070",
     "test/extensions/crash_report/crash_report_config_test.dart": "fb9a14ec74374d575006474954ccd92497ec9a0f1fcf15d7c7d2b56fef7e7c51",

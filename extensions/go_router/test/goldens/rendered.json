@@ -1,7 +1,7 @@
 {
   "extension": "go_router",
   "files": {
-    "lib/extensions/go_router/app_router.dart": "08d31899bd522a8f4c3afed74c841266d6e5e09d589f6b466d4316c1abc38b37",
+    "lib/extensions/go_router/app_router.dart": "4477c91a10a18db6db496f51a9502a3bc485b13a253c4eec2d6e92544f664a16",
     "lib/extensions/go_router/app_routes.dart": "c605d3486f2ccd2b0ad7410b833859a240f441206040c4beee540c9737d0176f",
     "lib/extensions/go_router/auth_redirect.dart": "c4d820e30b7048555457b4328eb0be97c01fc659773f6e83b9275f569f74828a",
     "lib/extensions/go_router/deep_link_route_mapper.dart": "cf66a67a4893efffbd1eaf5ddf31e60229b0a4861efd8684e882ec5f65e6c2dc",
@@ -11,21 +11,21 @@
     "lib/extensions/go_router/notification_route_mapper.dart": "a3e3a471a3d84ebf99caf983014bbe6ba925c8cab5dcd7c9f8c5983a2f265044",
     "lib/extensions/go_router/route_guard.dart": "aa60edfb3a291eb968e1cfa5a22b87352365894238ce405ff43c9cc58821276b",
     "lib/extensions/go_router/route_slot.dart": "62865804cbcdb59e385a7de20259b0ed786f41737d3df5a36e12e1f9f6f1996c",
-    "lib/extensions/go_router/route_transitions.dart": "563c231e0f5c47fe6ddfaf0a35b7981b5a64b5a3054e0a46b01fb0da32ae0216",
+    "lib/extensions/go_router/route_transitions.dart": "695367993cc79e6eeb7375d9809a0ebdb90d946ccf59d73066bc1a7feba9c7a8",
     "lib/extensions/go_router/router_config.dart": "e0b65b5bb6c271c61e0b3aec55c225f5182ff4fe163774b7ad58b0b0fa2dc75a",
     "lib/extensions/go_router/session_refresh_listenable.dart": "9ac897a6a82032217daf25b18d2d4016a2e0d3c0202af037748d6dc99c7a1503",
     "lib/extensions/go_router/sign_in_page_builder.dart": "6636f8e4e593ec3c193d12089a6c6e38cb0f0b09a33d5aba5e3e3d5b0590820e",
-    "test/extensions/go_router/app_router_test.dart": "3b14aa30223aac408010d5ed2b35c24a5a51eefd00dab7f0325d6c079ecaaa66",
+    "test/extensions/go_router/app_router_test.dart": "7c660b6a1720877d55ddccf18cf5137674ac534f60fcff036c736050763ce3bf",
     "test/extensions/go_router/app_routes_test.dart": "1177dac6dd9aa3f8c436b5fe772697493431870ef92420d4e49851c43482ceae",
     "test/extensions/go_router/auth_redirect_test.dart": "ba3cf9e33d03f6797e6a1d66fbdc9cf6f75737f8bfa6535cdaab864256fc55b6",
     "test/extensions/go_router/deep_link_route_mapper_test.dart": "d8704619c7ae579476a511bc0bcd30bc1631db57e9b0dcfd6c6f45eb1be44de8",
-    "test/extensions/go_router/go_router_module_test.dart": "7e308a9bd3fc477abff8c1eb0e9da43dc167c3ef04e379c9f2745b8a2a483cb7",
+    "test/extensions/go_router/go_router_module_test.dart": "4f46b7ae17e370cee3074a813e073804cfeab41990656764d1b08d8a755eae44",
     "test/extensions/go_router/go_router_support_test.dart": "ada26571744a756e42af98154e0b226ef0cdae5ac249c3d659d7fb0531f6a9fb",
-    "test/extensions/go_router/navigation_observer_test.dart": "164628d80808db04163127fa91034bbd6673f7ba9f82f809511ac38bfd635812",
+    "test/extensions/go_router/navigation_observer_test.dart": "470c4a3db882a33e99169a6eb263d5b944ec02e1480ec2dc61f9132d1e92d615",
     "test/extensions/go_router/notification_route_mapper_test.dart": "2460337be4d20fbb83eee37b1a5268e383cbc90417d2d37850d1a4b97b58c07e",
     "test/extensions/go_router/route_guard_test.dart": "0a5ddb911ed69887a4eea9e0aed22c49ceeb8c72e289d962b05838a957900aca",
-    "test/extensions/go_router/route_slot_test.dart": "c1d75afba13bb1da1e3b921cc1d6e1a2b35dbf85562eb76903605c9736ad643c",
+    "test/extensions/go_router/route_slot_test.dart": "b6147f9443ce3e85cdca17990778f4b181cc07b7d5b593018eea4a02607b4cd7",
     "test/extensions/go_router/session_refresh_listenable_test.dart": "dc7eed1d37b50f2a5e2f11bbb6d6af3cc0dc20aae279bc62246a3d7d80a34642",
-    "test/extensions/go_router/test_support.dart": "f6bcc85cf3f83fefa8f89328c319d199cc40b3ae205deff2c78b6a911f16cc0e"
+    "test/extensions/go_router/test_support.dart": "0486ce1bb95c0562f28096757a06fa7ebd4fe5af14e8d11e84849f24b1ff304d"
   }
 }

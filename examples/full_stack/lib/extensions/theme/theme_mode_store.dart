@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 /// Persists the selected [ThemeMode] through the optional [Storage] contract.

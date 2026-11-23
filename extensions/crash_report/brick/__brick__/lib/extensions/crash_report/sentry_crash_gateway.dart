@@ -73,14 +73,14 @@ final class SdkSentryCrashGateway implements CrashReportGateway {
 
   @override
   Future<void> setUser(String? userId) async {
-    Sentry.configureScope(
+    await Sentry.configureScope(
       (scope) => scope.setUser(userId == null ? null : SentryUser(id: userId)),
     );
   }
 
   @override
   Future<void> setContext(String key, Map<String, Object?> value) async {
-    Sentry.configureScope((scope) => scope.setContexts(key, value));
+    await Sentry.configureScope((scope) => scope.setContexts(key, value));
   }
 
   @override

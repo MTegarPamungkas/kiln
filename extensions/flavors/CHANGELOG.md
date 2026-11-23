@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Import package:material_ui instead of the package:flutter/material.dart entry point, which Flutter 3.50 deprecated.
+
 ## 0.1.1
 
 - The module orders itself after the logger, so the release guard can

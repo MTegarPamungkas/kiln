@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Import package:material_ui instead of the package:flutter/material.dart entry point, which Flutter 3.50 deprecated.
+
 ## 0.1.0
 
 - Follow optional PushNotificationOpens taps alongside local notification taps.

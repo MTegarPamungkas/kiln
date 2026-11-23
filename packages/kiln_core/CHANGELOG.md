@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Reject `Registry.unregister` after disposal, matching every other mutator, so
+  it cannot race the owned-disposal pass and the container reset.
+
 ## 0.1.1
 
 - Report dependent modules as unavailable when their provider is filtered by

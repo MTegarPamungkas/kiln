@@ -52,6 +52,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   appwrite: ^28.2.0
   http: ^1.6.0
   shared_preferences: ^2.3.0

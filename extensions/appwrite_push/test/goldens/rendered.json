@@ -4,7 +4,7 @@
     "lib/extensions/appwrite_push/appwrite_push_background.dart": "2a30e05672c72e2032760651272e11acd010be9e29237a71da2801921e4691ad",
     "lib/extensions/appwrite_push/appwrite_push_module.dart": "1ad9158d709682fae25fad9e1109b765145ec8f149342ec4325fdf36d61df11e",
     "lib/extensions/appwrite_push/appwrite_push_transport.dart": "476a51f66c3e830aae1baf7d4113d17837252e248df8e853d538c351867c50d4",
-    "test/extensions/appwrite_push/appwrite_push_contract_test.dart": "1d84f201d4db440b23434dd9703ee16e7cdbf57ebbce3b62de9858313996da2b",
+    "test/extensions/appwrite_push/appwrite_push_contract_test.dart": "184d7faee5b04647f5087adfd23fb68b93dab21a7cc55a834c0940333dbae22c",
     "test/extensions/appwrite_push/appwrite_push_module_test.dart": "8fb0b0c15beb7055c4a62fc62f918b954bd83dda99be5a776b3b54be1f2873e2"
   }
 }

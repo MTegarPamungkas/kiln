@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:full_stack/app/registry_scope.dart';
 import 'package:full_stack/core/l10n/core_copy.dart';
 

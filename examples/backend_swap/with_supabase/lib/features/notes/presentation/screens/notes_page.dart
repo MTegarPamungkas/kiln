@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../../app/registry_scope.dart';
 import '../../domain/entities/note.dart';

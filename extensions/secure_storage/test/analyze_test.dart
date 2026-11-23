@@ -44,6 +44,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   flutter_secure_storage: ^11.2.0
   kiln_core: $coreDependency
 dev_dependencies:

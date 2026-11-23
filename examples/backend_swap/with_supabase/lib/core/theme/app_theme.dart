@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The default Kiln theme used until the `theme` extension replaces it.
 abstract final class AppTheme {

@@ -20,6 +20,7 @@ coverage/
 
 # Local verification logs
 /*.log
+packages/*/*.log
 
 # Local Kiln state
 .kiln/backups/

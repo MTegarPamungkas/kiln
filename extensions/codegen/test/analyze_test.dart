@@ -36,6 +36,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   json_annotation: ^4.12.0
   freezed_annotation: ^3.1.0
 dev_dependencies:

@@ -23,8 +23,8 @@
     "lib/features/notes/presentation/bloc/notes_bloc.dart": "26eed22a8fa54266af79396c2f6a8ec8f26144bf23b878db9d998eb4d01aca37",
     "lib/features/notes/presentation/bloc/notes_event.dart": "0dc4bd0a4eb34ab3108a6ba6b1dfc31c946d8764f6953884d73781c0d1842cde",
     "lib/features/notes/presentation/bloc/notes_state.dart": "a3a92e5333f0ed36ef07d60eae88a5fd14fa29178837f69fa85e7a6091c19e92",
-    "lib/features/notes/presentation/screens/notes_page.dart": "ae84d8ed799938eded30cd3d28495a83649f4c0992f87e9a0b5ba4624e58fbdc",
-    "lib/features/notes/presentation/widgets/note_tile.dart": "886830aafd4820e679b5e38f0c8666c9484b11d073668f0299eb5bad9378bd9c",
+    "lib/features/notes/presentation/screens/notes_page.dart": "43a092da31851340d1057dbb80938b2ba2c3a217779e7e14349138bd05c20582",
+    "lib/features/notes/presentation/widgets/note_tile.dart": "2595e95a256d3c11a64ae97408152dfb1114872576075339ef053303703be195",
     "test/extensions/bloc/bloc_bootstrap_test.dart": "5f5f519f04912e2192bb3a483c0130a2004baa885191f2ee944f50d7273eb66c",
     "test/extensions/bloc/bloc_module_test.dart": "193c5e12df0fa82a9e7709f92f19bfa81f3a10c5c25960461d5d767a2688efc0",
     "test/extensions/bloc/core/bloc/app_bloc_observer_test.dart": "0a7bebf06d855c691437098d72172deed1d6005db628ade9e7594306dc42514f",
@@ -34,6 +34,6 @@
     "test/extensions/bloc/core/bloc/bloc_transformers_test.dart": "a8e8203a359136e0540d0fb7fd4332fa543a45699216d037901c3658c6a87140",
     "test/extensions/bloc/core/bloc/session_bloc_test.dart": "9f41df60f6d8692bd5ee1ea28772a0f29321ed0ee4e2393d1afe45fc873e84ff",
     "test/features/notes/notes_bloc_test.dart": "4e7388e3f288e7c81edc7115508e56752606fcb25b13e62e4c68e0b5f030e829",
-    "test/features/notes/notes_page_test.dart": "c2acc4672e8ba28ba7bf339b003af4931b7cb660d63225b3c4b90645643580c8"
+    "test/features/notes/notes_page_test.dart": "cbb8b6610d15e53748a6ec65b8afb864fd41484632199ab952c791acdd1c092d"
   }
 }

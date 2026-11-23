@@ -138,5 +138,59 @@ void main() {
       expect(const Rollback().latestCommitted(project), isNull);
       expect(Directory('${project.path}/.kiln/backups').existsSync(), isFalse);
     });
+
+    test('a failing history prune keeps the commit and the written files', () {
+      // Fill history past the retention limit, then add one older entry whose
+      // directory name is an id RootPath rejects. Pruning it throws
+      // KilnException from validateId, not FileSystemException.
+      for (var count = 0; count < 11; count++) {
+        Transaction.begin(project)
+          ..writeText('lib/deleted.dart', 'history $count')
+          ..commit();
+      }
+      final backups = Directory('${project.path}/.kiln/backups');
+      final unsafe = Directory('${backups.path}/unsafe id')
+        ..createSync(recursive: true);
+      final unsafeJournal = File('${unsafe.path}/journal.json')
+        ..writeAsStringSync(
+          '{"id": "unsafe id", "status": "committed", "operations": []}',
+        );
+      unsafeJournal.setLastModifiedSync(DateTime.utc(2000));
+
+      final transaction = Transaction.begin(project)
+        ..writeText('lib/existing.dart', 'committed');
+
+      // The committed state is final; retention must not throw at the caller.
+      expect(transaction.commit, returnsNormally);
+      expect(existing.readAsStringSync(), 'committed');
+      expect(unsafe.existsSync(), isTrue, reason: 'prune is best effort');
+      expect(
+        const Rollback().latestCommitted(project),
+        isNotNull,
+        reason: 'history must still be readable after a failed prune',
+      );
+    });
+
+    test('transaction ids are unique within one microsecond', () {
+      final ids = <String>{
+        for (var index = 0; index < 50; index++)
+          Journal.create(project).id,
+      };
+      expect(ids, hasLength(50));
+      for (final id in ids) {
+        expect(RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(id), isTrue);
+      }
+    });
+
+    test('transaction ids avoid an existing journal and snapshot', () {
+      final first = Journal.create(project);
+      first.save();
+      Directory('${project.path}/.kiln/backups/${first.id}')
+          .createSync(recursive: true);
+
+      final second = Journal.create(project);
+      expect(second.id, isNot(first.id));
+      expect(second.file.existsSync(), isFalse);
+    });
   });
 }

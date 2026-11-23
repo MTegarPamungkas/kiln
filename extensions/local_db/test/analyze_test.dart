@@ -44,6 +44,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   sembast: ^3.9.0
   sembast_web: ^2.4.6+1
   path_provider: ^2.1.6

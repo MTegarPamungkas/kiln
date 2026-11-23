@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Await `Sentry.configureScope` calls in `SentryCrashGateway.setUser` and `setContext` to satisfy `unawaited_futures`.
+
 ## 0.1.0
 
 - Close late SDK initialization after disposal, stop disposed reporters

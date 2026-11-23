@@ -49,6 +49,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   local_auth: ^3.0.2
   kiln_core: $coreDependency
 dev_dependencies:

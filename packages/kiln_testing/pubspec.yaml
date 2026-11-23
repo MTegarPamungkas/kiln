@@ -15,6 +15,8 @@ dependencies:
   flutter_test:
     sdk: flutter
   kiln_core: ^0.1.0
+  # Flutter 3.50 deprecated package:flutter/material.dart in favour of this.
+  material_ui: ^1.11.1
   # Loose on purpose: flutter_test pins test_api, so a tight lower bound makes
   # kiln_testing unusable in projects that also run build_runner or freezed.
   test: ">=1.25.0 <2.0.0"

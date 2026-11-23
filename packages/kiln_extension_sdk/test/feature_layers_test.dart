@@ -126,7 +126,7 @@ void main() {
           feature: 'notes',
           layer: FeatureLayer.presentation,
           file: 'screens/notes_page.dart',
-          imports: <String>['package:flutter/material.dart'],
+          imports: <String>['package:material_ui/material_ui.dart'],
         ),
         packageName: 'app',
       );

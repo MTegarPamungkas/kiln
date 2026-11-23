@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 final RegExp _rgbPattern = RegExp(r'^[0-9a-fA-F]{6}$');

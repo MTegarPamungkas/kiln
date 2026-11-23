@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Repack archive with deterministic cross-OS gzip and without root `test/`.
+
 ## 0.1.1
 
 - The module orders itself after secure storage, so protected storage is

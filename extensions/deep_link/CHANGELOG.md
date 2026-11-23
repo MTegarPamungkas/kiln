@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Update the rendered config golden for the custom-scheme host settings added in
+  the previous release.
+
 ## 0.1.1
 
 - Apply route prefixes to custom links, add separate custom-scheme host

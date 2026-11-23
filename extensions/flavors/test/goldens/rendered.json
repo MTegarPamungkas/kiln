@@ -2,7 +2,7 @@
   "extension": "flavors",
   "files": {
     ".vscode/launch.json": "aa6b22bbca4c012008b3e08fae8a51ab65448d2a57d104e1f62b9c78917084d8",
-    "lib/extensions/flavors/app_flavors.dart": "ff6d860e66fda725d52783165685150dbd228251715ea50739632a5003aed536",
+    "lib/extensions/flavors/app_flavors.dart": "6cf14f4c5cc69adc838f0c7d1784dd2da167b38c9bdc5dd100927de88aa5d6ba",
     "lib/extensions/flavors/flavor_x.dart": "38bea40ea3241ec8abb51da9d510202261c031364da7a4315b211ab58e3736dc",
     "lib/extensions/flavors/flavors_module.dart": "599064bc3aea41e6d7b92860ade7fe2aafa88b197d9b1f46fbd0649410b56315",
     "lib/extensions/flavors/flavors_support.dart": "af247b96eff50791e8f093a2933c037607a4ef3c9b80405f4b9798e1ae195734",

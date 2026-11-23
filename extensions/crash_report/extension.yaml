@@ -1,6 +1,6 @@
 id: crash_report
 name: Crash Report
-version: 0.1.0
+version: 0.1.1
 description: Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.
 category: crash
 tier: official

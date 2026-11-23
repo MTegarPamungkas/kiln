@@ -58,6 +58,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.1
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.3

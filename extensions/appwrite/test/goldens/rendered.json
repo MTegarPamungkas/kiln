@@ -30,7 +30,7 @@
     "test/extensions/appwrite/appwrite_account_management_test.dart": "2e2d312c2e668792a543a01bb9c489d70e1c66971ecc7af025912ea98336cece",
     "test/extensions/appwrite/appwrite_auth_test.dart": "2b5ef52f3034cae3303dd25318a10c4d989e6f8e6d31dc10c0046859f07b517d",
     "test/extensions/appwrite/appwrite_config_test.dart": "9a516017164ec13fdf89c19cd08f92accc92ac26a96ed66626c5f27270be8d7c",
-    "test/extensions/appwrite/appwrite_contract_test.dart": "b0733cdb9ffe99a5cb70ee24a7837a4c3c5e6fc1f58838577af9270c435c5008",
+    "test/extensions/appwrite/appwrite_contract_test.dart": "24b6ea39c90b49f6b145128e55c7300a6b5656d20ede17a8f7a1c5573c93bf85",
     "test/extensions/appwrite/appwrite_e2e_test.dart": "208fa0898758906151315e0cdbdea279e65380ffd4763707af327c764d9f9cb2",
     "test/extensions/appwrite/appwrite_failure_mapper_test.dart": "bfc511e07be32c3e46533115db215edf133802aa024ac73f41a304be3dbfeb0f",
     "test/extensions/appwrite/appwrite_file_storage_test.dart": "d5a9af996d032241a82940fec4b24797176e393d115ac24dcb9d6af116be5c49",

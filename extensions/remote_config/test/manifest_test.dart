@@ -15,7 +15,7 @@ void main() {
     expect(manifest.category, 'config');
     expect(manifest.exclusive, isFalse);
     expect(manifest.provides, <String>['remote_config']);
-    expect(manifest.optionalRequires, <String>['flavor']);
+    expect(manifest.optionalRequires, <String>['flavor', 'storage']);
     expect(manifest.dependencies, containsPair('http', '^1.6.0'));
     expect(manifest.platformSetup.android.permissions, <String>[
       'android.permission.INTERNET',

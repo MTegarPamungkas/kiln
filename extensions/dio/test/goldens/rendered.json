@@ -13,7 +13,7 @@
     "lib/extensions/dio/interceptors/request_id_interceptor.dart": "53ac01929736cc329263ec4296a1ad844b005ad651278827dbdec0034afefd82",
     "lib/extensions/dio/interceptors/user_agent_interceptor.dart": "2efa50201a2ce4cb5eaaf8c77e39d84964e40a6890c797aae70955f6accd6211",
     "lib/extensions/dio/multipart_helper.dart": "0936cc2aa9767cb99274a646ae5f0531947c66419a0a941bddbd30b8e9391cb7",
-    "test/extensions/dio/cancellation_test.dart": "1a0fd0762ef9ac5c9c38f47d2230a18ea6c154c6a59b7dd3f028d391fedb5d64",
+    "test/extensions/dio/cancellation_test.dart": "64051e0fb96317142a207fe83ca8e5fbf347420180a9cc50a12138f7f9ae0ae3",
     "test/extensions/dio/dio_client_test.dart": "c614711f8f9453aefa23432f445c33d42ace521be0ff5af5492d973b9b50b8cc",
     "test/extensions/dio/dio_config_test.dart": "5f18dd7e1af559be1e4c34937a1928eca40bf9b96577efe827613001fe50fa2d",
     "test/extensions/dio/dio_failure_mapper_test.dart": "360c09ffaadfd29eac03805d815e4c9a3b19cfebeed6c8ae7af063e700a99842",

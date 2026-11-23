@@ -23,6 +23,7 @@ void main() {
       'token_provider',
       'account_management',
       'push_targets',
+      'appwrite_client',
     ]);
     expect(manifest.optionalRequires, ['secure_storage']);
     expect(manifest.dependencies, contains('appwrite'));

@@ -362,6 +362,7 @@ String _pubspec({
     ..writeln('dependencies:')
     ..writeln('  flutter:')
     ..writeln('    sdk: flutter')
+    ..writeln('  material_ui: ^1.11.1')
     ..writeln('  kiln_core:')
     ..writeln('    path: $core');
   final names = dependencies.keys.toList()..sort();

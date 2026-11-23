@@ -1,6 +1,6 @@
 id: appwrite_push
 name: Appwrite Push
-version: 0.1.1
+version: 0.1.2
 description: Push transport bridging Firebase Cloud Messaging into the push_targets capability on Appwrite.
 category: notifications
 tier: official

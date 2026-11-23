@@ -1,6 +1,6 @@
 id: permission
 name: Permission
-version: 0.1.0
+version: 0.1.1
 description: Typed permission checks and requests with rationale flow.
 category: platform
 tier: official

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Repack archive with deterministic cross-OS gzip and without root `test/`.
+
 ## 0.1.2
 
 - A request deadline flows through `TokenProvider.accessToken` into the refresh

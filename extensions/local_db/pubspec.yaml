@@ -1,6 +1,6 @@
 name: kiln_local_db_extension
 description: Tests and tooling for the local_db Kiln extension.
-version: 0.1.0
+version: 0.1.1
 publish_to: none
 
 environment:

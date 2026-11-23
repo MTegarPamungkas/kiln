@@ -16,6 +16,11 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # kiln_lints sits outside the workspace (see its pubspec); resolve it
+      # before the root `dart analyze`, which also analyzes that package.
+      - name: Resolve kiln_lints
+        working-directory: packages/kiln_lints
+        run: dart pub get
       - run: dart analyze
       - run: dart run tool/lint_extensions.dart
       - run: dart run tool/bundle.dart --check
@@ -24,6 +29,7 @@ jobs:
       - run: dart run tool/registry.dart --check
       - run: dart run tool/check_docs.dart --check
       - run: dart run tool/check_versions.dart --check
+      - run: dart run tool/check_workflows.dart
       - name: kiln_core
         working-directory: packages/kiln_core
         run: dart test
@@ -41,7 +47,12 @@ jobs:
         run: dart test
       - name: kiln_lints
         working-directory: packages/kiln_lints
-        run: dart test
+        # kiln_lints resolves outside the workspace: custom_lint_builder pins
+        # analyzer ^8, which cannot coexist with the analyzer ^14 that the
+        # Flutter SDK's test_api requires. Its own lockfile keeps analyzer 8.
+        run: |
+          dart pub get
+          dart test
       - name: Extension suites
         run: |
           for extension in extensions/*; do
