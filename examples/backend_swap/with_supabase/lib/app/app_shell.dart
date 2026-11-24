@@ -29,11 +29,10 @@ class AppShell extends StatelessWidget {
     final supportedLocales =
         localizations?.supportedLocales ??
         AppLocalizationsConfig.defaultLocales;
+    final theme = themeConfig?.light ?? AppTheme.light;
+    final darkTheme = themeConfig?.dark ?? AppTheme.dark;
 
     Widget buildApp(ThemeMode mode, Locale? locale) {
-      final theme = themeConfig?.light ?? AppTheme.light;
-      final darkTheme = themeConfig?.dark ?? AppTheme.dark;
-
       Widget app;
       if (router != null) {
         app = MaterialApp.router(

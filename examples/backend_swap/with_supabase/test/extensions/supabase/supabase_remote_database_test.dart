@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:with_supabase/extensions/supabase/postgrest_gateway.dart';
+import 'package:with_supabase/extensions/supabase/supabase_realtime_gateway.dart';
 import 'package:with_supabase/extensions/supabase/supabase_remote_database.dart';
 
 import 'test_support.dart';
@@ -181,6 +184,82 @@ void main() {
         ),
       ),
     );
+  });
+
+  group('SdkSupabaseRealtimeGateway.handleSubscribeStatus', () {
+    test('channelError emits a remoteDatabaseUnavailable Failure', () async {
+      final controller = StreamController<Map<String, Object?>?>();
+      final errors = <Object>[];
+      final sub = controller.stream.listen((_) {}, onError: errors.add);
+
+      SdkSupabaseRealtimeGateway.handleSubscribeStatus(
+        status: RealtimeSubscribeStatus.channelError,
+        error: StateError('socket dropped'),
+        table: 'tasks',
+        id: '1',
+        controller: controller,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(errors, hasLength(1));
+      final failure = errors.single as Failure;
+      expect(failure.code, FailureCode.remoteDatabaseUnavailable);
+      expect(failure.kind, FailureKind.network);
+
+      await sub.cancel();
+      await controller.close();
+    });
+
+    test('timedOut emits a retryable networkTimeout Failure', () async {
+      final controller = StreamController<Map<String, Object?>?>();
+      final errors = <Object>[];
+      final sub = controller.stream.listen((_) {}, onError: errors.add);
+
+      SdkSupabaseRealtimeGateway.handleSubscribeStatus(
+        status: RealtimeSubscribeStatus.timedOut,
+        error: null,
+        table: 'tasks',
+        id: '1',
+        controller: controller,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(errors, hasLength(1));
+      final failure = errors.single as Failure;
+      expect(failure.code, FailureCode.networkTimeout);
+      expect(failure.kind, FailureKind.network);
+      expect(failure.isRetryable, isTrue);
+
+      await sub.cancel();
+      await controller.close();
+    });
+
+    test('closed completes the stream cleanly', () async {
+      final controller = StreamController<Map<String, Object?>?>();
+      var done = false;
+      final sub = controller.stream.listen((_) {}, onDone: () => done = true);
+
+      SdkSupabaseRealtimeGateway.handleSubscribeStatus(
+        status: RealtimeSubscribeStatus.subscribed,
+        error: null,
+        table: 'tasks',
+        id: '1',
+        controller: controller,
+      );
+      expect(done, isFalse);
+
+      SdkSupabaseRealtimeGateway.handleSubscribeStatus(
+        status: RealtimeSubscribeStatus.closed,
+        error: null,
+        table: 'tasks',
+        id: '1',
+        controller: controller,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(done, isTrue);
+      await sub.cancel();
+    });
   });
 }
 

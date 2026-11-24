@@ -38,16 +38,16 @@ dependencies:
   kiln_core:
     path: ../../packages/kiln_core
   go_router: ^18.1.4
-  bloc: ^9.2.1
-  flutter_bloc: ^9.1.1
-  bloc_concurrency: ^0.3.0
-  rxdart: ^0.28.0
   dio: ^5.11.1
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.3
-  path_provider: ^2.1.6
   flutter_secure_storage: ^11.2.0
+  bloc: ^9.2.1
+  flutter_bloc: ^9.1.1
+  bloc_concurrency: ^0.3.0
+  rxdart: ^0.28.0
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:

@@ -57,8 +57,9 @@ final class SinkPipeline implements LogSink {
 
   @override
   Future<void> flush() async {
-    while (_inFlight.isNotEmpty) {
-      await Future.wait(_inFlight.toList(growable: false));
+    final pending = _inFlight.toList(growable: false);
+    if (pending.isNotEmpty) {
+      await Future.wait(pending);
     }
     for (final sink in List<LogSink>.of(_sinks)) {
       try {

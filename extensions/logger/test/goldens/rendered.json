@@ -5,7 +5,7 @@
     "lib/extensions/logger/console_logger.dart": "f60b4271258a83110a8c45f86a2e47a05c9916e4f1ad2c0d868aa27028121f04",
     "lib/extensions/logger/file_log_sink.dart": "8d7442e03eb9b0a3c8dde39bddfd5ba507eb89b2484eff27822ab9d6dbbc1550",
     "lib/extensions/logger/file_log_sink_io.dart": "b66e466e87686439635bb758605e804119704eccd9c684d2aba51295ab1aaadf",
-    "lib/extensions/logger/file_log_sink_stub.dart": "97a7513eedda66f36420c448c891b323b6e0f45274906a84d162630993509795",
+    "lib/extensions/logger/file_log_sink_stub.dart": "6db80aac606016c9b82d9e66ecb5db8bdfbc2bae8d9716a232065a5c11fd11de",
     "lib/extensions/logger/gate_logger.dart": "3fbaac9d9ecac0652097d6fb94905fbaa08cb903c8e564993faa121dc75488ea",
     "lib/extensions/logger/http_log_middleware.dart": "f5eca94d75784f88d3f2e23c2406cffdf4b907f46367d7189c675f0e9c5772c4",
     "lib/extensions/logger/log_exporter.dart": "da8dedb648a115a9ba738c9a90b42dcbaf6ad184df1196d0df854168ff54e9fa",

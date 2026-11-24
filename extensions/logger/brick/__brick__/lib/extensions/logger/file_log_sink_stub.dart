@@ -50,10 +50,10 @@ final class FileLogSink implements LogSink {
   Object? lastFailure;
 
   @override
-  FutureOr<void> write(LogRecord record) => null;
+  Future<void> write(LogRecord record) async {}
 
   @override
-  FutureOr<void> flush() => null;
+  Future<void> flush() async {}
 
   /// Returns the content of every retained file; empty on the web.
   Future<String> read() async => '';

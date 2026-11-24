@@ -23,14 +23,27 @@ class RegistryScope extends InheritedWidget {
   static Registry? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<RegistryScope>()?.registry;
 
-  static T read<T extends Object>(BuildContext context) =>
-      of(context).read<T>();
+  static Registry? _peek(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<RegistryScope>()?.registry;
 
-  static T? readOrNull<T extends Object>(BuildContext context) =>
-      of(context).readOrNull<T>();
+  static T read<T extends Object>(BuildContext context) {
+    final registry = _peek(context);
+    if (registry == null) {
+      throw StateError('No RegistryScope found above this widget');
+    }
+    return registry.read<T>();
+  }
+
+  static T? readOrNull<T extends Object>(BuildContext context) {
+    final registry = _peek(context);
+    if (registry == null) {
+      throw StateError('No RegistryScope found above this widget');
+    }
+    return registry.readOrNull<T>();
+  }
 
   static T? maybeReadOrNull<T extends Object>(BuildContext context) =>
-      maybeOf(context)?.readOrNull<T>();
+      _peek(context)?.readOrNull<T>();
 
   @override
   bool updateShouldNotify(RegistryScope oldWidget) =>

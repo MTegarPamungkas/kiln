@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T15:23:16.590822Z",
+  "generated_at": "2026-11-24T15:44:00.951301Z",
   "extensions": [
     {
       "id": "analytics",
@@ -1337,7 +1337,7 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -1380,6 +1380,18 @@
           "version": "0.1.3",
           "url": "archives/logger-0.1.3.tgz",
           "sha256": "df159962c2e0f20a7e1ebc6db8308d1ddb4d32f2b11c519fc249ac3a1d7a3c97",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/logger-0.1.4.tgz",
+          "sha256": "2a4a7a05de29ffb14db4dbcd05416820c5cfb387062a86219a78c0086ba1b4d1",
           "provides": [
             "logger"
           ],

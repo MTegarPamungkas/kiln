@@ -48,7 +48,7 @@ extensions:
       "lib/extensions/l10n/docs/formatting.md": "sha256:0b9145b60f5080461dc399c9b8296361ca30073105b0d5d61b9a8060841d2e36"
       "lib/extensions/l10n/docs/l10n.md": "sha256:98e7083326695c3138a858f9a81b3c723ceff10dd55adcc2dbb5a92992f3eacc"
   supabase:
-    version: "0.1.1"
+    version: "0.1.3"
     source: "bundled"
     dependencies:
       - "supabase_flutter"
@@ -66,7 +66,7 @@ extensions:
       "lib/extensions/supabase/supabase_link_handler.dart": "sha256:4e2fb8b8c5f3a0f9a0460712838630dd947d31fe881215c086151ca8b0e39488"
       "lib/extensions/supabase/supabase_module.dart": "sha256:b62c34c93c3f2fc9afec6e662ed756fcdd7b351636b8441ee534b00693dda8ef"
       "lib/extensions/supabase/supabase_query_mapper.dart": "sha256:3df985efc09c0726e00c45f9fae312d03b7e7181f46b4cd0c705583a8da3de57"
-      "lib/extensions/supabase/supabase_realtime_gateway.dart": "sha256:a9de3b64b64304a805f3842f54904c4131841c336799b28f7e77f0c0b9f817cf"
+      "lib/extensions/supabase/supabase_realtime_gateway.dart": "sha256:33b515b124d5c39c35e0121630b33bfb5900ab1ead02c4cd527c5fb8aa1b687a"
       "lib/extensions/supabase/supabase_remote_database.dart": "sha256:92325df7e0397fb250d02b6d24bd6cb546ddfcbf54bdfe996c123cfc2fb8d2d5"
       "lib/extensions/supabase/supabase_session_bridge.dart": "sha256:e2df15146fdb7cecbb9a2a17f5189ef040ddde97baa6fff9ffe335fd5608cb68"
       "lib/extensions/supabase/supabase_storage_gateway.dart": "sha256:de2f92269b1ea5425879013f689de744d8752befb72828ad501f0c38af308ea8"
@@ -82,7 +82,7 @@ extensions:
       "test/extensions/supabase/supabase_local_rls_test.dart": "sha256:57725f2ee40712fea3a40efb692ce81939beeb8f77a97f78e70babf7e21f93f0"
       "test/extensions/supabase/supabase_module_test.dart": "sha256:1cf7a25c72096954537f8521c921b8e7eef1adf6e2d5209101304ea2cb249017"
       "test/extensions/supabase/supabase_query_mapper_test.dart": "sha256:c7438549b3792fe204f3c543ba3b484ff958c23af1b9467267f629881e9ad5e3"
-      "test/extensions/supabase/supabase_remote_database_test.dart": "sha256:81443f4b379e45a9a0405ad2ff45cd8f702409f0716bfaa64585470f202cbc55"
+      "test/extensions/supabase/supabase_remote_database_test.dart": "sha256:e4c3b94b1fc883cc7413af30948e110f70f4d061adacf1d5a907679bb4d5db46"
       "test/extensions/supabase/supabase_session_bridge_test.dart": "sha256:78100dcb7f4841475d663ae97861491ccf9e5121297528fe6b610f1c54fe0657"
       "test/extensions/supabase/supabase_signed_url_test.dart": "sha256:7cf880b30cde5f370117f6bea86e57baafdcb66abe7fb870319b2fea291393fe"
       "test/extensions/supabase/supabase_storage_url_test.dart": "sha256:0f5596731642220b518b67a51506e5ba975c58b2613681912cbec9817314f0af"

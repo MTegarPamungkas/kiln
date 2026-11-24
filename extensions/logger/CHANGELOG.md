@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Align `FileLogSink` web stub `write`/`flush` return types with `Future<void>`
+  from the IO implementation so conditional imports analyze cleanly.
+
 ## 0.1.3
 
 - Retain queued records in `FileLogSink` across transient write errors with

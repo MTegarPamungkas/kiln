@@ -21,28 +21,39 @@ final class FileLogSink implements LogSink {
     this.fileName = 'app.log',
     this.maxFileBytes = 262144,
     this.maxFiles = 3,
+    this.maxPending = 1000,
+    this.maxWriteAttempts = 3,
+    this.writeRetryDelay = const Duration(milliseconds: 50),
     this.formatter = const LogFormatter(),
     this.clock = const SystemClock(),
     this.onFailure,
   }) : assert(maxFileBytes > 0),
-       assert(maxFiles > 0);
+       assert(maxFiles > 0),
+       assert(maxPending > 0),
+       assert(maxWriteAttempts > 0);
 
   final String? directoryPath;
   final String fileName;
   final int maxFileBytes;
   final int maxFiles;
+  final int maxPending;
+  final int maxWriteAttempts;
+  final Duration writeRetryDelay;
   final LogFormatter formatter;
   final Clock clock;
   final SinkFailureWriter? onFailure;
+
+  /// Number of records dropped because the pending buffer reached [maxPending].
+  int get droppedCount => 0;
 
   /// Last failure reported by this sink, if any.
   Object? lastFailure;
 
   @override
-  FutureOr<void> write(LogRecord record) => null;
+  Future<void> write(LogRecord record) async {}
 
   @override
-  FutureOr<void> flush() => null;
+  Future<void> flush() async {}
 
   /// Returns the content of every retained file; empty on the web.
   Future<String> read() async => '';

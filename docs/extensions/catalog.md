@@ -27,7 +27,7 @@ This catalog is generated from extension manifests by
 | `image_picker` | Image picker | 0.1.1 | media | official | `media` |
 | `l10n` | Localization | 0.1.2 | l10n | official | `l10n` |
 | `local_db` | Local database | 0.1.5 | database | official | `local_db` |
-| `logger` | Logger | 0.1.3 | logging | official | `logger` |
+| `logger` | Logger | 0.1.4 | logging | official | `logger` |
 | `notifications` | Notifications | 0.1.3 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.1 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.2 | config | official | `remote_config` |
