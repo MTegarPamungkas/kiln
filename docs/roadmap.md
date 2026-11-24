@@ -47,8 +47,9 @@
 - [x] `kiln store search/info/install`, multi-version upgrade with a migration
       runner.
 - [x] `kiln ext publish` and the registry version of `kiln ext pack`.
-- [x] `kiln_lints` with five base rules, running on analyzer 8 until
-      `custom_lint_builder` supports analyzer 14.
+- [x] `kiln_lints` with five base rules on `analysis_server_plugin`
+      (`analyzer 14`), running directly inside `dart analyze` and
+      `flutter analyze`.
 
 ## Phase 4 — Quality and scale
 

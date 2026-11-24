@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 /// Appwrite connection settings rendered from the install prompts.
@@ -7,6 +8,7 @@ final class AppwriteConfig {
     this.projectId = 'kiln_demo',
     this.databaseId = 'kiln',
     this.bucketId = 'kiln_files',
+    this.oAuthRedirectUrl,
   });
 
   /// Values the Kiln installer writes into the application.
@@ -29,15 +31,24 @@ final class AppwriteConfig {
   /// Bucket that backs [FileStorage].
   final String bucketId;
 
+  /// Web-only override for a subdirectory deployment or custom callback page.
+  /// It must use the application's origin. Native login uses the SDK default.
+  final String? oAuthRedirectUrl;
+
   Uri get endpointUri => Uri.parse(endpoint);
 
   /// Whether the endpoint uses cleartext http, as self-hosted Appwrite often does.
   bool get isInsecureTransport =>
       Uri.tryParse(endpoint)?.isScheme('http') ?? false;
 
-  /// Callback URL scheme Appwrite always accepts for OAuth redirects. The SDK
-  /// reads the session secret from the deep link that reopens the app here.
-  String get oAuthSuccessUrl => 'appwrite-callback-$projectId://';
+  /// Web callback page, or the native scheme used to validate callback setup.
+  /// The native launcher omits redirect overrides when calling the SDK so the
+  /// server's default redirect includes the session credentials.
+  String get oAuthSuccessUrl =>
+      oAuthRedirectUrl ??
+      (kIsWeb
+          ? Uri.base.resolve('/kiln_appwrite_auth.html').toString()
+          : 'appwrite-callback-$projectId://');
 
   /// Rejects values the Appwrite client cannot be built from.
   void validate() {

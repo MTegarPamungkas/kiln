@@ -40,6 +40,13 @@ final class AppwriteQueryMapper {
     if (query.offset > 0) {
       queries.add(Query.offset(query.offset));
     }
+    final cursor = query.cursor;
+    if (cursor != null) {
+      if (cursor.trim().isEmpty || query.offset != 0) {
+        throw _invalid('Use a non-empty row cursor without an offset.');
+      }
+      queries.add(Query.cursorAfter(cursor));
+    }
     return List<String>.unmodifiable(queries);
   }
 

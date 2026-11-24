@@ -9,6 +9,7 @@ import 'package:yaml/yaml.dart';
 Future<void> main(List<String> arguments) async {
   final json = arguments.contains('--json');
   final check = arguments.contains('--check');
+  final includeMinor = arguments.contains('--minor');
   final root = Directory.current;
   final packages = <String, String>{};
 
@@ -23,14 +24,16 @@ Future<void> main(List<String> arguments) async {
     if (document is! YamlMap) {
       continue;
     }
-    final dependencies = document['dependencies'];
-    if (dependencies is! YamlMap) {
-      continue;
-    }
-    for (final entry in dependencies.entries) {
-      final value = entry.value;
-      if (value is String && value.trim().isNotEmpty) {
-        packages.putIfAbsent('${entry.key}', () => value.trim());
+    for (final section in const <String>['dependencies', 'dev_dependencies']) {
+      final dependencies = document[section];
+      if (dependencies is! YamlMap) {
+        continue;
+      }
+      for (final entry in dependencies.entries) {
+        final value = entry.value;
+        if (value is String && value.trim().isNotEmpty) {
+          packages.putIfAbsent('${entry.key}', () => value.trim());
+        }
       }
     }
   }
@@ -39,24 +42,48 @@ Future<void> main(List<String> arguments) async {
   final drift = <Map<String, Object?>>[];
   final unavailable = <String>[];
   try {
-    for (final entry in packages.entries) {
-      final latest = await _latestVersion(client, entry.key);
-      if (latest == null) {
-        unavailable.add(entry.key);
-        continue;
-      }
-      final VersionConstraint constraint;
-      try {
-        constraint = VersionConstraint.parse(entry.value);
-      } on FormatException {
-        continue;
-      }
-      if (!constraint.allows(latest)) {
-        drift.add(<String, Object?>{
-          'package': entry.key,
-          'constraint': entry.value,
-          'latest': latest.toString(),
-        });
+    final entries = packages.entries.toList(growable: false);
+    const batchSize = 8;
+    for (var i = 0; i < entries.length; i += batchSize) {
+      final batch = entries.sublist(
+        i,
+        i + batchSize > entries.length ? entries.length : i + batchSize,
+      );
+      final results = await Future.wait(
+        batch.map(
+          (entry) async =>
+              (entry: entry, latest: await _latestVersion(client, entry.key)),
+        ),
+      );
+      for (final result in results) {
+        final entry = result.entry;
+        final latest = result.latest;
+        if (latest == null) {
+          unavailable.add(entry.key);
+          continue;
+        }
+        final VersionConstraint constraint;
+        try {
+          constraint = VersionConstraint.parse(entry.value);
+        } on FormatException {
+          continue;
+        }
+        final isMajorDrift = !constraint.allows(latest);
+        final isMinorDrift =
+            includeMinor &&
+            !isMajorDrift &&
+            entry.value.startsWith('^') &&
+            constraint is VersionRange &&
+            constraint.min != null &&
+            constraint.min! < latest;
+        if (isMajorDrift || isMinorDrift) {
+          drift.add(<String, Object?>{
+            'package': entry.key,
+            'constraint': entry.value,
+            'latest': latest.toString(),
+            'kind': isMajorDrift ? 'major' : 'minor',
+          });
+        }
       }
     }
   } finally {
@@ -80,7 +107,7 @@ Future<void> main(List<String> arguments) async {
     stdout.writeln('Dependency drift:');
     for (final entry in drift) {
       stdout.writeln(
-        '  ${entry['package']} ${entry['constraint']} -> ${entry['latest']}',
+        '  ${entry['package']} ${entry['constraint']} -> ${entry['latest']} (${entry['kind']})',
       );
     }
   }

@@ -75,8 +75,7 @@ final class SupabaseQueryMapper {
     if (operator == null) {
       throw Failure(
         code: FailureCode.validationUnsupportedValue,
-        message:
-            'Operator ${filter.operator.name} is not supported by PostgREST yet.',
+        message: 'Operator ${filter.operator.name} is not supported by PostgREST yet.',
         kind: FailureKind.validation,
         details: <String, Object?>{'field': filter.field},
       );

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T16:31:04.111007Z",
+  "generated_at": "2026-11-24T12:20:15.508992Z",
   "extensions": [
     {
       "id": "analytics",
       "name": "Analytics",
       "description": "PostHog product analytics with consent gating and PII scrubbing.",
       "category": "analytics",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -33,6 +33,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/analytics-0.1.2.tgz",
+          "sha256": "6f6b74c15705ea9243a59f83548cbd917efeab0b980ef26e70caad60b05fac45",
+          "provides": [
+            "analytics"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -41,7 +53,7 @@
       "name": "Appwrite",
       "description": "Appwrite auth, social sign-in, remote database, file storage, and cloud function backends.",
       "category": "auth",
-      "latest": "0.3.3",
+      "latest": "0.3.4",
       "tier": "official",
       "versions": [
         {
@@ -169,6 +181,26 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.3.4",
+          "url": "archives/appwrite-0.3.4.tgz",
+          "sha256": "4f84db732375e39c18b6baca28d5cafbd85b7ef9153726936fa9803e333275e4",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "functions",
+            "token_provider",
+            "account_management",
+            "push_targets",
+            "appwrite_client"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -177,7 +209,7 @@
       "name": "Appwrite Push",
       "description": "Push transport bridging Firebase Cloud Messaging into the push_targets capability on Appwrite.",
       "category": "notifications",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -224,6 +256,21 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/appwrite_push-0.1.3.tgz",
+          "sha256": "6c9e3d1706910ef2aca033b596ed85cce18916a73907226c74fa84679966638a",
+          "requires": [
+            "push_targets"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -232,7 +279,7 @@
       "name": "Appwrite Native Push",
       "description": "Push transport over Appwrite Push (MQTT), without Firebase or device tokens.",
       "category": "notifications",
-      "latest": "0.2.2",
+      "latest": "0.2.3",
       "tier": "official",
       "versions": [
         {
@@ -284,6 +331,21 @@
           "version": "0.2.2",
           "url": "archives/appwrite_push_native-0.2.2.tgz",
           "sha256": "d4edb1c6bd17f63fb863d0f234da24aef1b98afab0bd214e8434f005394b4fb7",
+          "requires": [
+            "appwrite_client"
+          ],
+          "provides": [
+            "push_transport"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.3",
+          "url": "archives/appwrite_push_native-0.2.3.tgz",
+          "sha256": "0148deeba5f3b8663dee2bf3402a342c11d2928022ea2c15cc05111697923f54",
           "requires": [
             "appwrite_client"
           ],
@@ -348,7 +410,7 @@
       "name": "Bloc state management",
       "description": "State management with Bloc on a clean architecture feature layout.",
       "category": "state",
-      "latest": "0.2.2",
+      "latest": "0.2.3",
       "tier": "official",
       "versions": [
         {
@@ -398,6 +460,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.2.3",
+          "url": "archives/bloc-0.2.3.tgz",
+          "sha256": "0d92ee642fbbcecb4a9ae563a261dc22b38ec55064bd02844674237dbcf7be4f",
+          "provides": [
+            "state_bloc"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -440,7 +514,7 @@
       "name": "Codegen",
       "description": "JSON model code generation with json_serializable and freezed, wired through build_runner.",
       "category": "codegen",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -459,6 +533,18 @@
           "version": "0.1.1",
           "url": "archives/codegen-0.1.1.tgz",
           "sha256": "bef70b1be66c0ed1d1d8e6a2988d313e20c6703c0b6416ded6a7fd02825b254f",
+          "provides": [
+            "codegen"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/codegen-0.1.2.tgz",
+          "sha256": "5a58675609ee366c7baa1217ee5b8558d49edd86fd3678bb57c0e45e94a88198",
           "provides": [
             "codegen"
           ],
@@ -532,7 +618,7 @@
       "name": "Crash Report",
       "description": "Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.",
       "category": "crash",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -551,6 +637,18 @@
           "version": "0.1.1",
           "url": "archives/crash_report-0.1.1.tgz",
           "sha256": "6f030993f34f69a590d69498d328db137c5fdcade23e80690846088c67c49093",
+          "provides": [
+            "crash_reporter"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/crash_report-0.1.2.tgz",
+          "sha256": "2af63a48c6b5a0b5e4e7bfe11b7b61a9c1942e5ca6304459301d245837826a6f",
           "provides": [
             "crash_reporter"
           ],
@@ -708,7 +806,7 @@
       "name": "Firebase",
       "description": "Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.",
       "category": "auth",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -749,6 +847,24 @@
           "version": "0.1.2",
           "url": "archives/firebase-0.1.2.tgz",
           "sha256": "7923b80ac35a75a861130159a2821d494daeae5d531c55eca5ee526e13f721b5",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage",
+            "token_provider",
+            "account_management"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0",
+            "flutter": ">=3.35.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/firebase-0.1.3.tgz",
+          "sha256": "197388fa41716c7c4fc6174c6642b163a67bb2036c97894f534e0fff9c97e849",
           "provides": [
             "auth",
             "social_auth",
@@ -816,7 +932,7 @@
       "name": "Geolocation",
       "description": "Device location with permission-aware reads and streaming updates.",
       "category": "location",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -842,6 +958,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/geolocation-0.1.2.tgz",
+          "sha256": "b47143b613790c33e610567dc291ef6f328e1d20fc111bcf32c6b9eb43f7c6ca",
+          "provides": [
+            "location"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -850,7 +978,7 @@
       "name": "GoRouter",
       "description": "Declarative routing with route slots, guards, and deep link mapping.",
       "category": "navigation",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -869,6 +997,18 @@
           "version": "0.1.1",
           "url": "archives/go_router-0.1.1.tgz",
           "sha256": "6af5a923d0004bb7443248c7a37eb86746ce5dab1ad979d1310ea4e160786cda",
+          "provides": [
+            "navigation"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/go_router-0.1.2.tgz",
+          "sha256": "fe008168a67d7eb8ae2074de544b74f0192d4328736a6709a4f737e55b107f36",
           "provides": [
             "navigation"
           ],
@@ -1058,7 +1198,7 @@
       "name": "Local database",
       "description": "Offline-first document database backed by Sembast.",
       "category": "database",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -1077,6 +1217,18 @@
           "version": "0.1.1",
           "url": "archives/local_db-0.1.1.tgz",
           "sha256": "7ad96032fb2893614ec127fc35dba71172682b9241904764bc9199eb61b65eba",
+          "provides": [
+            "local_db"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/local_db-0.1.2.tgz",
+          "sha256": "2dce8527c8eed28b49b18bf0a6683ac9088f1fb52d8ccb74c525721176110a8a",
           "provides": [
             "local_db"
           ],
@@ -1126,7 +1278,7 @@
       "name": "Notifications",
       "description": "Local notifications with channels, scheduling, and tap routing.",
       "category": "notifications",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -1157,6 +1309,18 @@
           "version": "0.1.2",
           "url": "archives/notifications-0.1.2.tgz",
           "sha256": "47973971a513e1c6e0ff38bbd9ddc61f5ad69e8b416d9afa6a3b8f2f59a88203",
+          "provides": [
+            "notifications"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/notifications-0.1.3.tgz",
+          "sha256": "3de3fcc21efa67e50b3683517caf69eab220613febec570e6e2b7f0252915efe",
           "provides": [
             "notifications"
           ],
@@ -1330,7 +1494,7 @@
       "name": "Riverpod state management",
       "description": "State management with Riverpod providers and notifiers on a clean architecture feature layout.",
       "category": "state",
-      "latest": "0.2.2",
+      "latest": "0.2.3",
       "tier": "official",
       "versions": [
         {
@@ -1373,6 +1537,18 @@
           "version": "0.2.2",
           "url": "archives/riverpod-0.2.2.tgz",
           "sha256": "c1b9ef8a557c2906cbdf1bf806b10cec71a7d690d1f9a67d1985a6656c03748f",
+          "provides": [
+            "state_riverpod"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.2.3",
+          "url": "archives/riverpod-0.2.3.tgz",
+          "sha256": "e21d168e542f7ec10a625bf451f3ec9b74b6a383388bc8002ca335e30d6b62da",
           "provides": [
             "state_riverpod"
           ],

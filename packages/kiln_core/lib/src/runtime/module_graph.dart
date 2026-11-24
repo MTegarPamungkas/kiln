@@ -85,6 +85,42 @@ final class ModuleGraph {
     return List<KilnModule>.unmodifiable(ordered);
   }
 
+  /// Groups resolved modules into dependency waves where every module in the
+  /// same wave is independent of the others and may initialize concurrently.
+  List<List<KilnModule>> resolveWaves({
+    Set<String> availableCapabilities = const <String>{},
+    Set<String> unavailableCapabilities = const <String>{},
+  }) {
+    final ordered = resolve(
+      availableCapabilities: availableCapabilities,
+      unavailableCapabilities: unavailableCapabilities,
+    );
+    if (ordered.isEmpty) {
+      return const <List<KilnModule>>[];
+    }
+    final capabilityWave = <String, int>{};
+    final waves = <List<KilnModule>>[];
+    for (final module in ordered) {
+      var wave = 0;
+      for (final cap in <String>{...module.requires, ...module.optionalRequires}) {
+        final providerWave = capabilityWave[cap];
+        if (providerWave != null && providerWave + 1 > wave) {
+          wave = providerWave + 1;
+        }
+      }
+      while (waves.length <= wave) {
+        waves.add(<KilnModule>[]);
+      }
+      waves[wave].add(module);
+      for (final cap in module.provides) {
+        capabilityWave[cap] = wave;
+      }
+    }
+    return List<List<KilnModule>>.unmodifiable(
+      waves.map(List<KilnModule>.unmodifiable),
+    );
+  }
+
   Map<String, KilnModule> _buildProviderIndex() {
     final providers = <String, KilnModule>{};
     final ids = <String>{};

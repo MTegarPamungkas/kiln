@@ -23,11 +23,12 @@ void main() {
     expect(gate.locale, isNull);
 
     final result = await gate.setLocale(Locale('id'));
-    expect(result, isA<Ok<void>>());
+    expect(result, isA<Ok<PersistOutcome>>());
+    expect(result.valueOrNull, PersistOutcome.notConfigured);
     expect(gate.locale, Locale('id'));
 
     final follow = await gate.followSystemLocale();
-    expect(follow, isA<Ok<void>>());
+    expect(follow, isA<Ok<PersistOutcome>>());
     expect(gate.locale, isNull);
   });
 }

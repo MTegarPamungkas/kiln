@@ -11,6 +11,7 @@ final class AppRouterConfig {
     this.errorBuilder,
     this.observers = const <NavigatorObserver>[],
     this.enableAuthRedirect = false,
+    this.sessionLoadingBuilder,
   });
 
   /// Location shown when the platform does not provide one.
@@ -22,6 +23,10 @@ final class AppRouterConfig {
   /// login wall; public pages can then keep `false` and guard specific routes
   /// with their own `RouteGuard`.
   final bool enableAuthRedirect;
+
+  /// Screen shown while session restoration is pending, before protected pages
+  /// or the sign-in page can be built. Defaults to a progress indicator.
+  final WidgetBuilder? sessionLoadingBuilder;
 
   /// Prints go_router diagnostics for every navigation decision.
   ///

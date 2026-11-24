@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Update dependency constraints (`sembast` `^3.10.1`, `sembast_web` `^2.4.7`).
+
 ## 0.1.1
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

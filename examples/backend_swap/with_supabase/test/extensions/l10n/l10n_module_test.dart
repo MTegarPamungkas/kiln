@@ -1,9 +1,9 @@
 import 'dart:ui' show PlatformDispatcher;
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:kiln_testing/kiln_testing.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:with_supabase/core/error/failure_presenter.dart';
 import 'package:with_supabase/core/l10n/app_localizations_config.dart';
 import 'package:with_supabase/core/l10n/core_copy.dart';
@@ -20,7 +20,7 @@ void main() {
   test('registers the ARB localization seam without storage', () {
     final registry = GetItRegistry();
 
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
 
     final config = registry.read<L10nConfig>();
     final controller = registry.read<LocaleController>();
@@ -32,9 +32,43 @@ void main() {
     expect(app.currentLocale, isNull);
     expect(app.localeListenable, same(controller.localeListenable));
     expect(app.delegates, contains(AppLocalizations.delegate));
+    expect(app.delegates, contains(GlobalMaterialLocalizations.delegate));
     expect(registry.read<FailureMessages>(), isA<L10nFailureMessages>());
     expect(registry.read<L10nSupport>(), isA<L10nSupport>());
     expect(registry.read<CoreCopy>(), isA<LocalizedCoreCopy>());
+  });
+
+  testWidgets('provides material_ui MaterialLocalizations for non-English locales', (
+    tester,
+  ) async {
+    final registry = GetItRegistry();
+    L10nModule().register(registry);
+    final app = registry.read<AppLocalizationsConfig>();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('id'),
+        supportedLocales: app.supportedLocales,
+        localizationsDelegates: app.delegates,
+        home: Scaffold(appBar: AppBar(title: const Text('Uji'))),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Uji'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  test('module disposes its controller once', () async {
+    final registry = GetItRegistry();
+    final module = L10nModule()..register(registry);
+    final controller = registry.read<LocaleController>();
+
+    await module.dispose();
+    await module.dispose();
+    await controller.setLocale(const Locale('en'));
+
+    expect(controller.locale, isNull);
   });
 
   test('registers LocaleStore when Storage is available', () {
@@ -42,14 +76,14 @@ void main() {
     final storage = InMemoryStorage();
     registry.registerSingleton<Storage>(storage);
 
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
 
     expect(registry.read<LocaleStore>().storage, same(storage));
   });
 
   test('current locale follows the controller listenable', () async {
     final registry = GetItRegistry();
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
     final app = registry.read<AppLocalizationsConfig>();
     final controller = registry.read<LocaleController>();
 
@@ -67,7 +101,7 @@ void main() {
 
   test('failure messages follow the platform locale by default', () {
     final registry = GetItRegistry();
-    const L10nModule().register(registry);
+    L10nModule().register(registry);
 
     final expected = lookupAppLocalizations(
       L10nConfig.defaults.resolve(PlatformDispatcher.instance.locale),
@@ -87,8 +121,8 @@ void main() {
     final registry = GetItRegistry();
     registry.registerSingleton<Storage>(storage);
 
-    const L10nModule().register(registry);
-    await const L10nModule().ready(registry);
+    L10nModule().register(registry);
+    await L10nModule().ready(registry);
 
     expect(registry.read<LocaleController>().locale, const Locale('en'));
   });
@@ -97,8 +131,8 @@ void main() {
     final registry = GetItRegistry();
     registry.registerSingleton<Storage>(_ThrowingStorage());
 
-    const L10nModule().register(registry);
-    await const L10nModule().ready(registry);
+    L10nModule().register(registry);
+    await L10nModule().ready(registry);
 
     expect(registry.read<LocaleController>().locale, isNull);
   });

@@ -19,6 +19,10 @@ final response = await client.get(Uri.parse('/users'));
 
 Relative paths are resolved against the configured `base_url`.
 
+Every HTTP response the server sends is returned, including 4xx and 5xx;
+status policy belongs to middleware or the calling adapter. Transport failures
+(timeouts, connection errors, cancellation) throw `Failure` instead.
+
 ## API key
 
 Configure where the key goes, then pass the key at build time:
@@ -31,7 +35,11 @@ flutter run --dart-define=KILN_API_KEY=secret
 ```
 
 Use `api_key_query=key` instead of a header when the API expects the key in the
-query string. `api_key_prefix` supports values such as `Bearer `.
+query string. `api_key_prefix` supports values such as `Bearer `. The key is
+only sent to requests whose resolved URL matches the `base_url` scheme, host,
+and port; third-party URLs never receive it. See
+[docs/cancellation-and-uploads.md](docs/cancellation-and-uploads.md) for
+cancellation, multipart, and download helpers.
 
 ## Gate
 

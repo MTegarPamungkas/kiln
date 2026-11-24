@@ -1,6 +1,6 @@
 id: crash_report
 name: Crash Report
-version: 0.1.1
+version: 0.1.2
 description: Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs from the logger.
 category: crash
 tier: official
@@ -11,7 +11,7 @@ optional_requires:
   - flavor
   - http_pipeline
 dependencies:
-  sentry_flutter: ^10.3.0
+  sentry_flutter: ^10.6.0
 prompts:
   - name: dsn
     type: secret

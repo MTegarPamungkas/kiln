@@ -76,25 +76,39 @@ final class AppwriteRemoteDatabase implements RemoteDatabase {
 
   @override
   Stream<Map<String, Object?>?> watch(String collection, String id) {
-    return realtime
-        .watch(tableId: collection, rowId: id)
-        .transform(
-          StreamTransformer<
-            Map<String, Object?>?,
-            Map<String, Object?>?
-          >.fromHandlers(
-            handleError: (error, stackTrace, sink) {
-              sink.addError(
-                _failures.map(
-                  error,
-                  scope: AppwriteFailureScope.database,
-                  stackTrace: stackTrace,
-                ),
-                stackTrace,
-              );
-            },
-          ),
-        );
+    return Stream<Map<String, Object?>?>.multi((controller) {
+      try {
+        final subscription = realtime
+            .watch(tableId: collection, rowId: id)
+            .listen(
+              controller.addSync,
+              onError: controller.addErrorSync,
+              onDone: controller.closeSync,
+            );
+        controller.onCancel = subscription.cancel;
+        controller.onPause = subscription.pause;
+        controller.onResume = subscription.resume;
+      } on Object catch (error, stackTrace) {
+        controller.addErrorSync(error, stackTrace);
+        controller.closeSync();
+      }
+    }).transform(
+      StreamTransformer<
+        Map<String, Object?>?,
+        Map<String, Object?>?
+      >.fromHandlers(
+        handleError: (error, stackTrace, sink) {
+          sink.addError(
+            _failures.map(
+              error,
+              scope: AppwriteFailureScope.database,
+              stackTrace: stackTrace,
+            ),
+            stackTrace,
+          );
+        },
+      ),
+    );
   }
 
   Future<T> _guard<T>(Future<T> Function() operation) async {

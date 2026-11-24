@@ -207,8 +207,20 @@ final class SdkSupabaseGateway implements SupabaseGateway {
   Future<void> signOut() {
     return _guard(
       () async {
-        await _auth.signOut();
+        Object? remoteError;
+        StackTrace? remoteStack;
+        try {
+          await _auth.signOut();
+        } catch (error, stackTrace) {
+          // Signing out offline still has to clear the local SDK session.
+          remoteError = error;
+          remoteStack = stackTrace;
+          await _auth.signOut(scope: SignOutScope.local);
+        }
         _refreshedUser = null;
+        if (remoteError != null) {
+          Error.throwWithStackTrace(remoteError, remoteStack!);
+        }
       },
       code: FailureCode.authSessionExpired,
       kind: FailureKind.session,
@@ -328,8 +340,7 @@ final class SdkSupabaseGateway implements SupabaseGateway {
         if (email == null || email.isEmpty) {
           throw const Failure(
             code: FailureCode.authSessionExpired,
-            message:
-                'There is no active session to send an email verification.',
+            message: 'There is no active session to send an email verification.',
             kind: FailureKind.session,
           );
         }
@@ -386,8 +397,7 @@ final class SdkSupabaseGateway implements SupabaseGateway {
     if (mapped == null) {
       throw const Failure(
         code: FailureCode.authSessionExpired,
-        message:
-            'The Supabase session is unavailable after the auth operation.',
+        message: 'The Supabase session is unavailable after the auth operation.',
         kind: FailureKind.session,
       );
     }

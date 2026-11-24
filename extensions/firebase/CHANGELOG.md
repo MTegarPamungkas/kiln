@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Update Firebase dependency constraints (`cloud_firestore` `^7.2.0`, `firebase_auth` `^7.1.0`, `firebase_core` `^5.2.0`, `firebase_storage` `^14.1.0`).
+
 ## 0.1.2
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

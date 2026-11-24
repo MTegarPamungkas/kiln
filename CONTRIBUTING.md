@@ -43,9 +43,8 @@ dart run tool/bundle.dart --check
 ## Dependencies
 
 Use the newest versions the toolchain can resolve. Run
-`flutter pub outdated`; do not downgrade a version without a reason. The two
-pins documented in `README.md` (`test` and `kiln_lints`) follow the Flutter SDK
-and `custom_lint`.
+`flutter pub outdated`; do not downgrade a version without a reason. The `test`
+pin documented in `README.md` follows the Flutter SDK.
 
 ## Pull requests
 

@@ -23,8 +23,16 @@ final class EnvSchema {
   const EnvSchema({required this.keys});
 
   static const allKeys = <EnvKeySpec>[
-    EnvKeySpec(name: 'api_base_url', type: EnvValueType.uri, required: true),
-    EnvKeySpec(name: 'api_key', type: EnvValueType.string, secret: true),
+    EnvKeySpec(
+      name: 'api_base_url',
+      type: EnvValueType.uri,
+      required: true,
+    ),
+    EnvKeySpec(
+      name: 'api_key',
+      type: EnvValueType.string,
+      secret: true,
+    ),
     EnvKeySpec(name: 'feature_flags', type: EnvValueType.string),
     EnvKeySpec(name: 'enable_debug_tools', type: EnvValueType.boolValue),
   ];
@@ -34,6 +42,7 @@ final class EnvSchema {
     'api_key',
     'feature_flags',
     'enable_debug_tools',
+    
   };
 
   static final defaults = EnvSchema(

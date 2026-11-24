@@ -1,6 +1,6 @@
 id: geolocation
 name: Geolocation
-version: 0.1.1
+version: 0.1.2
 description: Device location with permission-aware reads and streaming updates.
 category: location
 tier: official
@@ -10,7 +10,7 @@ provides:
 optional_requires:
   - permission
 dependencies:
-  geolocator: ^14.0.1
+  geolocator: ^14.1.2
 platforms:
   - android
   - ios

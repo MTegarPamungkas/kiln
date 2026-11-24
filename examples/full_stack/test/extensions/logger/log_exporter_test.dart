@@ -8,9 +8,7 @@ import 'package:full_stack/extensions/logger/memory_log_sink.dart';
 
 void main() {
   test('merges memory and file logs in redacted form', () async {
-    final directory = await Directory.systemTemp.createTemp(
-      'kiln_logger_export_',
-    );
+    final directory = await Directory.systemTemp.createTemp('kiln_logger_export_');
     addTearDown(() async {
       if (directory.existsSync()) {
         await directory.delete(recursive: true);
@@ -18,7 +16,7 @@ void main() {
     });
     final clock = FixedClock(DateTime.utc(2026, 2, 3, 4, 5, 6));
     final memory = MemoryLogSink();
-    memory.write(
+    await memory.write(
       LogRecord(
         level: LogLevel.info,
         message: 'memory andi@example.com',
@@ -35,7 +33,11 @@ void main() {
     );
     await file.flush();
 
-    final exporter = LogExporter(memory: memory, file: file, clock: clock);
+    final exporter = LogExporter(
+      memory: memory,
+      file: file,
+      clock: clock,
+    );
     final report = await exporter.export();
 
     expect(report, contains('generated: 2026-02-03T04:05:06.000Z'));
@@ -48,14 +50,14 @@ void main() {
   });
 
   test('exports memory only when no file sink is attached', () async {
-    final memory = MemoryLogSink()
-      ..write(
-        LogRecord(
-          level: LogLevel.info,
-          message: 'only memory',
-          timestamp: DateTime.utc(2026, 1, 1),
-        ),
-      );
+    final memory = MemoryLogSink();
+    await memory.write(
+      LogRecord(
+        level: LogLevel.info,
+        message: 'only memory',
+        timestamp: DateTime.utc(2026, 1, 1),
+      ),
+    );
     final exporter = LogExporter(memory: memory);
 
     final report = await exporter.export();

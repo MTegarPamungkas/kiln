@@ -84,49 +84,65 @@ abstract final class KilnBootstrap {
         activeModules.expand((module) => module.provides),
       );
 
-      final ordered = ModuleGraph(activeModules).resolve(
+      final waves = ModuleGraph(activeModules).resolveWaves(
         availableCapabilities: capabilities,
         unavailableCapabilities: platformBlocked,
       );
       final available = <String>{...capabilities};
-      for (final module in ordered) {
-        final missing = module.requires.difference(available);
-        if (missing.intersection(platformBlocked).isEmpty) {
-          lifecycle.addDisposeCallback(module.dispose);
-          module.register(registry);
-        } else {
-          // A filtered provider has no registrations for dependents to read.
-          platformBlocked.addAll(module.provides);
+      for (final wave in waves) {
+        final waveEntries = <({KilnModule module, Set<String> missing})>[];
+        for (final module in wave) {
+          final missing = module.requires.difference(available);
+          if (missing.intersection(platformBlocked).isEmpty) {
+            lifecycle.addDisposeCallback(module.dispose);
+            module.register(registry);
+          } else {
+            // A filtered provider has no registrations for dependents to read.
+            platformBlocked.addAll(module.provides);
+          }
+          waveEntries.add((module: module, missing: missing));
         }
-        final info = missing.isEmpty
-            ? await _probeSupport(module, registry, supportTimeout)
-            : SupportInfo.unsupported(
-                SupportState.unavailable,
-                message:
-                    '${module.id} requires unavailable capabilities: '
-                    '${missing.join(', ')}.',
-                details: <String, Object?>{
-                  'missing_capabilities': missing.toList(),
-                },
-              );
-        support.record(module.id, info);
-        if (info.isSupported) {
-          await Future<void>.sync(() => module.ready(registry))
-              .timeout(timeout);
-        }
-        // ready() may downgrade support after an initialization failure.
-        final effective = support[module.id] ?? info;
-        if (effective.isSupported) {
-          available.addAll(module.provides);
-          onModuleReady?.call(module);
-        } else if (module.requiredForStartup) {
-          // A required module must stop startup with the typed reason instead of
-          // leaving an invalid backend looking ready.
-          throw effective.toFailure(
-            message:
-                'Required module ${module.id} is unavailable: '
-                '${effective.message}',
-          );
+
+        final results = await Future.wait(
+          waveEntries.map((entry) async {
+            final module = entry.module;
+            final missing = entry.missing;
+            final info = missing.isEmpty
+                ? await _probeSupport(module, registry, supportTimeout)
+                : SupportInfo.unsupported(
+                    SupportState.unavailable,
+                    message:
+                        '${module.id} requires unavailable capabilities: '
+                        '${missing.join(', ')}.',
+                    details: <String, Object?>{
+                      'missing_capabilities': missing.toList(),
+                    },
+                  );
+            support.record(module.id, info);
+            if (info.isSupported) {
+              await Future<void>.sync(() => module.ready(registry))
+                  .timeout(timeout);
+            }
+            return (module: module, info: info);
+          }),
+        );
+
+        for (final result in results) {
+          final module = result.module;
+          // ready() may downgrade support after an initialization failure.
+          final effective = support[module.id] ?? result.info;
+          if (effective.isSupported) {
+            available.addAll(module.provides);
+            onModuleReady?.call(module);
+          } else if (module.requiredForStartup) {
+            // A required module must stop startup with the typed reason instead of
+            // leaving an invalid backend looking ready.
+            throw effective.toFailure(
+              message:
+                  'Required module ${module.id} is unavailable: '
+                  '${effective.message}',
+            );
+          }
         }
       }
       final missingRequired = requiredCapabilities.difference(available);

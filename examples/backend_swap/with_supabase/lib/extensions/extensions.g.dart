@@ -8,5 +8,8 @@ import 'l10n/l10n_module.dart';
 import 'supabase/supabase_module.dart';
 
 List<KilnModule> kilnModules() {
-  return <KilnModule>[L10nModule(), SupabaseModule()];
+  return <KilnModule>[
+  L10nModule(),
+  SupabaseModule(),
+  ];
 }

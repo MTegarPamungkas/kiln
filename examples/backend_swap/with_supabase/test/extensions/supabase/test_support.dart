@@ -28,6 +28,8 @@ class FakeSupabaseGateway implements SupabaseGateway {
   final List<String> oauthProviders = <String>[];
   final List<String?> oauthRedirects = <String?>[];
   final List<String> idTokenProviders = <String>[];
+  final List<String?> idTokenNonces = <String?>[];
+  final List<String?> idTokenAccessTokens = <String?>[];
 
   String? lastEmailRedirect;
   String? lastVerificationRedirect;
@@ -36,10 +38,17 @@ class FakeSupabaseGateway implements SupabaseGateway {
   int refreshUserCalls = 0;
   int signOutCalls = 0;
   bool cancelOAuth = false;
+  bool emitOAuthSession = true;
+  SupabaseSession? oauthSession;
   bool requireEmailConfirmation = false;
   bool verifyOnSignIn = true;
   bool verifyOnRefresh = false;
   bool throwOnSignIn = false;
+  Object? signOutFailure;
+  Completer<void>? signInGate;
+  Completer<void>? restoreGate;
+  Completer<void>? signOutGate;
+  Completer<void>? exchangeGate;
 
   @override
   SupabaseSession? get currentSession => _session;
@@ -51,7 +60,10 @@ class FakeSupabaseGateway implements SupabaseGateway {
   bool get isEmailVerified => _session?.emailVerified ?? false;
 
   @override
-  Future<SupabaseSession?> restoreSession() async => initialSession;
+  Future<SupabaseSession?> restoreSession() async {
+    await restoreGate?.future;
+    return initialSession;
+  }
 
   @override
   Future<SupabaseSession> signInWithPassword({
@@ -59,6 +71,7 @@ class FakeSupabaseGateway implements SupabaseGateway {
     required String password,
   }) async {
     signedInEmails.add(email);
+    await signInGate?.future;
     if (throwOnSignIn || password == 'wrong-password') {
       throw const AuthException(
         'Invalid login credentials',
@@ -87,6 +100,11 @@ class FakeSupabaseGateway implements SupabaseGateway {
   @override
   Future<void> signOut() async {
     signOutCalls += 1;
+    await signOutGate?.future;
+    final failure = signOutFailure;
+    if (failure != null) {
+      throw failure;
+    }
     _session = null;
     _changes.add(null);
   }
@@ -107,6 +125,8 @@ class FakeSupabaseGateway implements SupabaseGateway {
     String? nonce,
   }) async {
     idTokenProviders.add(provider.name);
+    idTokenNonces.add(nonce);
+    idTokenAccessTokens.add(accessToken);
     return _emit(
       _sessionFor(email: 'social@kiln.dev', displayName: 'Social User'),
     );
@@ -123,13 +143,20 @@ class FakeSupabaseGateway implements SupabaseGateway {
     if (cancelOAuth) {
       return false;
     }
-    _emit(_sessionFor(email: 'oauth@kiln.dev', displayName: 'OAuth User'));
+    if (!emitOAuthSession) {
+      return true;
+    }
+    _emit(
+      oauthSession ??
+          _sessionFor(email: 'oauth@kiln.dev', displayName: 'OAuth User'),
+    );
     return true;
   }
 
   @override
   Future<SupabaseSession> exchangeCodeForSession(String code) async {
     exchangedCodes.add(code);
+    await exchangeGate?.future;
     return _emit(
       _sessionFor(email: 'callback@kiln.dev', displayName: 'Callback'),
     );

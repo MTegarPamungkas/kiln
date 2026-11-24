@@ -1,6 +1,6 @@
 id: go_router
 name: GoRouter
-version: 0.1.1
+version: 0.1.2
 description: Declarative routing with route slots, guards, and deep link mapping.
 category: navigation
 tier: official
@@ -14,7 +14,7 @@ optional_requires:
   - analytics
   - logger
 dependencies:
-  go_router: ^18.1.2
+  go_router: ^18.1.4
 slots:
   - name: router.routes
     item: AppRoute

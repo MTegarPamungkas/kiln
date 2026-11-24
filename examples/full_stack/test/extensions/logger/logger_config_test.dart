@@ -22,7 +22,10 @@ void main() {
     expect(config.levelFor(AppFlavor.development), LogLevel.trace);
     expect(config.levelFor(AppFlavor.staging), LogLevel.debug);
     expect(config.levelFor(AppFlavor.production), LogLevel.warning);
-    expect(config.levelFor(const AppFlavor('qa')), config.productionLevel);
+    expect(
+      config.levelFor(const AppFlavor('qa')),
+      config.productionLevel,
+    );
   });
 
   test('active sinks drive the convenience getters', () {
@@ -36,5 +39,13 @@ void main() {
     expect(config.fileSinkEnabled, isFalse);
     expect(config.breadcrumbSinkEnabled, isFalse);
     expect(config.levelFor(AppFlavor.development), LogLevel.info);
+  });
+
+  test('rejects a non-positive record cap', () {
+    const config = LoggerConfig(maxRecordTextLength: 0);
+
+    final failure = config.validate();
+
+    expect(failure?.code, FailureCode.configurationInvalid);
   });
 }

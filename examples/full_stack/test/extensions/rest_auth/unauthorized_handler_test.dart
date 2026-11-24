@@ -120,29 +120,26 @@ void main() {
     expect(signOuts, 0);
   });
 
-  test(
-    'a credential endpoint 401 does not start a recursive refresh',
-    () async {
-      var refreshes = 0;
-      final handler = UnauthorizedHandler(
-        policy: _policy,
-        refresh: () async {
-          refreshes++;
-          return 'fresh';
-        },
-        signOut: () async {},
-      );
+  test('a credential endpoint 401 does not start a recursive refresh', () async {
+    var refreshes = 0;
+    final handler = UnauthorizedHandler(
+      policy: _policy,
+      refresh: () async {
+        refreshes++;
+        return 'fresh';
+      },
+      signOut: () async {},
+    );
 
-      final response = await handler.handle(
-        HttpRequest(
-          method: HttpMethod.post,
-          uri: Uri.parse('https://api.kiln.dev/auth/refresh'),
-        ),
-        (_) async => const HttpResponse(statusCode: 401),
-      );
+    final response = await handler.handle(
+      HttpRequest(
+        method: HttpMethod.post,
+        uri: Uri.parse('https://api.kiln.dev/auth/refresh'),
+      ),
+      (_) async => const HttpResponse(statusCode: 401),
+    );
 
-      expect(response.statusCode, 401);
-      expect(refreshes, 0);
-    },
-  );
+    expect(response.statusCode, 401);
+    expect(refreshes, 0);
+  });
 }

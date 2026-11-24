@@ -15,7 +15,10 @@ void main() {
       MaterialApp(
         theme: brand.light,
         home: const Center(
-          child: RepaintBoundary(key: _swatchKey, child: _SwatchBoard()),
+          child: RepaintBoundary(
+            key: _swatchKey,
+            child: _SwatchBoard(),
+          ),
         ),
       ),
     );

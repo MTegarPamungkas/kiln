@@ -1,6 +1,6 @@
 # kiln_lints
 
-Custom lint rules that keep Kiln applications on contracts.
+Analyzer plugin rules that keep Kiln applications on contracts.
 
 | Rule | Default | Purpose |
 | --- | --- | --- |
@@ -12,61 +12,30 @@ Custom lint rules that keep Kiln applications on contracts.
 
 ## Install
 
-```yaml
-dev_dependencies:
-  custom_lint: ^0.8.1
-  kiln_lints: ^0.1.0
-```
-
-`analysis_options.yaml`:
+Add `kiln_lints` under the top-level `plugins:` section in
+`analysis_options.yaml` (Dart 3.10+ / `analysis_server_plugin`):
 
 ```yaml
-analyzer:
-  plugins:
-    - custom_lint
+plugins:
+  kiln_lints:
+    path: ../packages/kiln_lints
 ```
 
-Run:
+Then run `dart analyze` or `flutter analyze` as usual.
 
-```bash
-dart run custom_lint
-```
-
-`no_edit_generated_files` is opt-in:
+`no_edit_generated_files` is registered as an opt-in lint rule and can be
+enabled per project under `plugins.kiln_lints.diagnostics`:
 
 ```yaml
-custom_lint:
-  rules:
-    - no_edit_generated_files
+plugins:
+  kiln_lints:
+    path: ../packages/kiln_lints
+    diagnostics:
+      no_edit_generated_files: true
 ```
 
 ## Analyzer version
 
-`custom_lint_builder` 0.8.1 still uses `analyzer ^8`, so this package uses
-analyzer 8 as well. When upstream ships analyzer 14 support, `analyzer` and
-`custom_lint_builder` are bumped together without changing the rule API.
-
-## What actually enforces these rules
-
-`flutter analyze` does not run these rules today. Dart has deprecated the
-legacy `analyzer.plugins` entry point that `custom_lint` uses, so adding
-
-```yaml
-analyzer:
-  plugins:
-    - custom_lint
-```
-
-to a generated app makes `flutter analyze` report
-`analysis_options_deprecated_plugins` and skip the rules entirely. Until
-`custom_lint` moves to the new plugin system, the boundary that matters for the
-feature layout is enforced by `kiln doctor`, which reads `lib/features/**`
-directly through `layerViolations()` in `kiln_extension_sdk`:
-`src/analysis/feature_layers.dart`. Treat this package as opt-in tooling that a
-developer runs with `dart run custom_lint`, not as a build gate.
-
-## Windows notes
-
-`custom_lint` 0.8.1 fails to load a path-dependency plugin when the project path
-contains spaces. Run the project from a path without spaces, or wait for the
-upstream fix, if you use the plugin through a local path.
+`kiln_lints` uses Dart's official `analysis_server_plugin` (`^0.3.26`) on
+`analyzer ^14.7.0`, so it resolves in the same workspace as the rest of the
+Kiln monorepo and runs directly inside `dart analyze` and `flutter analyze`.

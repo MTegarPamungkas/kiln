@@ -29,17 +29,32 @@ final class AuthTokens {
 
 /// Stores auth tokens and the cached user in [SecureStorage].
 final class RestTokenStore {
-  RestTokenStore({required this.storage, this.prefix = 'rest_auth'});
+  RestTokenStore({
+    required this.storage,
+    this.prefix = 'rest_auth',
+    this.backend = '',
+  });
 
   final SecureStorage storage;
   final String prefix;
 
+  /// Backend identity that owns the stored tokens; empty disables the guard.
+  final String backend;
+
+  /// Normalizes a base URL into a stable backend identity.
+  static String identityFor(String baseUrl) =>
+      baseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+
+  String get _backendKey => '$prefix.backend';
   String get _accessKey => '$prefix.access_token';
   String get _refreshKey => '$prefix.refresh_token';
   String get _expiresKey => '$prefix.expires_at';
   String get _userKey => '$prefix.user';
 
   Future<AuthTokens?> read() async {
+    if (!await _matchesBackend()) {
+      return null;
+    }
     final accessToken = await storage.read(_accessKey);
     if (accessToken == null || accessToken.isEmpty) {
       return null;
@@ -54,6 +69,7 @@ final class RestTokenStore {
   }
 
   Future<void> save(AuthTokens tokens) async {
+    await _writeBackend();
     await storage.write(_accessKey, tokens.accessToken);
     final refreshToken = tokens.refreshToken;
     if (refreshToken != null && refreshToken.isNotEmpty) {
@@ -69,7 +85,12 @@ final class RestTokenStore {
     }
   }
 
-  Future<String?> refreshToken() => storage.read(_refreshKey);
+  Future<String?> refreshToken() async {
+    if (!await _matchesBackend()) {
+      return null;
+    }
+    return storage.read(_refreshKey);
+  }
 
   Future<Map<String, Object?>?> readUser() async {
     final raw = await storage.read(_userKey);
@@ -95,10 +116,34 @@ final class RestTokenStore {
 
   Future<void> clear() async {
     await Future.wait(<Future<void>>[
+      storage.delete(_backendKey),
       storage.delete(_accessKey),
       storage.delete(_refreshKey),
       storage.delete(_expiresKey),
       storage.delete(_userKey),
     ]);
+  }
+
+  Future<bool> _matchesBackend() async {
+    if (backend.isEmpty) {
+      return true;
+    }
+    final stored = await storage.read(_backendKey);
+    if (stored == backend) {
+      return true;
+    }
+    // Tokens without a marker belong to an unknown backend; do not reuse them.
+    final accessToken = await storage.read(_accessKey);
+    if (accessToken != null) {
+      await clear();
+    }
+    return false;
+  }
+
+  Future<void> _writeBackend() async {
+    if (backend.isEmpty) {
+      return;
+    }
+    await storage.write(_backendKey, backend);
   }
 }

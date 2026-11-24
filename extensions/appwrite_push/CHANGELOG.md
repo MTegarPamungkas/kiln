@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+- Widen `flutter_local_notifications` constraint to `>=22.3.3 <24.0.0` so it
+  allows 23.x while staying compatible with `appwrite` 28.x.
+- Update `firebase_core` to `^5.2.0` and `firebase_messaging` to `^17.1.0`.
+
 ## 0.1.2
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

@@ -83,7 +83,8 @@ final class SupabaseConfig {
         !(uri.isScheme('http') || uri.isScheme('https'))) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'The Supabase URL must be a complete http or https address.',
+        message:
+            'The Supabase URL must be a complete http or https address.',
         kind: FailureKind.configuration,
       );
     }
@@ -105,7 +106,8 @@ final class SupabaseConfig {
     if (redirect == null || !redirect.hasScheme) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message: 'authRedirectUrl must be a URI with a scheme, for example kiln-auth://auth-callback.',
+        message:
+            'authRedirectUrl must be a URI with a scheme, for example kiln-auth://auth-callback.',
         kind: FailureKind.configuration,
       );
     }

@@ -1,3 +1,4 @@
+import 'package:kiln_core/kiln_core.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../core/l10n/app_localizations_config.dart';
@@ -7,6 +8,7 @@ import '../core/theme/app_theme_config.dart';
 {{^minimal}}
 import 'app_home.dart';
 {{/minimal}}
+import 'app_route.dart';
 import 'app_wrappers.dart';
 import 'registry_scope.dart';
 
@@ -24,6 +26,14 @@ class AppShell extends StatelessWidget {
     final localizations = registry.readOrNull<AppLocalizationsConfig>();
     final copy = registry.read<CoreCopy>();
     final router = registry.readOrNull<RouterConfig<Object>>();
+    final routeSlot = registry
+        .readOrNull<SlotRegistry>()
+        ?.find<AppRoute>(SlotNames.routerRoutes);
+    // When a router module opened `router.routes` but no feature has
+    // contributed any routes yet, fall back to `resolvedHome` instead of
+    // rendering a blank screen.
+    final useRouter =
+        router != null && (routeSlot == null || routeSlot.items.isNotEmpty);
     {{#minimal}}
     final resolvedHome = home ?? const SizedBox.shrink();
     {{/minimal}}
@@ -36,13 +46,12 @@ class AppShell extends StatelessWidget {
     final supportedLocales =
         localizations?.supportedLocales ??
         AppLocalizationsConfig.defaultLocales;
+    final theme = themeConfig?.light ?? AppTheme.light;
+    final darkTheme = themeConfig?.dark ?? AppTheme.dark;
 
     Widget buildApp(ThemeMode mode, Locale? locale) {
-      final theme = themeConfig?.light ?? AppTheme.light;
-      final darkTheme = themeConfig?.dark ?? AppTheme.dark;
-
       Widget app;
-      if (router != null) {
+      if (useRouter) {
         app = MaterialApp.router(
           onGenerateTitle: copy.appTitle,
           theme: theme,
@@ -66,26 +75,35 @@ class AppShell extends StatelessWidget {
         );
       }
 
-      for (final wrapper in wrappers.reversed) {
-        app = wrapper(context, app);
-      }
       return app;
+    }
+
+    Widget wrapApp(Widget child) {
+      var wrapped = child;
+      for (final wrapper in wrappers.reversed) {
+        wrapped = wrapper(context, wrapped);
+      }
+      return wrapped;
     }
 
     final themeListenable = themeConfig?.modeListenable;
     final localeListenable = localizations?.localeListenable;
     final listenables = <Listenable>[?themeListenable, ?localeListenable];
     if (listenables.isEmpty) {
-      return buildApp(
-        themeConfig?.mode ?? ThemeMode.system,
-        localizations?.locale,
+      return wrapApp(
+        buildApp(
+          themeConfig?.mode ?? ThemeMode.system,
+          localizations?.locale,
+        ),
       );
     }
-    return AnimatedBuilder(
-      animation: Listenable.merge(listenables),
-      builder: (context, _) => buildApp(
-        themeConfig?.currentMode ?? ThemeMode.system,
-        localizations?.currentLocale,
+    return wrapApp(
+      AnimatedBuilder(
+        animation: Listenable.merge(listenables),
+        builder: (context, _) => buildApp(
+          themeConfig?.currentMode ?? ThemeMode.system,
+          localizations?.currentLocale,
+        ),
       ),
     );
   }

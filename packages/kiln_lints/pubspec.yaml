@@ -1,22 +1,18 @@
 name: kiln_lints
-description: Optional custom lint rules that keep Kiln applications on contracts.
+description: Optional analyzer plugin rules that keep Kiln applications on contracts.
 version: 0.1.0
 publish_to: none
 
 environment:
   sdk: ^3.13.0
 
-# Deliberately outside the workspace. custom_lint_builder 0.8.1 is still the
-# newest release and pins analyzer ^8, while the Flutter SDK's test_api requires
-# analyzer ^14 through `test`. Pub resolves a workspace as one unit, so keeping
-# this package in it made the whole repo unresolvable on Flutter 3.50. Its own
-# pubspec.lock keeps analyzer 8 here; move it back and drop that lock when
-# custom_lint publishes analyzer 14 support.
+resolution: workspace
+
 dependencies:
-  analyzer: ^8.4.0
-  custom_lint_builder: ^0.8.1
+  analysis_server_plugin: ^0.3.26
+  analyzer: ^14.7.0
   path: ^1.9.1
 
 dev_dependencies:
   lints: ^6.1.0
-  test: ^1.31.1
+  test: ^1.32.0

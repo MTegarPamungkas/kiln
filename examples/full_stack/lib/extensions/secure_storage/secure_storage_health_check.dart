@@ -6,7 +6,10 @@ final class SecureStorageHealthCheck {
 
   final String probeKey;
 
-  Future<bool> run(SecureStorage storage, {AppLogger? logger}) async {
+  Future<bool> run(
+    SecureStorage storage, {
+    AppLogger? logger,
+  }) async {
     const value = 'ok';
     try {
       await storage.write(probeKey, value);

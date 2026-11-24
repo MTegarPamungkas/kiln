@@ -8,8 +8,16 @@ void main() {
   test('reports every missing required key in one Failure', () {
     const schema = EnvSchema(
       keys: <EnvKeySpec>[
-        EnvKeySpec(name: 'first', type: EnvValueType.string, required: true),
-        EnvKeySpec(name: 'second', type: EnvValueType.string, required: true),
+        EnvKeySpec(
+          name: 'first',
+          type: EnvValueType.string,
+          required: true,
+        ),
+        EnvKeySpec(
+          name: 'second',
+          type: EnvValueType.string,
+          required: true,
+        ),
         EnvKeySpec(name: 'optional', type: EnvValueType.string),
       ],
     );
@@ -37,7 +45,9 @@ void main() {
     final schema = EnvSchema.defaults;
     final env = BuildEnv(
       schema: schema,
-      values: const <String, String>{'api_base_url': 'https://api.kiln.dev'},
+      values: const <String, String>{
+        'api_base_url': 'https://api.kiln.dev',
+      },
     );
 
     expect(() => const EnvValidator().validate(env, schema), returnsNormally);

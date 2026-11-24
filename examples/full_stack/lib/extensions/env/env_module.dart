@@ -13,6 +13,9 @@ final class EnvModule extends KilnModule {
   String get id => 'env';
 
   @override
+  bool get requiredForStartup => true;
+
+  @override
   Set<String> get provides => const <String>{'env'};
 
   @override

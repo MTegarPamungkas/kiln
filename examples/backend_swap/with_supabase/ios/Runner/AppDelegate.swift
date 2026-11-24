@@ -12,8 +12,7 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
-  }
-  // kiln:url-schemes
+  }  // kiln:url-schemes
   override func application(
     _ app: UIApplication,
     open url: URL,

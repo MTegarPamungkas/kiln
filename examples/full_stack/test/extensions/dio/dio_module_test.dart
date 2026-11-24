@@ -11,7 +11,7 @@ void main() {
     final registry = createTestRegistry();
     registry.unregister<HttpClient>();
 
-    const DioModule().register(registry);
+    DioModule().register(registry);
 
     expect(registry.read<HttpClient>(), isA<DioClient>());
     expect(registry.read<HttpPipeline>(), isA<HttpPipeline>());
@@ -23,5 +23,14 @@ void main() {
     );
     expect(slot, isNotNull);
     expect(slot!.items, hasLength(2));
+  });
+
+  test('module disposes its transport once', () async {
+    final registry = createTestRegistry();
+    registry.unregister<HttpClient>();
+    final module = DioModule()..register(registry);
+
+    await module.dispose();
+    await module.dispose();
   });
 }

@@ -1,6 +1,6 @@
 id: firebase
 name: Firebase
-version: 0.1.2
+version: 0.1.3
 description: Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.
 category: auth
 tier: official
@@ -13,10 +13,10 @@ provides:
   - token_provider
   - account_management
 dependencies:
-  firebase_core: ^5.1.0
-  firebase_auth: ^7.0.1
-  cloud_firestore: ^7.1.0
-  firebase_storage: ^14.0.1
+  firebase_core: ^5.2.0
+  firebase_auth: ^7.1.0
+  cloud_firestore: ^7.2.0
+  firebase_storage: ^14.1.0
 prompts:
   - name: options_source
     type: enum

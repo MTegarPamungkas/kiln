@@ -15,6 +15,7 @@ final class LoggerConfig {
     this.fileName = 'app.log',
     this.maxFileBytes = 262144,
     this.maxFiles = 3,
+    this.maxRecordTextLength = 16384,
     this.httpLoggingEnabled = true,
   });
 
@@ -38,6 +39,10 @@ final class LoggerConfig {
   final String fileName;
   final int maxFileBytes;
   final int maxFiles;
+
+  /// Ceiling for one string in a record (message, error, stack trace, or data
+  /// value). The module applies it even when [redactionEnabled] is false.
+  final int maxRecordTextLength;
   final bool httpLoggingEnabled;
 
   bool get fileSinkEnabled => activeSinks.contains(LogSinkKind.file);
@@ -73,6 +78,13 @@ final class LoggerConfig {
       return const Failure(
         code: FailureCode.configurationInvalid,
         message: 'Logger file limits must be positive.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (maxRecordTextLength < 1) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Logger maxRecordTextLength must be at least one.',
         kind: FailureKind.configuration,
       );
     }

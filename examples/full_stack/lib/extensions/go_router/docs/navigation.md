@@ -1,5 +1,12 @@
 # Navigation
 
+Push transports may additionally implement `PushNotificationOpens` from
+`kiln_core`. The router listens automatically when the registered
+`PushTransport` implements it, using the same payload mapper as local
+notifications. Native Appwrite supplies this optional interface. Other transports
+remain compatible and only participate if they implement it. A push tap payload
+uses `{"route":"/orders/42?tab=items"}`; normal auth guards still apply.
+
 ## What is registered
 
 `GoRouterModule` registers three things in the Registry:

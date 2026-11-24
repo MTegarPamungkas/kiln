@@ -73,12 +73,15 @@ final class SupabaseAccountManagement implements AccountManagement {
     if (value != null && value.isEmpty) {
       throw const Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'The photo URL cannot be empty text; use null to clear it.',
+        message:
+            'The photo URL cannot be empty text; use null to clear it.',
         kind: FailureKind.validation,
       );
     }
     await _call(
-      () => _gateway.updateUser(data: <String, Object?>{'avatar_url': value}),
+      () => _gateway.updateUser(
+        data: <String, Object?>{'avatar_url': value},
+      ),
     );
   }
 

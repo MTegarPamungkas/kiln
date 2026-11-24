@@ -14,19 +14,21 @@ coverage/
 .idea/
 .vscode/*.log
 
-# The compiled CLI is a build artifact: rebuild it with bin/rebuild.cmd and
-# attach it to a release instead of committing ~12 MB per rebuild.
+# The compiled CLI is a build artifact: rebuild it with bin/rebuild.cmd (Windows)
+# or bin/rebuild.sh (Linux/macOS) and attach it to a release instead of
+# committing ~12 MB per rebuild.
 /bin/kiln.exe
+/bin/kiln
 
 # Local verification logs
 /*.log
 packages/*/*.log
 
 # Local Kiln state
-.kiln/backups/
-.kiln/journal/
-.kiln/logs/
-.kiln/project.lock
+**/.kiln/backups/
+**/.kiln/journal/
+**/.kiln/logs/
+**/.kiln/project.lock
 
 # Local environment files
 env/*.json

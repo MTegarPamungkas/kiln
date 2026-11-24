@@ -20,6 +20,8 @@ abstract final class RouteSlot {
 
   /// Converts an ordered slot contribution list into [GoRoute]s.
   static List<GoRoute> toGoRoutes(Iterable<AppRoute> routes) {
-    return <GoRoute>[for (final route in routes) toGoRoute(route)];
+    return <GoRoute>[
+      for (final route in routes) toGoRoute(route),
+    ];
   }
 }

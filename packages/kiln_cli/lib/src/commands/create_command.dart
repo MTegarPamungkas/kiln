@@ -56,7 +56,12 @@ final class CreateCommand extends KilnCommand {
       )
       ..addFlag('force', negatable: false)
       ..addFlag('yes', abbr: 'y', negatable: false)
-      ..addFlag('pub', defaultsTo: true, help: 'Run flutter pub get.');
+      ..addFlag('pub', defaultsTo: true, help: 'Run flutter pub get.')
+      ..addFlag(
+        'with-lints',
+        defaultsTo: false,
+        help: 'Enable the kiln_lints analyzer plugin in analysis_options.yaml.',
+      );
   }
 
   @override
@@ -85,6 +90,7 @@ final class CreateCommand extends KilnCommand {
     final force = argResults!['force'] == true;
     final assumeYes = argResults!['yes'] == true;
     final runPub = argResults!['pub'] == true;
+    final withLints = argResults!['with-lints'] == true;
     final output = argResults!['output'] as String;
 
     // Without --yes, on an interactive terminal, ask for every option the
@@ -235,9 +241,9 @@ final class CreateCommand extends KilnCommand {
     // project's lock even though the target is a subdirectory.
     if (target.existsSync() && force) {
       final lock = await ProjectLock.acquire(target);
-      return lock.run(() => _scaffold(name: name, target: target, force: force, state: state, platforms: platforms, withExtensions: withExtensions, org: org, description: description, template: template, corePath: corePath, coreGit: coreGit, coreRef: coreRef, runPub: runPub, assumeYes: assumeYes));
+      return lock.run(() => _scaffold(name: name, target: target, force: force, state: state, platforms: platforms, withExtensions: withExtensions, org: org, description: description, template: template, corePath: corePath, coreGit: coreGit, coreRef: coreRef, runPub: runPub, assumeYes: assumeYes, withLints: withLints));
     }
-    return _scaffold(name: name, target: target, force: force, state: state, platforms: platforms, withExtensions: withExtensions, org: org, description: description, template: template, corePath: corePath, coreGit: coreGit, coreRef: coreRef, runPub: runPub, assumeYes: assumeYes);
+    return _scaffold(name: name, target: target, force: force, state: state, platforms: platforms, withExtensions: withExtensions, org: org, description: description, template: template, corePath: corePath, coreGit: coreGit, coreRef: coreRef, runPub: runPub, assumeYes: assumeYes, withLints: withLints);
   }
 
   Future<int> _scaffold({
@@ -255,6 +261,7 @@ final class CreateCommand extends KilnCommand {
     required String? coreRef,
     required bool runPub,
     required bool assumeYes,
+    required bool withLints,
   }) async {
     final requested = <String>{
       if (findAvailableExtension('l10n') != null) 'l10n',
@@ -344,6 +351,14 @@ final class CreateCommand extends KilnCommand {
         coreGit: coreGit,
         coreRef: coreRef,
       );
+      if (withLints) {
+        _writeLintsPlugin(
+          staged,
+          corePath: corePath,
+          coreGit: coreGit,
+          coreRef: coreRef,
+        );
+      }
 
       if (requested.isNotEmpty) {
         final installer = ExtensionInstaller(
@@ -572,6 +587,54 @@ final class CreateCommand extends KilnCommand {
       );
     }
     pubspecFile.writeAsStringSync(edited);
+  }
+
+  void _writeLintsPlugin(
+    Directory target, {
+    String? corePath,
+    String? coreGit,
+    String? coreRef,
+  }) {
+    final optionsFile = File(p.join(target.path, 'analysis_options.yaml'));
+    final existing = optionsFile.existsSync()
+        ? optionsFile.readAsStringSync()
+        : '';
+    if (RegExp(r'^plugins\s*:', multiLine: true).hasMatch(existing)) {
+      return;
+    }
+
+    final buffer = StringBuffer(existing.trimRight());
+    if (buffer.isNotEmpty) {
+      buffer
+        ..writeln()
+        ..writeln();
+    }
+    buffer.writeln('plugins:');
+
+    if (coreGit != null) {
+      buffer.writeln('  kiln_lints:');
+      _writeYamlBlock(buffer, <String, Object?>{
+        'git': <String, Object?>{
+          'url': coreGit,
+          if (coreRef != null && coreRef.isNotEmpty) 'ref': coreRef,
+          'path': 'packages/kiln_lints',
+        },
+      }, '    ');
+    } else if (corePath != null) {
+      final lintsDir = Directory(p.join(corePath, '..', 'kiln_lints'));
+      if (lintsDir.existsSync()) {
+        buffer.writeln('  kiln_lints:');
+        _writeYamlBlock(buffer, <String, Object?>{
+          'path': p.normalize(lintsDir.path).replaceAll('\\', '/'),
+        }, '    ');
+      } else {
+        buffer.writeln('  kiln_lints: ^0.1.0');
+      }
+    } else {
+      buffer.writeln('  kiln_lints: ^0.1.0');
+    }
+
+    optionsFile.writeAsStringSync(buffer.toString());
   }
 
   /// Appends `dependency_overrides` as a block mapping at the end of the file.

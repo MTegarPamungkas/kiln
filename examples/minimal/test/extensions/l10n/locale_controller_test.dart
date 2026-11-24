@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
+import 'package:kiln_core/kiln_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_testing/kiln_testing.dart';
 import 'package:minimal/extensions/l10n/l10n_config.dart';
@@ -7,6 +10,58 @@ import 'package:minimal/extensions/l10n/locale_store.dart';
 
 void main() {
   group('LocaleController', () {
+    test('an older load cannot overwrite a newer load', () async {
+      final first = Completer<String?>();
+      final second = Completer<String?>();
+      final storage = _ControlledStorage()..reads.addAll([first, second]);
+      final controller = LocaleController(store: LocaleStore(storage));
+      addTearDown(controller.dispose);
+      final old = controller.load();
+      final recent = controller.load();
+      second.complete('en');
+      await recent;
+      first.complete('id');
+      await old;
+      expect(controller.locale, const Locale('en'));
+    });
+
+    test('a failed preference write does not poison later selections', () async {
+      final storage = _ControlledStorage()..failWrites = true;
+      final controller = LocaleController(store: LocaleStore(storage));
+      addTearDown(controller.dispose);
+      await controller.setLocale(const Locale('en'));
+      expect(controller.locale, const Locale('en'));
+      storage.failWrites = false;
+      await controller.setLocale(const Locale('id'));
+      expect(storage.values[LocaleStore.defaultKey], 'id');
+    });
+    test('setLocale reports whether the choice is durable', () async {
+      final storage = _ControlledStorage();
+      final controller = LocaleController(store: LocaleStore(storage));
+      addTearDown(controller.dispose);
+
+      expect(
+        await controller.setLocale(const Locale('en')),
+        PersistOutcome.persisted,
+      );
+      storage.failWrites = true;
+      expect(
+        await controller.setLocale(const Locale('id')),
+        PersistOutcome.sessionOnly,
+      );
+      expect(controller.locale, const Locale('id'));
+    });
+
+    test('setLocale reports notConfigured without storage', () async {
+      final controller = LocaleController();
+      addTearDown(controller.dispose);
+
+      expect(
+        await controller.setLocale(const Locale('en')),
+        PersistOutcome.notConfigured,
+      );
+    });
+
     test('starts by following the system locale', () {
       final controller = LocaleController();
       addTearDown(controller.dispose);
@@ -31,6 +86,19 @@ void main() {
 
       expect(controller.locale, isNull);
       expect(notifications, 2);
+    });
+
+    test('dispose ignores later changes', () async {
+      final storage = InMemoryStorage();
+      final controller = LocaleController(store: LocaleStore(storage));
+
+      controller.dispose();
+      controller.dispose();
+      await controller.setLocale(const Locale('en'));
+      await controller.followSystem();
+
+      expect(controller.locale, isNull);
+      expect(storage.snapshot, isEmpty);
     });
 
     test('canonicalizes regional locales', () async {
@@ -76,22 +144,19 @@ void main() {
       expect(controller.locale, isNull);
     });
 
-    test(
-      'persists the selection and clears it when following system',
-      () async {
-        final storage = InMemoryStorage();
-        final store = LocaleStore(storage);
-        final controller = LocaleController(store: store);
-        addTearDown(controller.dispose);
+    test('persists the selection and clears it when following system', () async {
+      final storage = InMemoryStorage();
+      final store = LocaleStore(storage);
+      final controller = LocaleController(store: store);
+      addTearDown(controller.dispose);
 
-        await controller.setLocale(const Locale('en'));
-        expect(await store.readOrNull(), const Locale('en'));
+      await controller.setLocale(const Locale('en'));
+      expect(await store.readOrNull(), const Locale('en'));
 
-        await controller.followSystem();
-        expect(await store.readOrNull(), isNull);
-        expect(storage.snapshot, isEmpty);
-      },
-    );
+      await controller.followSystem();
+      expect(await store.readOrNull(), isNull);
+      expect(storage.snapshot, isEmpty);
+    });
 
     test('works without storage', () async {
       final controller = LocaleController(
@@ -108,4 +173,27 @@ void main() {
       expect(controller.locale, const Locale('en'));
     });
   });
+}
+
+final class _ControlledStorage implements Storage {
+  final reads = <Completer<String?>>[];
+  final values = <String, String>{};
+  bool failWrites = false;
+
+  @override
+  Future<String?> read(String key) async => reads.isEmpty
+      ? values[key] : await reads.removeAt(0).future;
+  @override
+  Future<void> write(String key, String value) async {
+    if (failWrites) throw StateError('storage unavailable');
+    values[key] = value;
+  }
+  @override
+  Future<void> delete(String key) async { values.remove(key); }
+  @override
+  Future<void> clear() async { values.clear(); }
+  @override
+  Future<bool> containsKey(String key) async => values.containsKey(key);
+  @override
+  Future<Set<String>> keys() async => values.keys.toSet();
 }

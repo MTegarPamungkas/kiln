@@ -343,6 +343,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An unexpected error occurred. Try again.'**
   String get failureUnexpected;
+
+  /// No description provided for @preferenceNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Your choice applies now, but it could not be saved and may reset when the app restarts.'**
+  String get preferenceNotSaved;
 }
 
 class _AppLocalizationsDelegate

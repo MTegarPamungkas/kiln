@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Update `posthog_flutter` dependency constraint to `^6.0.0`.
+
 ## 0.1.1
 
 - Update the rendered config golden for the session-identity and consent

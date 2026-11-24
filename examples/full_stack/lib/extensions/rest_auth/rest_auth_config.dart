@@ -59,8 +59,7 @@ final class RestAuthConfig {
         !(uri.isScheme('http') || uri.isScheme('https'))) {
       return const Failure(
         code: FailureCode.configurationInvalid,
-        message:
-            'The REST auth base URL must be an absolute HTTP or HTTPS URL.',
+        message: 'The REST auth base URL must be an absolute HTTP or HTTPS URL.',
         kind: FailureKind.configuration,
       );
     }

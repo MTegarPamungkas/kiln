@@ -69,13 +69,22 @@ final class AppRouter {
                 routeGuards,
                 RouteGuardContext(
                   location: state.uri.path,
+                  requestedUri: state.uri,
                   name: state.name,
                   isAuthenticated: session?.isAuthenticated ?? false,
+                  sessionStatus: session?.status,
                 ),
               );
             },
       errorBuilder: config.errorBuilder,
       routes: <RouteBase>[
+        if (config.enableAuthRedirect && session != null)
+          GoRoute(
+            path: AppRoutes.sessionLoading,
+            name: AppRoutes.sessionLoadingName,
+            builder: (context, state) => config.sessionLoadingBuilder?.call(context) ??
+                const Scaffold(body: Center(child: CircularProgressIndicator())),
+          ),
         if (signInBuilder != null)
           GoRoute(
             path: AppRoutes.signIn,
@@ -129,6 +138,11 @@ final class AppRouter {
     final notifications = registry.readOrNull<Notifications>();
     if (notifications != null) {
       _subscriptions.add(notifications.taps.listen(_followTap));
+    }
+    final push = registry.readOrNull<PushTransport>();
+    if (push is PushNotificationOpens) {
+      final opens = push as PushNotificationOpens;
+      _subscriptions.add(opens.notificationTaps.listen(_followTap));
     }
   }
 

@@ -33,6 +33,7 @@ final class SupabaseLinkHandler {
   StreamSubscription<Uri>? _subscription;
   Future<void> _pending = Future<void>.value();
   SupabaseSession? _lastSession;
+  bool _disposed = false;
 
   bool get isAttached => _subscription != null;
 
@@ -47,12 +48,17 @@ final class SupabaseLinkHandler {
   /// Does nothing when [DeepLinks] is not installed.
   Future<void> start() async {
     final deepLinks = _deepLinks;
-    if (deepLinks == null || _subscription != null) {
+    if (deepLinks == null || _subscription != null || _disposed) {
       return;
     }
     final initial = deepLinks.initialLink;
     if (initial != null) {
       await _handle(initial);
+      // The initial callback can await the server; disposal during it must not
+      // leave a listener behind.
+      if (_disposed) {
+        return;
+      }
     }
     _subscription = deepLinks.links.listen((uri) {
       _pending = _pending.then((_) => _handle(uri));
@@ -100,6 +106,10 @@ final class SupabaseLinkHandler {
 
   /// Removes the subscription and closes the failure stream.
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _subscription?.cancel();
     _subscription = null;
     await _failures.close();
@@ -123,6 +133,9 @@ final class SupabaseLinkHandler {
   }
 
   void _complete(SupabaseSession session) {
+    if (_disposed) {
+      return;
+    }
     _lastSession = session;
     _onSession?.call(session);
   }

@@ -12,7 +12,10 @@ final class SecureTokenStore implements TokenProvider {
   final String accessTokenKey;
   final String refreshTokenKey;
 
-  Future<void> save({required String accessToken, String? refreshToken}) async {
+  Future<void> save({
+    required String accessToken,
+    String? refreshToken,
+  }) async {
     await storage.write(accessTokenKey, accessToken);
     if (refreshToken != null) {
       await storage.write(refreshTokenKey, refreshToken);
@@ -22,7 +25,7 @@ final class SecureTokenStore implements TokenProvider {
   Future<String?> refreshToken() => storage.read(refreshTokenKey);
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) {
+  Future<String?> accessToken({bool forceRefresh = false, DateTime? deadline}) {
     return storage.read(accessTokenKey);
   }
 

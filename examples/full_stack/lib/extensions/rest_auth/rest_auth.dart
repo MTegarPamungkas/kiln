@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:kiln_core/kiln_core.dart';
 
-import 'auth_response_parser.dart';
 import 'auth_request_policy.dart';
+import 'auth_response_parser.dart';
 import 'jwt_expiry.dart';
 import 'rest_auth_config.dart';
 import 'rest_auth_failure_mapper.dart';
@@ -38,6 +38,9 @@ final class RestAuth implements AuthRepository {
       StreamController<AuthSession?>.broadcast(sync: true);
   AuthSession? _session;
   bool _initialized = false;
+  bool _disposed = false;
+  int _generation = 0;
+  Future<void> _commits = Future<void>.value();
 
   @override
   AuthSession? get currentSession => _session;
@@ -47,15 +50,17 @@ final class RestAuth implements AuthRepository {
 
   /// Restores a stored session, keeping it when the network is offline.
   Future<void> initialize() async {
-    if (_initialized) {
+    if (_initialized || _disposed) {
       return;
     }
     _initialized = true;
+    final generation = _generation;
     final stored = await store.read();
-    if (stored == null) {
+    if (stored == null || generation != _generation || _disposed) {
       return;
     }
     final cached = await store.readUser();
+    if (generation != _generation || _disposed) return;
     if (cached != null) {
       final session = _sessionFrom(cached, stored);
       if (session != null) {
@@ -74,6 +79,7 @@ final class RestAuth implements AuthRepository {
     required String email,
     required String password,
   }) async {
+    final generation = _beginOperation();
     final response = await request(
       HttpMethod.post,
       config.loginPath,
@@ -81,7 +87,7 @@ final class RestAuth implements AuthRepository {
       authenticated: false,
       credential: true,
     );
-    return _apply(response);
+    return _apply(response, generation);
   }
 
   @override
@@ -90,6 +96,7 @@ final class RestAuth implements AuthRepository {
     required String password,
     String? displayName,
   }) async {
+    final generation = _beginOperation();
     final response = await request(
       HttpMethod.post,
       config.registerPath,
@@ -101,40 +108,65 @@ final class RestAuth implements AuthRepository {
       authenticated: false,
       credential: true,
     );
-    return _apply(response);
+    return _apply(response, generation);
   }
 
   @override
   Future<void> signOut() async {
+    // Local state is cleared before remote work so a slow or offline server
+    // cannot keep the user signed in.
+    final generation = _beginOperation();
+    _emit(null);
+    AuthTokens? tokens;
+    Object? readError;
+    StackTrace? readStack;
     try {
-      if (config.logoutPath.isNotEmpty) {
-        await request(
-          HttpMethod.post,
-          config.logoutPath,
-          body: const <String, Object?>{},
-        );
+      tokens = await store.read();
+    } on Object catch (error, stackTrace) {
+      readError = error;
+      readStack = stackTrace;
+    }
+    await _serializeCommit(() async {
+      if (generation != _generation) {
+        return;
       }
+      await tokenProvider.clear();
+    });
+    if (generation != _generation || _disposed) return;
+    if (readError != null) Error.throwWithStackTrace(readError, readStack!);
+    if (config.logoutPath.isEmpty) {
+      return;
+    }
+    try {
+      await _sendLogout(tokens?.accessToken);
     } on Object {
       // Signing out must succeed offline.
-    } finally {
-      await clearSession();
     }
   }
 
   /// Clears local credentials without making another HTTP request.
-  Future<void> clearSession() async {
-    try {
+  Future<void> clearSession() {
+    final generation = _beginOperation();
+    _emit(null);
+    return _serializeCommit(() async {
+      if (generation != _generation) {
+        return;
+      }
       await tokenProvider.clear();
-    } finally {
-      _emit(null);
-    }
+    });
   }
 
   /// Reloads the current user from the me endpoint.
   Future<void> reloadSession() async {
+    if (_disposed) return;
+    final generation = _generation;
     final stored = await store.read();
     if (stored == null) {
-      _emit(null);
+      await _serializeCommit(() async {
+        if (generation == _generation) {
+          _emit(null);
+        }
+      });
       return;
     }
     final response = await request(HttpMethod.get, config.mePath);
@@ -146,7 +178,6 @@ final class RestAuth implements AuthRepository {
         kind: FailureKind.authentication,
       );
     }
-    await store.saveUser(user);
     final session = _sessionFrom(user, stored);
     if (session == null) {
       throw const Failure(
@@ -155,12 +186,24 @@ final class RestAuth implements AuthRepository {
         kind: FailureKind.authentication,
       );
     }
-    _emit(session);
+    await _serializeCommit(() async {
+      if (generation != _generation) {
+        return;
+      }
+      final current = await store.read() ?? stored;
+      if (generation != _generation || _disposed) return;
+      await store.saveUser(user);
+      if (generation != _generation || _disposed) return;
+      _emit(_sessionFrom(user, current) ?? session);
+    });
   }
 
   /// Refreshes the access token; returns null when no refresh token exists.
-  Future<String?> refreshAccessToken() {
-    return tokenProvider.accessToken(forceRefresh: true);
+  Future<String?> refreshAccessToken({DateTime? deadline}) {
+    return tokenProvider.accessToken(
+      forceRefresh: true,
+      deadline: deadline,
+    );
   }
 
   /// Sends a request with JSON encoding and auth headers.
@@ -206,9 +249,17 @@ final class RestAuth implements AuthRepository {
     return response;
   }
 
-  Future<void> dispose() => _changes.close();
+  Future<void> dispose() async {
+    if (_disposed) return;
+    _disposed = true;
+    _generation++;
+    _session = null;
+    await _commits;
+    await _changes.close();
+  }
 
-  Future<AuthSession> _apply(HttpResponse response) async {
+  Future<AuthSession> _apply(HttpResponse response, int generation) async {
+    _ensureCurrent(generation);
     final body = _bodyMap(response.data);
     if (body == null) {
       throw const Failure(
@@ -218,8 +269,6 @@ final class RestAuth implements AuthRepository {
       );
     }
     final parsed = parser.parse(body);
-    await tokenProvider.clear();
-    await store.save(parsed.tokens);
     var user = parsed.user;
     final hasUserId =
         _string(user, const <String>[
@@ -233,10 +282,12 @@ final class RestAuth implements AuthRepository {
         null;
     var session = hasUserId ? _sessionFrom(user, parsed.tokens) : null;
     if (session == null) {
-      final me = await _tryFetchMe();
+      final me = await _tryFetchMe(parsed.tokens.accessToken);
+      if (generation != _generation) {
+        throw _superseded();
+      }
       if (me != null) {
         user = me;
-        await store.saveUser(me);
         session = _sessionFrom(me, parsed.tokens);
       }
     }
@@ -248,21 +299,84 @@ final class RestAuth implements AuthRepository {
         kind: FailureKind.authentication,
       );
     }
-    await store.saveUser(user);
-    _emit(session);
-    return session;
+    final committed = session;
+    final committedUser = user;
+    return _serializeCommit(() async {
+      _ensureCurrent(generation);
+      try {
+        await tokenProvider.clear();
+        _ensureCurrent(generation);
+        await store.save(parsed.tokens);
+        _ensureCurrent(generation);
+        await store.saveUser(committedUser);
+        _ensureCurrent(generation);
+        _emit(committed);
+        return committed;
+      } on Object catch (error, stackTrace) {
+        // A partially written or superseded login must not restore next launch.
+        // This commit owns the store until cleanup finishes; later commits wait.
+        try {
+          await tokenProvider.clear();
+        } on Object catch (cleanupError) {
+          throw Failure(
+            code: FailureCode.storageWriteFailed,
+            message:
+                'The incomplete session could not be removed from storage.',
+            kind: FailureKind.storage,
+            cause: cleanupError,
+            details: const {'localCleanupFailed': true},
+          );
+        }
+        if (generation == _generation && !_disposed) _emit(null);
+        Error.throwWithStackTrace(error, stackTrace);
+      }
+    });
   }
 
-  Future<Map<String, Object?>?> _tryFetchMe() async {
+  int _beginOperation() {
+    if (_disposed) throw _superseded();
+    return ++_generation;
+  }
+
+  void _ensureCurrent(int generation) {
+    if (_disposed || generation != _generation) throw _superseded();
+  }
+
+  Future<Map<String, Object?>?> _tryFetchMe(String accessToken) async {
     if (config.mePath.isEmpty) {
       return null;
     }
     try {
-      final response = await request(HttpMethod.get, config.mePath);
+      final response = await client.send(
+        HttpRequest(
+          method: HttpMethod.get,
+          uri: _backendEndpoint(config.mePath),
+          headers: <String, String>{
+            'Accept': 'application/json',
+            if (accessToken.isNotEmpty) 'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+      if (!response.isSuccessful) {
+        return null;
+      }
       return _bodyMap(response.data);
     } on Failure {
       return null;
     }
+  }
+
+  Failure _superseded() => const Failure(
+    code: FailureCode.authCancelled,
+    message: 'The session changed while the request was in flight.',
+    kind: FailureKind.authentication,
+  );
+
+  /// Runs session writes in order so late results cannot interleave.
+  Future<T> _serializeCommit<T>(Future<T> Function() action) {
+    final result = _commits.then((_) => action());
+    _commits = result.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return result;
   }
 
   AuthSession? _sessionFrom(Map<String, Object?> user, AuthTokens tokens) {
@@ -297,7 +411,11 @@ final class RestAuth implements AuthRepository {
     );
   }
 
-  Future<AuthTokens?> _exchangeRefresh(String refreshToken) async {
+  Future<AuthTokens?> _exchangeRefresh(
+    String refreshToken,
+    DateTime? deadline,
+  ) async {
+    final generation = _generation;
     final response = await client.send(
       HttpRequest(
         method: HttpMethod.post,
@@ -307,11 +425,18 @@ final class RestAuth implements AuthRepository {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(<String, Object?>{'refreshToken': refreshToken}),
+        deadline: deadline,
       ),
     );
     if (!response.isSuccessful) {
       if (response.statusCode == 401 || response.statusCode == 403) {
-        await clearSession();
+        final current = await store.read();
+        // Only the session that issued this refresh may be cleared.
+        if (generation == _generation &&
+            current != null &&
+            current.refreshToken == refreshToken) {
+          await clearSession();
+        }
       }
       throw mapRestResponse(response);
     }
@@ -327,6 +452,26 @@ final class RestAuth implements AuthRepository {
     return parsed.tokens.refreshToken == null
         ? parsed.tokens.copyWith(refreshToken: refreshToken)
         : parsed.tokens;
+  }
+
+  /// Best-effort remote logout with the token captured before local clearing.
+  Future<void> _sendLogout(String? accessToken) async {
+    final response = await client.send(
+      HttpRequest(
+        method: HttpMethod.post,
+        uri: _backendEndpoint(config.logoutPath),
+        headers: <String, String>{
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          if (accessToken != null && accessToken.isNotEmpty)
+            'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(const <String, Object?>{}),
+      ),
+    );
+    if (!response.isSuccessful) {
+      throw mapRestResponse(response);
+    }
   }
 
   Uri _backendEndpoint(String path) {

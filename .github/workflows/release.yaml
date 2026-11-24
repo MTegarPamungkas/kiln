@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  verify-and-package:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -19,11 +19,6 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      # kiln_lints sits outside the workspace (see its pubspec); resolve it
-      # before the root `dart analyze`, which also analyzes that package.
-      - name: Resolve kiln_lints
-        working-directory: packages/kiln_lints
-        run: dart pub get
       - run: dart analyze
       - run: dart run tool/lint_extensions.dart
       - run: dart run tool/bundle.dart --check
@@ -32,12 +27,13 @@ jobs:
       - run: dart run tool/registry.dart --check
       - run: dart run tool/check_docs.dart --check
       - run: dart run tool/check_versions.dart --check
+      - run: dart run tool/check_workflows.dart
       - name: Package registry and CLI sources
         run: |
           mkdir -p dist
           tar -czf "dist/kiln-registry-${GITHUB_REF_NAME}.tgz" registry
           git archive --format=tar.gz --output="dist/kiln-monorepo-sources-${GITHUB_REF_NAME}.tgz" HEAD
-      - name: Verify source archive and build CLI
+      - name: Verify source archive smoke build
         run: |
           source_dir="$(mktemp -d)"
           cli_dir="$(mktemp -d)"
@@ -56,10 +52,59 @@ jobs:
             cd release_smoke
             flutter analyze
           )
-          cp "$cli_dir/kiln" dist/kiln-linux-x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-archives
+          path: dist/*.tgz
+
+  build-cli:
+    needs: verify-and-package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: kiln-linux-x64
+          - os: windows-latest
+            artifact: kiln-windows-x64.exe
+          - os: macos-latest
+            artifact: kiln-macos-arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Compile CLI (${{ matrix.artifact }})
+        shell: bash
+        run: |
+          mkdir -p dist
+          release_commit="$(git rev-parse HEAD)"
+          dart compile exe -DKILN_CORE_GIT_REF="$release_commit" \
+            packages/kiln_cli/bin/kiln.dart -o "dist/${{ matrix.artifact }}"
+          "./dist/${{ matrix.artifact }}" version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}
+
+  publish:
+    needs: [verify-and-package, build-cli]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Generate SHA256SUMS
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            dist/*.tgz
-            dist/kiln-linux-x64
+            dist/*

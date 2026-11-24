@@ -214,12 +214,10 @@ Every direct dependency uses a caret constraint on the newest release the
 current toolchain can resolve, so a routine upgrade only needs
 `flutter pub upgrade --major-versions`.
 
-Two packages are intentionally held back because the SDK or a plugin pins
-them:
+One package is intentionally held back because the Flutter SDK pins its
+transitive dependency:
 
-- `test` stays on `1.31.1` while the Flutter SDK pins `test_api 0.7.12`;
+- `test` stays on `1.32.0` while the Flutter SDK pins `test_api 0.7.14`;
   `test 1.33` requires `test_api 0.7.15`.
-- `custom_lint_builder` 0.8.x pins `analyzer ^8`; `kiln_lints` ships on
-  analyzer 8 and moves to analyzer 14 when upstream supports it.
 
-Both constraints move forward as soon as the upstream packages allow it.
+This constraint moves forward as soon as the Flutter SDK allows it.

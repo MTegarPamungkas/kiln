@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:appwrite/appwrite.dart' as sdk;
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
@@ -7,6 +9,8 @@ import 'package:with_appwrite/extensions/appwrite/appwrite_account_management.da
 import 'package:with_appwrite/extensions/appwrite/appwrite_auth.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_config.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_file_storage.dart';
+import 'package:with_appwrite/extensions/appwrite/appwrite_functions.dart';
+import 'package:with_appwrite/extensions/appwrite/appwrite_push_targets.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_module.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_remote_database.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_session_bridge.dart';
@@ -50,6 +54,9 @@ void main() {
 
     module.register(registry);
 
+    expect(registry.read<sdk.Client>().getHeaders()['Cache-Control'],
+      'no-cache, no-store', reason: 'Contract reads must revalidate deleted/replaced files.');
+
     expect(registry.read<AppwriteConfig>(), same(config));
     expect(registry.read<AppwriteSupport>(), isA<AppwriteSupport>());
     expect(registry.read<AuthRepository>(), isA<AppwriteAuth>());
@@ -59,6 +66,8 @@ void main() {
     );
     expect(registry.read<RemoteDatabase>(), isA<AppwriteRemoteDatabase>());
     expect(registry.read<FileStorage>(), isA<AppwriteFileStorage>());
+    expect(registry.read<CloudFunctions>(), isA<AppwriteFunctions>());
+    expect(registry.read<PushTargets>(), isA<AppwritePushTargets>());
     expect(registry.read<TokenProvider>(), isA<AppwriteTokenProvider>());
 
     await module.dispose();
@@ -73,7 +82,12 @@ void main() {
       'social_auth',
       'remote_database',
       'file_storage',
+      'functions',
+      'token_provider',
+      'account_management',
+      'push_targets',
+      'appwrite_client',
     });
-    expect(module.optionalRequires, isEmpty);
+    expect(module.optionalRequires, {'secure_storage'});
   });
 }

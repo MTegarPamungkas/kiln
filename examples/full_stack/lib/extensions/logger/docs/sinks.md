@@ -52,6 +52,13 @@ The module already does this for all sinks when `redactionEnabled` is true.
 `LogExporter` redacts again when reading, so reports stay safe even if old
 records came from another sink.
 
+Every sink is also wrapped in `LimitedSink`, independent of redaction. One
+record cannot grow without bound: message, error, stack trace and data strings
+are capped at `LoggerConfig.maxRecordTextLength` (16384 by default), and
+structured data is limited to 12 nested levels and 200 entries. This matters
+when `redactionEnabled` is false for local debugging; the PII is kept, the size
+cap is not lost.
+
 ## Implementation notes
 
 - Write records serially when a sink has state, such as a rotating file.

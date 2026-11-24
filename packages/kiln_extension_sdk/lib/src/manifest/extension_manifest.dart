@@ -226,22 +226,41 @@ final class RegistryArtifact {
 
 /// A manifest together with the Mason bundle the CLI ships for it.
 final class AvailableExtension {
-  const AvailableExtension({
+  AvailableExtension({
     required this.manifest,
-    required this.bundle,
-    this.docs = const <String, List<int>>{},
+    required MasonBundle this._bundle,
+    Map<String, List<int>> this._docs = const <String, List<int>>{},
     this.source = ExtensionSource.bundled,
     this.artifact,
-  });
+  }) : _bundleLoader = null,
+       _docsLoader = null;
+
+  /// Creates an extension whose [bundle] and [docs] are decoded lazily on first
+  /// access and cached thereafter, avoiding eager decoding of unused bundles at
+  /// CLI startup.
+  AvailableExtension.lazy({
+    required this.manifest,
+    required MasonBundle Function() this._bundleLoader,
+    this._docsLoader,
+    this.source = ExtensionSource.bundled,
+    this.artifact,
+  }) : _bundle = null,
+       _docs = null;
 
   final ExtensionManifest manifest;
-  final MasonBundle bundle;
+  MasonBundle? _bundle;
+  final MasonBundle Function()? _bundleLoader;
+  Map<String, List<int>>? _docs;
+  final Map<String, List<int>> Function()? _docsLoader;
+
+  MasonBundle get bundle => _bundle ??= _bundleLoader!();
 
   /// Documentation installed into the app next to the extension's code, keyed
   /// by path relative to the extension root (`README.md`, `docs/setup.md`).
   /// Bundled extensions embed these; store extensions fall back to reading
   /// them from [ExtensionManifest.rootPath].
-  final Map<String, List<int>> docs;
+  Map<String, List<int>> get docs =>
+      _docs ??= _docsLoader?.call() ?? const <String, List<int>>{};
 
   final ExtensionSource source;
   final RegistryArtifact? artifact;

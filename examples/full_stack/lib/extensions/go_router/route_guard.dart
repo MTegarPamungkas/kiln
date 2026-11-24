@@ -1,9 +1,13 @@
+import 'package:kiln_core/kiln_core.dart';
+
 /// State passed to every [RouteGuard] during a redirect decision.
 final class RouteGuardContext {
   const RouteGuardContext({
     required this.location,
     this.name,
     this.isAuthenticated = false,
+    this.sessionStatus,
+    this.requestedUri,
   });
 
   /// Path being requested, without query parameters.
@@ -14,6 +18,17 @@ final class RouteGuardContext {
 
   /// Whether a session is currently authenticated.
   final bool isAuthenticated;
+
+  /// Full session state. Older callers may keep using [isAuthenticated].
+  final SessionStatus? sessionStatus;
+
+  /// Full requested URI, preserving [location] as a path for existing guards.
+  final Uri? requestedUri;
+
+  Uri get uri => requestedUri ?? Uri.parse(location);
+
+  SessionStatus get effectiveSessionStatus => sessionStatus ??
+      (isAuthenticated ? SessionStatus.authenticated : SessionStatus.unauthenticated);
 }
 
 /// A synchronous redirect rule evaluated before a route is shown.

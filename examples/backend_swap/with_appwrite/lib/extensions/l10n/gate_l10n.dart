@@ -7,7 +7,9 @@ import 'locale_controller.dart';
 /// Gate verbs for the locale capability.
 ///
 /// Lets the app switch the locale (or follow the system) with a single call
-/// returning a [Result]. The SDK owns the choice, not the UI.
+/// returning a [Result]. The SDK owns the choice, not the UI. The verbs report
+/// a [PersistOutcome] so the app can warn the user when a choice applies now
+/// but will not survive a restart.
 extension GateL10nX on Gate {
   LocaleController get localeController => use<LocaleController>();
 
@@ -16,9 +18,9 @@ extension GateL10nX on Gate {
   /// Locales the application ships with, for building a language picker.
   List<Locale> get supportedLocales => localeController.config.supportedLocales;
 
-  Future<Result<void>> setLocale(Locale? locale) =>
-      call<void>(() => localeController.setLocale(locale));
+  Future<Result<PersistOutcome>> setLocale(Locale? locale) =>
+      call(() => localeController.setLocale(locale));
 
-  Future<Result<void>> followSystemLocale() =>
-      call<void>(localeController.followSystem);
+  Future<Result<PersistOutcome>> followSystemLocale() =>
+      call(localeController.followSystem);
 }

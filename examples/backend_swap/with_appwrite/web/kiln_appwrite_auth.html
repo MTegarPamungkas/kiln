@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Sign-in complete</title>
+<p>You can return to the app.</p>
+<script>
+  const message = {
+    'flutter-web-auth-2': window.location.href,
+    'kiln-appwrite-oauth': window.location.href
+  };
+  if (window.opener) {
+    window.opener.postMessage(message, window.location.origin);
+    window.close();
+  } else if (window.parent !== window) {
+    window.parent.postMessage(message, window.location.origin);
+  } else {
+    localStorage.setItem('flutter-web-auth-2', window.location.href);
+    window.close();
+  }
+</script>
+</html>

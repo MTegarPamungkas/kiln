@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Update `sentry_flutter` dependency constraint to `^10.6.0`.
+
 ## 0.1.1
 
 - Await `Sentry.configureScope` calls in `SentryCrashGateway.setUser` and `setContext` to satisfy `unawaited_futures`.

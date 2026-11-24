@@ -6,6 +6,15 @@ import 'package:kiln_core/kiln_core.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_query_mapper.dart';
 
 void main() {
+  test('cursor pagination reaches Appwrite instead of repeating the first page', () {
+    const mapper = AppwriteQueryMapper();
+    expect(mapper.map(const RemoteQuery(cursor: 'row-1', limit: 2)),
+      [Query.limit(2), Query.cursorAfter('row-1')]);
+    for (final query in [const RemoteQuery(cursor: ' '),
+      const RemoteQuery(cursor: 'row-1', offset: 1)]) {
+      expect(() => mapper.map(query), throwsA(isA<Failure>()));
+    }
+  });
   const mapper = AppwriteQueryMapper();
 
   test('filters, ordering, limit, and offset become query strings', () {

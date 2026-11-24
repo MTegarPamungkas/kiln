@@ -23,7 +23,13 @@ void main() {
 
     const EnvModule().register(registry);
 
-    expect(registry.read<EnvSupport>().info.state, SupportState.notConfigured);
-    expect(() => const EnvModule().ready(registry), throwsA(isA<Failure>()));
+    expect(
+      registry.read<EnvSupport>().info.state,
+      SupportState.notConfigured,
+    );
+    expect(
+      () => const EnvModule().ready(registry),
+      throwsA(isA<Failure>()),
+    );
   });
 }

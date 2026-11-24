@@ -59,26 +59,35 @@ class AppShell extends StatelessWidget {
         );
       }
 
-      for (final wrapper in wrappers.reversed) {
-        app = wrapper(context, app);
-      }
       return app;
+    }
+
+    Widget wrapApp(Widget child) {
+      var wrapped = child;
+      for (final wrapper in wrappers.reversed) {
+        wrapped = wrapper(context, wrapped);
+      }
+      return wrapped;
     }
 
     final themeListenable = themeConfig?.modeListenable;
     final localeListenable = localizations?.localeListenable;
     final listenables = <Listenable>[?themeListenable, ?localeListenable];
     if (listenables.isEmpty) {
-      return buildApp(
-        themeConfig?.mode ?? ThemeMode.system,
-        localizations?.locale,
+      return wrapApp(
+        buildApp(
+          themeConfig?.mode ?? ThemeMode.system,
+          localizations?.locale,
+        ),
       );
     }
-    return AnimatedBuilder(
-      animation: Listenable.merge(listenables),
-      builder: (context, _) => buildApp(
-        themeConfig?.currentMode ?? ThemeMode.system,
-        localizations?.currentLocale,
+    return wrapApp(
+      AnimatedBuilder(
+        animation: Listenable.merge(listenables),
+        builder: (context, _) => buildApp(
+          themeConfig?.currentMode ?? ThemeMode.system,
+          localizations?.currentLocale,
+        ),
       ),
     );
   }

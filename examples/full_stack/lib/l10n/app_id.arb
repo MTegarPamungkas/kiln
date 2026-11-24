@@ -56,5 +56,6 @@
   "failureCancelled": "Tindakan dibatalkan.",
   "failureUnavailable": "Fitur ini belum tersedia.",
   "failureUnsupported": "Fitur ini tidak didukung di perangkat ini.",
-  "failureUnexpected": "Terjadi kesalahan tak terduga. Coba lagi."
+  "failureUnexpected": "Terjadi kesalahan tak terduga. Coba lagi.",
+  "preferenceNotSaved": "Pilihan Anda berlaku sekarang, tetapi tidak dapat disimpan dan mungkin kembali saat aplikasi dimulai ulang."
 }

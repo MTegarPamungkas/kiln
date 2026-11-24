@@ -2,7 +2,7 @@
   "extension": "bloc",
   "files": {
     "lib/app/bloc_providers.dart": "f130d1dc83e8ab460febe2d0b9d8bb8ce401d560d7e98e97df359b2262769c0d",
-    "lib/core/bloc/app_bloc_observer.dart": "e1c04b4e80afbb525e4abadcee6b5b9abe330660e2df003242dfb702b6553b7e",
+    "lib/core/bloc/app_bloc_observer.dart": "0b8a061a2a76bcfc7e97d81eeb0e644bf5bdf5235ce7b9bd1e7f8f08f980803b",
     "lib/core/bloc/async_bloc.dart": "6830dcf321f9447124f0a4a3e2866a2970121de9295a3ceb95dfa84fa331c3f0",
     "lib/core/bloc/async_state.dart": "7a44915cb23c7a3371ca8e3e2b2a4a6f914bd45997e6d2ec1f41d5e21bf12c68",
     "lib/core/bloc/base_bloc.dart": "0088007e78b2e8a632a5a0b317dbdf8f4bf1cde7ee955e282bc44ba71a8be346",

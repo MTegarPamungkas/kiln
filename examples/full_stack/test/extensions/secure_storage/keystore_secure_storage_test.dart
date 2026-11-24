@@ -5,7 +5,8 @@ import 'test_support.dart';
 
 void main() {
   test('stores secrets under the app prefix', () async {
-    final gateway = FakeSecureStorageGateway()..values['other.key'] = 'keep';
+    final gateway = FakeSecureStorageGateway()
+      ..values['other.key'] = 'keep';
     final storage = createTestSecureStorage(gateway: gateway);
 
     await storage.write('token', 'secret');

@@ -97,7 +97,10 @@ void main() {
     deepLinks.emit(Uri.parse('https://example.com/'));
     await tester.pumpAndSettle();
 
-    expect(router.routerDelegate.currentConfiguration.uri.path, AppRoutes.home);
+    expect(
+      router.routerDelegate.currentConfiguration.uri.path,
+      AppRoutes.home,
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await module.dispose();

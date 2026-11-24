@@ -41,6 +41,21 @@ void main() {
     expect(controller.session?.email, 'stored@kiln.dev');
   });
 
+  test('start after dispose does not attach or seed a session', () async {
+    gateway.initialSession = const SupabaseSession(
+      userId: 'user-9',
+      email: 'stored@kiln.dev',
+      accessToken: 'stored-token',
+    );
+    await auth.restore();
+    await bridge.dispose();
+
+    bridge.start();
+
+    expect(bridge.isAttached, isFalse);
+    expect(controller.session, isNull);
+  });
+
   test('start without a session marks unauthenticated', () {
     bridge.start();
 

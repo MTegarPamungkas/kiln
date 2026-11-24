@@ -16,5 +16,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - name: Check extension dependency drift
+      - name: Check extension major dependency drift
         run: dart run tool/check_drift.dart --check
+      - name: Report minor/patch constraint lag
+        run: dart run tool/check_drift.dart --minor

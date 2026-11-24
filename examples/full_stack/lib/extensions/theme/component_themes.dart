@@ -114,7 +114,9 @@ final class ComponentThemes {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
-          side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.6)),
+          side: BorderSide(
+            color: colors.outlineVariant.withValues(alpha: 0.6),
+          ),
         ),
       ),
       dialog: DialogThemeData(

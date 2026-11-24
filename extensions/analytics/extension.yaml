@@ -1,6 +1,6 @@
 id: analytics
 name: Analytics
-version: 0.1.1
+version: 0.1.2
 description: PostHog product analytics with consent gating and PII scrubbing.
 category: analytics
 tier: official
@@ -10,7 +10,7 @@ provides:
 optional_requires:
   - flavor
 dependencies:
-  posthog_flutter: ^5.58.3
+  posthog_flutter: ^6.0.0
 prompts:
   - name: api_key
     type: secret

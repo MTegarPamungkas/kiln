@@ -50,7 +50,10 @@ void main() {
 
   test('autoLoad false waits for the caller', () async {
     var calls = 0;
-    final bloc = AsyncBloc<int>(() async => calls++, autoLoad: false);
+    final bloc = AsyncBloc<int>(
+      () async => calls++,
+      autoLoad: false,
+    );
     await _idle();
 
     expect(calls, 0);

@@ -4,10 +4,134 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_realtime_gateway.dart';
+import 'package:with_appwrite/extensions/appwrite/appwrite_database_gateway.dart';
 
 import 'test_support.dart';
 
 void main() {
+  test('an unlistened watch does not open a socket or read the row', () async {
+    final database = FakeAppwriteDatabaseGateway();
+    final realtime = FakeRealtime();
+    final gateway = SdkAppwriteRealtimeGateway(
+      realtime: realtime,
+      database: database,
+      databaseId: 'database',
+    );
+    gateway.watch(tableId: 'users', rowId: 'missing');
+    await pumpEventQueue();
+    expect(realtime.channels, isEmpty);
+    expect(database.calls, isEmpty);
+    await gateway.dispose();
+  });
+
+  test('a missing row emits an initial null', () async {
+    final gateway = SdkAppwriteRealtimeGateway(
+      realtime: FakeRealtime(),
+      database: FakeAppwriteDatabaseGateway(),
+      databaseId: 'database',
+    );
+    expect(
+      await gateway.watch(tableId: 'users', rowId: 'missing').first,
+      isNull,
+    );
+    await gateway.dispose();
+  });
+
+  test(
+    'cancelling the last listener releases the server subscription',
+    () async {
+      final realtime = FakeRealtime();
+      final gateway = SdkAppwriteRealtimeGateway(
+        realtime: realtime,
+        database: FakeAppwriteDatabaseGateway(),
+        databaseId: 'database',
+      );
+      final stream = gateway.watch(tableId: 'users', rowId: 'missing');
+      final first = stream.listen((_) {});
+      final second = stream.listen((_) {});
+      await first.cancel();
+      expect(realtime.unsubscribed, isFalse);
+      await second.cancel();
+      await pumpEventQueue();
+      expect(realtime.unsubscribed, isTrue);
+      await gateway.dispose();
+    },
+  );
+
+  for (final initial in [true, false]) {
+    test(
+      '${initial ? 'initial' : 'reconciliation'} read cannot overwrite a newer event',
+      () async {
+        final pending = Completer<Map<String, Object?>?>();
+        var reads = 0;
+        final database = _ReadGateway(() {
+          reads++;
+          if (initial || reads > 1) return pending.future;
+          return Future.value({'id': 'row', 'name': 'Initial'});
+        });
+        final realtime = FakeRealtime();
+        final gateway = SdkAppwriteRealtimeGateway(
+          realtime: realtime,
+          database: database,
+          databaseId: 'database',
+          reconcileDelay: initial ? const Duration(days: 1) : Duration.zero,
+        );
+        final received = <Map<String, Object?>?>[];
+        final subscription = gateway
+            .watch(tableId: 'users', rowId: 'row')
+            .listen(received.add);
+        await pumpEventQueue();
+        realtime.emit(
+          events: ['row.update'],
+          payload: {r'$id': 'row', 'name': 'New'},
+        );
+        await pumpEventQueue();
+        pending.complete({'id': 'row', 'name': 'Stale'});
+        await pumpEventQueue();
+        expect(received.last?['name'], 'New');
+        expect(received.any((row) => row?['name'] == 'Stale'), isFalse);
+        await subscription.cancel();
+        await gateway.dispose();
+      },
+    );
+  }
+
+  test('duplicate nested payloads are emitted once', () async {
+    final realtime = FakeRealtime();
+    final gateway = SdkAppwriteRealtimeGateway(
+      realtime: realtime,
+      database: _ReadGateway(
+        () async => {
+          'id': 'row',
+          'items': [
+            1,
+            {'a': 2},
+          ],
+        },
+      ),
+      databaseId: 'database',
+    );
+    final received = <Map<String, Object?>?>[];
+    final subscription = gateway
+        .watch(tableId: 'users', rowId: 'row')
+        .listen(received.add);
+    await pumpEventQueue();
+    realtime.emit(
+      events: ['row.update'],
+      payload: {
+        r'$id': 'row',
+        'items': [
+          1,
+          {'a': 2},
+        ],
+      },
+    );
+    await pumpEventQueue();
+    expect(received, hasLength(1));
+    await subscription.cancel();
+    await gateway.dispose();
+  });
+
   test('watch emits the current row, then realtime changes', () async {
     final database = FakeAppwriteDatabaseGateway();
     final created = await database.createRow('users', <String, Object?>{
@@ -86,6 +210,15 @@ void main() {
     await subscription.cancel();
     await gateway.dispose();
   });
+}
+
+class _ReadGateway implements AppwriteDatabaseGateway {
+  _ReadGateway(this.read);
+  final Future<Map<String, Object?>?> Function() read;
+  @override
+  Future<Map<String, Object?>?> getRow(String tableId, String rowId) => read();
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 final class FakeRealtime implements Realtime {

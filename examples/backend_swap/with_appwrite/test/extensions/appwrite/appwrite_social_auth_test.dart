@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_account.dart';
@@ -45,12 +46,15 @@ void main() {
       ).signIn(SocialProvider.google);
 
       expect(account.lastOAuthProvider, SocialProvider.google);
-      expect(account.lastOAuthSuccessUrl, 'appwrite-callback-proj://');
+      expect(account.lastOAuthSuccessUrl, config.oAuthSuccessUrl);
       expect(credential, isNotNull);
       expect(credential!.provider, SocialProvider.google);
       expect(credential.email, 'ana@kiln.dev');
       expect(credential.displayName, 'Ana');
       expect(credential.idToken, 'jwt-gh-1');
+      expect(credential.audience, SocialTokenAudience.backend);
+      expect(credential.backendSessionToken, 'jwt-gh-1');
+      expect(credential.accessToken, isNull);
       expect(bridge.session?.userId, 'gh-1');
     },
   );
@@ -70,6 +74,14 @@ void main() {
       expect(bridge.session, isNull);
     },
   );
+
+  test('native browser cancellation returns null', () async {
+    final account = FakeAppwriteAccount()
+      ..failure = PlatformException(code: 'CANCELED');
+    final bridge = AppwriteSessionBridge();
+    expect(await social(account, bridge).signIn(SocialProvider.google), isNull);
+    expect(bridge.session, isNull);
+  });
 
   test('sign-out clears the account and the bridged session', () async {
     final account = FakeAppwriteAccount()

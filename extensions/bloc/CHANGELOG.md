@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- Skip `AppBlocObserver.onChange` state stringification and redaction outside
+  debug mode (`logTransitions = kDebugMode`) and call `PiiRedactor.redactText`
+  directly to avoid per-emit `HashSet` allocations.
+
 ## 0.2.2
 
 - Import package:material_ui instead of the package:flutter/material.dart entry point, which Flutter 3.50 deprecated.

@@ -154,4 +154,8 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get failureUnexpected => 'Terjadi kesalahan tak terduga. Coba lagi.';
+
+  @override
+  String get preferenceNotSaved =>
+      'Pilihan Anda berlaku sekarang, tetapi tidak dapat disimpan dan mungkin kembali saat aplikasi dimulai ulang.';
 }

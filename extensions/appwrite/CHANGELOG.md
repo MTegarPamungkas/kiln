@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4
+
+- Update dependency constraints (`appwrite` `^28.4.1`, `shared_preferences` `^2.5.6`, `web` `^1.1.2`).
+
 ## 0.3.3
 
 - Update the manifest and render golden tests for the shared Appwrite client

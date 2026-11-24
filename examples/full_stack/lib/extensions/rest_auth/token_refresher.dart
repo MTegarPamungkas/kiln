@@ -5,6 +5,10 @@ import 'package:kiln_core/kiln_core.dart';
 import 'jwt_expiry.dart';
 import 'rest_token_store.dart';
 
+/// Exchanges a refresh token for new tokens, carrying the caller's deadline.
+typedef RefreshExchange =
+    Future<AuthTokens?> Function(String refreshToken, DateTime? deadline);
+
 /// Refreshes tokens once for any number of concurrent callers.
 final class TokenRefresher implements TokenProvider {
   TokenRefresher({
@@ -17,13 +21,16 @@ final class TokenRefresher implements TokenProvider {
   final RestTokenStore store;
   final Clock clock;
   final Duration leeway;
-  final Future<AuthTokens?> Function(String refreshToken) exchange;
+  final RefreshExchange exchange;
   Future<AuthTokens?>? _inFlight;
   Future<void> _writes = Future<void>.value();
   int _generation = 0;
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) async {
+  Future<String?> accessToken({
+    bool forceRefresh = false,
+    DateTime? deadline,
+  }) async {
     final generation = _generation;
     final stored = await store.read();
     if (generation != _generation) {
@@ -33,17 +40,21 @@ final class TokenRefresher implements TokenProvider {
       return stored.accessToken;
     }
     final refreshToken = stored?.refreshToken ?? await store.refreshToken();
-    if (generation != _generation ||
-        refreshToken == null ||
-        refreshToken.isEmpty) {
+    if (generation != _generation || refreshToken == null || refreshToken.isEmpty) {
       return null;
     }
-    final refreshed = await refreshWith(refreshToken);
+    final refreshed = await refreshWith(refreshToken, deadline: deadline);
     return refreshed?.accessToken;
   }
 
   /// Refreshes once and shares the result with every waiting caller.
-  Future<AuthTokens?> refreshWith(String refreshToken) {
+  ///
+  /// The first caller's [deadline] governs the shared exchange; a later caller
+  /// joins the in-flight request instead of shortening it.
+  Future<AuthTokens?> refreshWith(
+    String refreshToken, {
+    DateTime? deadline,
+  }) {
     final existing = _inFlight;
     if (existing != null) {
       return existing;
@@ -53,7 +64,7 @@ final class TokenRefresher implements TokenProvider {
     _inFlight = completer.future;
     () async {
       try {
-        final tokens = await exchange(refreshToken);
+        final tokens = await exchange(refreshToken, deadline);
         if (tokens != null) {
           await _updateStore(() async {
             if (generation == _generation) {
@@ -83,10 +94,7 @@ final class TokenRefresher implements TokenProvider {
   Future<void> _updateStore(Future<void> Function() update) {
     // Clearing never waits for the network, but follows any ongoing token write.
     final operation = _writes.then((_) => update());
-    _writes = operation.then<void>(
-      (_) {},
-      onError: (Object _, StackTrace _) {},
-    );
+    _writes = operation.then<void>((_) {}, onError: (Object _, StackTrace _) {});
     return operation;
   }
 

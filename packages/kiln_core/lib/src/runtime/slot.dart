@@ -35,11 +35,15 @@ final class OrderedSlot<T> {
   final StreamController<List<T>> _changes =
       StreamController<List<T>>.broadcast(sync: true);
   int _sequence = 0;
+  List<SlotEntry<T>>? _cachedEntries;
+  List<T>? _cachedItems;
 
-  List<SlotEntry<T>> get entries => List<SlotEntry<T>>.unmodifiable(_sorted());
+  List<SlotEntry<T>> get entries =>
+      _cachedEntries ??= List<SlotEntry<T>>.unmodifiable(_sorted());
 
-  List<T> get items =>
-      List<T>.unmodifiable(_sorted().map((entry) => entry.item));
+  List<T> get items => _cachedItems ??= List<T>.unmodifiable(
+    entries.map((entry) => entry.item),
+  );
 
   Stream<List<T>> get changes => _changes.stream;
 
@@ -52,14 +56,14 @@ final class OrderedSlot<T> {
         owner: owner,
       ),
     );
-    _emit();
+    _invalidateAndEmit();
   }
 
   void removeOwner(String owner) {
     final before = _entries.length;
     _entries.removeWhere((entry) => entry.owner == owner);
     if (_entries.length != before) {
-      _emit();
+      _invalidateAndEmit();
     }
   }
 
@@ -69,7 +73,7 @@ final class OrderedSlot<T> {
       return;
     }
     _entries.removeAt(index);
-    _emit();
+    _invalidateAndEmit();
   }
 
   void clear() {
@@ -77,11 +81,15 @@ final class OrderedSlot<T> {
       return;
     }
     _entries.clear();
-    _emit();
+    _invalidateAndEmit();
   }
 
-  void _emit() {
-    _changes.add(items);
+  void _invalidateAndEmit() {
+    _cachedEntries = null;
+    _cachedItems = null;
+    if (_changes.hasListener) {
+      _changes.add(items);
+    }
   }
 
   List<SlotEntry<T>> _sorted() {

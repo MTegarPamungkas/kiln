@@ -5,34 +5,34 @@ This catalog is generated from extension manifests by
 
 | ID | Name | Version | Category | Tier | Provides |
 | --- | --- | --- | --- | --- | --- |
-| `analytics` | Analytics | 0.1.1 | analytics | official | `analytics` |
-| `appwrite` | Appwrite | 0.3.3 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`, `appwrite_client` |
-| `appwrite_push` | Appwrite Push | 0.1.2 | notifications | official | `push_transport` |
-| `appwrite_push_native` | Appwrite Native Push | 0.2.2 | notifications | official | `push_transport` |
+| `analytics` | Analytics | 0.1.2 | analytics | official | `analytics` |
+| `appwrite` | Appwrite | 0.3.4 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`, `appwrite_client` |
+| `appwrite_push` | Appwrite Push | 0.1.3 | notifications | official | `push_transport` |
+| `appwrite_push_native` | Appwrite Native Push | 0.2.3 | notifications | official | `push_transport` |
 | `biometric` | Biometric | 0.1.2 | security | official | `biometric` |
-| `bloc` | Bloc state management | 0.2.2 | state | official | `state_bloc` |
+| `bloc` | Bloc state management | 0.2.3 | state | official | `state_bloc` |
 | `calendar` | Calendar | 0.1.1 | calendar | official | `calendar` |
-| `codegen` | Codegen | 0.1.1 | codegen | official | `codegen` |
+| `codegen` | Codegen | 0.1.2 | codegen | official | `codegen` |
 | `connectivity` | Connectivity | 0.1.3 | connectivity | official | `connectivity` |
-| `crash_report` | Crash Report | 0.1.1 | crash | official | `crash_reporter` |
+| `crash_report` | Crash Report | 0.1.2 | crash | official | `crash_reporter` |
 | `deep_link` | Deep links | 0.1.2 | deep_link | official | `deep_links` |
 | `dio` | Dio HTTP client | 0.1.3 | network | official | `http_client`, `http_pipeline` |
 | `env` | Environment | 0.1.1 | config | official | `env` |
-| `firebase` | Firebase | 0.1.2 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `token_provider`, `account_management` |
+| `firebase` | Firebase | 0.1.3 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage`, `token_provider`, `account_management` |
 | `flavors` | Flavors | 0.1.2 | flavor | official | `flavor` |
-| `geolocation` | Geolocation | 0.1.1 | location | official | `location` |
-| `go_router` | GoRouter | 0.1.1 | navigation | official | `navigation` |
+| `geolocation` | Geolocation | 0.1.2 | location | official | `location` |
+| `go_router` | GoRouter | 0.1.2 | navigation | official | `navigation` |
 | `http_cache` | HTTP cache | 0.1.2 | network | official | `http_cache` |
 | `http_retry` | HTTP retry | 0.1.1 | network | official |  |
 | `image_picker` | Image picker | 0.1.1 | media | official | `media` |
 | `l10n` | Localization | 0.1.2 | l10n | official | `l10n` |
-| `local_db` | Local database | 0.1.1 | database | official | `local_db` |
+| `local_db` | Local database | 0.1.2 | database | official | `local_db` |
 | `logger` | Logger | 0.1.1 | logging | official | `logger` |
-| `notifications` | Notifications | 0.1.2 | notifications | official | `notifications` |
+| `notifications` | Notifications | 0.1.3 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.1 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.2 | config | official | `remote_config` |
 | `rest_auth` | REST auth | 0.1.3 | auth | official | `auth`, `token_provider`, `account_management` |
-| `riverpod` | Riverpod state management | 0.2.2 | state | official | `state_riverpod` |
+| `riverpod` | Riverpod state management | 0.2.3 | state | official | `state_riverpod` |
 | `secure_storage` | Secure storage | 0.1.1 | storage | official | `secure_storage` |
 | `share` | Share | 0.1.1 | share | official | `share` |
 | `social_login` | Social login | 0.1.1 | social | official | `social_login` |
@@ -46,7 +46,7 @@ PostHog product analytics with consent gating and PII scrubbing.
 
 - Provides: `analytics`
 - Prompts: api_key, host
-- Dependencies: `posthog_flutter: ^5.58.3`
+- Dependencies: `posthog_flutter: ^6.0.0`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## appwrite
@@ -55,7 +55,7 @@ Appwrite auth, social sign-in, remote database, file storage, and cloud function
 
 - Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `functions`, `token_provider`, `account_management`, `push_targets`, `appwrite_client`
 - Prompts: endpoint, project_id, database_id, bucket_id
-- Dependencies: `appwrite: ^28.2.0`, `http: ^1.6.0`, `shared_preferences: ^2.3.0`, `web: ^1.1.1`
+- Dependencies: `appwrite: ^28.4.1`, `http: ^1.6.0`, `shared_preferences: ^2.5.6`, `web: ^1.1.2`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## appwrite_push
@@ -64,7 +64,7 @@ Push transport bridging Firebase Cloud Messaging into the push_targets capabilit
 
 - Provides: `push_transport`
 - Requires: `push_targets`
-- Dependencies: `firebase_core: ^5.1.0`, `firebase_messaging: ^17.0.1`, `flutter_local_notifications: ^22.3.3`
+- Dependencies: `firebase_core: ^5.2.0`, `firebase_messaging: ^17.1.0`, `flutter_local_notifications: >=22.3.3 <24.0.0`
 - Platforms: android
 
 ## appwrite_push_native
@@ -74,7 +74,7 @@ Push transport over Appwrite Push (MQTT), without Firebase or device tokens.
 - Provides: `push_transport`
 - Requires: `appwrite_client`
 - Prompts: push_endpoint, background, notification_title, background_reliability
-- Dependencies: `appwrite: ^28.2.0`
+- Dependencies: `appwrite: ^28.4.1`
 - Platforms: android, ios
 
 ## biometric
@@ -123,7 +123,7 @@ Sentry crash reporting behind a consent gate, with PII redaction and breadcrumbs
 
 - Provides: `crash_reporter`
 - Prompts: dsn, release
-- Dependencies: `sentry_flutter: ^10.3.0`
+- Dependencies: `sentry_flutter: ^10.6.0`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## deep_link
@@ -158,7 +158,7 @@ Firebase Auth, Firestore, and Cloud Storage behind Kiln contracts.
 
 - Provides: `auth`, `social_auth`, `remote_database`, `file_storage`, `token_provider`, `account_management`
 - Prompts: options_source, firebase_options_path, emulator_host, use_emulator_in_development
-- Dependencies: `firebase_core: ^5.1.0`, `firebase_auth: ^7.0.1`, `cloud_firestore: ^7.1.0`, `firebase_storage: ^14.0.1`
+- Dependencies: `firebase_core: ^5.2.0`, `firebase_auth: ^7.1.0`, `cloud_firestore: ^7.2.0`, `firebase_storage: ^14.1.0`
 - Platforms: android, ios, macos, web, windows
 
 ## flavors
@@ -174,7 +174,7 @@ Dart-level app flavors, entry points, and launch configurations.
 Device location with permission-aware reads and streaming updates.
 
 - Provides: `location`
-- Dependencies: `geolocator: ^14.0.1`
+- Dependencies: `geolocator: ^14.1.2`
 - Platforms: android, ios, macos, web, windows
 
 ## go_router
@@ -182,7 +182,7 @@ Device location with permission-aware reads and streaming updates.
 Declarative routing with route slots, guards, and deep link mapping.
 
 - Provides: `navigation`
-- Dependencies: `go_router: ^18.1.2`
+- Dependencies: `go_router: ^18.1.4`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## http_cache
@@ -223,7 +223,7 @@ ARB-based localizations with gen-l10n, locale selection, plurals, and formatting
 Offline-first document database backed by Sembast.
 
 - Provides: `local_db`
-- Dependencies: `sembast: ^3.9.0`, `sembast_web: ^2.4.6+1`, `path_provider: ^2.1.6`, `path: ^1.9.1`, `encrypt: ^5.0.3`
+- Dependencies: `sembast: ^3.10.1`, `sembast_web: ^2.4.7`, `path_provider: ^2.1.6`, `path: ^1.9.1`, `encrypt: ^5.0.3`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## logger
@@ -241,7 +241,7 @@ Local notifications with channels, scheduling, and tap routing.
 
 - Provides: `notifications`
 - Prompts: default_channel, small_icon, exact_alarms
-- Dependencies: `flutter_local_notifications: ^22.3.3`, `flutter_timezone: ^5.1.1`, `timezone: ^0.11.2`
+- Dependencies: `flutter_local_notifications: >=22.3.3 <24.0.0`, `flutter_timezone: ^5.1.1`, `timezone: ^0.11.2`
 - Platforms: android, ios, macos, web, windows, linux
 
 ## permission
@@ -275,7 +275,7 @@ Email and password authentication against a REST API.
 State management with Riverpod providers and notifiers on a clean architecture feature layout.
 
 - Provides: `state_riverpod`
-- Dependencies: `flutter_riverpod: ^3.4.3`
+- Dependencies: `flutter_riverpod: ^3.5.0`
 
 ## secure_storage
 

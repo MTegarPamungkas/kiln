@@ -18,7 +18,11 @@ final class RestAuthModule extends KilnModule {
   String get id => 'rest_auth';
 
   @override
-  Set<String> get provides => const <String>{'auth'};
+  Set<String> get provides => const <String>{
+    'auth',
+    'token_provider',
+    'account_management',
+  };
 
   @override
   Set<String> get requires => const <String>{'http_client', 'secure_storage'};
@@ -30,7 +34,10 @@ final class RestAuthModule extends KilnModule {
     final storage = registry.read<SecureStorage>();
     final auth = RestAuth(
       client: client,
-      store: RestTokenStore(storage: storage),
+      store: RestTokenStore(
+        storage: storage,
+        backend: RestTokenStore.identityFor(config.baseUrl),
+      ),
       config: config,
       clock: registry.readOrNull<Clock>() ?? const SystemClock(),
     );
@@ -68,6 +75,11 @@ final class RestAuthModule extends KilnModule {
           priority: 11,
         );
     }
+
+    // The module has no mutable state of its own, so the bridge is disposed
+    // through the lifecycle; without it a late ready() would re-subscribe after
+    // application disposal.
+    registry.readOrNull<LifecycleController>()?.addDisposeCallback(bridge.dispose);
   }
 
   @override

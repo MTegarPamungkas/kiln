@@ -6,23 +6,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:with_supabase/extensions/supabase/supabase_failure_mapper.dart';
 
 void main() {
-  test(
-    'a wrong-credentials AuthException becomes auth.invalid_credentials',
-    () {
-      final failure = mapSupabaseError(
-        const AuthException(
-          'Invalid login credentials',
-          statusCode: '400',
-          code: 'invalid_credentials',
-        ),
-      );
+  test('a wrong-credentials AuthException becomes auth.invalid_credentials', () {
+    final failure = mapSupabaseError(
+      const AuthException(
+        'Invalid login credentials',
+        statusCode: '400',
+        code: 'invalid_credentials',
+      ),
+    );
 
-      expect(failure.code, FailureCode.authInvalidCredentials);
-      expect(failure.kind, FailureKind.authentication);
-      expect(failure.details['supabase_code'], 'invalid_credentials');
-      expect(failure.isRetryable, isFalse);
-    },
-  );
+    expect(failure.code, FailureCode.authInvalidCredentials);
+    expect(failure.kind, FailureKind.authentication);
+    expect(failure.details['supabase_code'], 'invalid_credentials');
+    expect(failure.isRetryable, isFalse);
+  });
 
   test('an unconfirmed-email AuthException is detected', () {
     final failure = mapSupabaseError(

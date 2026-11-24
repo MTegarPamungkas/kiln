@@ -1,6 +1,7 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart';
+import 'package:kiln_core/kiln_core.dart';
 
 import 'l10n_config.dart';
 import 'locale_store.dart';
@@ -23,6 +24,9 @@ final class LocaleController {
   final LocaleStore? store;
 
   final ValueNotifier<Locale?> _locale;
+  bool _disposed = false;
+  int _generation = 0;
+  Future<void> _writes = Future<void>.value();
 
   /// The live locale, suitable for `AppLocalizationsConfig.localeListenable`.
   ValueListenable<Locale?> get localeListenable => _locale;
@@ -37,12 +41,16 @@ final class LocaleController {
   /// preference must never block application startup.
   Future<void> load() async {
     final store = this.store;
-    if (store == null) {
+    if (store == null || _disposed) {
       return;
     }
+    final generation = ++_generation;
     try {
       final stored = await store.readOrNull();
-      if (stored != null && config.supports(stored)) {
+      if (stored != null &&
+          !_disposed &&
+          generation == _generation &&
+          config.supports(stored)) {
         _locale.value = config.canonical(stored);
       }
     } on Object {
@@ -53,28 +61,43 @@ final class LocaleController {
   /// Changes the locale and persists it.
   ///
   /// A `null` [next] follows the system locale. Unsupported locales throw an
-  /// [ArgumentError] so programming mistakes surface in tests.
-  Future<void> setLocale(Locale? next) async {
+  /// [ArgumentError] so programming mistakes surface in tests. The returned
+  /// [PersistOutcome] says whether the choice survives a restart.
+  Future<PersistOutcome> setLocale(Locale? next) async {
+    if (_disposed) {
+      return PersistOutcome.notConfigured;
+    }
     final normalized = _normalize(config, next);
+    _generation++;
     _locale.value = normalized;
-    await _persist(normalized);
+    final store = this.store;
+    if (store == null) {
+      return PersistOutcome.notConfigured;
+    }
+    final write = _writes.then((_) => _persist(store, normalized));
+    _writes = write.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return write;
   }
 
   /// Clears the explicit choice and follows the system locale again.
-  Future<void> followSystem() => setLocale(null);
+  Future<PersistOutcome> followSystem() => setLocale(null);
 
   /// Releases the notifier.
-  void dispose() => _locale.dispose();
-
-  Future<void> _persist(Locale? locale) async {
-    final store = this.store;
-    if (store == null) {
+  void dispose() {
+    if (_disposed) {
       return;
     }
+    _disposed = true;
+    _locale.dispose();
+  }
+
+  Future<PersistOutcome> _persist(LocaleStore store, Locale? locale) async {
     try {
       await store.save(locale);
+      return PersistOutcome.persisted;
     } on Object {
       // The selection still applies for this session.
+      return PersistOutcome.sessionOnly;
     }
   }
 

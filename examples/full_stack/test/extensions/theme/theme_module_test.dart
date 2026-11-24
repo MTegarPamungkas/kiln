@@ -10,10 +10,14 @@ import 'package:full_stack/extensions/theme/theme_module.dart';
 import 'package:full_stack/extensions/theme/theme_support.dart';
 
 void main() {
+  test('declares the optional dependency that determines readiness', () {
+    expect(ThemeModule().optionalRequires, contains('storage'));
+  });
+
   test('registers the theme seams without storage', () {
     final registry = GetItRegistry();
 
-    const ThemeModule().register(registry);
+    ThemeModule().register(registry);
 
     final appTheme = registry.read<AppThemeConfig>();
     final controller = registry.read<ThemeModeController>();
@@ -29,10 +33,22 @@ void main() {
     expect(registry.readOrNull<ThemeModeStore>(), isNull);
   });
 
+  test('module disposes its controller once', () async {
+    final registry = GetItRegistry();
+    final module = ThemeModule()..register(registry);
+    final controller = registry.read<ThemeModeController>();
+
+    await module.dispose();
+    await module.dispose();
+    await controller.setMode(ThemeMode.dark);
+
+    expect(controller.mode, ThemeMode.system);
+  });
+
   test('registers the store and restores the saved mode on ready', () async {
     final storage = InMemoryStorage(<String, String>{'theme.mode': 'dark'});
     final registry = GetItRegistry()..registerSingleton<Storage>(storage);
-    const module = ThemeModule();
+    final module = ThemeModule();
 
     module.register(registry);
     final controller = registry.read<ThemeModeController>();

@@ -17,6 +17,9 @@ final class BlocModule extends KilnModule {
   Set<String> get provides => const <String>{'state_bloc'};
 
   @override
+  Set<String> get optionalRequires => const <String>{'logger'};
+
+  @override
   void register(Registry registry) {
     final logger = registry.readOrNull<AppLogger>();
     if (logger != null) {

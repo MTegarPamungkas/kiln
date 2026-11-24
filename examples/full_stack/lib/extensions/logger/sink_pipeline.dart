@@ -12,8 +12,11 @@ import 'log_sink.dart';
 /// [onFailure] and never stops the remaining sinks. Failures are never fed
 /// back into this pipeline, which would risk an infinite loop.
 final class SinkPipeline implements LogSink {
-  SinkPipeline(Iterable<LogSink> sinks, {this.onFailure, this.enabled = true})
-    : _sinks = List<LogSink>.of(sinks);
+  SinkPipeline(
+    Iterable<LogSink> sinks, {
+    this.onFailure,
+    this.enabled = true,
+  }) : _sinks = List<LogSink>.of(sinks);
 
   final List<LogSink> _sinks;
 

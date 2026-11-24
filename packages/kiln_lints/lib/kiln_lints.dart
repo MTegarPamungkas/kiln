@@ -1,4 +1,5 @@
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analysis_server_plugin/plugin.dart';
+import 'package:analysis_server_plugin/registry.dart';
 
 import 'src/rules/no_cross_extension_import.dart';
 import 'src/rules/no_edit_generated_files.dart';
@@ -6,21 +7,19 @@ import 'src/rules/no_plugin_in_features.dart';
 import 'src/rules/prefer_contract_over_impl.dart';
 import 'src/rules/require_failure_handling.dart';
 
-/// Entry point used by custom_lint to load the plugin.
-PluginBase createPlugin() => KilnLintsPlugin();
-
-/// Custom lint rules that keep Kiln applications on contracts.
-class KilnLintsPlugin extends PluginBase {
+/// Analyzer plugin that keeps Kiln applications on contracts.
+class KilnLintsPlugin extends Plugin {
   KilnLintsPlugin();
 
   @override
-  List<LintRule> getLintRules(CustomLintConfigs configs) {
-    return const <LintRule>[
-      NoCrossExtensionImport(),
-      PreferContractOverImpl(),
-      NoPluginInFeatures(),
-      NoEditGeneratedFiles(),
-      RequireFailureHandling(),
-    ];
+  String get name => 'kiln_lints';
+
+  @override
+  void register(PluginRegistry registry) {
+    registry.registerWarningRule(NoCrossExtensionImport());
+    registry.registerWarningRule(PreferContractOverImpl());
+    registry.registerWarningRule(NoPluginInFeatures());
+    registry.registerLintRule(NoEditGeneratedFiles());
+    registry.registerWarningRule(RequireFailureHandling());
   }
 }

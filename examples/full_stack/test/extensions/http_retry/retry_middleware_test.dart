@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:full_stack/extensions/http_retry/retry_budget.dart';
@@ -8,11 +10,13 @@ import 'package:full_stack/extensions/http_retry/retry_settings.dart';
 HttpRequest _request({
   HttpMethod method = HttpMethod.get,
   Map<String, String> headers = const <String, String>{},
+  DateTime? deadline,
 }) {
   return HttpRequest(
     method: method,
     uri: Uri.parse('https://api.kiln.dev/users'),
     headers: headers,
+    deadline: deadline,
   );
 }
 
@@ -25,6 +29,51 @@ const _settings = HttpRetrySettings(
 );
 
 void main() {
+  for (final networkFailure in [false, true]) {
+    test(
+      'cancels a pending retry wait after ${networkFailure ? 'failure' : 'response'}',
+      () async {
+        final token = HttpCancelToken();
+        final waiting = Completer<void>();
+        final delayed = Completer<void>();
+        final middleware = RetryMiddleware(
+          settings: _settings,
+          delay: (_) {
+            waiting.complete();
+            return delayed.future;
+          },
+        );
+        var attempts = 0;
+        final result = middleware.handle(
+          _request().copyWith(cancelToken: token),
+          (_) async {
+            attempts++;
+            if (networkFailure) {
+              throw const Failure(
+                code: FailureCode.networkTimeout,
+                message: 'Temporary network failure.',
+                kind: FailureKind.network,
+                isRetryable: true,
+              );
+            }
+            return const HttpResponse(statusCode: 503);
+          },
+        );
+        final expectation = expectLater(
+          result,
+          throwsA(
+            isA<Failure>().having((f) => f.code, 'code', FailureCode.cancelled),
+          ),
+        );
+        await waiting.future;
+        token.cancel();
+        await expectation.timeout(const Duration(seconds: 1));
+        expect(attempts, 1);
+        delayed.complete();
+      },
+    );
+  }
+
   test('retries a retryable status and returns the next success', () async {
     var calls = 0;
     final delays = <Duration>[];
@@ -112,7 +161,7 @@ void main() {
     expect(calls, 2);
   });
 
-  test('uses Retry-After for the next delay', () async {
+  test('clamps Retry-After to the configured ceiling', () async {
     final delays = <Duration>[];
     final middleware = RetryMiddleware(
       settings: _settings,
@@ -131,7 +180,7 @@ void main() {
       return const HttpResponse(statusCode: 200);
     });
 
-    expect(delays.single, const Duration(seconds: 2));
+    expect(delays.single, _settings.maxDelay);
   });
 
   test('stops when the retry budget is exhausted', () async {
@@ -152,5 +201,246 @@ void main() {
     expect(response.statusCode, 503);
     expect(calls, 2);
     expect(giveUps, isNotEmpty);
+  });
+
+  group('total budget', () {
+    HttpRetrySettings budgeted(Duration budget) => HttpRetrySettings(
+      maxAttempts: 5,
+      initialDelay: const Duration(milliseconds: 100),
+      maxDelay: const Duration(milliseconds: 100),
+      jitter: false,
+      totalBudget: budget,
+      retryableStatusCodes: const <int>{503},
+    );
+
+    test('stops retrying when the wall-clock budget is spent', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      final delays = <Duration>[];
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: budgeted(const Duration(milliseconds: 250)),
+        clock: clock,
+        delay: (delay) async {
+          delays.add(delay);
+          clock.advance(delay);
+        },
+      );
+
+      final response = await middleware.handle(_request(), (_) async {
+        attempts++;
+        return const HttpResponse(statusCode: 503);
+      });
+
+      expect(response.statusCode, 503);
+      expect(attempts, 3);
+      expect(delays, const <Duration>[
+        Duration(milliseconds: 100),
+        Duration(milliseconds: 100),
+        Duration(milliseconds: 50),
+      ]);
+    });
+
+    test('a budget shorter than the first delay allows one attempt', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      final delays = <Duration>[];
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: budgeted(const Duration(milliseconds: 30)),
+        clock: clock,
+        delay: (delay) async {
+          delays.add(delay);
+          clock.advance(delay);
+        },
+      );
+
+      await middleware.handle(_request(), (_) async {
+        attempts++;
+        return const HttpResponse(statusCode: 503);
+      });
+
+      expect(attempts, 1);
+      expect(delays, const <Duration>[Duration(milliseconds: 30)]);
+    });
+
+    test('clips a Retry-After wait to the remaining budget', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      Duration? waited;
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: HttpRetrySettings(
+          maxAttempts: 5,
+          initialDelay: const Duration(milliseconds: 100),
+          maxDelay: const Duration(seconds: 8),
+          jitter: false,
+          totalBudget: const Duration(milliseconds: 500),
+          retryableStatusCodes: const <int>{503},
+        ),
+        clock: clock,
+        delay: (delay) async {
+          waited = delay;
+          clock.advance(delay);
+        },
+      );
+
+      await middleware.handle(_request(), (_) async {
+        attempts++;
+        return const HttpResponse(
+          statusCode: 503,
+          headers: <String, List<String>>{
+            'retry-after': <String>['30'],
+          },
+        );
+      });
+
+      expect(attempts, 1);
+      expect(waited, const Duration(milliseconds: 500));
+    });
+
+    test('the failure branch also honours the budget', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: budgeted(const Duration(milliseconds: 250)),
+        clock: clock,
+        delay: (delay) async => clock.advance(delay),
+      );
+
+      await expectLater(
+        middleware.handle(_request(), (_) async {
+          attempts++;
+          throw const Failure(
+            code: FailureCode.networkTimeout,
+            message: 'Temporary network failure.',
+            kind: FailureKind.network,
+            isRetryable: true,
+          );
+        }),
+        throwsA(isA<Failure>()),
+      );
+
+      expect(attempts, 3);
+    });
+
+    test('without a budget the attempt limit still applies', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: HttpRetrySettings(
+          maxAttempts: 3,
+          initialDelay: const Duration(milliseconds: 10),
+          maxDelay: const Duration(milliseconds: 10),
+          jitter: false,
+          retryableStatusCodes: const <int>{503},
+        ),
+        clock: clock,
+        delay: (delay) async => clock.advance(delay),
+      );
+
+      await middleware.handle(_request(), (_) async {
+        attempts++;
+        return const HttpResponse(statusCode: 503);
+      });
+
+      expect(attempts, 3);
+    });
+  });
+
+  group('request deadline', () {
+    test('an expired deadline fails before the first attempt', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: _settings,
+        clock: clock,
+        delay: (_) async {},
+      );
+
+      await expectLater(
+        middleware.handle(
+          _request(
+            deadline: clock.now().subtract(const Duration(seconds: 1)),
+          ),
+          (_) async {
+            attempts++;
+            return const HttpResponse(statusCode: 200);
+          },
+        ),
+        throwsA(
+          isA<Failure>().having(
+            (failure) => failure.code,
+            'code',
+            FailureCode.networkDeadlineExceeded,
+          ),
+        ),
+      );
+      expect(attempts, 0);
+    });
+
+    test('clips retry waits to the deadline and fails when it passes', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      final delays = <Duration>[];
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: HttpRetrySettings(
+          maxAttempts: 5,
+          initialDelay: const Duration(milliseconds: 100),
+          maxDelay: const Duration(milliseconds: 100),
+          jitter: false,
+          retryableStatusCodes: const <int>{503},
+        ),
+        clock: clock,
+        delay: (delay) async {
+          delays.add(delay);
+          clock.advance(delay);
+        },
+      );
+
+      await expectLater(
+        middleware.handle(
+          _request(
+            deadline: clock.now().add(const Duration(milliseconds: 250)),
+          ),
+          (_) async {
+            attempts++;
+            return const HttpResponse(statusCode: 503);
+          },
+        ),
+        throwsA(
+          isA<Failure>().having(
+            (failure) => failure.code,
+            'code',
+            FailureCode.networkDeadlineExceeded,
+          ),
+        ),
+      );
+
+      expect(attempts, 3);
+      expect(delays, const <Duration>[
+        Duration(milliseconds: 100),
+        Duration(milliseconds: 100),
+        Duration(milliseconds: 50),
+      ]);
+    });
+
+    test('a deadline after a successful retry does not interfere', () async {
+      final clock = FixedClock(DateTime.utc(2026, 11, 21));
+      var attempts = 0;
+      final middleware = RetryMiddleware(
+        settings: _settings,
+        clock: clock,
+        delay: (_) async {},
+      );
+
+      final response = await middleware.handle(
+        _request(deadline: clock.now().add(const Duration(minutes: 1))),
+        (_) async {
+          attempts++;
+          return HttpResponse(statusCode: attempts == 1 ? 503 : 200);
+        },
+      );
+
+      expect(response.statusCode, 200);
+      expect(attempts, 2);
+    });
   });
 }

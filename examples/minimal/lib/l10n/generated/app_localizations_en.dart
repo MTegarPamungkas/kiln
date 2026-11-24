@@ -157,4 +157,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failureUnexpected => 'An unexpected error occurred. Try again.';
+
+  @override
+  String get preferenceNotSaved =>
+      'Your choice applies now, but it could not be saved and may reset when the app restarts.';
 }

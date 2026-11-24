@@ -49,6 +49,11 @@ without a leading `/` are ignored. This extension does not import the
 notifications extension; it only uses the `Notifications` and `NotificationTap`
 contracts from `kiln_core`.
 
+Bootstrap order does not matter: the notifications hub retains the launch
+payload and taps received during initialization, then replays them once when the
+router subscribes. Later taps flow live, and re-subscribing does not replay the
+launch route.
+
 ## Testing links
 
 ```dart

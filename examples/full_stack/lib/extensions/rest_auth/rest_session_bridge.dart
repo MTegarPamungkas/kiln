@@ -9,8 +9,12 @@ final class RestSessionBridge {
   final AuthRepository auth;
   final SessionController session;
   StreamSubscription<AuthSession?>? _subscription;
+  bool _disposed = false;
 
   Future<void> start() async {
+    if (_disposed) {
+      return;
+    }
     _subscription ??= auth.authStateChanges.listen(session.setSession);
     final current = auth.currentSession;
     if (current != null) {
@@ -19,6 +23,10 @@ final class RestSessionBridge {
   }
 
   Future<void> dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
     await _subscription?.cancel();
     _subscription = null;
   }

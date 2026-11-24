@@ -8,14 +8,18 @@ import 'appwrite_client_factory.dart';
 import 'appwrite_config.dart';
 import 'appwrite_database_gateway.dart';
 import 'appwrite_file_storage.dart';
+import 'appwrite_functions.dart';
+import 'appwrite_push_targets.dart';
 import 'appwrite_remote_database.dart';
 import 'appwrite_realtime_gateway.dart';
 import 'appwrite_session_bridge.dart';
+import 'appwrite_session_store.dart';
 import 'appwrite_social_auth.dart';
 import 'appwrite_storage_gateway.dart';
 import 'appwrite_support.dart';
 
-/// Registers AuthRepository, SocialAuth, RemoteDatabase, and FileStorage for Appwrite.
+/// Registers AuthRepository, SocialAuth, RemoteDatabase, FileStorage,
+/// CloudFunctions, and PushTargets for Appwrite.
 final class AppwriteModule extends KilnModule {
   AppwriteModule({
     this.config = AppwriteConfig.defaults,
@@ -35,9 +39,13 @@ final class AppwriteModule extends KilnModule {
   AppwriteSessionBridge? _bridge;
   AppwriteRealtimeGateway? _realtime;
   AppwriteAuth? _auth;
+  SdkAppwriteAccount? _account;
 
   @override
   String get id => 'appwrite';
+
+  @override
+  Set<String> get optionalRequires => const {'secure_storage'};
 
   @override
   Set<String> get provides => const <String>{
@@ -45,17 +53,32 @@ final class AppwriteModule extends KilnModule {
     'social_auth',
     'remote_database',
     'file_storage',
+    'functions',
+    'token_provider',
+    'account_management',
+    'push_targets',
+    'appwrite_client',
   };
 
   @override
   void register(Registry registry) {
     final support = AppwriteSupport(config: config);
     final client = clientFactory.create(config: config, flavor: flavor);
+    final sdkAccount = appwrite.Account(client);
+    final secureStorage = registry.readOrNull<SecureStorage>();
     final account = SdkAppwriteAccount(
-      account: appwrite.Account(client),
+      account: sdkAccount,
       client: client,
+      flavor: flavor,
+      sessionStore: secureStorage == null
+          ? const PreferencesAppwriteSessionStore()
+          : SecureAppwriteSessionStore(secureStorage),
     );
-    final tokens = AppwriteTokenProvider(account: account);
+    _account = account;
+    final tokens = AppwriteTokenProvider(
+      account: account,
+      clock: registry.readOrNull<Clock>() ?? const SystemClock(),
+    );
     final bridge = AppwriteSessionBridge(
       controller: registry.readOrNull<SessionController>(),
       tokenProvider: tokens,
@@ -91,10 +114,15 @@ final class AppwriteModule extends KilnModule {
       ),
     );
 
+    final functions = AppwriteFunctions(functions: appwrite.Functions(client));
+
+    final pushTargets = AppwritePushTargets(account: sdkAccount);
+
     _bridge = bridge;
     _realtime = realtime;
 
     registry
+      ..registerSingleton<appwrite.Client>(client)
       ..registerSingleton<AppwriteConfig>(config)
       ..registerSingleton<AppwriteSupport>(support)
       ..registerSingleton<AuthRepository>(auth)
@@ -103,6 +131,8 @@ final class AppwriteModule extends KilnModule {
       ..registerSingleton<AccountManagement>(accountManagement)
       ..registerSingleton<RemoteDatabase>(database)
       ..registerSingleton<FileStorage>(storage)
+      ..registerSingleton<CloudFunctions>(functions)
+      ..registerSingleton<PushTargets>(pushTargets)
       ..registerSingleton<TokenProvider>(tokens);
   }
 
@@ -129,6 +159,8 @@ final class AppwriteModule extends KilnModule {
 
   @override
   Future<void> dispose() async {
+    _account?.cancelOAuth();
+    _account = null;
     await _realtime?.dispose();
     await _bridge?.dispose();
     _realtime = null;

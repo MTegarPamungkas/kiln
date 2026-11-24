@@ -1,15 +1,15 @@
+import 'package:go_router/go_router.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 import 'app_route.dart';
 import '../features/home/presentation/screens/home_page.dart';
+import '../features/notes/presentation/screens/notes_page.dart';
 
-/// Contributes the application root route to whatever router is installed.
+/// Contributes the application routes to whatever router is installed.
 ///
 /// `AppShell` mounts a `MaterialApp.router` as soon as the `go_router`
 /// extension registers a `RouterConfig`, and that router only knows the routes
-/// already contributed to the `router.routes` slot when it is built. Without
-/// this module the generated home page would be ignored and the app would open
-/// on a "no routes for location: /" error.
+/// already contributed to the `router.routes` slot when it is built.
 ///
 /// Register it before the extension modules so the slot exists first.
 final class AppRoutesModule extends KilnModule {
@@ -27,12 +27,27 @@ final class AppRoutesModule extends KilnModule {
     }
 
     final routes = slots.open<AppRoute>(SlotNames.routerRoutes);
-    if (routes.items.any((route) => route.path == '/')) {
-      return;
+    if (!routes.items.any((route) => route.path == '/')) {
+      routes.add(
+        AppRoute(
+          path: '/',
+          name: 'home',
+          builder: (context) => HomePage(
+            onOpenNotes: () => GoRouter.of(context).push('/notes'),
+          ),
+        ),
+        owner: 'app',
+      );
     }
-    routes.add(
-      AppRoute(path: '/', name: 'home', builder: (_) => const HomePage()),
-      owner: 'app',
-    );
+    if (!routes.items.any((route) => route.path == '/notes')) {
+      routes.add(
+        AppRoute(
+          path: '/notes',
+          name: 'notes',
+          builder: (_) => const NotesPage(),
+        ),
+        owner: 'app',
+      );
+    }
   }
 }

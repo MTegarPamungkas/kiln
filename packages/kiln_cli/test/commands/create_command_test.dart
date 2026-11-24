@@ -660,5 +660,59 @@ void main() {
       expect(code, ExitCodes.project);
       expect(captured.err.join('\n'), contains('not both'));
     });
+
+    test('--with-lints wires kiln_lints path plugin into analysis_options.yaml', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+
+      final code = await runner.run(<String>[
+        'create',
+        'linted_app',
+        '--core-path',
+        corePath,
+        '--with-lints',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      final options = File(
+        p.join(workspace.path, 'linted_app', 'analysis_options.yaml'),
+      ).readAsStringSync();
+      expect(options, contains('plugins:'));
+      expect(options, contains('kiln_lints:'));
+      expect(options, contains('kiln_lints'));
+    });
+
+    test('--with-lints with --core-git wires git plugin into analysis_options.yaml', () async {
+      final runner = buildTestRunner(
+        cwd: workspace,
+        captured: captured,
+        processRunner: FakeProcessRunner(_fakeFlutter),
+      );
+
+      final code = await runner.run(<String>[
+        'create',
+        'git_linted_app',
+        '--core-git',
+        'https://github.com/kiln-dev/kiln.git',
+        '--core-ref',
+        'v0.1.0',
+        '--with-lints',
+        '--yes',
+      ]);
+
+      expect(code, ExitCodes.success, reason: captured.err.join('\n'));
+      final options = File(
+        p.join(workspace.path, 'git_linted_app', 'analysis_options.yaml'),
+      ).readAsStringSync();
+      expect(options, contains('plugins:'));
+      expect(options, contains('kiln_lints:'));
+      expect(options, contains("url: 'https://github.com/kiln-dev/kiln.git'"));
+      expect(options, contains("ref: 'v0.1.0'"));
+      expect(options, contains("path: 'packages/kiln_lints'"));
+    });
   });
 }

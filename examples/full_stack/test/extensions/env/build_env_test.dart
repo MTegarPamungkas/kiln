@@ -19,10 +19,7 @@ void main() {
     expect(env.read('unknown'), isNull);
     expect(env.containsKey(EnvKeys.apiBaseUrl), isTrue);
     expect(env.values, isNot(contains('unknown')));
-    expect(
-      env.values,
-      containsPair(EnvKeys.apiBaseUrl, 'https://api.kiln.dev'),
-    );
+    expect(env.values, containsPair(EnvKeys.apiBaseUrl, 'https://api.kiln.dev'));
   });
 
   test('treats empty values as absent', () {

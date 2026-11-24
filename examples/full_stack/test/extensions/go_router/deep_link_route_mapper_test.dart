@@ -15,10 +15,7 @@ void main() {
   test('maps custom schemes using the host as the first segment', () {
     expect(mapper.map(Uri.parse('myapp://orders/42')), '/orders/42');
     expect(mapper.map(Uri.parse('myapp:///orders/42')), '/orders/42');
-    expect(
-      mapper.map(Uri.parse('myapp://explore?ref=email')),
-      '/explore?ref=email',
-    );
+    expect(mapper.map(Uri.parse('myapp://explore?ref=email')), '/explore?ref=email');
   });
 
   test('ignores unsupported and empty links', () {

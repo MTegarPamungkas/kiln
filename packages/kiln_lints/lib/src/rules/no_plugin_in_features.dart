@@ -1,40 +1,67 @@
-import 'package:analyzer/error/listener.dart' show DiagnosticReporter;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart';
 
 import '../checks.dart';
 
 /// Forbids feature code from importing platform and backend plugins directly.
-final class NoPluginInFeatures extends DartLintRule {
-  const NoPluginInFeatures()
+final class NoPluginInFeatures extends AnalysisRule {
+  NoPluginInFeatures()
     : super(
-        code: const LintCode(
-          name: 'no_plugin_in_features',
-          problemMessage:
-              'Feature code must not import a plugin directly. '
-              'Use a contract from kiln_core.',
-          correctionMessage:
-              'Add or install an extension that provides the contract.',
-        ),
+        name: code.lowerCaseName,
+        description:
+            'Forbids feature code from importing platform and backend plugins '
+            'directly.',
       );
 
+  static const LintCode code = LintCode(
+    'no_plugin_in_features',
+    'Feature code must not import a plugin directly. '
+        'Use a contract from kiln_core.',
+    correctionMessage:
+        'Add or install an extension that provides the contract.',
+  );
+
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  DiagnosticCode get diagnosticCode => code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addImportDirective((node) {
-      final uri = node.uri.stringValue;
-      if (uri == null) {
-        return;
-      }
-      final message = pluginInFeatureMessage(
-        filePath: resolver.path,
-        importUri: uri,
-      );
-      if (message != null) {
-        reporter.atNode(node.uri, code);
-      }
-    });
+    final unit = context.currentUnit;
+    if (unit == null) {
+      return;
+    }
+    registry.addImportDirective(
+      this,
+      _Visitor(rule: this, filePath: unit.file.path),
+    );
+  }
+}
+
+final class _Visitor extends SimpleAstVisitor<void> {
+  _Visitor({required this.rule, required this.filePath});
+
+  final NoPluginInFeatures rule;
+  final String filePath;
+
+  @override
+  void visitImportDirective(ImportDirective node) {
+    final uri = node.uri.stringValue;
+    if (uri == null) {
+      return;
+    }
+    final message = pluginInFeatureMessage(
+      filePath: filePath,
+      importUri: uri,
+    );
+    if (message != null) {
+      rule.reportAtNode(node.uri);
+    }
   }
 }

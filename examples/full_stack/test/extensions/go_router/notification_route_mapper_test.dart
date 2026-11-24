@@ -5,6 +5,23 @@ import 'package:full_stack/extensions/go_router/notification_route_mapper.dart';
 void main() {
   const mapper = NotificationRouteMapper();
 
+  test('push routes stay local and retain query parameters', () {
+    expect(
+      mapper.mapPayload('{"route":"/orders/42?tab=items#summary"}'),
+      '/orders/42?tab=items#summary',
+    );
+    for (final route in [
+      '//other.test/orders',
+      '/\\other.test',
+      '/%2fother.test',
+      '/%252fother.test',
+      '/orders/%2e%2e/admin',
+      '/orders/%0a',
+    ]) {
+      expect(mapper.mapPayload(route), isNull, reason: route);
+    }
+  });
+
   test('accepts a plain route payload', () {
     expect(mapper.map(const NotificationTap('/orders/42')), '/orders/42');
     expect(mapper.mapPayload('  /explore  '), '/explore');

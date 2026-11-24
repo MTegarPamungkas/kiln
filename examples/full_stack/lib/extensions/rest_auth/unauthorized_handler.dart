@@ -42,8 +42,7 @@ final class UnauthorizedHandler implements HttpMiddleware {
       request.copyWith(
         headers: <String, String>{
           for (final header in request.headers.entries)
-            if (header.key.toLowerCase() != 'authorization')
-              header.key: header.value,
+            if (header.key.toLowerCase() != 'authorization') header.key: header.value,
           'Authorization': 'Bearer $token',
         },
       ),

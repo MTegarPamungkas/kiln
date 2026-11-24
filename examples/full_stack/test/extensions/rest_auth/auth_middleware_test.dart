@@ -11,7 +11,10 @@ final class _TokenProvider implements TokenProvider {
   String? token;
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) async => token;
+  Future<String?> accessToken({
+    bool forceRefresh = false,
+    DateTime? deadline,
+  }) async => token;
 
   @override
   Future<void> clear() async {
@@ -95,17 +98,10 @@ void main() {
   });
 
   test('does not add the bearer token to the credential endpoints', () async {
-    for (final path in <String>[
-      '/auth/login',
-      '/auth/register',
-      '/auth/refresh',
-    ]) {
+    for (final path in <String>['/auth/login', '/auth/register', '/auth/refresh']) {
       late HttpRequest seen;
       await _middleware('abc').handle(
-        HttpRequest(
-          method: HttpMethod.post,
-          uri: Uri.parse('https://api.kiln.dev$path'),
-        ),
+        HttpRequest(method: HttpMethod.post, uri: Uri.parse('https://api.kiln.dev$path')),
         (request) async {
           seen = request;
           return const HttpResponse(statusCode: 200);
@@ -115,21 +111,18 @@ void main() {
     }
   });
 
-  test(
-    'resolves relative backend requests before checking the origin',
-    () async {
-      late HttpRequest seen;
+  test('resolves relative backend requests before checking the origin', () async {
+    late HttpRequest seen;
 
-      await _middleware('abc').handle(
-        HttpRequest(method: HttpMethod.get, uri: Uri.parse('/me')),
-        (request) async {
-          seen = request;
-          return const HttpResponse(statusCode: 200);
-        },
-      );
+    await _middleware('abc').handle(
+      HttpRequest(method: HttpMethod.get, uri: Uri.parse('/me')),
+      (request) async {
+        seen = request;
+        return const HttpResponse(statusCode: 200);
+      },
+    );
 
-      expect(seen.uri, Uri.parse('https://api.kiln.dev/me'));
-      expect(seen.headers['Authorization'], 'Bearer abc');
-    },
-  );
+    expect(seen.uri, Uri.parse('https://api.kiln.dev/me'));
+    expect(seen.headers['Authorization'], 'Bearer abc');
+  });
 }

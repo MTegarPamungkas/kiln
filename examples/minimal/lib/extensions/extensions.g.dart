@@ -7,5 +7,7 @@ import 'package:kiln_core/kiln_core.dart';
 import 'l10n/l10n_module.dart';
 
 List<KilnModule> kilnModules() {
-  return <KilnModule>[L10nModule()];
+  return <KilnModule>[
+  L10nModule(),
+  ];
 }

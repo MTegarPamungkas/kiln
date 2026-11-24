@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Update `go_router` dependency constraint to `^18.1.4`.
+
 ## 0.1.1
 
 - Import package:material_ui instead of the package:flutter/material.dart entry point, which Flutter 3.50 deprecated.

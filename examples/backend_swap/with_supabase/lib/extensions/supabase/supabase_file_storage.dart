@@ -102,7 +102,8 @@ final class SupabaseFileStorage implements FileStorage {
     if (!_pathPattern.hasMatch(path)) {
       throw Failure(
         code: FailureCode.validationInvalidInput,
-        message: 'The file path may only contain letters, digits, and supported separators.',
+        message:
+            'The file path may only contain letters, digits, and supported separators.',
         kind: FailureKind.validation,
       );
     }

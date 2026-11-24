@@ -1,8 +1,18 @@
+import 'dart:async';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:kiln_core/kiln_core.dart';
 
 /// Contract area an Appwrite error came from.
-enum AppwriteFailureScope { auth, account, database, storage, realtime }
+enum AppwriteFailureScope {
+  auth,
+  account,
+  database,
+  storage,
+  realtime,
+  functions,
+  pushTargets,
+}
 
 /// Converts Appwrite and transport exceptions into contract failures.
 final class AppwriteFailureMapper {
@@ -83,6 +93,20 @@ final class AppwriteFailureMapper {
           error: error,
           stackTrace: stackTrace,
         ),
+        AppwriteFailureScope.functions => _build(
+          code: FailureCode.functionsNotFound,
+          message: _message(error, 'The requested function does not exist.'),
+          kind: FailureKind.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+        AppwriteFailureScope.pushTargets => _build(
+          code: FailureCode.pushTargetsNotFound,
+          message: _message(error, 'The requested push target does not exist.'),
+          kind: FailureKind.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
       };
     }
     if (status == 409) {
@@ -109,6 +133,20 @@ final class AppwriteFailureMapper {
           code: FailureCode.validationInvalidInput,
           message: _message(error, 'The account already exists.'),
           kind: FailureKind.validation,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+        AppwriteFailureScope.functions => _build(
+          code: FailureCode.unexpected,
+          message: _message(error, 'The function execution conflicts.'),
+          kind: FailureKind.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+        AppwriteFailureScope.pushTargets => _build(
+          code: FailureCode.unexpected,
+          message: _message(error, 'The push target conflicts.'),
+          kind: FailureKind.unknown,
           error: error,
           stackTrace: stackTrace,
         ),
@@ -203,6 +241,17 @@ final class AppwriteFailureMapper {
     AppwriteFailureScope scope,
     StackTrace? stackTrace,
   ) {
+    if (error is TimeoutException) {
+      return Failure(
+        code: FailureCode.networkTimeout,
+        message: 'The Appwrite request timed out.',
+        kind: FailureKind.network,
+        cause: error,
+        stackTrace: stackTrace,
+        isRetryable: true,
+        details: {'scope': scope.name},
+      );
+    }
     final description = error is AppwriteException
         ? _message(error, 'Appwrite network request failed.')
         : error.toString();
@@ -250,6 +299,8 @@ final class AppwriteFailureMapper {
       AppwriteFailureScope.database ||
       AppwriteFailureScope.realtime => FailureKind.database,
       AppwriteFailureScope.storage => FailureKind.file,
+      AppwriteFailureScope.functions ||
+      AppwriteFailureScope.pushTargets => FailureKind.unknown,
     };
   }
 

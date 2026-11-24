@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  archive: ^4.6.0
+  archive: ^4.7.1
   collection: ^1.19.1
   crypto: ^3.0.8
   kiln_core: ^0.1.0
@@ -24,4 +24,4 @@ dependencies:
 dev_dependencies:
   kiln_testing: ^0.1.0
   lints: ^6.1.0
-  test: ^1.31.1
+  test: ^1.32.0

@@ -9,7 +9,9 @@ import 'interceptors/user_agent_interceptor.dart';
 
 /// Registers the HTTP client, pipeline, and default interceptors.
 final class DioModule extends KilnModule {
-  const DioModule();
+  DioModule();
+
+  DioClient? _client;
 
   @override
   String get id => 'dio';
@@ -30,6 +32,7 @@ final class DioModule extends KilnModule {
       pipeline.use(entry.item, priority: entry.priority);
     }
     final client = DioClient(config: config, pipeline: pipeline);
+    _client = client;
     final support = DioSupport(config: config);
 
     registry.registerSingleton<DioConfig>(config);
@@ -41,5 +44,12 @@ final class DioModule extends KilnModule {
   @override
   SupportInfo support(Registry registry) {
     return registry.read<DioSupport>().info;
+  }
+
+  @override
+  Future<void> dispose() async {
+    final client = _client;
+    _client = null;
+    client?.close(force: true);
   }
 }

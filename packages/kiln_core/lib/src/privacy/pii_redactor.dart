@@ -129,10 +129,20 @@ final class PiiRedactor {
   String redactText(String input) {
     // Drop oversized text entirely rather than exposing a truncated token.
     if (input.length > maxTextLength) return replacement;
-    return input
-        .replaceAll(_bearer, 'Bearer $replacement')
-        .replaceAll(_jwt, replacement)
-        .replaceAll(_email, replacement);
+    if (input.isEmpty) return input;
+    var result = input;
+    if (result.length >= 8 &&
+        (result.contains('B') || result.contains('b')) &&
+        (result.contains(' ') || result.contains('\t') || result.contains('\n'))) {
+      result = result.replaceAll(_bearer, 'Bearer $replacement');
+    }
+    if (result.contains('eyJ')) {
+      result = result.replaceAll(_jwt, replacement);
+    }
+    if (result.contains('@')) {
+      result = result.replaceAll(_email, replacement);
+    }
+    return result;
   }
 }
 

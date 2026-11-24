@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Update `flutter_riverpod` dependency constraint to `^3.5.0`.
+
 ## 0.2.2
 
 - Import package:material_ui instead of the package:flutter/material.dart entry point, which Flutter 3.50 deprecated.

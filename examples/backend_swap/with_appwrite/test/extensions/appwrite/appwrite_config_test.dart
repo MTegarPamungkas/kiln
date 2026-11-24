@@ -1,8 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kiln_core/kiln_core.dart';
 import 'package:with_appwrite/extensions/appwrite/appwrite_config.dart';
 
 void main() {
+  test('OAuth uses a callback appropriate to the platform', () {
+    const config = AppwriteConfig(projectId: 'project');
+    expect(
+      config.oAuthSuccessUrl,
+      kIsWeb
+          ? Uri.base.resolve('/kiln_appwrite_auth.html').toString()
+          : 'appwrite-callback-project://',
+    );
+    expect(
+      const AppwriteConfig(
+        oAuthRedirectUrl: 'https://app.example/app/callback.html',
+      ).oAuthSuccessUrl,
+      'https://app.example/app/callback.html',
+    );
+  });
   test('defaults carry the rendered prompts', () {
     const config = AppwriteConfig.defaults;
 
@@ -10,10 +26,7 @@ void main() {
     expect(config.projectId, 'kiln_demo');
     expect(config.databaseId, 'kiln');
     expect(config.bucketId, 'kiln_files');
-    expect(
-      config.endpointUri.host,
-      Uri.parse('https://cloud.appwrite.io/v1').host,
-    );
+    expect(config.endpointUri.host, Uri.parse('https://cloud.appwrite.io/v1').host);
   });
 
   test('an incomplete configuration fails before the client is built', () {

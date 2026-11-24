@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Update `appwrite` dependency constraint to `^28.4.1`.
+
 ## 0.2.2
 
 - Assert the `appwrite_client` requirement in the manifest test, matching the

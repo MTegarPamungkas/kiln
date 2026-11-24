@@ -20,6 +20,7 @@ final class GoRouterModule extends KilnModule {
 
   @override
   Set<String> get optionalRequires => const <String>{
+    'push_transport',
     'deep_links',
     'notifications',
     'analytics',

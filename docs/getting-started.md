@@ -259,4 +259,3 @@ kiln ext publish extensions/logger --registry="$(pwd)/registry"
 
 - Publishing directly to an HTTP registry is not active yet; publish to a local
   folder instead.
-- `kiln_lints` is waiting for `custom_lint` to support analyzer 14.

@@ -28,12 +28,16 @@ bool isAppPath(String relativeLibPath) {
       relativeLibPath.startsWith('lib/core/');
 }
 
+final RegExp _extensionPathPattern = RegExp(
+  r'^lib/extensions/([a-z][a-z0-9_]*)/',
+);
+final RegExp _resolvedExtensionImportPattern = RegExp(
+  r'(?:^|/)lib/extensions/([a-z][a-z0-9_]*)/',
+);
+
 /// Extension id for a file under `lib/extensions/<id>/`, if any.
 String? extensionIdForPath(String relativeLibPath) {
-  final match = RegExp(
-    r'^lib/extensions/([a-z][a-z0-9_]*)/',
-  ).firstMatch(relativeLibPath);
-  return match?.group(1);
+  return _extensionPathPattern.firstMatch(relativeLibPath)?.group(1);
 }
 
 /// Extension id referenced by an import, if the import targets an extension.
@@ -54,10 +58,7 @@ String? extensionIdForImport({
   final resolved = p.posix.normalize(
     p.posix.join(p.posix.dirname(relativeLibPath), importUri),
   );
-  final match = RegExp(
-    r'(?:^|/)lib/extensions/([a-z][a-z0-9_]*)/',
-  ).firstMatch(resolved);
-  return match?.group(1);
+  return _resolvedExtensionImportPattern.firstMatch(resolved)?.group(1);
 }
 
 /// Message for an extension importing another extension, or null when allowed.

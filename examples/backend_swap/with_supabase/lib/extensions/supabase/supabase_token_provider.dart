@@ -16,7 +16,7 @@ final class SupabaseTokenProvider implements TokenProvider {
   final SupabaseGateway _gateway;
 
   @override
-  Future<String?> accessToken({bool forceRefresh = false}) async {
+  Future<String?> accessToken({bool forceRefresh = false, DateTime? deadline}) async {
     try {
       final token = await _gateway.accessToken(forceRefresh: forceRefresh);
       return token == null || token.isEmpty ? null : token;

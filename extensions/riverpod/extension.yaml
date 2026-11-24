@@ -1,6 +1,6 @@
 id: riverpod
 name: Riverpod state management
-version: 0.2.2
+version: 0.2.3
 description: State management with Riverpod providers and notifiers on a clean architecture feature layout.
 category: state
 tier: official
@@ -10,7 +10,7 @@ provides:
 optional_requires:
   - logger
 dependencies:
-  flutter_riverpod: ^3.4.3
+  flutter_riverpod: ^3.5.0
 compatibility:
   kiln: ">=0.1.0 <0.2.0"
   dart: ">=3.9.0"

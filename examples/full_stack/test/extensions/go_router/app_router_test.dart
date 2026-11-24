@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +14,95 @@ import 'package:full_stack/extensions/go_router/sign_in_page_builder.dart';
 import 'test_support.dart';
 
 void main() {
+  testWidgets(
+    'push taps preserve protected destination through restore and login',
+    (tester) async {
+      final session = SessionController();
+      final registry = _registry(session: session);
+      final push = _TapPush();
+      registry.registerSingleton<PushTransport>(push);
+      registry.registerSingleton<SignInPageBuilder>(
+        const _CustomSignInBuilder(),
+      );
+      _addRoute(registry, '/', 'home', const Text('Home'));
+      _addRoute(
+        registry,
+        '/orders/:id',
+        'order',
+        const Text('Protected order'),
+      );
+      final appRouter = AppRouter(
+        registry: registry,
+        config: const AppRouterConfig(enableAuthRedirect: true),
+      );
+      appRouter.start();
+      await tester.pumpWidget(
+        MaterialApp.router(routerConfig: appRouter.router),
+      );
+      await tester.pump();
+      push.taps.add(const NotificationTap('{"route":"/orders/42?tab=items"}'));
+      await tester.pump();
+      expect(find.text('Protected order'), findsNothing);
+      session.markUnauthenticated();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('custom-sign-in')), findsOneWidget);
+      session.setSession(const AuthSession(userId: 'user'));
+      await tester.pumpAndSettle();
+      expect(find.text('Protected order'), findsOneWidget);
+      expect(
+        appRouter.router.routerDelegate.currentConfiguration.uri.toString(),
+        '/orders/42?tab=items',
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await appRouter.dispose();
+      unawaited(push.dispose());
+      await session.dispose();
+    },
+  );
+  testWidgets(
+    'restoration hides protected content and preserves deep-link query',
+    (tester) async {
+      final session = SessionController();
+      final registry = _registry(session: session);
+      _addRoute(
+        registry,
+        '/orders/:id',
+        'order',
+        const Text('Protected order'),
+      );
+      registry.registerSingleton<SignInPageBuilder>(
+        const _CustomSignInBuilder(),
+      );
+      final appRouter = AppRouter(
+        registry: registry,
+        config: const AppRouterConfig(
+          enableAuthRedirect: true,
+          initialLocation: '/orders/42?tab=items',
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp.router(routerConfig: appRouter.router),
+      );
+      await tester.pump();
+      expect(find.text('Protected order'), findsNothing);
+      expect(find.byKey(const Key('custom-sign-in')), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      session.markUnauthenticated();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('custom-sign-in')), findsOneWidget);
+      session.setSession(const AuthSession(userId: 'user-1'));
+      await tester.pumpAndSettle();
+      expect(find.text('Protected order'), findsOneWidget);
+      expect(
+        appRouter.router.routerDelegate.currentConfiguration.uri.toString(),
+        '/orders/42?tab=items',
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await appRouter.dispose();
+      await session.dispose();
+    },
+  );
+
   testWidgets('builds the router from application routes', (tester) async {
     final registry = _registry(signedIn: true);
     _addRoute(registry, AppRoutes.home, 'home', const Text('Beranda'));
@@ -223,6 +314,18 @@ void _addRoute(Registry registry, String path, String name, Widget child) {
           builder: (BuildContext context) => Scaffold(body: child),
         ),
       );
+}
+
+final class _TapPush implements PushTransport, PushNotificationOpens {
+  final taps = StreamController<NotificationTap>.broadcast(sync: true);
+  @override
+  Stream<NotificationTap> get notificationTaps => taps.stream;
+  @override
+  Stream<PushEnvelope> get foreground => const Stream.empty();
+  @override
+  Future<String?> token() async => null;
+  @override
+  Future<void> dispose() => taps.close();
 }
 
 final class _CustomSignInBuilder implements SignInPageBuilder {

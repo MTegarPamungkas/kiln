@@ -102,8 +102,8 @@ provider that disagrees fails its `kiln_testing` contract suite.
 ## Dependencies
 
 All dependencies use a caret to the newest release that the current toolchain
-can resolve. Two exceptions are documented in `README.md`: `test` follows
-Flutter's `test_api` pin, and `kiln_lints` follows `custom_lint_builder`.
+can resolve. One exception is documented in `README.md`: `test` follows
+Flutter's `test_api` pin.
 
 See [folder-structure.md](folder-structure.md) for the complete target structure
 and [roadmap.md](roadmap.md) for the phase order.

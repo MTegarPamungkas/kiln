@@ -53,10 +53,7 @@ void main() {
     });
 
     test('reports language support', () {
-      expect(
-        LocaleResolution.supports(const Locale('id'), const Locale('id')),
-        isTrue,
-      );
+      expect(LocaleResolution.supports(const Locale('id'), const Locale('id')), isTrue);
       expect(
         LocaleResolution.supports(const Locale('en'), const Locale('en', 'US')),
         isTrue,
