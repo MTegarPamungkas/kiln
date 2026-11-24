@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Expose `SdkSupabaseRealtimeGateway.handleSubscribeStatus` and add unit tests
+  covering `channelError`, `timedOut`, and `closed` realtime channel states.
+
 ## 0.1.2
 
 - Handle Supabase realtime channel subscribe status callbacks in

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:kiln_core/kiln_core.dart';
 import 'package:test/test.dart';
 
@@ -760,4 +762,118 @@ void main() {
       );
     });
   });
+
+  group('Gate call timeout', () {
+    test('a slow action becomes a retryable network timeout Err', () async {
+      final gate = Gate(GetItRegistry());
+      final never = Completer<int>();
+
+      final result = await gate.call(
+        () => never.future,
+        timeout: const Duration(milliseconds: 10),
+      );
+
+      expect(result.isErr, isTrue);
+      expect(result.failureOrNull?.code, FailureCode.networkTimeout);
+      expect(result.failureOrNull?.kind, FailureKind.network);
+      expect(result.failureOrNull?.isRetryable, isTrue);
+    });
+
+    test('a fast action is unaffected by the timeout', () async {
+      final gate = Gate(GetItRegistry());
+
+      final result = await gate.call(
+        () async => 42,
+        timeout: const Duration(seconds: 1),
+      );
+
+      expect(result.valueOrNull, 42);
+    });
+  });
+
+  group('Gate local database verbs', () {
+    late GetItRegistry registry;
+    late _LocalDb db;
+
+    setUp(() {
+      registry = GetItRegistry();
+      db = _LocalDb();
+      registry.registerSingleton<LocalDatabase>(db);
+    });
+
+    test('localDelete and localQuery delegate', () async {
+      final gate = Gate(registry);
+      await gate.localPut('tasks', '1', <String, Object?>{'t': 'a'});
+      await gate.localPut('tasks', '2', <String, Object?>{'t': 'b'});
+
+      final queried = await gate.localQuery('tasks');
+      expect(queried.valueOrNull?.map((r) => r.key), ['1', '2']);
+
+      expect((await gate.localDelete('tasks', '1')).isOk, isTrue);
+      expect((await gate.localGet('tasks', '1')).valueOrNull, isNull);
+    });
+
+    test('localWatch streams records', () async {
+      final gate = Gate(registry);
+      await gate.localPut('tasks', '1', <String, Object?>{'t': 'a'});
+
+      final first = await gate.localWatch('tasks').first;
+      expect(first.single.key, '1');
+    });
+
+    test('localWatch without a database is a stream error, not a throw', () {
+      final gate = Gate(GetItRegistry());
+
+      late Stream<List<LocalRecord>> stream;
+      expect(() => stream = gate.localWatch('tasks'), returnsNormally);
+      expect(
+        stream,
+        emitsError(
+          isA<Failure>().having(
+            (f) => f.code,
+            'code',
+            FailureCode.configurationMissing,
+          ),
+        ),
+      );
+    });
+  });
+}
+
+final class _LocalDb implements LocalDatabase {
+  final Map<String, Map<String, Map<String, Object?>>> _data =
+      <String, Map<String, Map<String, Object?>>>{};
+
+  @override
+  Future<void> put(
+    String collection,
+    String key,
+    Map<String, Object?> data,
+  ) async {
+    (_data[collection] ??= <String, Map<String, Object?>>{})[key] = data;
+  }
+
+  @override
+  Future<Map<String, Object?>?> get(String collection, String key) async =>
+      _data[collection]?[key];
+
+  @override
+  Future<List<LocalRecord>> query(String collection, {LocalQuery? query}) async {
+    return <LocalRecord>[
+      for (final entry in (_data[collection] ?? const {}).entries)
+        LocalRecord(key: entry.key, data: entry.value),
+    ];
+  }
+
+  @override
+  Future<void> delete(String collection, String key) async {
+    _data[collection]?.remove(key);
+  }
+
+  @override
+  Stream<List<LocalRecord>> watch(String collection, {LocalQuery? query}) =>
+      Stream<List<LocalRecord>>.fromFuture(this.query(collection));
+
+  @override
+  Future<void> close() async {}
 }

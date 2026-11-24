@@ -110,4 +110,75 @@ void main() {
     final content = await sink.read();
     expect(content, contains('burst-9'));
   });
+
+  test('keeps queued records across a transient write failure', () async {
+    final directory = await Directory.systemTemp.createTemp('kiln_logger_retry_');
+    addTearDown(() async {
+      if (directory.existsSync()) {
+        await directory.delete(recursive: true);
+      }
+    });
+    // A file where the log directory should be makes the first write fail.
+    final blocker = File('${directory.path}${Platform.pathSeparator}blocked')
+      ..writeAsStringSync('x');
+    final failures = <String>[];
+    final sink = FileLogSink(
+      directoryPath: '${blocker.path}${Platform.pathSeparator}logs',
+      writeRetryDelay: const Duration(milliseconds: 1),
+      onFailure: (message, error, stackTrace) {
+        failures.add(message);
+        if (blocker.existsSync()) {
+          blocker.deleteSync();
+        }
+      },
+    );
+
+    await sink.write(
+      LogRecord(
+        level: LogLevel.info,
+        message: 'survives',
+        timestamp: DateTime.utc(2026, 1, 1),
+      ),
+    );
+    await sink.flush();
+
+    expect(failures, hasLength(1));
+    expect(sink.droppedCount, 0);
+    expect(await sink.read(), contains('survives'));
+  });
+
+  test('drops and counts records after repeated write failures', () async {
+    final directory = await Directory.systemTemp.createTemp('kiln_logger_fail_');
+    addTearDown(() async {
+      if (directory.existsSync()) {
+        await directory.delete(recursive: true);
+      }
+    });
+    final blocker = File('${directory.path}${Platform.pathSeparator}blocked')
+      ..writeAsStringSync('x');
+    final failures = <String>[];
+    final sink = FileLogSink(
+      directoryPath: '${blocker.path}${Platform.pathSeparator}logs',
+      maxWriteAttempts: 2,
+      writeRetryDelay: const Duration(milliseconds: 1),
+      onFailure: (message, error, stackTrace) => failures.add(message),
+    );
+
+    for (var i = 0; i < 3; i++) {
+      // ignore: unawaited_futures
+      sink.write(
+        LogRecord(
+          level: LogLevel.info,
+          message: 'lost-$i',
+          timestamp: DateTime.utc(2026, 1, 1),
+        ),
+      );
+    }
+    await sink.flush().timeout(const Duration(seconds: 5));
+
+    expect(failures, hasLength(2));
+    expect(failures.last, contains('dropped'));
+    expect(sink.droppedCount, 3);
+    expect(sink.lastFailure, isNotNull);
+  });
 }

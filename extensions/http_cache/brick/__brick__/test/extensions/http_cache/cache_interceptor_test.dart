@@ -663,4 +663,51 @@ void main() {
     final refreshed = await cache.read(const CacheKeyBuilder().build(_get()));
     expect(refreshed?.response.data, 'data-2');
   });
+
+  test('coalesces concurrent identical in-flight GET requests', () async {
+    final cache = MemoryHttpCache();
+    final interceptor = CacheInterceptor(cache: cache);
+    final gate = Completer<void>();
+    var networkCalls = 0;
+
+    Future<HttpResponse> terminal(HttpRequest request) async {
+      networkCalls++;
+      await gate.future;
+      return _response('shared', cacheControl: 'max-age=60');
+    }
+
+    final first = interceptor.handle(_get('/items'), terminal);
+    final second = interceptor.handle(_get('/items'), terminal);
+    await Future<void>.delayed(Duration.zero);
+    gate.complete();
+
+    final results = await Future.wait([first, second]);
+    expect(networkCalls, 1);
+    expect(results[0].data, 'shared');
+    expect(results[1].data, 'shared');
+  });
+
+  test('a slow write for one key does not block reads for another key', () async {
+    final cache = _DelayedWriteCache();
+    await cache.inner.write(
+      const CacheKeyBuilder().build(_get('/posts')),
+      _response('cached-posts', cacheControl: 'max-age=60'),
+      ttl: const Duration(seconds: 60),
+    );
+    final interceptor = CacheInterceptor(cache: cache);
+
+    final slowUsers = interceptor.handle(
+      _get('/users'),
+      (_) async => _response('users', cacheControl: 'max-age=60'),
+    );
+    await cache.started.future;
+
+    final posts = await interceptor
+        .handle(_get('/posts'), (_) async => _response('network-posts'))
+        .timeout(const Duration(milliseconds: 500));
+    expect(posts.data, 'cached-posts');
+
+    cache.release.complete();
+    await slowUsers;
+  });
 }

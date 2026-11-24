@@ -351,10 +351,18 @@ final class Gate {
     LocalQuery? query,
   }) => call(() => localDb.query(collection, query: query));
 
+  /// Watches [collection]. A missing `LocalDatabase` surfaces as a stream
+  /// error instead of a synchronous throw, matching the other gate verbs.
   Stream<List<LocalRecord>> localWatch(
     String collection, {
     LocalQuery? query,
-  }) => localDb.watch(collection, query: query);
+  }) {
+    try {
+      return localDb.watch(collection, query: query);
+    } on Failure catch (failure, stackTrace) {
+      return Stream<List<LocalRecord>>.error(failure, stackTrace);
+    }
+  }
 
   // Analytics
   Future<Result<void>> captureEvent(

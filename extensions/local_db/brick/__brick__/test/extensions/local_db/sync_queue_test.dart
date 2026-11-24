@@ -147,6 +147,59 @@ void main() {
     },
   );
 
+  test('transient failures never dead-letter an item', () async {
+    final database = await openTestDatabase();
+    final queue = SyncQueue(database: database, maxAttempts: 2);
+    await queue.enqueue('tasks', 'offline', {'title': 'offline'});
+
+    for (var i = 0; i < 6; i++) {
+      await expectLater(
+        queue.flush((_) async {
+          throw const Failure(
+            code: FailureCode.networkTimeout,
+            message: 'offline',
+            kind: FailureKind.network,
+            isRetryable: true,
+          );
+        }),
+        throwsA(isA<Failure>()),
+      );
+    }
+
+    final pending = await queue.pending();
+    expect(pending.map((item) => item.key), ['offline']);
+    expect(pending.single.failures, 0);
+    expect(pending.single.attempts, 6);
+    expect(await queue.deadLetters(), isEmpty);
+
+    expect(await queue.flush((_) async {}), 1);
+    await database.close();
+  });
+
+  test('requeueDeadLetters restores delivery with a fresh budget', () async {
+    final database = await openTestDatabase();
+    final queue = SyncQueue(database: database, maxAttempts: 1);
+    await queue.enqueue('tasks', 'bad', {'title': 'bad'});
+
+    expect(
+      await queue.flush((_) async {
+        throw StateError('422 invalid payload');
+      }),
+      0,
+    );
+    expect(await queue.deadLetters(), hasLength(1));
+    expect(await queue.pending(), isEmpty);
+
+    expect(await queue.requeueDeadLetters(), 1);
+    final revived = await queue.pending();
+    expect(revived.single.failures, 0);
+    expect(revived.single.isDeadLetter, isFalse);
+
+    expect(await queue.flush((_) async {}), 1);
+    expect(await queue.pending(includeDeadLetter: true), isEmpty);
+    await database.close();
+  });
+
   test('closed SembastLocalDatabase rejects subsequent calls', () async {
     final database = await openTestDatabase();
     await database.close();

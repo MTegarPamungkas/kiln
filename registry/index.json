@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T13:41:49.812100Z",
+  "generated_at": "2026-11-24T15:23:16.590822Z",
   "extensions": [
     {
       "id": "analytics",
@@ -1036,7 +1036,7 @@
       "name": "HTTP cache",
       "description": "Caches HTTP responses with TTL, ETag, and invalidation.",
       "category": "network",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -1091,6 +1091,22 @@
           "version": "0.1.3",
           "url": "archives/http_cache-0.1.3.tgz",
           "sha256": "0358139cd9ab14d5ed7082dd76f8cf2f5c428c0a2814a95394ab7b42263e5b2a",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/http_cache-0.1.4.tgz",
+          "sha256": "9e0a7c287d3aa2a66abeda3d7bdf4eb12c6759b379eb7953eb6970b622b00a58",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -1239,7 +1255,7 @@
       "name": "Local database",
       "description": "Offline-first document database backed by Sembast.",
       "category": "database",
-      "latest": "0.1.4",
+      "latest": "0.1.5",
       "tier": "official",
       "versions": [
         {
@@ -1301,6 +1317,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.5",
+          "url": "archives/local_db-0.1.5.tgz",
+          "sha256": "23e10c27e6c36c359f1c94b6dac889260e59f889eac9003f1f07078d56778cba",
+          "provides": [
+            "local_db"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -1309,7 +1337,7 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -1340,6 +1368,18 @@
           "version": "0.1.2",
           "url": "archives/logger-0.1.2.tgz",
           "sha256": "af7a568f828e212215df7145ba7d6aac10c9072afaebe5da60aabe7214f63e58",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/logger-0.1.3.tgz",
+          "sha256": "df159962c2e0f20a7e1ebc6db8308d1ddb4d32f2b11c519fc249ac3a1d7a3c97",
           "provides": [
             "logger"
           ],
@@ -1783,7 +1823,7 @@
       "name": "Supabase",
       "description": "Supabase auth, PostgREST database, realtime, and storage for Kiln.",
       "category": "auth",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -1820,6 +1860,21 @@
           "version": "0.1.2",
           "url": "archives/supabase-0.1.2.tgz",
           "sha256": "7a40a06f2499042a6e4818454191d6cf3f41cf2229b9293fb70d002705427c85",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/supabase-0.1.3.tgz",
+          "sha256": "68c8ad08ae04c4ea350a6e628018c5e42fe51493a9c4e98df9836ce1eab08d42",
           "provides": [
             "auth",
             "social_auth",

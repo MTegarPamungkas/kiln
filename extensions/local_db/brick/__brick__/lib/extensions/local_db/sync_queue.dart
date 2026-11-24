@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:kiln_core/kiln_core.dart';
@@ -15,6 +16,7 @@ final class SyncQueueItem {
     this.claimId,
     this.claimedAt,
     this.attempts = 0,
+    this.failures = 0,
     this.status = 'pending',
     this.nextAttemptAt,
     this.lastError,
@@ -39,6 +41,11 @@ final class SyncQueueItem {
 
   /// How many times a flush has claimed this item.
   final int attempts;
+
+  /// Failures that count toward [SyncQueue.maxAttempts]. Transient failures
+  /// (offline, timeouts, retryable [Failure]s) are retried with backoff and do
+  /// not increase this counter.
+  final int failures;
 
   /// Delivery state (`pending` or `dead_letter`).
   final String status;
@@ -81,6 +88,7 @@ final class SyncQueue {
     this.maxAttempts = 5,
     this.initialBackoff = Duration.zero,
     this.maxBackoff = const Duration(minutes: 5),
+    this.isTransientError = defaultIsTransientError,
     Clock? clock,
   }) : assert(maxAttempts > 0),
        _clock = clock ?? const SystemClock();
@@ -95,8 +103,9 @@ final class SyncQueue {
   /// take the item over.
   final Duration claimLease;
 
-  /// Maximum delivery attempts before an item moves to `dead_letter` so it
-  /// cannot permanently block later items in the queue.
+  /// Maximum non-transient failures before an item moves to `dead_letter` so
+  /// it cannot permanently block later items in the queue. Transient failures
+  /// (see [isTransientError]) never dead-letter an item.
   final int maxAttempts;
 
   /// Base exponential backoff applied after a failed attempt.
@@ -104,6 +113,29 @@ final class SyncQueue {
 
   /// Upper cap for per-item exponential backoff.
   final Duration maxBackoff;
+
+  /// Classifies a handler error as transient (retry forever with backoff) or
+  /// counted toward [maxAttempts].
+  final bool Function(Object error) isTransientError;
+
+  /// Default classifier: retryable [Failure]s, network, auth/session,
+  /// unavailable and cancelled failures, and [TimeoutException]s are
+  /// transient. Everything else (validation, 4xx-style errors, unknown
+  /// exceptions) counts toward [maxAttempts].
+  static bool defaultIsTransientError(Object error) {
+    if (error is Failure) {
+      return error.isRetryable ||
+          switch (error.kind) {
+            FailureKind.network ||
+            FailureKind.authentication ||
+            FailureKind.session ||
+            FailureKind.unavailable ||
+            FailureKind.cancelled => true,
+            _ => false,
+          };
+    }
+    return error is TimeoutException;
+  }
   final Clock _clock;
   final String _instanceId = _newInstanceId();
   int _sequence = 0;
@@ -264,16 +296,20 @@ final class SyncQueue {
         try {
           await handler(claimed);
         } on Object catch (error) {
-          final isPermanent = claimed.attempts >= maxAttempts;
-          if (isPermanent) {
-            await _markDeadLetter(claimed, flushId, error);
+          final transient = isTransientError(error);
+          final failures = transient ? claimed.failures : claimed.failures + 1;
+          if (!transient && failures >= maxAttempts) {
+            await _markDeadLetter(claimed, flushId, error, failures: failures);
             continue;
           }
           await _release(
             claimed,
             flushId,
-            nextAttemptAt: _nextBackoffAt(claimed.attempts),
+            nextAttemptAt: _nextBackoffAt(
+              transient ? claimed.attempts : failures,
+            ),
             lastError: '$error',
+            failures: failures,
           );
           rethrow;
         }
@@ -341,6 +377,7 @@ final class SyncQueue {
     String flushId, {
     DateTime? nextAttemptAt,
     String? lastError,
+    int? failures,
   }) async {
     final record = await database.get(collection, item.id);
     if (record == null || record['claimId'] != flushId) {
@@ -357,14 +394,18 @@ final class SyncQueue {
     if (lastError != null) {
       released['lastError'] = lastError;
     }
+    if (failures != null) {
+      released['failures'] = failures;
+    }
     await database.put(collection, item.id, released);
   }
 
   Future<void> _markDeadLetter(
     SyncQueueItem item,
     String flushId,
-    Object error,
-  ) async {
+    Object error, {
+    required int failures,
+  }) async {
     final record = await database.get(collection, item.id);
     if (record == null || record['claimId'] != flushId) {
       return;
@@ -374,8 +415,31 @@ final class SyncQueue {
       ..remove('claimedAt')
       ..remove('nextAttemptAt')
       ..['status'] = 'dead_letter'
+      ..['failures'] = failures
       ..['lastError'] = '$error';
     await database.put(collection, item.id, dead);
+  }
+
+  /// Moves dead-lettered items back into active delivery with a fresh
+  /// failure budget, for example after the app fixed the payload or the
+  /// backend accepted a schema change. Returns how many items were requeued.
+  Future<int> requeueDeadLetters({
+    String? owner,
+    bool allOwners = false,
+  }) async {
+    final dead = await deadLetters(owner: owner, allOwners: allOwners);
+    for (final item in dead) {
+      final record = await database.get(collection, item.id);
+      if (record == null) {
+        continue;
+      }
+      final revived = Map<String, Object?>.of(record)
+        ..remove('status')
+        ..remove('nextAttemptAt')
+        ..['failures'] = 0;
+      await database.put(collection, item.id, revived);
+    }
+    return dead.length;
   }
 
   SyncQueueItem _itemFrom(
@@ -400,6 +464,7 @@ final class SyncQueue {
           (record['claimId'] is String ? record['claimId'] as String : null),
       claimedAt: claimedAt ?? DateTime.tryParse('${record['claimedAt']}'),
       attempts: record['attempts'] is int ? record['attempts'] as int : 0,
+      failures: record['failures'] is int ? record['failures'] as int : 0,
       status: record['status'] is String ? record['status'] as String : 'pending',
       nextAttemptAt: DateTime.tryParse('${record['nextAttemptAt']}'),
       lastError: record['lastError'] is String

@@ -15,7 +15,7 @@
     "lib/extensions/http_cache/stale_while_revalidate.dart": "977bb237c042b7c0cc2a67e2850a65765bbcaa07bcaafb0341168862e9c308e9",
     "lib/extensions/http_cache/storage_http_cache.dart": "72a800458eb91d98523b009a172a183c30f7b7c1e00ed804900d74a6424ce6ef",
     "test/extensions/http_cache/cache_control_parser_test.dart": "5518fe741fc7e8a25f1519294b4397f098313afecf03663e4f700b1b4e1c472b",
-    "test/extensions/http_cache/cache_interceptor_test.dart": "76957841bcbcf2e8a650394a1d876f74acc26dc764ae7abd226ec0be306c97a1",
+    "test/extensions/http_cache/cache_interceptor_test.dart": "0682cb99f9431fb9c2ef41ad58bdf253be8dd4d23e4ddebbdc3a96fcce6484ed",
     "test/extensions/http_cache/cache_invalidation_test.dart": "2a4ddf9aa6434b3842cb03b866796f46afc30e00960c95bd52c76ac68a689542",
     "test/extensions/http_cache/cache_key_test.dart": "c7957424093303e976590edf02ac777d4cab791c9ab5676a2bea3f21c8626564",
     "test/extensions/http_cache/etag_validator_test.dart": "cc8083b0ef2a55989217e9fdd3f35d2c2a13a2d09a17fb1124e65edc7cbd518e",
@@ -23,6 +23,6 @@
     "test/extensions/http_cache/http_cache_support_test.dart": "681d7279173a8792f8063db6f856d056b641217840bb45cd361bf98cf0a58167",
     "test/extensions/http_cache/memory_http_cache_test.dart": "02f3439349361865d982e61d3158a74785d81d11c5e4e193c56bccc578aefb8e",
     "test/extensions/http_cache/stale_while_revalidate_test.dart": "2f3a52cdd7d8610701ee4da6cf93623ff53b54e752605481c0426d507cb9b560",
-    "test/extensions/http_cache/storage_http_cache_test.dart": "08a059b21378258da62fed5feebb3aee7c40f7df7e24031fe6621c66d5b54126"
+    "test/extensions/http_cache/storage_http_cache_test.dart": "d2ae7af3acda622fd210a58687bf7cfe2360b8957d62684be140555c9621742e"
   }
 }

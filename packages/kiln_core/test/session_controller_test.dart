@@ -75,5 +75,16 @@ void main() {
       expect(controller.status, SessionStatus.authenticated);
       expect(controller.session?.userId, 'user-1');
     });
+
+    test('updates after dispose do not throw on closed streams', () async {
+      final controller = SessionController();
+      await controller.dispose();
+
+      expect(
+        () => controller.setSession(const AuthSession(userId: 'late')),
+        returnsNormally,
+      );
+      expect(controller.markUnauthenticated, returnsNormally);
+    });
   });
 }

@@ -65,34 +65,13 @@ final class SdkSupabaseRealtimeGateway implements SupabaseRealtimeGateway {
               if (controller.isClosed || channel != active) {
                 return;
               }
-              switch (status) {
-                case RealtimeSubscribeStatus.subscribed:
-                  break;
-                case RealtimeSubscribeStatus.channelError:
-                  controller.addError(
-                    mapSupabaseError(
-                      error ??
-                          StateError(
-                            'Supabase realtime channel error on $table:$id.',
-                          ),
-                      fallbackCode: FailureCode.remoteDatabaseUnavailable,
-                      fallbackKind: FailureKind.network,
-                    ),
-                  );
-                case RealtimeSubscribeStatus.timedOut:
-                  controller.addError(
-                    Failure(
-                      code: FailureCode.networkTimeout,
-                      message:
-                          'Supabase realtime subscription timed out for $table:$id.',
-                      kind: FailureKind.network,
-                      isRetryable: true,
-                      cause: error,
-                    ),
-                  );
-                case RealtimeSubscribeStatus.closed:
-                  unawaited(controller.close());
-              }
+              handleSubscribeStatus(
+                status: status,
+                error: error,
+                table: table,
+                id: id,
+                controller: controller,
+              );
             });
       } on Object catch (error, stackTrace) {
         controller.addError(
@@ -115,5 +94,44 @@ final class SdkSupabaseRealtimeGateway implements SupabaseRealtimeGateway {
     };
 
     return controller.stream;
+  }
+
+  /// Translates a Supabase realtime channel lifecycle status into stream
+  /// errors or completion on [controller].
+  static void handleSubscribeStatus({
+    required RealtimeSubscribeStatus status,
+    required Object? error,
+    required String table,
+    required String id,
+    required StreamController<Map<String, Object?>?> controller,
+  }) {
+    if (controller.isClosed) {
+      return;
+    }
+    switch (status) {
+      case RealtimeSubscribeStatus.subscribed:
+        break;
+      case RealtimeSubscribeStatus.channelError:
+        controller.addError(
+          mapSupabaseError(
+            error ??
+                StateError('Supabase realtime channel error on $table:$id.'),
+            fallbackCode: FailureCode.remoteDatabaseUnavailable,
+            fallbackKind: FailureKind.network,
+          ),
+        );
+      case RealtimeSubscribeStatus.timedOut:
+        controller.addError(
+          Failure(
+            code: FailureCode.networkTimeout,
+            message: 'Supabase realtime subscription timed out for $table:$id.',
+            kind: FailureKind.network,
+            isRetryable: true,
+            cause: error,
+          ),
+        );
+      case RealtimeSubscribeStatus.closed:
+        unawaited(controller.close());
+    }
   }
 }

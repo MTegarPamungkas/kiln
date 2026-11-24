@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5
+
+- Never dead-letter `SyncQueue` items on transient failures (network, timeout,
+  auth/session, unavailable, cancelled, or retryable `Failure`); only count
+  non-transient failures toward `maxAttempts`.
+- Add `SyncQueue.requeueDeadLetters()` to move dead-lettered items back into
+  active delivery with a fresh failure budget.
+
 ## 0.1.4
 
 - Add `maxAttempts`, per-item exponential backoff (`nextAttemptAt`), and

@@ -114,4 +114,24 @@ void main() {
     expect(await cache.read('get|https://api.kiln.dev/a'), isNotNull);
     expect(await cache.read('get|https://api.kiln.dev/b'), isNull);
   });
+
+  test('enforces maxBytes with LRU eviction', () async {
+    final storage = _MemoryStorage();
+    final cache = StorageHttpCache(
+      storage: storage,
+      settings: const HttpCacheSettings(maxEntries: 100, maxBytes: 600),
+    );
+
+    final chunk = 'x' * 150;
+    await cache.write('a', HttpResponse(statusCode: 200, data: chunk));
+    await cache.write('b', HttpResponse(statusCode: 200, data: chunk));
+    // Touch 'a' so 'b' becomes least recently used.
+    expect((await cache.read('a'))?.response.data, chunk);
+
+    await cache.write('c', HttpResponse(statusCode: 200, data: chunk));
+
+    expect(await cache.read('b'), isNull);
+    expect((await cache.read('a'))?.response.data, chunk);
+    expect((await cache.read('c'))?.response.data, chunk);
+  });
 }

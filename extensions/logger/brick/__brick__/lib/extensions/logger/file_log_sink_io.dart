@@ -43,18 +43,27 @@ final class FileLogSink implements LogSink {
     this.maxFileBytes = 262144,
     this.maxFiles = 3,
     this.maxPending = 1000,
+    this.maxWriteAttempts = 3,
+    this.writeRetryDelay = const Duration(milliseconds: 50),
     this.formatter = const LogFormatter(),
     this.clock = const SystemClock(),
     this.onFailure,
   }) : assert(maxFileBytes > 0),
        assert(maxFiles > 0),
-       assert(maxPending > 0);
+       assert(maxPending > 0),
+       assert(maxWriteAttempts > 0);
 
   final String? directoryPath;
   final String fileName;
   final int maxFileBytes;
   final int maxFiles;
   final int maxPending;
+
+  /// Consecutive failed writes tolerated before queued records are dropped.
+  final int maxWriteAttempts;
+
+  /// Base delay between write retries; grows linearly per failure.
+  final Duration writeRetryDelay;
   final LogFormatter formatter;
   final Clock clock;
   final SinkFailureWriter? onFailure;
@@ -66,7 +75,8 @@ final class FileLogSink implements LogSink {
   bool _fileExists = false;
   int _droppedCount = 0;
 
-  /// Number of records dropped because the pending buffer reached [maxPending].
+  /// Number of records dropped because the pending buffer reached [maxPending]
+  /// or writes kept failing after [maxWriteAttempts].
   int get droppedCount => _droppedCount;
 
   /// Last failure reported by this sink, if any.
@@ -126,82 +136,97 @@ final class FileLogSink implements LogSink {
   }
 
   Future<void> _drain() async {
-    try {
-      await _ensureDirectory();
-      final directory = _directory;
-      if (directory == null) {
-        _buffer.clear();
-        return;
+    var consecutiveFailures = 0;
+    while (_buffer.isNotEmpty) {
+      try {
+        await _writeAvailable();
+        consecutiveFailures = 0;
+      } on Object catch (error, stackTrace) {
+        consecutiveFailures++;
+        lastFailure = error;
+        final giveUp = consecutiveFailures >= maxWriteAttempts;
+        if (giveUp) {
+          // A persistent I/O failure must not spin forever or hold memory:
+          // drop what is queued and count it, then accept new records.
+          _droppedCount += _buffer.length;
+          _buffer.clear();
+        }
+        _report(error, stackTrace, giveUp: giveUp);
+        if (giveUp) {
+          return;
+        }
+        // Re-resolve the directory next time in case it was removed.
+        _directory = null;
+        await Future<void>.delayed(writeRetryDelay * consecutiveFailures);
       }
-      final file = File(_pathIn(directory, fileName));
-      while (_buffer.isNotEmpty) {
-        final next = _buffer.first;
-        if (_currentSize > 0 && _currentSize + next.length > maxFileBytes) {
-          await _rotate(directory);
-        }
+    }
+  }
 
-        final batch = BytesBuilder(copy: false);
-        var batchBytes = 0;
-        if (!_fileExists) {
-          final header = utf8.encode(
-            '# started ${LogFormatter.timestamp(clock.now())}\n',
-          );
-          batch.add(header);
-          batchBytes += header.length;
-        }
-
-        var entriesInBatch = 0;
-        while (_buffer.isNotEmpty) {
-          final entry = _buffer.first;
-          final projected = _currentSize + batchBytes + entry.length;
-          if (entriesInBatch > 0 && projected > maxFileBytes) {
-            break;
-          }
-          if (_currentSize > 0 && projected > maxFileBytes) {
-            break;
-          }
-          _buffer.removeFirst();
-          batch.add(entry);
-          batchBytes += entry.length;
-          entriesInBatch++;
-        }
-
-        // If a single record is larger than maxFileBytes on a fresh file,
-        // write it anyway so the queue always makes progress.
-        if (entriesInBatch == 0 && _buffer.isNotEmpty) {
-          final oversized = _buffer.removeFirst();
-          batch.add(oversized);
-          batchBytes += oversized.length;
-        }
-
-        if (batch.isNotEmpty) {
-          final mode = _fileExists ? FileMode.append : FileMode.write;
-          await file.writeAsBytes(
-            batch.takeBytes(),
-            mode: mode,
-            flush: false,
-          );
-          _fileExists = true;
-          _currentSize += batchBytes;
-        }
-      }
-    } on Object catch (error, stackTrace) {
-      // Drop queued entries from the failed drain cycle so a persistent I/O
-      // failure cannot spin in an infinite retry loop.
+  /// Writes buffered records in size-bounded batches. Records leave the
+  /// buffer only after their batch reached the file, so a failed write keeps
+  /// them for the next attempt.
+  Future<void> _writeAvailable() async {
+    await _ensureDirectory();
+    final directory = _directory;
+    if (directory == null) {
       _buffer.clear();
-      lastFailure = error;
-      final writer = onFailure;
-      if (writer != null) {
-        try {
-          writer(
-            'FileLogSink could not append a log record.',
-            error,
-            stackTrace,
-          );
-        } on Object {
-          // A broken failure writer must not stall the write queue.
-        }
+      return;
+    }
+    final file = File(_pathIn(directory, fileName));
+    while (_buffer.isNotEmpty) {
+      final next = _buffer.first;
+      if (_currentSize > 0 && _currentSize + next.length > maxFileBytes) {
+        await _rotate(directory);
       }
+
+      final batch = BytesBuilder(copy: false);
+      var batchBytes = 0;
+      if (!_fileExists) {
+        final header = utf8.encode(
+          '# started ${LogFormatter.timestamp(clock.now())}\n',
+        );
+        batch.add(header);
+        batchBytes += header.length;
+      }
+
+      var entries = 0;
+      for (final entry in _buffer) {
+        final projected = _currentSize + batchBytes + entry.length;
+        // Always take at least one record so an oversized record still makes
+        // progress on a fresh file.
+        if (entries > 0 && projected > maxFileBytes) {
+          break;
+        }
+        batch.add(entry);
+        batchBytes += entry.length;
+        entries++;
+      }
+
+      final mode = _fileExists ? FileMode.append : FileMode.write;
+      await file.writeAsBytes(batch.takeBytes(), mode: mode, flush: false);
+      for (var i = 0; i < entries; i++) {
+        _buffer.removeFirst();
+      }
+      _fileExists = true;
+      _currentSize += batchBytes;
+    }
+  }
+
+  void _report(Object error, StackTrace stackTrace, {required bool giveUp}) {
+    final writer = onFailure;
+    if (writer == null) {
+      return;
+    }
+    try {
+      writer(
+        giveUp
+            ? 'FileLogSink dropped queued records after repeated write failures.'
+            : 'FileLogSink could not append log records; retrying.',
+        error,
+        stackTrace,
+      );
+    } on Object {
+      // A broken failure writer must not stall the write queue.
     }
   }
 

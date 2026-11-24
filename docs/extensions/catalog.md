@@ -22,12 +22,12 @@ This catalog is generated from extension manifests by
 | `flavors` | Flavors | 0.1.2 | flavor | official | `flavor` |
 | `geolocation` | Geolocation | 0.1.2 | location | official | `location` |
 | `go_router` | GoRouter | 0.1.2 | navigation | official | `navigation` |
-| `http_cache` | HTTP cache | 0.1.3 | network | official | `http_cache` |
+| `http_cache` | HTTP cache | 0.1.4 | network | official | `http_cache` |
 | `http_retry` | HTTP retry | 0.1.2 | network | official |  |
 | `image_picker` | Image picker | 0.1.1 | media | official | `media` |
 | `l10n` | Localization | 0.1.2 | l10n | official | `l10n` |
-| `local_db` | Local database | 0.1.4 | database | official | `local_db` |
-| `logger` | Logger | 0.1.2 | logging | official | `logger` |
+| `local_db` | Local database | 0.1.5 | database | official | `local_db` |
+| `logger` | Logger | 0.1.3 | logging | official | `logger` |
 | `notifications` | Notifications | 0.1.3 | notifications | official | `notifications` |
 | `permission` | Permission | 0.1.1 | platform | official | `permission` |
 | `remote_config` | Remote Config | 0.1.2 | config | official | `remote_config` |
@@ -37,7 +37,7 @@ This catalog is generated from extension manifests by
 | `share` | Share | 0.1.1 | share | official | `share` |
 | `social_login` | Social login | 0.1.1 | social | official | `social_login` |
 | `storage` | Key-value storage | 0.1.1 | storage | official | `storage` |
-| `supabase` | Supabase | 0.1.2 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
+| `supabase` | Supabase | 0.1.3 | auth | official | `auth`, `social_auth`, `remote_database`, `file_storage` |
 | `theme` | Theme | 0.1.2 | theme | official | `theme` |
 
 ## analytics

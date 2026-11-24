@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+- Retain queued records in `FileLogSink` across transient write errors with
+  bounded retries (`maxWriteAttempts`, `writeRetryDelay`); only drop and count
+  records in `droppedCount` after repeated consecutive write failures.
+
 ## 0.1.2
 
 - Buffer and batch writes in `FileLogSink` with a bounded pending queue

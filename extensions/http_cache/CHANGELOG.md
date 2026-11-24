@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Add unit tests for in-flight GET coalescing, per-key write isolation, and
+  `StorageHttpCache` byte-budget LRU eviction.
+
 ## 0.1.3
 
 - Add in-memory LRU and tag index plus byte budget (`maxBytes`) to
