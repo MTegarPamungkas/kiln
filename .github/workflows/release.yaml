@@ -52,7 +52,7 @@ jobs:
             cd release_smoke
             flutter analyze
           )
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-archives
           path: dist/*.tgz
@@ -86,7 +86,7 @@ jobs:
           dart compile exe -DKILN_CORE_GIT_REF="$release_commit" \
             packages/kiln_cli/bin/kiln.dart -o "dist/${{ matrix.artifact }}"
           "./dist/${{ matrix.artifact }}" version
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cli-${{ matrix.artifact }}
           path: dist/${{ matrix.artifact }}
