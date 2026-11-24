@@ -110,6 +110,59 @@ void main() {
     },
   );
 
+  test(
+    'moves permanently failing items to dead_letter so later items flush',
+    () async {
+      final database = await openTestDatabase();
+      final queue = SyncQueue(database: database, maxAttempts: 2);
+      await queue.enqueue('tasks', 'bad', {'title': 'bad'});
+      await queue.enqueue('tasks', 'good', {'title': 'good'});
+
+      // First failure increments attempts to 1 and throws.
+      await expectLater(
+        queue.flush((item) async {
+          if (item.key == 'bad') {
+            throw StateError('400 bad request');
+          }
+        }),
+        throwsStateError,
+      );
+
+      // Second failure reaches maxAttempts (2), dead-letters 'bad', and flushes 'good'.
+      final flushed = <String>[];
+      final count = await queue.flush((item) async {
+        if (item.key == 'bad') {
+          throw StateError('400 bad request');
+        }
+        flushed.add(item.key);
+      });
+
+      expect(count, 1);
+      expect(flushed, ['good']);
+      expect(await queue.pending(), isEmpty);
+      final dead = await queue.deadLetters();
+      expect(dead.map((item) => item.key), ['bad']);
+      expect(dead.single.status, 'dead_letter');
+      await database.close();
+    },
+  );
+
+  test('closed SembastLocalDatabase rejects subsequent calls', () async {
+    final database = await openTestDatabase();
+    await database.close();
+    expect(database.isClosed, isTrue);
+    await expectLater(
+      database.get('tasks', '1'),
+      throwsA(
+        isA<Failure>().having(
+          (f) => f.code,
+          'code',
+          FailureCode.databaseUnavailable,
+        ),
+      ),
+    );
+  });
+
   test('owner scoping keeps another user\'s queue out of a flush', () async {
     final database = await openTestDatabase();
     final queue = SyncQueue(database: database);

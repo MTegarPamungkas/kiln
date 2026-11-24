@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Widen `connectivity_plus` constraint to `^7.3.0` so apps combining
+  `connectivity` and `geolocation` (`geolocator ^14.1.2`) resolve without a
+  `dbus` version conflict.
+
 ## 0.1.3
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

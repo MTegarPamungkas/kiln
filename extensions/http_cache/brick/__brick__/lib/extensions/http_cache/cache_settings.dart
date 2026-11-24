@@ -5,6 +5,7 @@ final class HttpCacheSettings {
   const HttpCacheSettings({
     this.defaultTtl = const Duration(seconds: 60),
     this.maxEntries = 100,
+    this.maxBytes = 5 * 1024 * 1024,
     this.staleWhileRevalidate = true,
     this.cacheableStatusCodes = const <int>{
       200,
@@ -26,6 +27,7 @@ final class HttpCacheSettings {
 
   final Duration defaultTtl;
   final int maxEntries;
+  final int maxBytes;
   final bool staleWhileRevalidate;
   final Set<int> cacheableStatusCodes;
 
@@ -42,6 +44,13 @@ final class HttpCacheSettings {
       return const Failure(
         code: FailureCode.configurationInvalid,
         message: 'Cache maxEntries must be at least one.',
+        kind: FailureKind.configuration,
+      );
+    }
+    if (maxBytes < 1) {
+      return const Failure(
+        code: FailureCode.configurationInvalid,
+        message: 'Cache maxBytes must be at least one.',
         kind: FailureKind.configuration,
       );
     }

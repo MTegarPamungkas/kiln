@@ -56,7 +56,7 @@ final class RetryMiddleware implements HttpMiddleware {
           return response;
         }
         if (attempt >= settings.maxAttempts ||
-            !budget.tryConsume(request.resolvedUri.path) ||
+            !budget.tryConsume(_budgetKey(request)) ||
             _isExhausted(startedAt, request)) {
           events?.onGiveUp?.call(
             RetryEvent(
@@ -108,7 +108,7 @@ final class RetryMiddleware implements HttpMiddleware {
           rethrow;
         }
         if (attempt >= settings.maxAttempts ||
-            !budget.tryConsume(request.resolvedUri.path) ||
+            !budget.tryConsume(_budgetKey(request)) ||
             _isExhausted(startedAt, request)) {
           events?.onGiveUp?.call(
             RetryEvent(
@@ -148,6 +148,14 @@ final class RetryMiddleware implements HttpMiddleware {
         }
       }
     }
+  }
+
+  String _budgetKey(HttpRequest request) {
+    final uri = request.resolvedUri;
+    if (uri.host.isNotEmpty) {
+      return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+    }
+    return uri.path;
   }
 
   /// Time left before the request deadline or [HttpRetrySettings.totalBudget],

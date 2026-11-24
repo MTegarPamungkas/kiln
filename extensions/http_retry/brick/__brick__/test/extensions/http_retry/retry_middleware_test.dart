@@ -203,6 +203,41 @@ void main() {
     expect(giveUps, isNotEmpty);
   });
 
+  test('shares retry budget per host across dynamic paths', () async {
+    final budget = RetryBudget(maxRetries: 1);
+    final middleware = RetryMiddleware(
+      settings: _settings,
+      budget: budget,
+      delay: (_) async {},
+    );
+
+    var firstCalls = 0;
+    await middleware.handle(
+      HttpRequest(
+        method: HttpMethod.get,
+        uri: Uri.parse('https://api.kiln.dev/users/1'),
+      ),
+      (_) async {
+        firstCalls++;
+        return const HttpResponse(statusCode: 503);
+      },
+    );
+    expect(firstCalls, 2);
+
+    var secondCalls = 0;
+    await middleware.handle(
+      HttpRequest(
+        method: HttpMethod.get,
+        uri: Uri.parse('https://api.kiln.dev/users/2'),
+      ),
+      (_) async {
+        secondCalls++;
+        return const HttpResponse(statusCode: 503);
+      },
+    );
+    expect(secondCalls, 1);
+  });
+
   group('total budget', () {
     HttpRetrySettings budgeted(Duration budget) => HttpRetrySettings(
       maxAttempts: 5,

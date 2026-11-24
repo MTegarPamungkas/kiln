@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4
+
+- Add `maxAttempts`, per-item exponential backoff (`nextAttemptAt`), and
+  `dead_letter` status to `SyncQueue` so permanent failures no longer block
+  subsequent queued items, and push `owner`/`status`/`limit` filtering into the
+  local database query.
+- Track closed state in `SembastLocalDatabase` so operations after `close()`
+  fail cleanly with `FailureCode.databaseUnavailable` instead of silently
+  reopening the database.
+
 ## 0.1.3
 
 - Make `sync_queue_test.dart` wait deterministically for the first flush callback

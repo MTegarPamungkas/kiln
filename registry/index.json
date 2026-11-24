@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T12:43:00.871105Z",
+  "generated_at": "2026-11-24T13:41:49.812100Z",
   "extensions": [
     {
       "id": "analytics",
@@ -560,7 +560,7 @@
       "name": "Connectivity",
       "description": "Network status monitoring and an offline guard middleware.",
       "category": "connectivity",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -603,6 +603,18 @@
           "version": "0.1.3",
           "url": "archives/connectivity-0.1.3.tgz",
           "sha256": "50f8abe1b5e9cf214d5e79848c67b78aaeaa40d403d73d06a0b2948316331d55",
+          "provides": [
+            "connectivity"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/connectivity-0.1.4.tgz",
+          "sha256": "bea93fb809899762b24b923d92d62fe085bb09dca62b642ec2f4a441bd0c5236",
           "provides": [
             "connectivity"
           ],
@@ -1024,7 +1036,7 @@
       "name": "HTTP cache",
       "description": "Caches HTTP responses with TTL, ETag, and invalidation.",
       "category": "network",
-      "latest": "0.1.2",
+      "latest": "0.1.3",
       "tier": "official",
       "versions": [
         {
@@ -1074,6 +1086,22 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.3",
+          "url": "archives/http_cache-0.1.3.tgz",
+          "sha256": "0358139cd9ab14d5ed7082dd76f8cf2f5c428c0a2814a95394ab7b42263e5b2a",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "provides": [
+            "http_cache"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -1082,7 +1110,7 @@
       "name": "HTTP retry",
       "description": "Retries temporary HTTP failures with backoff and a retry budget.",
       "category": "network",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -1102,6 +1130,19 @@
           "version": "0.1.1",
           "url": "archives/http_retry-0.1.1.tgz",
           "sha256": "de05d623066f4e883204f762dbfe7943ce99249706062deeabde87f86426fd3e",
+          "requires": [
+            "http_client",
+            "http_pipeline"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/http_retry-0.1.2.tgz",
+          "sha256": "a994000eac5ef2840d851bee762a50f5bfc5564da9bdff71f795b846a6589bcd",
           "requires": [
             "http_client",
             "http_pipeline"
@@ -1198,7 +1239,7 @@
       "name": "Local database",
       "description": "Offline-first document database backed by Sembast.",
       "category": "database",
-      "latest": "0.1.3",
+      "latest": "0.1.4",
       "tier": "official",
       "versions": [
         {
@@ -1248,6 +1289,18 @@
             "kiln": ">=0.1.0 <0.2.0",
             "dart": ">=3.9.0"
           }
+        },
+        {
+          "version": "0.1.4",
+          "url": "archives/local_db-0.1.4.tgz",
+          "sha256": "8ba98844c32ad59b69d638b5c64f29227743354ff3e0d82895960af093997e68",
+          "provides": [
+            "local_db"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
         }
       ]
     },
@@ -1256,7 +1309,7 @@
       "name": "Logger",
       "description": "Structured application logging with redaction, rotating files, and crash breadcrumbs.",
       "category": "logging",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -1275,6 +1328,18 @@
           "version": "0.1.1",
           "url": "archives/logger-0.1.1.tgz",
           "sha256": "5de84ee472d8a8d62430a47d3c592f099a537a3757a3e0d2004f24b7b0e29a9b",
+          "provides": [
+            "logger"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/logger-0.1.2.tgz",
+          "sha256": "af7a568f828e212215df7145ba7d6aac10c9072afaebe5da60aabe7214f63e58",
           "provides": [
             "logger"
           ],
@@ -1718,7 +1783,7 @@
       "name": "Supabase",
       "description": "Supabase auth, PostgREST database, realtime, and storage for Kiln.",
       "category": "auth",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "tier": "official",
       "versions": [
         {
@@ -1740,6 +1805,21 @@
           "version": "0.1.1",
           "url": "archives/supabase-0.1.1.tgz",
           "sha256": "6cfc5205bf186c16555fe38918ccf40351f4d5065396c7f9fa8efeb58a7b22ec",
+          "provides": [
+            "auth",
+            "social_auth",
+            "remote_database",
+            "file_storage"
+          ],
+          "compatibility": {
+            "kiln": ">=0.1.0 <0.2.0",
+            "dart": ">=3.9.0"
+          }
+        },
+        {
+          "version": "0.1.2",
+          "url": "archives/supabase-0.1.2.tgz",
+          "sha256": "7a40a06f2499042a6e4818454191d6cf3f41cf2229b9293fb70d002705427c85",
           "provides": [
             "auth",
             "social_auth",

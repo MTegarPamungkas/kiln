@@ -20,6 +20,14 @@ abstract interface class Lifecycle {
 
 /// Tracks lifecycle state and forwards callbacks to attached listeners.
 final class LifecycleController implements Lifecycle {
+  LifecycleController({
+    this.listenerTimeout = const Duration(seconds: 5),
+  });
+
+  /// Maximum time allowed for each individual listener callback during
+  /// [onReady], [onPause], and [onResume].
+  final Duration listenerTimeout;
+
   final List<Lifecycle> _listeners = <Lifecycle>[];
   final List<FutureOr<void> Function()> _disposeCallbacks = [];
   Future<void>? _disposeFuture;
@@ -55,28 +63,51 @@ final class LifecycleController implements Lifecycle {
   @override
   Future<void> onReady() async {
     _checkActive();
-    for (final listener in List<Lifecycle>.of(_listeners)) {
-      await listener.onReady();
-    }
-    _set(LifecycleState.ready);
+    await _dispatch(
+      (listener) => listener.onReady(),
+      LifecycleState.ready,
+    );
   }
 
   @override
   Future<void> onPause() async {
     _checkActive();
-    for (final listener in List<Lifecycle>.of(_listeners)) {
-      await listener.onPause();
-    }
-    _set(LifecycleState.paused);
+    await _dispatch(
+      (listener) => listener.onPause(),
+      LifecycleState.paused,
+    );
   }
 
   @override
   Future<void> onResume() async {
     _checkActive();
-    for (final listener in List<Lifecycle>.of(_listeners)) {
-      await listener.onResume();
+    await _dispatch(
+      (listener) => listener.onResume(),
+      LifecycleState.resumed,
+    );
+  }
+
+  Future<void> _dispatch(
+    Future<void> Function(Lifecycle listener) action,
+    LifecycleState nextState,
+  ) async {
+    Object? firstError;
+    StackTrace? firstStackTrace;
+    final snapshot = List<Lifecycle>.of(_listeners);
+    await Future.wait(
+      snapshot.map((listener) async {
+        try {
+          await action(listener).timeout(listenerTimeout);
+        } catch (error, stackTrace) {
+          firstError ??= error;
+          firstStackTrace ??= stackTrace;
+        }
+      }),
+    );
+    _set(nextState);
+    if (firstError != null) {
+      Error.throwWithStackTrace(firstError!, firstStackTrace!);
     }
-    _set(LifecycleState.resumed);
   }
 
   @override

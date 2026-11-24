@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Handle Supabase realtime channel subscribe status callbacks in
+  `SdkSupabaseRealtimeGateway` so `channelError`, `timedOut`, and `closed`
+  events surface typed `Failure` errors or close `watchRow` streams cleanly.
+
 ## 0.1.1
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

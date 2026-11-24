@@ -82,8 +82,30 @@ final class Gate {
     FailureCode? code,
     String? message,
     Map<String, Object?> info = const <String, Object?>{},
+    Duration? timeout,
   }) async {
-    final result = await Result.guard<T>(action, code: code, message: message);
+    FutureOr<T> guardedAction() {
+      if (timeout == null) {
+        return action();
+      }
+      return Future<T>.sync(action).timeout(
+        timeout,
+        onTimeout: () => throw Failure(
+          code: code ?? FailureCode.networkTimeout,
+          message:
+              message ??
+              'Operation timed out after ${timeout.inMilliseconds}ms.',
+          kind: FailureKind.network,
+          isRetryable: true,
+        ),
+      );
+    }
+
+    final result = await Result.guard<T>(
+      guardedAction,
+      code: code,
+      message: message,
+    );
     return switch (result) {
       Ok<T>() => result,
       Err<T>(:final failure) when info.isNotEmpty => Err<T>(
@@ -320,6 +342,19 @@ final class Gate {
     String key,
     Map<String, Object?> data,
   ) => call<void>(() => localDb.put(collection, key, data));
+
+  Future<Result<void>> localDelete(String collection, String key) =>
+      call<void>(() => localDb.delete(collection, key));
+
+  Future<Result<List<LocalRecord>>> localQuery(
+    String collection, {
+    LocalQuery? query,
+  }) => call(() => localDb.query(collection, query: query));
+
+  Stream<List<LocalRecord>> localWatch(
+    String collection, {
+    LocalQuery? query,
+  }) => localDb.watch(collection, query: query);
 
   // Analytics
   Future<Result<void>> captureEvent(

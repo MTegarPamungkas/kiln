@@ -1,6 +1,6 @@
 id: connectivity
 name: Connectivity
-version: 0.1.3
+version: 0.1.4
 description: Network status monitoring and an offline guard middleware.
 category: connectivity
 tier: official
@@ -11,7 +11,7 @@ optional_requires:
   - http_client
   - http_pipeline
 dependencies:
-  connectivity_plus: ^7.3.2
+  connectivity_plus: ^7.3.0
 prompts:
   - name: probe_url
     type: url

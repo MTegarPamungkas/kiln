@@ -14,8 +14,20 @@ final class SembastLocalDatabase implements LocalDatabase {
   final LocalDatabaseOpener? opener;
   Database? database;
   Future<Database>? _opening;
+  bool _closed = false;
+
+  bool get isClosed => _closed;
 
   Future<Database> _db() {
+    if (_closed) {
+      return Future<Database>.error(
+        const Failure(
+          code: FailureCode.databaseUnavailable,
+          message: 'Local database has been closed.',
+          kind: FailureKind.database,
+        ),
+      );
+    }
     final existing = database;
     if (existing != null) {
       return Future<Database>.value(existing);
@@ -130,6 +142,7 @@ final class SembastLocalDatabase implements LocalDatabase {
 
   @override
   Future<void> close() async {
+    _closed = true;
     final existing = database ?? await _opening;
     database = null;
     _opening = null;

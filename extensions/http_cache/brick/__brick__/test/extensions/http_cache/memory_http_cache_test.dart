@@ -67,4 +67,41 @@ void main() {
     await cache.invalidate('', tag: 'posts');
     expect(await cache.read('get|https://api.kiln.dev/posts'), isNull);
   });
+
+  test('prefix invalidation respects path segment boundaries', () async {
+    final cache = MemoryHttpCache();
+    await cache.write(
+      'get|https://api.kiln.dev/users/4',
+      const HttpResponse(statusCode: 200, data: 'u4'),
+      ttl: const Duration(minutes: 1),
+    );
+    await cache.write(
+      'get|https://api.kiln.dev/users/42',
+      const HttpResponse(statusCode: 200, data: 'u42'),
+      ttl: const Duration(minutes: 1),
+    );
+
+    await cache.invalidate('/users/4');
+    expect(await cache.read('get|https://api.kiln.dev/users/4'), isNull);
+    expect(await cache.read('get|https://api.kiln.dev/users/42'), isNotNull);
+  });
+
+  test('defensively clones cached data so callers cannot mutate cache', () async {
+    final cache = MemoryHttpCache();
+    final payload = <String, Object?>{'name': 'alice'};
+    await cache.write(
+      'get|https://api.kiln.dev/profile',
+      HttpResponse(statusCode: 200, data: payload),
+      ttl: const Duration(minutes: 1),
+    );
+    payload['name'] = 'mutated-after-write';
+
+    final first = await cache.read('get|https://api.kiln.dev/profile');
+    final map = first!.response.data! as Map<String, Object?>;
+    expect(map['name'], 'alice');
+    map['name'] = 'mutated-after-read';
+
+    final second = await cache.read('get|https://api.kiln.dev/profile');
+    expect((second!.response.data! as Map<String, Object?>)['name'], 'alice');
+  });
 }

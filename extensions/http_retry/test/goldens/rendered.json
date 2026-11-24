@@ -6,9 +6,9 @@
     "lib/extensions/http_retry/http_retry_support.dart": "bf080239ebfd96a610d35bad8b02d7ec708e23cca332b566151b2c72503d85e1",
     "lib/extensions/http_retry/idempotency.dart": "b7bad216f6c169240c4296e187023378439a3f736ce280c151d6e145480cdc15",
     "lib/extensions/http_retry/retry_after_parser.dart": "5a581c98ca015892ca8bc773ceec47d319704893385e6945f59fbcc66d0418a9",
-    "lib/extensions/http_retry/retry_budget.dart": "9dec1a33aac62b0106b9d7f9dee6679beeeb936fdeac0b20b3f6e4251d54f239",
+    "lib/extensions/http_retry/retry_budget.dart": "915e8fa5a41185b8baba7becdc379a1b1dd1d750fa5dc3b5c74451fed54de3e2",
     "lib/extensions/http_retry/retry_events.dart": "a1e1dc79b66ab5f9fee1b9ed1181e6529cd7fd177b366b1bca72f86d29630782",
-    "lib/extensions/http_retry/retry_middleware.dart": "8dbc06fe5897190e57714fc4d0d182de768d52e248f035dc6ff8daaece22efb8",
+    "lib/extensions/http_retry/retry_middleware.dart": "2d1f29995b869295e57ec95e6d9365645328f1ad956ec6f3b7ef23e0cbdab165",
     "lib/extensions/http_retry/retry_policy.dart": "d204a6b01d4d7418d384905608200aad6fabe705a266fd1d9419ca12ffb8db1f",
     "lib/extensions/http_retry/retry_settings.dart": "108d38d7f70f45a2f6727a7aca4446bc9363491c88902b38510f7ddaf2c0e195",
     "test/extensions/http_retry/backoff_test.dart": "08a2411ef68815aa711e61a906134f26e6510303294c67022eb046587eb55764",
@@ -17,7 +17,7 @@
     "test/extensions/http_retry/idempotency_test.dart": "82c267320badc66f8018f75f0ec83ef245a1d0bd0a0815e0ef366a6d86a3916c",
     "test/extensions/http_retry/retry_after_parser_test.dart": "0f0c9e690f95d5202479a772ec3b3db6008b6c1350a55cb2db735a95d824d34a",
     "test/extensions/http_retry/retry_budget_test.dart": "2a80b60f613dcc3d8851b4e26ef6d77bdfd6aafdd145a999a2b5561221e1f693",
-    "test/extensions/http_retry/retry_middleware_test.dart": "ec0b158c1677d2590ca5573958dcf89b2360a753b9dcf2b9ec756df484e79d42",
+    "test/extensions/http_retry/retry_middleware_test.dart": "01c953217924160e05abda72f43d1fe05d170daaea11115d97b6e23688391263",
     "test/extensions/http_retry/retry_settings_test.dart": "e62fdd8de882a64526b4aba8387e63eccada169282e0c9d551a980081aaccd28"
   }
 }

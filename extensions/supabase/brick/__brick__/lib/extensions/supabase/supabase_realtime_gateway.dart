@@ -61,7 +61,39 @@ final class SdkSupabaseRealtimeGateway implements SupabaseRealtimeGateway {
                 }
               },
             )
-            .subscribe();
+            .subscribe((RealtimeSubscribeStatus status, Object? error) {
+              if (controller.isClosed || channel != active) {
+                return;
+              }
+              switch (status) {
+                case RealtimeSubscribeStatus.subscribed:
+                  break;
+                case RealtimeSubscribeStatus.channelError:
+                  controller.addError(
+                    mapSupabaseError(
+                      error ??
+                          StateError(
+                            'Supabase realtime channel error on $table:$id.',
+                          ),
+                      fallbackCode: FailureCode.remoteDatabaseUnavailable,
+                      fallbackKind: FailureKind.network,
+                    ),
+                  );
+                case RealtimeSubscribeStatus.timedOut:
+                  controller.addError(
+                    Failure(
+                      code: FailureCode.networkTimeout,
+                      message:
+                          'Supabase realtime subscription timed out for $table:$id.',
+                      kind: FailureKind.network,
+                      isRetryable: true,
+                      cause: error,
+                    ),
+                  );
+                case RealtimeSubscribeStatus.closed:
+                  unawaited(controller.close());
+              }
+            });
       } on Object catch (error, stackTrace) {
         controller.addError(
           mapSupabaseError(

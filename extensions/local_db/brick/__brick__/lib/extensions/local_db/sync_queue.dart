@@ -15,6 +15,9 @@ final class SyncQueueItem {
     this.claimId,
     this.claimedAt,
     this.attempts = 0,
+    this.status = 'pending',
+    this.nextAttemptAt,
+    this.lastError,
   });
 
   final String id;
@@ -36,6 +39,17 @@ final class SyncQueueItem {
 
   /// How many times a flush has claimed this item.
   final int attempts;
+
+  /// Delivery state (`pending` or `dead_letter`).
+  final String status;
+
+  /// Earliest UTC timestamp for the next retry attempt, or null when ready now.
+  final DateTime? nextAttemptAt;
+
+  /// Last error recorded when delivery failed, if any.
+  final String? lastError;
+
+  bool get isDeadLetter => status == 'dead_letter';
 }
 
 /// Stores local changes so they can be replayed when the network returns.
@@ -64,8 +78,12 @@ final class SyncQueue {
     this.collection = '_sync_queue',
     this.lock,
     this.claimLease = const Duration(minutes: 2),
+    this.maxAttempts = 5,
+    this.initialBackoff = Duration.zero,
+    this.maxBackoff = const Duration(minutes: 5),
     Clock? clock,
-  }) : _clock = clock ?? const SystemClock();
+  }) : assert(maxAttempts > 0),
+       _clock = clock ?? const SystemClock();
 
   final LocalDatabase database;
   final String collection;
@@ -76,6 +94,16 @@ final class SyncQueue {
   /// How long a durable claim stays authoritative before another flush may
   /// take the item over.
   final Duration claimLease;
+
+  /// Maximum delivery attempts before an item moves to `dead_letter` so it
+  /// cannot permanently block later items in the queue.
+  final int maxAttempts;
+
+  /// Base exponential backoff applied after a failed attempt.
+  final Duration initialBackoff;
+
+  /// Upper cap for per-item exponential backoff.
+  final Duration maxBackoff;
   final Clock _clock;
   final String _instanceId = _newInstanceId();
   int _sequence = 0;
@@ -117,18 +145,48 @@ final class SyncQueue {
   Future<List<SyncQueueItem>> pending({
     String? owner,
     bool allOwners = false,
+    bool includeDeadLetter = false,
+    int? limit,
   }) async {
+    final where = <String, Object?>{
+      if (!allOwners && owner != null) 'owner': owner,
+    };
     final records = await database.query(
       collection,
-      query: const LocalQuery(orderBy: 'createdAt'),
+      query: LocalQuery(
+        where: where.isEmpty ? null : where,
+        orderBy: 'createdAt',
+        limit: (allOwners || owner != null) && includeDeadLetter ? limit : null,
+      ),
     );
-    final items = <SyncQueueItem>[
-      for (final record in records) _itemFrom(record.data, record.key),
-    ];
-    if (allOwners) {
-      return items;
+    final items = <SyncQueueItem>[];
+    for (final record in records) {
+      final item = _itemFrom(record.data, record.key);
+      if (!allOwners && item.owner != owner) {
+        continue;
+      }
+      if (!includeDeadLetter && item.isDeadLetter) {
+        continue;
+      }
+      items.add(item);
+      if (limit != null && items.length >= limit) {
+        break;
+      }
     }
-    return items.where((item) => item.owner == owner).toList(growable: false);
+    return items;
+  }
+
+  /// Items that exhausted [maxAttempts] and were moved out of active delivery.
+  Future<List<SyncQueueItem>> deadLetters({
+    String? owner,
+    bool allOwners = false,
+  }) async {
+    final all = await pending(
+      owner: owner,
+      allOwners: allOwners,
+      includeDeadLetter: true,
+    );
+    return all.where((item) => item.isDeadLetter).toList(growable: false);
   }
 
   Future<void> remove(String id) => database.delete(collection, id);
@@ -194,6 +252,10 @@ final class SyncQueue {
       var count = 0;
       for (final item in items) {
         if (sessionChanged) break;
+        final now = _clock.now().toUtc();
+        if (item.nextAttemptAt != null && now.isBefore(item.nextAttemptAt!)) {
+          continue;
+        }
         final claimed = await _claim(item, flushId);
         if (claimed == null) {
           // Another flush holds a live claim on this item.
@@ -201,9 +263,18 @@ final class SyncQueue {
         }
         try {
           await handler(claimed);
-        } on Object {
-          // The remote effect failed; make the item claimable again now.
-          await _release(claimed, flushId);
+        } on Object catch (error) {
+          final isPermanent = claimed.attempts >= maxAttempts;
+          if (isPermanent) {
+            await _markDeadLetter(claimed, flushId, error);
+            continue;
+          }
+          await _release(
+            claimed,
+            flushId,
+            nextAttemptAt: _nextBackoffAt(claimed.attempts),
+            lastError: '$error',
+          );
           rethrow;
         }
         // Leave an uncertain remote effect pending for idempotent retry by its
@@ -252,8 +323,25 @@ final class SyncQueue {
     return _itemFrom(claimed, item.id, claimId: flushId, claimedAt: now);
   }
 
-  /// Clears our claim so the item can be retried immediately.
-  Future<void> _release(SyncQueueItem item, String flushId) async {
+  DateTime? _nextBackoffAt(int attempts) {
+    if (initialBackoff <= Duration.zero) {
+      return null;
+    }
+    final shift = (attempts - 1).clamp(0, 10);
+    final delayMs = initialBackoff.inMilliseconds * (1 << shift);
+    final cappedMs = delayMs > maxBackoff.inMilliseconds
+        ? maxBackoff.inMilliseconds
+        : delayMs;
+    return _clock.now().toUtc().add(Duration(milliseconds: cappedMs));
+  }
+
+  /// Clears our claim so the item can be retried after [nextAttemptAt].
+  Future<void> _release(
+    SyncQueueItem item,
+    String flushId, {
+    DateTime? nextAttemptAt,
+    String? lastError,
+  }) async {
     final record = await database.get(collection, item.id);
     if (record == null || record['claimId'] != flushId) {
       return;
@@ -261,7 +349,33 @@ final class SyncQueue {
     final released = Map<String, Object?>.of(record)
       ..remove('claimId')
       ..remove('claimedAt');
+    if (nextAttemptAt != null) {
+      released['nextAttemptAt'] = nextAttemptAt.toIso8601String();
+    } else {
+      released.remove('nextAttemptAt');
+    }
+    if (lastError != null) {
+      released['lastError'] = lastError;
+    }
     await database.put(collection, item.id, released);
+  }
+
+  Future<void> _markDeadLetter(
+    SyncQueueItem item,
+    String flushId,
+    Object error,
+  ) async {
+    final record = await database.get(collection, item.id);
+    if (record == null || record['claimId'] != flushId) {
+      return;
+    }
+    final dead = Map<String, Object?>.of(record)
+      ..remove('claimId')
+      ..remove('claimedAt')
+      ..remove('nextAttemptAt')
+      ..['status'] = 'dead_letter'
+      ..['lastError'] = '$error';
+    await database.put(collection, item.id, dead);
   }
 
   SyncQueueItem _itemFrom(
@@ -286,6 +400,11 @@ final class SyncQueue {
           (record['claimId'] is String ? record['claimId'] as String : null),
       claimedAt: claimedAt ?? DateTime.tryParse('${record['claimedAt']}'),
       attempts: record['attempts'] is int ? record['attempts'] as int : 0,
+      status: record['status'] is String ? record['status'] as String : 'pending',
+      nextAttemptAt: DateTime.tryParse('${record['nextAttemptAt']}'),
+      lastError: record['lastError'] is String
+          ? record['lastError'] as String
+          : null,
     );
   }
 }

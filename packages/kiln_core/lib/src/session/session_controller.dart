@@ -52,8 +52,12 @@ final class SessionController {
 
   void _emit(SessionStatus status) {
     _status = status;
-    _changes.add(status);
-    _sessions.add(_session);
+    if (!_changes.isClosed) {
+      _changes.add(status);
+    }
+    if (!_sessions.isClosed) {
+      _sessions.add(_session);
+    }
   }
 
   Future<void> dispose() async {

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Buffer and batch writes in `FileLogSink` with a bounded pending queue
+  (`maxPending`, drop-oldest, and `droppedCount`).
+- Snapshot in-flight writes in `SinkPipeline.flush()` so continuous logging
+  cannot starve flush completion.
+
 ## 0.1.1
 
 - Await `FutureOr<void>` sink `write` calls in logger brick tests to satisfy `unawaited_futures`.

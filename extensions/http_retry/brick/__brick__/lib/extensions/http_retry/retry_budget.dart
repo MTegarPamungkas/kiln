@@ -16,12 +16,20 @@ final class RetryBudget {
   bool tryConsume(String key) {
     final now = _clock.now().toUtc();
     final cutoff = now.subtract(window);
-    final attempts = _attempts.putIfAbsent(key, () => <DateTime>[]);
-    attempts.removeWhere((time) => time.isBefore(cutoff));
-    if (attempts.length >= maxRetries) {
+    _pruneStale(cutoff);
+    final attempts = _attempts[key];
+    if (attempts != null) {
+      attempts.removeWhere((time) => time.isBefore(cutoff));
+      if (attempts.length >= maxRetries) {
+        return false;
+      }
+      attempts.add(now);
+      return true;
+    }
+    if (maxRetries <= 0) {
       return false;
     }
-    attempts.add(now);
+    _attempts[key] = <DateTime>[now];
     return true;
   }
 
@@ -33,6 +41,26 @@ final class RetryBudget {
       return maxRetries;
     }
     attempts.removeWhere((time) => time.isBefore(cutoff));
+    if (attempts.isEmpty) {
+      _attempts.remove(key);
+      return maxRetries;
+    }
     return (maxRetries - attempts.length).clamp(0, maxRetries);
+  }
+
+  void _pruneStale(DateTime cutoff) {
+    if (_attempts.length <= 16) {
+      return;
+    }
+    final emptyKeys = <String>[];
+    _attempts.forEach((key, attempts) {
+      attempts.removeWhere((time) => time.isBefore(cutoff));
+      if (attempts.isEmpty) {
+        emptyKeys.add(key);
+      }
+    });
+    for (final key in emptyKeys) {
+      _attempts.remove(key);
+    }
   }
 }

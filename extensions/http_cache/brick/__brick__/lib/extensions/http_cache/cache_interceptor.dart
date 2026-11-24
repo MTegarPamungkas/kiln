@@ -36,8 +36,11 @@ final class CacheInterceptor implements HttpMiddleware {
 
   // Any mutation invalidates pending snapshots, including collection lists.
   int _revision = 0;
-  Future<void> _cacheWrites = Future<void>.value();
+  final Map<String, Future<void>> _keyWrites = <String, Future<void>>{};
+  Future<void> _invalidationBarrier = Future<void>.value();
   final Set<String> _refreshing = <String>{};
+  final Map<String, Future<HttpResponse>> _inFlightGets =
+      <String, Future<HttpResponse>>{};
 
   @override
   Future<HttpResponse> handle(HttpRequest request, HttpHandler next) async {
@@ -56,7 +59,7 @@ final class CacheInterceptor implements HttpMiddleware {
     final key = keyBuilder.build(request);
     var entry = await _read(key);
     if (entry != null && !_cacheable(request, entry.response)) {
-      await _invalidate(key);
+      await _invalidateKey(key);
       entry = null;
     }
     request.cancelToken?.throwIfCancelled();
@@ -82,6 +85,44 @@ final class CacheInterceptor implements HttpMiddleware {
       return entry.response.copyWith(fromCache: true);
     }
 
+    final canCoalesce =
+        request.method == HttpMethod.get &&
+        request.cancelToken == null &&
+        !requestControl.noCache;
+    if (canCoalesce) {
+      final existing = _inFlightGets[key];
+      if (existing != null) {
+        return existing;
+      }
+    }
+
+    final future = _fetchAndStore(
+      key: key,
+      request: request,
+      next: next,
+      entry: entry,
+      requestControl: requestControl,
+      control: control,
+    );
+    if (!canCoalesce) {
+      return future;
+    }
+    _inFlightGets[key] = future;
+    return future.whenComplete(() {
+      if (identical(_inFlightGets[key], future)) {
+        _inFlightGets.remove(key);
+      }
+    });
+  }
+
+  Future<HttpResponse> _fetchAndStore({
+    required String key,
+    required HttpRequest request,
+    required HttpHandler next,
+    required CacheEntry? entry,
+    required CacheControl requestControl,
+    required CacheControl control,
+  }) async {
     final etag = etagValidator.ifNoneMatch(request, entry);
     final outgoing = etag == null
         ? request
@@ -168,7 +209,7 @@ final class CacheInterceptor implements HttpMiddleware {
     HttpRequest request,
     HttpResponse response, {
     required int revision,
-  }) => _serializeCache(() async {
+  }) => _serializeKey(key, () async {
     if (revision != _revision) return;
     if (_cacheable(request, response)) {
       try {
@@ -188,15 +229,36 @@ final class CacheInterceptor implements HttpMiddleware {
 
   Future<CacheEntry?> _read(String key) async {
     try {
-      await _cacheWrites;
+      await _invalidationBarrier;
+      final pending = _keyWrites[key];
+      if (pending != null) {
+        await pending;
+      }
       return await cache.read(key);
     } on Object {
       return null;
     }
   }
 
-  Future<void> _invalidate(String prefix, {String? tag}) =>
-      _serializeCache(() => _invalidateDirect(prefix, tag: tag));
+  Future<void> _invalidateKey(String key) =>
+      _serializeKey(key, () => _invalidateDirect(key));
+
+  Future<void> _invalidate(String prefix, {String? tag}) {
+    final previous = _invalidationBarrier;
+    final pendingKeys = _keyWrites.values.toList(growable: false);
+    final operation = () async {
+      await previous;
+      if (pendingKeys.isNotEmpty) {
+        await Future.wait(pendingKeys);
+      }
+      await _invalidateDirect(prefix, tag: tag);
+    }();
+    _invalidationBarrier = operation.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return operation;
+  }
 
   Future<void> _invalidateDirect(String prefix, {String? tag}) async {
     try {
@@ -206,13 +268,20 @@ final class CacheInterceptor implements HttpMiddleware {
     }
   }
 
-  Future<void> _serializeCache(Future<void> Function() operation) {
-    final result = _cacheWrites.then((_) => operation());
-    _cacheWrites = result.then<void>(
-      (_) {},
-      onError: (Object _, StackTrace _) {},
-    );
-    return result;
+  Future<void> _serializeKey(String key, Future<void> Function() operation) {
+    final previous = _keyWrites[key] ?? Future<void>.value();
+    final barrier = _invalidationBarrier;
+    late final Future<void> tracked;
+    tracked = Future.wait(<Future<void>>[previous, barrier])
+        .then((_) => operation())
+        .then<void>((_) {}, onError: (Object _, StackTrace _) {})
+        .whenComplete(() {
+          if (identical(_keyWrites[key], tracked)) {
+            _keyWrites.remove(key);
+          }
+        });
+    _keyWrites[key] = tracked;
+    return tracked;
   }
 
   Future<void> _refresh(

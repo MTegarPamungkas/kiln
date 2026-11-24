@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Key `RetryMiddleware` retry budget consumption by host instead of dynamic
+  request path so retry storms against a failing backend are bounded.
+- Prune expired keys from `RetryBudget` so the bucket map does not grow
+  unboundedly.
+
 ## 0.1.1
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

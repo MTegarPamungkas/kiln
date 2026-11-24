@@ -21,19 +21,25 @@ final class FileLogSink implements LogSink {
     this.fileName = 'app.log',
     this.maxFileBytes = 262144,
     this.maxFiles = 3,
+    this.maxPending = 1000,
     this.formatter = const LogFormatter(),
     this.clock = const SystemClock(),
     this.onFailure,
   }) : assert(maxFileBytes > 0),
-       assert(maxFiles > 0);
+       assert(maxFiles > 0),
+       assert(maxPending > 0);
 
   final String? directoryPath;
   final String fileName;
   final int maxFileBytes;
   final int maxFiles;
+  final int maxPending;
   final LogFormatter formatter;
   final Clock clock;
   final SinkFailureWriter? onFailure;
+
+  /// Number of records dropped because the pending buffer reached [maxPending].
+  int get droppedCount => 0;
 
   /// Last failure reported by this sink, if any.
   Object? lastFailure;

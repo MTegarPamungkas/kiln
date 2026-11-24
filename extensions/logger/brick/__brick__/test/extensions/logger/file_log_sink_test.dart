@@ -80,4 +80,34 @@ void main() {
     expect(await file.exists(), isTrue);
     expect(await file.readAsString(), contains('[DEBUG] named'));
   });
+
+  test('drops oldest pending records when maxPending is exceeded', () async {
+    final directory = await Directory.systemTemp.createTemp('kiln_logger_cap_');
+    addTearDown(() async {
+      if (directory.existsSync()) {
+        await directory.delete(recursive: true);
+      }
+    });
+    final sink = FileLogSink(
+      directoryPath: directory.path,
+      maxPending: 3,
+    );
+
+    for (var i = 0; i < 10; i++) {
+      // Fire synchronously without awaiting so records queue up in memory.
+      // ignore: unawaited_futures
+      sink.write(
+        LogRecord(
+          level: LogLevel.info,
+          message: 'burst-$i',
+          timestamp: DateTime.utc(2026, 1, 1),
+        ),
+      );
+    }
+    await sink.flush();
+
+    expect(sink.droppedCount, greaterThan(0));
+    final content = await sink.read();
+    expect(content, contains('burst-9'));
+  });
 }

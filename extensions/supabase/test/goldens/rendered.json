@@ -12,7 +12,7 @@
     "lib/extensions/supabase/supabase_link_handler.dart": "4e2fb8b8c5f3a0f9a0460712838630dd947d31fe881215c086151ca8b0e39488",
     "lib/extensions/supabase/supabase_module.dart": "b62c34c93c3f2fc9afec6e662ed756fcdd7b351636b8441ee534b00693dda8ef",
     "lib/extensions/supabase/supabase_query_mapper.dart": "3df985efc09c0726e00c45f9fae312d03b7e7181f46b4cd0c705583a8da3de57",
-    "lib/extensions/supabase/supabase_realtime_gateway.dart": "a9de3b64b64304a805f3842f54904c4131841c336799b28f7e77f0c0b9f817cf",
+    "lib/extensions/supabase/supabase_realtime_gateway.dart": "d90f9ab9b3b0687637bdf3147eefdfba954e4e67cbb8caad60f19e19aabbb618",
     "lib/extensions/supabase/supabase_remote_database.dart": "92325df7e0397fb250d02b6d24bd6cb546ddfcbf54bdfe996c123cfc2fb8d2d5",
     "lib/extensions/supabase/supabase_session_bridge.dart": "e2df15146fdb7cecbb9a2a17f5189ef040ddde97baa6fff9ffe335fd5608cb68",
     "lib/extensions/supabase/supabase_storage_gateway.dart": "de2f92269b1ea5425879013f689de744d8752befb72828ad501f0c38af308ea8",

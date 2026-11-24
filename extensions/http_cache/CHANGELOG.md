@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.3
+
+- Add in-memory LRU and tag index plus byte budget (`maxBytes`) to
+  `StorageHttpCache` so eviction and invalidation no longer decode every stored
+  entry on the UI isolate.
+- Upgrade `MemoryHttpCache` to true LRU eviction, byte budget enforcement, tag
+  indexing, and defensive cloning of cached responses.
+- Fix `CacheInvalidation` to skip `/api` and `/vN` prefix segments when deriving
+  tags and to match prefixes by path-segment boundaries (`/users/4` no longer
+  invalidates `/users/42`).
+- Serialize writes per cache key instead of globally and coalesce concurrent
+  identical in-flight GET requests.
+
 ## 0.1.2
 
 - Repack archive with deterministic cross-OS gzip and without root `test/`.

@@ -367,7 +367,13 @@ String _pubspec({
     ..writeln('    path: $core');
   final names = dependencies.keys.toList()..sort();
   for (final name in names) {
-    buffer.writeln('  $name: ${dependencies[name]}');
+    final raw = dependencies[name]!;
+    if (raw.startsWith('{') && raw.endsWith('}')) {
+      buffer.writeln('  $name: $raw');
+    } else {
+      final value = raw.replaceAll("'", "''");
+      buffer.writeln("  $name: '$value'");
+    }
   }
   buffer
     ..writeln('dev_dependencies:')
