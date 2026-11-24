@@ -16,7 +16,7 @@ void main() {
     expect(manifest.exclusive, isTrue);
     expect(manifest.provides, <String>['crash_reporter']);
     expect(manifest.optionalRequires, <String>['flavor', 'http_pipeline']);
-    expect(manifest.dependencies, containsPair('sentry_flutter', '^10.3.0'));
+    expect(manifest.dependencies, containsPair('sentry_flutter', '^10.6.0'));
     expect(manifest.platformSetup.android.permissions, <String>[
       'android.permission.INTERNET',
     ]);

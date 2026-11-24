@@ -182,6 +182,9 @@ Future<bool> _analyzeExtension({
         for (final nested in value.entries) {
           dependencies.writeln('    ${nested.key}: ${nested.value}');
         }
+      } else if (value is String) {
+        final escaped = value.replaceAll("'", "''");
+        dependencies.writeln("  ${entry.key}: '$escaped'");
       } else {
         dependencies.writeln('  ${entry.key}: $value');
       }

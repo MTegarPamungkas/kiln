@@ -35,7 +35,7 @@
     "test/extensions/local_db/multiprocess_test.dart": "3f2760f63a4f9e237751337ad7d4d1748d9ed1e0526b131092d4d4f011087175",
     "test/extensions/local_db/multiprocess_worker.dart": "2a48e0d7dc8e410ffc444a35d7a15c531acbe52367eff24bb951813915553c20",
     "test/extensions/local_db/schema_migrator_test.dart": "e847df639f312f483f0b68f1bd20517b5ff5ecb447e3bbb5f40e334e94f9216d",
-    "test/extensions/local_db/sync_queue_test.dart": "fc23cc33a0bad41bf8e8155192a30a670ab86a9a33d070e91608cfbec9930da0",
+    "test/extensions/local_db/sync_queue_test.dart": "2323107efd528d63a469715addfd099dabe03e3479bf6294374ed0112c041e24",
     "test/extensions/local_db/test_support.dart": "3622294a7ca5dbf71b5d77f607a585dea0a8692b0cd2fa4bcd18154f0c4457fe",
     "test/extensions/local_db/transaction_runner_test.dart": "f485c989d763df7529a2ee2c4c18eb955ccc0da0c1536fa26d8535605bc5646d",
     "test/extensions/local_db/typed_collection_test.dart": "897a33b0cde7ae2c592489c77310f87027e50d8e32f900c01495a380d25b7ea5"

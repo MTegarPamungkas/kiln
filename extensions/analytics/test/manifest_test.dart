@@ -16,7 +16,7 @@ void main() {
     expect(manifest.exclusive, isTrue);
     expect(manifest.provides, <String>['analytics']);
     expect(manifest.optionalRequires, <String>['flavor']);
-    expect(manifest.dependencies, containsPair('posthog_flutter', '^5.58.3'));
+    expect(manifest.dependencies, containsPair('posthog_flutter', '^6.0.0'));
     expect(manifest.platformSetup.android.permissions, <String>[
       'android.permission.INTERNET',
     ]);

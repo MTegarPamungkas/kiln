@@ -40,17 +40,20 @@ void main() {
     await queue.enqueue('tasks', '1', {'title': 'one'});
     await queue.enqueue('tasks', '2', {'title': 'two'});
 
+    final firstStarted = Completer<void>();
     final gate = Completer<void>();
     var handled = 0;
     final first = queue.flush((item) async {
       handled++;
       if (handled == 1) {
+        firstStarted.complete();
         await gate.future;
       }
     });
     final second = otherQueue.flush((item) async {
       handled++;
     });
+    await firstStarted.future;
     await Future<void>.delayed(Duration.zero);
 
     expect(handled, 1);

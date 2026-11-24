@@ -21,7 +21,7 @@ void main() {
       'analytics',
       'logger',
     ]));
-    expect(manifest.dependencies, containsPair('go_router', '^18.1.2'));
+    expect(manifest.dependencies, containsPair('go_router', '^18.1.4'));
     expect(manifest.slots, hasLength(1));
     expect(manifest.slots.single.name, 'router.routes');
     expect(manifest.slots.single.item, 'AppRoute');

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Make `sync_queue_test.dart` wait deterministically for the first flush callback
+  before asserting serialization under concurrent flushes.
+
 ## 0.1.2
 
 - Update dependency constraints (`sembast` `^3.10.1`, `sembast_web` `^2.4.7`).
